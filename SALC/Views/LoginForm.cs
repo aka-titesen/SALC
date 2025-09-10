@@ -1,3 +1,4 @@
+// Views/LoginForm.cs
 using System;
 using System.Drawing;
 using System.Windows.Forms;
@@ -14,13 +15,12 @@ namespace SALC
 
         public LoginForm()
         {
-            InitializeComponent();
+            InitializeComponent(); // Asegúrate de que LoginForm.Designer.cs esté sincronizado
             InitializeCustomComponents();
         }
 
         private void InitializeCustomComponents()
         {
-            // Configurar el formulario principal
             this.Text = "SALC - Acceso al Sistema";
             this.Size = new Size(500, 650);
             this.StartPosition = FormStartPosition.CenterScreen;
@@ -29,7 +29,6 @@ namespace SALC
             this.MinimizeBox = false;
             this.BackColor = Color.FromArgb(233, 236, 239);
 
-            // Panel principal contenedor
             Panel mainPanel = new Panel
             {
                 Dock = DockStyle.Fill,
@@ -37,7 +36,6 @@ namespace SALC
                 Padding = new Padding(20)
             };
 
-            // Contenedor de login centrado
             Panel loginContainer = new Panel
             {
                 Size = new Size(400, 500),
@@ -46,7 +44,6 @@ namespace SALC
                 Location = new Point(50, 75)
             };
 
-            // Logo/Icono
             PictureBox logoBox = new PictureBox
             {
                 Size = new Size(80, 80),
@@ -55,9 +52,9 @@ namespace SALC
                 BackColor = Color.FromArgb(0, 123, 255)
             };
 
-            // Intentar cargar el icono
             try
             {
+                // Ajusta la ruta si es necesario
                 string iconPath = Path.Combine(Application.StartupPath, "..", "..", "..", "icono.png");
                 if (File.Exists(iconPath))
                 {
@@ -67,7 +64,6 @@ namespace SALC
             }
             catch { /* Mantener color de fondo azul si no se puede cargar */ }
 
-            // Título principal
             Label titleLabel = new Label
             {
                 Text = "SALC",
@@ -78,7 +74,6 @@ namespace SALC
                 Location = new Point(10, 120)
             };
 
-            // Subtítulo
             Label subtitleLabel = new Label
             {
                 Text = "Sistema de Administración de Laboratorio Clínico",
@@ -89,7 +84,6 @@ namespace SALC
                 Location = new Point(10, 160)
             };
 
-            // Título de sección
             Label loginTitle = new Label
             {
                 Text = "Iniciar Sesión",
@@ -100,17 +94,15 @@ namespace SALC
                 Location = new Point(10, 220)
             };
 
-            // Label Usuario
             Label userLabel = new Label
             {
-                Text = "👤 Usuario",
+                Text = "👤 Usuario (DNI)",
                 Font = new Font("Segoe UI", 11, FontStyle.Bold),
                 ForeColor = Color.FromArgb(52, 58, 64),
                 Size = new Size(150, 25),
                 Location = new Point(50, 270)
             };
 
-            // TextBox Usuario
             userTextBox = new TextBox
             {
                 Size = new Size(300, 30),
@@ -120,7 +112,6 @@ namespace SALC
                 BackColor = Color.White
             };
 
-            // Label Contraseña
             Label passwordLabel = new Label
             {
                 Text = "🔒 Contraseña",
@@ -130,7 +121,6 @@ namespace SALC
                 Location = new Point(50, 340)
             };
 
-            // TextBox Contraseña
             passwordTextBox = new TextBox
             {
                 Size = new Size(300, 30),
@@ -141,7 +131,6 @@ namespace SALC
                 BackColor = Color.White
             };
 
-            // Botón de Login
             loginButton = new Button
             {
                 Text = "Acceder al Sistema",
@@ -153,10 +142,8 @@ namespace SALC
                 FlatStyle = FlatStyle.Flat,
                 Cursor = Cursors.Hand
             };
-
             loginButton.FlatAppearance.BorderSize = 0;
 
-            // Label de error
             errorLabel = new Label
             {
                 Text = "",
@@ -168,7 +155,6 @@ namespace SALC
                 Visible = false
             };
 
-            // Footer
             Label footerLabel = new Label
             {
                 Text = "© 2025 SALC - Desarrollado con .NET Framework",
@@ -179,7 +165,6 @@ namespace SALC
                 Location = new Point(10, 520)
             };
 
-            // Eventos
             loginButton.Click += LoginButton_Click;
             loginButton.MouseEnter += (s, e) => loginButton.BackColor = Color.FromArgb(0, 86, 179);
             loginButton.MouseLeave += (s, e) => loginButton.BackColor = Color.FromArgb(0, 123, 255);
@@ -202,60 +187,49 @@ namespace SALC
                 }
             };
 
-            // Agregar todos los controles al contenedor de login
-            loginContainer.Controls.AddRange(new Control[] 
-            { 
+            loginContainer.Controls.AddRange(new Control[]
+            {
                 logoBox, titleLabel, subtitleLabel, loginTitle,
-                userLabel, userTextBox, passwordLabel, passwordTextBox, 
+                userLabel, userTextBox, passwordLabel, passwordTextBox,
                 loginButton, errorLabel, footerLabel
             });
 
-            // Agregar el contenedor al panel principal
             mainPanel.Controls.Add(loginContainer);
-
-            // Agregar el panel principal al formulario
             this.Controls.Add(mainPanel);
-
-            // Configurar foco inicial
             userTextBox.Focus();
         }
 
         private void LoginButton_Click(object sender, EventArgs e)
         {
-            if (ValidateCredentials(userTextBox.Text, passwordTextBox.Text))
+            // Usar los TextBox definidos en esta clase
+            string username = userTextBox.Text.Trim();
+            string password = passwordTextBox.Text;
+
+            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
             {
-                ShowSuccessMessage();
-                this.Hide();
-                
-                Form1 mainForm = new Form1();
-                mainForm.FormClosed += (s, args) => this.Close();
+                MessageBox.Show("Por favor, ingrese nombre de usuario (DNI) y contraseña.", "Campos incompletos", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            bool loginSuccessful = UserAuthentication.Login(username, password);
+
+            if (loginSuccessful)
+            {
+                MessageBox.Show($"¡Bienvenido, {UserAuthentication.CurrentUser.Nombre}!", "Inicio de Sesión Exitoso", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                MainDashboardForm mainForm = new MainDashboardForm();
                 mainForm.Show();
+                this.Hide();
             }
             else
             {
-                ShowErrorMessage("Usuario o contraseña incorrectos. Inténtelo de nuevo.");
-                passwordTextBox.Text = "";
+                MessageBox.Show("Nombre de usuario (DNI) o contraseña incorrectos.", "Error de Autenticación", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                passwordTextBox.Clear();
                 passwordTextBox.Focus();
             }
         }
-
-        private void ShowErrorMessage(string message)
-        {
-            errorLabel.Text = message;
-            errorLabel.ForeColor = Color.FromArgb(220, 53, 69);
-            errorLabel.Visible = true;
-        }
-
-        private void ShowSuccessMessage()
-        {
-            errorLabel.Text = "¡Inicio de sesión exitoso!";
-            errorLabel.ForeColor = Color.FromArgb(40, 167, 69);
-            errorLabel.Visible = true;
-        }
-
-        private bool ValidateCredentials(string username, string password)
-        {
-            return UserAuthentication.ValidateCredentials(username, password);
-        }
+        // Fin del método LoginButton_Click
+        // Fin de la clase LoginForm
     }
+    // Fin del namespace SALC
 }

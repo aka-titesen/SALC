@@ -1,25 +1,48 @@
-﻿using System;
+﻿// Views/MainDashboardForm.cs
+using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using System.IO;
 
 namespace SALC
 {
-    public partial class Form1 : Form
+    public partial class MainDashboardForm : Form
     {
         private Panel sidebar;
         private Panel mainContent;
         private Panel topbar;
         private Panel dashboardGrid;
         private Panel recentOrdersPanel;
+        private Panel navigationPanel;
+        private Dictionary<string, Button> menuButtons = new Dictionary<string, Button>(StringComparer.OrdinalIgnoreCase);
+        private List<Panel> dashboardCards = new List<Panel>();
 
-        public Form1()
+        private Dictionary<string, List<string>> RoleAccessMap = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase)
         {
-            InitializeComponent();
-            InitializeMainForm();
+            { "📊 Dashboard", new List<string> { "admin" } },
+            { "🏥 Gestión de Pacientes", new List<string> { "admin", "clinico" } },
+            { "🧪 Gestión de Estudios", new List<string> { "admin", "clinico" } },
+            { "⚗️ Carga de Resultados", new List<string> { "admin", "tecnico", "clinico" } },
+            { "📄 Generar Informes", new List<string> { "admin", "clinico" } },
+            { "🔔 Notificaciones", new List<string> { "admin", "clinico" } },
+            { "📋 Historial de Órdenes", new List<string> { "admin", "clinico", "tecnico" } },
+            { "Ver Pacientes", new List<string> { "admin", "clinico" } },
+            { "Nueva Orden", new List<string> { "admin", "clinico" } },
+            { "Cargar Resultados", new List<string> { "admin", "tecnico", "clinico" } },
+            { "Ver Informes", new List<string> { "admin", "clinico" } },
+            { "Enviar Notificación", new List<string> { "admin", "clinico" } },
+            { "Ver Historial", new List<string> { "admin", "clinico", "tecnico" } }
+        };
+
+        public MainDashboardForm()
+        {
+            InitializeComponent(); // Asegúrate de que MainDashboardForm.Designer.cs esté sincronizado
+            InitializeComponents();
+            ApplyRoleBasedAccess();
         }
 
-        private void InitializeMainForm()
+        private void InitializeComponents()
         {
             this.Text = "SALC - Dashboard Clínico";
             this.Size = new Size(1200, 800);
@@ -41,7 +64,6 @@ namespace SALC
                 Padding = new Padding(20)
             };
 
-            // Logo container
             Panel logoContainer = new Panel
             {
                 Size = new Size(210, 120),
@@ -49,7 +71,6 @@ namespace SALC
                 BackColor = Color.Transparent
             };
 
-            // Logo
             PictureBox logoBox = new PictureBox
             {
                 Size = new Size(80, 80),
@@ -58,9 +79,9 @@ namespace SALC
                 BackColor = Color.Transparent
             };
 
-            // Intentar cargar el icono
             try
             {
+                // Ajusta la ruta si es necesario
                 string iconPath = Path.Combine(Application.StartupPath, "..", "..", "..", "icono.png");
                 if (File.Exists(iconPath))
                 {
@@ -81,8 +102,7 @@ namespace SALC
 
             logoContainer.Controls.AddRange(new Control[] { logoBox, logoLabel });
 
-            // Navegación
-            Panel navigation = new Panel
+            navigationPanel = new Panel
             {
                 Size = new Size(210, 400),
                 Location = new Point(20, 160),
@@ -91,13 +111,13 @@ namespace SALC
 
             var menuItems = new[]
             {
-                new { Text = "📊 Dashboard", Action = new EventHandler(ShowDashboard), Active = true },
-                new { Text = "🏥 Gestión de Pacientes", Action = new EventHandler(ShowPatients), Active = false },
-                new { Text = "🧪 Gestión de Estudios", Action = new EventHandler(ShowStudies), Active = false },
-                new { Text = "⚗️ Carga de Resultados", Action = new EventHandler(ShowResults), Active = false },
-                new { Text = "📄 Generar Informes", Action = new EventHandler(ShowReports), Active = false },
-                new { Text = "🔔 Notificaciones", Action = new EventHandler(ShowNotifications), Active = false },
-                new { Text = "📋 Historial de Órdenes", Action = new EventHandler(ShowHistory), Active = false }
+                new { Text = "📊 Dashboard", Action = new EventHandler(ShowDashboard) },
+                new { Text = "🏥 Gestión de Pacientes", Action = new EventHandler(ShowPatients) },
+                new { Text = "🧪 Gestión de Estudios", Action = new EventHandler(ShowStudies) },
+                new { Text = "⚗️ Carga de Resultados", Action = new EventHandler(ShowResults) },
+                new { Text = "📄 Generar Informes", Action = new EventHandler(ShowReports) },
+                new { Text = "🔔 Notificaciones", Action = new EventHandler(ShowNotifications) },
+                new { Text = "📋 Historial de Órdenes", Action = new EventHandler(ShowHistory) }
             };
 
             int yPosition = 0;
@@ -109,33 +129,32 @@ namespace SALC
                     Size = new Size(210, 45),
                     Location = new Point(0, yPosition),
                     Font = new Font("Segoe UI", 10, FontStyle.Regular),
-                    ForeColor = item.Active ? Color.White : Color.FromArgb(173, 181, 189),
-                    BackColor = item.Active ? Color.FromArgb(0, 123, 255) : Color.Transparent,
+                    ForeColor = Color.FromArgb(173, 181, 189),
+                    BackColor = Color.Transparent,
                     FlatStyle = FlatStyle.Flat,
                     TextAlign = ContentAlignment.MiddleLeft,
-                    Cursor = Cursors.Hand
+                    Cursor = Cursors.Hand,
+                    Tag = item.Text
                 };
 
                 menuButton.FlatAppearance.BorderSize = 0;
                 menuButton.Click += item.Action;
 
-                // Efectos hover
-                menuButton.MouseEnter += (s, e) => 
+                menuButton.MouseEnter += (s, e) =>
                 {
-                    if (menuButton.BackColor == Color.Transparent)
-                        menuButton.BackColor = Color.FromArgb(0, 123, 255);
+                    if (((Button)s).BackColor == Color.Transparent)
+                        ((Button)s).BackColor = Color.FromArgb(0, 123, 255);
                 };
-                menuButton.MouseLeave += (s, e) => 
+                menuButton.MouseLeave += (s, e) =>
                 {
-                    if (!item.Active)
-                        menuButton.BackColor = Color.Transparent;
+                    // Lógica de "activo"
                 };
 
-                navigation.Controls.Add(menuButton);
+                navigationPanel.Controls.Add(menuButton);
+                menuButtons[item.Text] = menuButton;
                 yPosition += 50;
             }
 
-            // User info
             Panel userInfo = new Panel
             {
                 Size = new Size(210, 100),
@@ -145,7 +164,7 @@ namespace SALC
 
             Label userLabel = new Label
             {
-                Text = $"👤 {UserAuthentication.CurrentUser?.Username ?? "Usuario"}",
+                Text = $"👤 {UserAuthentication.CurrentUser?.Nombre ?? UserAuthentication.CurrentUser?.Apellido ?? "Usuario"}",
                 Font = new Font("Segoe UI", 10, FontStyle.Regular),
                 ForeColor = Color.FromArgb(173, 181, 189),
                 Size = new Size(210, 20),
@@ -154,7 +173,7 @@ namespace SALC
 
             Label roleLabel = new Label
             {
-                Text = $"Rol: {UserAuthentication.CurrentUser?.Role ?? "No definido"}",
+                Text = $"Rol: {UserAuthentication.CurrentUser?.Rol ?? "No definido"}",
                 Font = new Font("Segoe UI", 9, FontStyle.Regular),
                 ForeColor = Color.FromArgb(173, 181, 189),
                 Size = new Size(210, 20),
@@ -178,7 +197,7 @@ namespace SALC
 
             userInfo.Controls.AddRange(new Control[] { userLabel, roleLabel, logoutButton });
 
-            sidebar.Controls.AddRange(new Control[] { logoContainer, navigation, userInfo });
+            sidebar.Controls.AddRange(new Control[] { logoContainer, navigationPanel, userInfo });
             this.Controls.Add(sidebar);
         }
 
@@ -186,8 +205,8 @@ namespace SALC
         {
             mainContent = new Panel
             {
-                Location = new Point(250, 0), // Empezar después del sidebar (250px)
-                Size = new Size(this.Width - 250, this.Height), // Ancho total menos el sidebar
+                Location = new Point(250, 0),
+                Size = new Size(this.Width - 250, this.Height),
                 BackColor = Color.FromArgb(248, 249, 250),
                 Padding = new Padding(30),
                 Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Bottom
@@ -202,9 +221,8 @@ namespace SALC
 
         private void CreateTopbar()
         {
-            // Usar el ancho del mainContent menos padding
-            int topbarWidth = Math.Max(600, (this.Width - 250) - 60); // Ancho disponible menos padding
-            
+            int topbarWidth = Math.Max(600, (this.Width - 250) - 60);
+
             topbar = new Panel
             {
                 Size = new Size(topbarWidth, 80),
@@ -222,7 +240,6 @@ namespace SALC
                 Location = new Point(20, 25)
             };
 
-            // Search bar
             Panel searchContainer = new Panel
             {
                 Size = new Size(300, 30),
@@ -241,7 +258,6 @@ namespace SALC
                 ForeColor = Color.Gray
             };
 
-            // Simular placeholder text
             searchBox.GotFocus += (s, e) =>
             {
                 if (searchBox.Text == "Buscar paciente o estudio...")
@@ -281,9 +297,8 @@ namespace SALC
 
         private void CreateDashboardGrid()
         {
-            // Usar el ancho del mainContent menos padding
-            int gridWidth = Math.Max(600, (this.Width - 250) - 60); // Ancho disponible menos padding
-            
+            int gridWidth = Math.Max(600, (this.Width - 250) - 60);
+
             dashboardGrid = new Panel
             {
                 Size = new Size(gridWidth, 300),
@@ -304,19 +319,20 @@ namespace SALC
 
             int cardWidth = 350;
             int cardHeight = 140;
-            
-            // Asegurar que el ancho del dashboard esté disponible antes de calcular
-            int availableWidth = Math.Max(dashboardGrid.Width, 800); // Mínimo 800px
-            int cardsPerRow = Math.Max(1, (availableWidth - 40) / (cardWidth + 20)); // Mínimo 1 tarjeta por fila
-            
+
+            int availableWidth = Math.Max(dashboardGrid.Width, 800);
+            int cardsPerRow = Math.Max(1, (availableWidth - 40) / (cardWidth + 20));
+
             for (int i = 0; i < cardData.Length; i++)
             {
                 int row = i / cardsPerRow;
                 int col = i % cardsPerRow;
-                
+
                 Panel card = CreateDashboardCard(cardData[i].Title, cardData[i].Description, cardData[i].ButtonText, cardData[i].Color);
+                card.Tag = cardData[i].ButtonText;
                 card.Location = new Point(col * (cardWidth + 20), row * (cardHeight + 20));
                 dashboardGrid.Controls.Add(card);
+                dashboardCards.Add(card);
             }
 
             mainContent.Controls.Add(dashboardGrid);
@@ -369,9 +385,8 @@ namespace SALC
 
         private void CreateRecentOrdersPanel()
         {
-            // Usar el ancho del mainContent menos padding
-            int panelWidth = Math.Max(600, (this.Width - 250) - 60); // Ancho disponible menos padding
-            
+            int panelWidth = Math.Max(600, (this.Width - 250) - 60);
+
             recentOrdersPanel = new Panel
             {
                 Size = new Size(panelWidth, 250),
@@ -390,7 +405,6 @@ namespace SALC
                 Location = new Point(20, 20)
             };
 
-            // Crear tabla de órdenes (simulada con labels)
             CreateOrdersTable();
 
             recentOrdersPanel.Controls.Add(ordersTitle);
@@ -408,7 +422,6 @@ namespace SALC
                 { "#00120", "Pedro Sánchez", "Perfil Hepático", "2025-08-29", "Entregado" }
             };
 
-            // Headers
             for (int i = 0; i < headers.Length; i++)
             {
                 Label header = new Label
@@ -425,7 +438,6 @@ namespace SALC
                 recentOrdersPanel.Controls.Add(header);
             }
 
-            // Data rows
             for (int row = 0; row < sampleData.GetLength(0); row++)
             {
                 for (int col = 0; col < sampleData.GetLength(1); col++)
@@ -442,8 +454,7 @@ namespace SALC
                         BorderStyle = BorderStyle.FixedSingle
                     };
 
-                    // Colorear estados
-                    if (col == 4) // Columna de estado
+                    if (col == 4)
                     {
                         switch (sampleData[row, col])
                         {
@@ -470,7 +481,6 @@ namespace SALC
             }
         }
 
-        // Event handlers para los menús
         private void ShowDashboard(object sender, EventArgs e) => MessageBox.Show("Mostrando Dashboard");
         private void ShowPatients(object sender, EventArgs e) => MessageBox.Show("Módulo de Gestión de Pacientes");
         private void ShowStudies(object sender, EventArgs e) => MessageBox.Show("Módulo de Gestión de Estudios");
@@ -481,18 +491,70 @@ namespace SALC
 
         private void LogoutButton_Click(object sender, EventArgs e)
         {
-            var result = MessageBox.Show("¿Está seguro que desea cerrar sesión?", "Confirmar Cierre de Sesión", 
+            var result = MessageBox.Show("¿Está seguro que desea cerrar sesión?", "Confirmar Cierre de Sesión",
                 MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
             if (result == DialogResult.Yes)
             {
                 UserAuthentication.Logout();
                 this.Hide();
-                
+
                 LoginForm loginForm = new LoginForm();
                 loginForm.Show();
                 loginForm.FormClosed += (s, args) => Application.Exit();
             }
         }
+
+        private void ApplyRoleBasedAccess()
+        {
+            string currentUserRole = UserAuthentication.CurrentUser?.Rol?.ToLower();
+
+            if (string.IsNullOrEmpty(currentUserRole))
+            {
+                MessageBox.Show("Error de autenticación: Rol de usuario no definido.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            foreach (var kvp in menuButtons)
+            {
+                string menuText = kvp.Key;
+                Button button = kvp.Value;
+
+                if (RoleAccessMap.ContainsKey(menuText))
+                {
+                    List<string> allowedRoles = RoleAccessMap[menuText];
+                    button.Visible = allowedRoles.Contains(currentUserRole);
+                }
+                else
+                {
+                    button.Visible = currentUserRole == "admin";
+                }
+            }
+
+            foreach (Panel card in dashboardCards)
+            {
+                string cardButtonText = card.Tag?.ToString();
+
+                if (!string.IsNullOrEmpty(cardButtonText))
+                {
+                    if (RoleAccessMap.ContainsKey(cardButtonText))
+                    {
+                        List<string> allowedRoles = RoleAccessMap[cardButtonText];
+                        card.Visible = allowedRoles.Contains(currentUserRole);
+                    }
+                    else
+                    {
+                        card.Visible = currentUserRole == "admin";
+                    }
+                }
+                else
+                {
+                    card.Visible = false;
+                }
+            }
+        }
+        // Fin del método ApplyRoleBasedAccess
+        // Fin de la clase MainDashboardForm
     }
+    // Fin del namespace SALC
 }

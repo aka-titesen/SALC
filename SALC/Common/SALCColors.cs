@@ -230,15 +230,22 @@ namespace SALC.UI
         /// <returns>Color correspondiente al estado</returns>
         public static Color GetStatusColor(string status)
         {
-            return status?.ToLower() switch
+            string key = string.IsNullOrEmpty(status) ? string.Empty : status.ToLower();
+            switch (key)
             {
-                "pendiente" => Warning,
-                "en proceso" => Info,
-                "completado" => Success,
-                "entregado" => Primary,
-                "cancelado" => Danger,
-                _ => Secondary
-            };
+                case "pendiente":
+                    return Warning;
+                case "en proceso":
+                    return Info;
+                case "completado":
+                    return Success;
+                case "entregado":
+                    return Primary;
+                case "cancelado":
+                    return Danger;
+                default:
+                    return Secondary;
+            }
         }
         
         /// <summary>
@@ -248,11 +255,14 @@ namespace SALC.UI
         /// <returns>Color de texto correspondiente al estado</returns>
         public static Color GetStatusTextColor(string status)
         {
-            return status?.ToLower() switch
+            string key = string.IsNullOrEmpty(status) ? string.Empty : status.ToLower();
+            switch (key)
             {
-                "pendiente" => TextPrimary, // Texto oscuro sobre fondo amarillo
-                _ => Color.White // Texto blanco sobre fondos coloridos
-            };
+                case "pendiente":
+                    return TextPrimary; // Texto oscuro sobre fondo amarillo
+                default:
+                    return Color.White; // Texto blanco sobre fondos coloridos
+            }
         }
     }
 }
