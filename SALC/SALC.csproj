@@ -35,11 +35,7 @@
 		<WarningLevel>4</WarningLevel>
 		<LangVersion>8.0</LangVersion>
 	</PropertyGroup>
-	<!-- Matar cualquier proceso en ejecución antes de compilar para evitar bloqueo de SALC.exe -->
-	<PropertyGroup>
-		<PreBuildEvent>taskkill /F /IM SALC.exe /T &gt;nul 2&gt;&amp;1</PreBuildEvent>
-	</PropertyGroup>
-	<!-- Asegurar la ejecución con un Target BeforeBuild -->
+	<!-- Eliminado PreBuildEvent que podía fallar la compilación si no hay proceso SALC.exe. Usamos Target BeforeBuild con ContinueOnError. -->
 	<Target Name="BeforeBuild">
 		<Message Importance="High" Text="Finalizando procesos SALC.exe si existen..." />
 		<Exec Command="taskkill /F /IM SALC.exe /T" ContinueOnError="true" />

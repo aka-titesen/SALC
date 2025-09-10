@@ -55,10 +55,10 @@ namespace SALC
 
             // Consulta SQL para verificar credenciales y obtener datos del usuario y rol
             string query = @"
-                SELECT u.dni, u.nombre, u.apellido, u.email, r.rol
+                SELECT u.dni, u.nombre, u.apellido, u.email, r.[rol]
                 FROM usuario u
                 INNER JOIN roles r ON u.id_rol = r.id_rol
-                WHERE u.dni = @Dni AND u.contraseña = @Contraseña"; // 'contraseña' en texto plano en la BD
+                WHERE u.dni = @Dni AND u.[contraseña] = @Password"; // 'contraseña' en texto plano en la BD
 
             try
             {
@@ -67,9 +67,9 @@ namespace SALC
                     connection.Open();
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
-                        // Parámetros tipados
+                        // Parámetros tipados (evitar caracteres especiales en nombres de parámetros)
                         command.Parameters.Add("@Dni", SqlDbType.Int).Value = dniValue;
-                        command.Parameters.Add("@Contraseña", SqlDbType.NVarChar, 256).Value = plainPassword;
+                        command.Parameters.Add("@Password", SqlDbType.NVarChar, 256).Value = plainPassword;
 
                         using (SqlDataReader reader = command.ExecuteReader())
                         {

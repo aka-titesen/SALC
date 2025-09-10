@@ -363,7 +363,4 @@ MigrationBackup/
 FodyWeavers.xsd
 
 # ERS
-ERS-SALC.md
-
-INTERFACE_DESIGN.md
-RESUMEN_EJECUTIVO.md
+SALC/ers-de-salc_ieee830.md
