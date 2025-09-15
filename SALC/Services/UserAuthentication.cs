@@ -55,7 +55,7 @@ namespace SALC
 
             // Consulta SQL para verificar credenciales y obtener datos del usuario y rol
             string query = @"
-                SELECT u.dni, u.nombre, u.apellido, u.email, r.[rol]
+                SELECT u.dni, u.nombre, u.apellido, u.email, u.telefono, r.[rol]
                 FROM usuario u
                 INNER JOIN roles r ON u.id_rol = r.id_rol
                 WHERE u.dni = @Dni AND u.[contraseña] = @Password"; // 'contraseña' en texto plano en la BD
@@ -80,6 +80,7 @@ namespace SALC
                                 int ordNombre = reader.GetOrdinal("nombre");
                                 int ordApellido = reader.GetOrdinal("apellido");
                                 int ordEmail = reader.GetOrdinal("email");
+                                int ordTelefono = reader.GetOrdinal("telefono");
                                 int ordRol = reader.GetOrdinal("rol");
 
                                 // Si se encuentra un usuario, crear el objeto Usuario
@@ -92,6 +93,7 @@ namespace SALC
                                     Nombre = reader.IsDBNull(ordNombre) ? string.Empty : reader.GetString(ordNombre),
                                     Apellido = reader.IsDBNull(ordApellido) ? string.Empty : reader.GetString(ordApellido),
                                     Email = reader.IsDBNull(ordEmail) ? string.Empty : reader.GetString(ordEmail),
+                                    Telefono = reader.IsDBNull(ordTelefono) ? string.Empty : reader.GetString(ordTelefono),
                                     Rol = normalizedRol
                                 };
                                 return authenticatedUser;
