@@ -176,6 +176,11 @@ namespace SALC
                     passwordTextBox.Focus();
                     e.Handled = true;
                 }
+                else if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
+                {
+                    // Bloquear cualquier cosa que no sea número ni tecla de control (ej: borrar)
+                    e.Handled = true;
+                }
             };
 
             passwordTextBox.KeyPress += (sender, e) =>

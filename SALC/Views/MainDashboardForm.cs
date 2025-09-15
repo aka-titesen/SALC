@@ -21,18 +21,19 @@ namespace SALC
         private Dictionary<string, List<string>> RoleAccessMap = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase)
         {
             { "📊 Dashboard", new List<string> { "admin" } },
-            { "🏥 Gestión de Pacientes", new List<string> { "admin", "clinico" } },
-            { "🧪 Gestión de Estudios", new List<string> { "admin", "clinico" } },
-            { "⚗️ Carga de Resultados", new List<string> { "admin", "tecnico", "clinico" } },
-            { "📄 Generar Informes", new List<string> { "admin", "clinico" } },
-            { "🔔 Notificaciones", new List<string> { "admin", "clinico" } },
-            { "📋 Historial de Órdenes", new List<string> { "admin", "clinico", "tecnico" } },
-            { "Ver Pacientes", new List<string> { "admin", "clinico" } },
-            { "Nueva Orden", new List<string> { "admin", "clinico" } },
-            { "Cargar Resultados", new List<string> { "admin", "tecnico", "clinico" } },
-            { "Ver Informes", new List<string> { "admin", "clinico" } },
-            { "Enviar Notificación", new List<string> { "admin", "clinico" } },
-            { "Ver Historial", new List<string> { "admin", "clinico", "tecnico" } }
+            { "🏥 Gestión de Pacientes", new List<string> {"clinico", "asistente" } },
+            { "🧪 Gestión de Estudios", new List<string> { "asistente", "clinico" } },
+            { "⚗️ Carga de Resultados", new List<string> {"asistente", "clinico" } },
+            { "📄 Generar Informes", new List<string> { "asistente", "clinico" } },
+            { "🔔 Notificaciones", new List<string> { "asistente", "clinico" } },
+            { "📋 Historial de Órdenes", new List<string> {"clinico", "asistente" } },
+            { "👥 Gestión de Usuarios", new List<string> {"admin" } },
+            { "Ver Pacientes", new List<string> { "asistente", "clinico" } },
+            { "Nueva Orden", new List<string> { "asistente", "clinico" } },
+            { "Cargar Resultados", new List<string> {"asistente", "clinico" } },
+            { "Ver Informes", new List<string> { "asistente", "clinico" } },
+            { "Enviar Notificación", new List<string> { "asistente", "clinico" } },
+            { "Ver Historial", new List<string> { "clinico", "asistente" } },
         };
 
         public MainDashboardForm()
@@ -117,7 +118,8 @@ namespace SALC
                 new { Text = "⚗️ Carga de Resultados", Action = new EventHandler(ShowResults) },
                 new { Text = "📄 Generar Informes", Action = new EventHandler(ShowReports) },
                 new { Text = "🔔 Notificaciones", Action = new EventHandler(ShowNotifications) },
-                new { Text = "📋 Historial de Órdenes", Action = new EventHandler(ShowHistory) }
+                new { Text = "📋 Historial de Órdenes", Action = new EventHandler(ShowHistory) },
+                new { Text = "👥 Gestión de Usuarios", Action = new EventHandler(ShowUserManagement) },
             };
 
             int yPosition = 0;
@@ -488,6 +490,7 @@ namespace SALC
         private void ShowReports(object sender, EventArgs e) => MessageBox.Show("Módulo de Generación de Informes");
         private void ShowNotifications(object sender, EventArgs e) => MessageBox.Show("Módulo de Notificaciones");
         private void ShowHistory(object sender, EventArgs e) => MessageBox.Show("Módulo de Historial de Órdenes");
+        private void ShowUserManagement(object sender, EventArgs e) => MessageBox.Show("Módulo de Gestión de Usuarios");
 
         private void LogoutButton_Click(object sender, EventArgs e)
         {
