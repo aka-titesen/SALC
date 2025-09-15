@@ -316,7 +316,9 @@ namespace SALC
                 new { Title = "⚗️ Carga de Resultados", Description = "Ingresa y valida los resultados de los análisis de laboratorio.", ButtonText = "Cargar Resultados", Color = Color.FromArgb(255, 193, 7) },
                 new { Title = "📄 Generación de Informes", Description = "Genera informes PDF de los estudios completados.", ButtonText = "Ver Informes", Color = Color.FromArgb(111, 66, 193) },
                 new { Title = "🔔 Notificaciones", Description = "Envía notificaciones automáticas a los pacientes.", ButtonText = "Enviar Notificación", Color = Color.FromArgb(253, 126, 20) },
-                new { Title = "📋 Historial de Órdenes", Description = "Consulta el historial completo de todas las órdenes de análisis.", ButtonText = "Ver Historial", Color = Color.FromArgb(40, 167, 69) }
+                new { Title = "📋 Historial de Órdenes", Description = "Consulta el historial completo de todas las órdenes de análisis.", ButtonText = "Ver Historial", Color = Color.FromArgb(40, 167, 69) },
+                new { Title = "👥 Gestión de Usuarios", Description = "Administracion de usuarios.", ButtonText = "Ver Usuarios", Color = Color.FromArgb(40, 167, 69) }
+
             };
 
             int cardWidth = 350;
@@ -491,6 +493,7 @@ namespace SALC
         private void ShowNotifications(object sender, EventArgs e) => MessageBox.Show("Módulo de Notificaciones");
         private void ShowHistory(object sender, EventArgs e) => MessageBox.Show("Módulo de Historial de Órdenes");
         private void ShowUserManagement(object sender, EventArgs e) => MessageBox.Show("Módulo de Gestión de Usuarios");
+
 
         private void LogoutButton_Click(object sender, EventArgs e)
         {
