@@ -28,12 +28,18 @@ namespace SALC
             { "🔔 Notificaciones", new List<string> { "asistente", "clinico" } },
             { "📋 Historial de Órdenes", new List<string> {"clinico", "asistente" } },
             { "👥 Gestión de Usuarios", new List<string> {"admin" } },
+            { "⚙️ Configuración del Sistema", new List<string> {"admin" } },
+            { "💾 Copias de Seguridad", new List<string> {"admin" } },
+            { "🔒 Supervisión de Seguridad", new List<string> {"admin" } },
             { "Ver Pacientes", new List<string> { "asistente", "clinico" } },
             { "Nueva Orden", new List<string> { "asistente", "clinico" } },
             { "Cargar Resultados", new List<string> {"asistente", "clinico" } },
             { "Ver Informes", new List<string> { "asistente", "clinico" } },
             { "Enviar Notificación", new List<string> { "asistente", "clinico" } },
             { "Ver Historial", new List<string> { "clinico", "asistente" } },
+            { "Configurar Parámetros", new List<string> {"admin" } },
+            { "Gestionar Copias", new List<string> {"admin" } },
+            { "Monitorear Seguridad", new List<string> {"admin" } },
         };
 
         public MainDashboardForm()
@@ -120,6 +126,9 @@ namespace SALC
                 new { Text = "🔔 Notificaciones", Action = new EventHandler(ShowNotifications) },
                 new { Text = "📋 Historial de Órdenes", Action = new EventHandler(ShowHistory) },
                 new { Text = "👥 Gestión de Usuarios", Action = new EventHandler(ShowUserManagement) },
+                new { Text = "⚙️ Configuración del Sistema", Action = new EventHandler(ShowSystemConfig) },
+                new { Text = "💾 Copias de Seguridad", Action = new EventHandler(ShowBackups) },
+                new { Text = "🔒 Supervisión de Seguridad", Action = new EventHandler(ShowSecurity) },
             };
 
             int yPosition = 0;
@@ -317,8 +326,14 @@ namespace SALC
                 new { Title = "📄 Generación de Informes", Description = "Genera informes PDF de los estudios completados.", ButtonText = "Ver Informes", Color = Color.FromArgb(111, 66, 193) },
                 new { Title = "🔔 Notificaciones", Description = "Envía notificaciones automáticas a los pacientes.", ButtonText = "Enviar Notificación", Color = Color.FromArgb(253, 126, 20) },
                 new { Title = "📋 Historial de Órdenes", Description = "Consulta el historial completo de todas las órdenes de análisis.", ButtonText = "Ver Historial", Color = Color.FromArgb(40, 167, 69) },
+<<<<<<< HEAD
                 new { Title = "👥 Gestión de Usuarios", Description = "Administracion de usuarios.", ButtonText = "Ver Usuarios", Color = Color.FromArgb(40, 167, 69) }
 
+=======
+                new { Title = "⚙️ Configuración del Sistema", Description = "Gestiona parámetros del sistema, tipos de estudios y rangos de referencia.", ButtonText = "Configurar Parámetros", Color = Color.FromArgb(108, 117, 125) },
+                new { Title = "💾 Copias de Seguridad", Description = "Crea, restaura y administra copias de seguridad de la base de datos.", ButtonText = "Gestionar Copias", Color = Color.FromArgb(52, 58, 64) },
+                new { Title = "🔒 Supervisión de Seguridad", Description = "Monitorea accesos, controla permisos y supervisa la seguridad del sistema.", ButtonText = "Monitorear Seguridad", Color = Color.FromArgb(220, 53, 69) }
+>>>>>>> f5c2f501964613bfb4906af9c9396551716c550c
             };
 
             int cardWidth = 350;
@@ -492,7 +507,14 @@ namespace SALC
         private void ShowReports(object sender, EventArgs e) => MessageBox.Show("Módulo de Generación de Informes");
         private void ShowNotifications(object sender, EventArgs e) => MessageBox.Show("Módulo de Notificaciones");
         private void ShowHistory(object sender, EventArgs e) => MessageBox.Show("Módulo de Historial de Órdenes");
-        private void ShowUserManagement(object sender, EventArgs e) => MessageBox.Show("Módulo de Gestión de Usuarios");
+        private void ShowUserManagement(object sender, EventArgs e)
+        {
+            UserManagementForm userManagementForm = new UserManagementForm();
+            userManagementForm.ShowDialog();
+        }
+        private void ShowSystemConfig(object sender, EventArgs e) => MessageBox.Show("Módulo de Configuración del Sistema - Gestión de parámetros, tipos de estudios, rangos de referencia");
+        private void ShowBackups(object sender, EventArgs e) => MessageBox.Show("Módulo de Copias de Seguridad - Crear, restaurar y gestionar backups de base de datos");
+        private void ShowSecurity(object sender, EventArgs e) => MessageBox.Show("Módulo de Supervisión de Seguridad - Control de accesos y monitoreo de seguridad");
 
 
         private void LogoutButton_Click(object sender, EventArgs e)

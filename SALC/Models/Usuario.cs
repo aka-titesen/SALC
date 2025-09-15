@@ -31,7 +31,12 @@ namespace SALC
 		/// </summary>
 		public string Email { get; set; }
 
-		// Puedes agregar más propiedades si las necesitas en el futuro
+		/// <summary>
+		/// Gets or sets the user's phone number.
+		/// </summary>
+		public string Telefono { get; set; }
+
+		// Puedes agregar mï¿½s propiedades si las necesitas en el futuro
 		// You can add more properties if needed in the future
 	}
 }
