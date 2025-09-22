@@ -16,6 +16,7 @@ namespace SALC.UI
         // ============================================
         // COLORES PRINCIPALES
         // ============================================
+
         
         /// <summary>
         /// Azul principal del sistema - representa confianza y profesionalismo médico

@@ -44,7 +44,7 @@ namespace SALC
 
         public MainDashboardForm()
         {
-            InitializeComponent(); // Asegúrate de que MainDashboardForm.Designer.cs esté sincronizado
+            InitializeComponent();
             InitializeComponents();
             ApplyRoleBasedAccess();
         }
@@ -88,7 +88,6 @@ namespace SALC
 
             try
             {
-                // Ajusta la ruta si es necesario
                 string iconPath = Path.Combine(Application.StartupPath, "..", "..", "..", "icono.png");
                 if (File.Exists(iconPath))
                 {
@@ -326,14 +325,13 @@ namespace SALC
                 new { Title = "📄 Generación de Informes", Description = "Genera informes PDF de los estudios completados.", ButtonText = "Ver Informes", Color = Color.FromArgb(111, 66, 193) },
                 new { Title = "🔔 Notificaciones", Description = "Envía notificaciones automáticas a los pacientes.", ButtonText = "Enviar Notificación", Color = Color.FromArgb(253, 126, 20) },
                 new { Title = "📋 Historial de Órdenes", Description = "Consulta el historial completo de todas las órdenes de análisis.", ButtonText = "Ver Historial", Color = Color.FromArgb(40, 167, 69) },
-<<<<<<< HEAD
-                new { Title = "👥 Gestión de Usuarios", Description = "Administracion de usuarios.", ButtonText = "Ver Usuarios", Color = Color.FromArgb(40, 167, 69) }
 
-=======
+                new { Title = "👥 Gestión de Usuarios", Description = "Administracion de usuarios.", ButtonText = "Ver Usuarios", Color = Color.FromArgb(40, 167, 69) },
+
                 new { Title = "⚙️ Configuración del Sistema", Description = "Gestiona parámetros del sistema, tipos de estudios y rangos de referencia.", ButtonText = "Configurar Parámetros", Color = Color.FromArgb(108, 117, 125) },
                 new { Title = "💾 Copias de Seguridad", Description = "Crea, restaura y administra copias de seguridad de la base de datos.", ButtonText = "Gestionar Copias", Color = Color.FromArgb(52, 58, 64) },
                 new { Title = "🔒 Supervisión de Seguridad", Description = "Monitorea accesos, controla permisos y supervisa la seguridad del sistema.", ButtonText = "Monitorear Seguridad", Color = Color.FromArgb(220, 53, 69) }
->>>>>>> f5c2f501964613bfb4906af9c9396551716c550c
+
             };
 
             int cardWidth = 350;

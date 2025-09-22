@@ -58,7 +58,7 @@ namespace SALC
                 SELECT u.dni, u.nombre, u.apellido, u.email, u.telefono, r.[rol]
                 FROM usuario u
                 INNER JOIN roles r ON u.id_rol = r.id_rol
-                WHERE u.dni = @Dni AND u.[contraseña] = @Password"; // 'contraseña' en texto plano en la BD
+                WHERE u.dni = @Dni AND u.[contraseña] = @Password AND u.estado_usuario = 1"; // 'contraseña' en texto plano en la BD
 
             try
             {

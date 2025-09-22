@@ -57,6 +57,7 @@
   </ItemGroup>
   <ItemGroup>
     <!-- Archivos en la carpeta Views -->
+    <Compile Include="Models\UserData.cs" />
     <Compile Include="Views\LoginForm.cs">
       <SubType>Form</SubType>
     </Compile>

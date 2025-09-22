@@ -36,7 +36,10 @@ namespace SALC
 		/// </summary>
 		public string Telefono { get; set; }
 
-		// Puedes agregar m�s propiedades si las necesitas en el futuro
-		// You can add more properties if needed in the future
-	}
+        // Puedes agregar m�s propiedades si las necesitas en el futuro
+        // You can add more properties if needed in the future
+
+        public int ID_estado { get; set; }                    
+        public string Estado { get; set; } = "";
+    }
 }

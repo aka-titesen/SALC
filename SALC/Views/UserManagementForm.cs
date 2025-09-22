@@ -1,11 +1,11 @@
-// Views/UserManagementForm.cs
+
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Data;
-using System.Data.SqlClient;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
+using SALC.Data;
 
 namespace SALC
 {
@@ -17,6 +17,7 @@ namespace SALC
         private Button addUserButton;
         private Button editUserButton;
         private Button deleteUserButton;
+        private Button activateUserButton;
         private Button refreshButton;
         private Label searchLabel;
         private Label roleFilterLabel;
@@ -118,6 +119,7 @@ namespace SALC
             usersDataGridView.Columns.Add("Email", "Email");
             usersDataGridView.Columns.Add("Telefono", "Teléfono");
             usersDataGridView.Columns.Add("Rol", "Rol");
+            usersDataGridView.Columns.Add("Estado", "Estado");
 
             usersDataGridView.Columns["DNI"].Width = 100;
             usersDataGridView.Columns["Nombre"].Width = 120;
@@ -125,6 +127,7 @@ namespace SALC
             usersDataGridView.Columns["Email"].Width = 150;
             usersDataGridView.Columns["Telefono"].Width = 100;
             usersDataGridView.Columns["Rol"].Width = 100;
+            usersDataGridView.Columns["Estado"].Width = 100;
 
             // Buttons Panel
             Panel buttonsPanel = new Panel
@@ -134,6 +137,24 @@ namespace SALC
                 BackColor = Color.White,
                 BorderStyle = BorderStyle.FixedSingle
             };
+
+            var colEstadoId = new DataGridViewTextBoxColumn
+            {
+                Name = "ID_estado",
+                HeaderText = "ID_estado",
+                Visible = false,                 // oculto
+                ValueType = typeof(int)
+            };
+            usersDataGridView.Columns.Add(colEstadoId);
+
+            /*var colEstadoNombre = new DataGridViewTextBoxColumn
+            {
+                Name = "Estado",
+                HeaderText = "Estado",           // visible para el usuario
+                Width = 120,
+                ValueType = typeof(string)
+            };
+            usersDataGridView.Columns.Add(colEstadoNombre);*/
 
             addUserButton = new Button
             {
@@ -161,7 +182,7 @@ namespace SALC
 
             deleteUserButton = new Button
             {
-                Text = "🗑️ Eliminar Usuario",
+                Text = "🗑️ Desactivar Usuario",
                 Size = new Size(150, 35),
                 Location = new Point(360, 7),
                 Font = new Font("Segoe UI", 9, FontStyle.Bold),
@@ -171,8 +192,20 @@ namespace SALC
             };
             deleteUserButton.Click += DeleteUserButton_Click;
 
+            activateUserButton = new Button
+            {
+                Text = "✅ Activar Usuario",
+                Size = new Size(150, 35),
+                Location = new Point(530, 7),
+                Font = new Font("Segoe UI", 9, FontStyle.Bold),
+                BackColor = Color.FromArgb(40, 167, 69),
+                ForeColor = Color.White,
+                FlatStyle = FlatStyle.Flat
+            };
+            activateUserButton.Click += ACtivateUserButton_Click;
+
             buttonsPanel.Controls.AddRange(new Control[] {
-                addUserButton, editUserButton, deleteUserButton
+                addUserButton, editUserButton, deleteUserButton, activateUserButton
             });
 
             this.Controls.AddRange(new Control[] {
@@ -182,38 +215,16 @@ namespace SALC
 
         private void LoadRoles()
         {
-            string connectionString = ConfigurationManager.ConnectionStrings["SALCConnection"]?.ConnectionString;
-            if (string.IsNullOrEmpty(connectionString))
-            {
-                MessageBox.Show("Error de configuración: Cadena de conexión no encontrada.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-
-            string query = "SELECT id_rol, rol FROM roles ORDER BY rol";
-
             try
             {
-                using (SqlConnection connection = new SqlConnection(connectionString))
+                rolesDictionary = UserData.LoadRoles();
+                roleFilterComboBox.Items.Clear();
+                roleFilterComboBox.Items.Add("Todos los roles");
+                foreach (var kv in rolesDictionary)
                 {
-                    connection.Open();
-                    using (SqlCommand command = new SqlCommand(query, connection))
-                    {
-                        using (SqlDataReader reader = command.ExecuteReader())
-                        {
-                            rolesDictionary.Clear();
-                            roleFilterComboBox.Items.Clear();
-                            roleFilterComboBox.Items.Add("Todos los roles");
-
-                            while (reader.Read())
-                            {
-                                int idRol = reader.GetInt32(0);
-                                string rol = reader.GetString(1);
-                                rolesDictionary[idRol] = rol;
-                                roleFilterComboBox.Items.Add(rol);
-                            }
-                        }
-                    }
+                    roleFilterComboBox.Items.Add(kv.Value);
                 }
+                roleFilterComboBox.SelectedIndex = 0;
             }
             catch (Exception ex)
             {
@@ -223,63 +234,13 @@ namespace SALC
 
         private void LoadUsers(string searchFilter = "", string roleFilter = "")
         {
-            string connectionString = ConfigurationManager.ConnectionStrings["SALCConnection"]?.ConnectionString;
-            if (string.IsNullOrEmpty(connectionString))
-            {
-                MessageBox.Show("Error de configuración: Cadena de conexión no encontrada.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-
-            string query = @"
-                SELECT u.dni, u.nombre, u.apellido, u.email, u.telefono, r.rol
-                FROM usuario u
-                INNER JOIN roles r ON u.id_rol = r.id_rol
-                WHERE 1=1";
-
-            if (!string.IsNullOrEmpty(searchFilter))
-            {
-                query += " AND (u.nombre LIKE @Search OR u.apellido LIKE @Search OR CAST(u.dni AS NVARCHAR) LIKE @Search)";
-            }
-
-            if (!string.IsNullOrEmpty(roleFilter) && roleFilter != "Todos los roles")
-            {
-                query += " AND r.rol = @Role";
-            }
-
-            query += " ORDER BY u.apellido, u.nombre";
-
             try
             {
-                using (SqlConnection connection = new SqlConnection(connectionString))
+                var usuarios = UserData.GetUsers(searchFilter, roleFilter);
+                usersDataGridView.Rows.Clear();
+                foreach (var u in usuarios)
                 {
-                    connection.Open();
-                    using (SqlCommand command = new SqlCommand(query, connection))
-                    {
-                        if (!string.IsNullOrEmpty(searchFilter))
-                        {
-                            command.Parameters.AddWithValue("@Search", $"%{searchFilter}%");
-                        }
-                        if (!string.IsNullOrEmpty(roleFilter) && roleFilter != "Todos los roles")
-                        {
-                            command.Parameters.AddWithValue("@Role", roleFilter);
-                        }
-
-                        using (SqlDataReader reader = command.ExecuteReader())
-                        {
-                            usersDataGridView.Rows.Clear();
-                            while (reader.Read())
-                            {
-                                usersDataGridView.Rows.Add(
-                                    reader.GetInt32(0), // DNI
-                                    reader.GetString(1), // Nombre
-                                    reader.GetString(2), // Apellido
-                                    reader.IsDBNull(3) ? "" : reader.GetString(3), // Email
-                                    reader.IsDBNull(4) ? "" : reader.GetString(4), // Telefono
-                                    reader.GetString(5) // Rol
-                                );
-                            }
-                        }
-                    }
+                    usersDataGridView.Rows.Add(u.Dni, u.Nombre, u.Apellido, u.Email ?? "", u.Telefono ?? "", u.Rol, u.Estado, u.ID_estado);
                 }
             }
             catch (Exception ex)
@@ -288,15 +249,9 @@ namespace SALC
             }
         }
 
-        private void SearchTextBox_TextChanged(object sender, EventArgs e)
-        {
-            ApplyFilters();
-        }
+        private void SearchTextBox_TextChanged(object sender, EventArgs e) => ApplyFilters();
 
-        private void RoleFilterComboBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            ApplyFilters();
-        }
+        private void RoleFilterComboBox_SelectedIndexChanged(object sender, EventArgs e) => ApplyFilters();
 
         private void ApplyFilters()
         {
@@ -338,8 +293,8 @@ namespace SALC
                 Dni = Convert.ToInt32(selectedRow.Cells["DNI"].Value),
                 Nombre = selectedRow.Cells["Nombre"].Value.ToString(),
                 Apellido = selectedRow.Cells["Apellido"].Value.ToString(),
-                Email = selectedRow.Cells["Email"].Value.ToString(),
-                Telefono = selectedRow.Cells["Telefono"].Value.ToString(),
+                Email = selectedRow.Cells["Email"].Value?.ToString(),
+                Telefono = selectedRow.Cells["Telefono"].Value?.ToString(),
                 Rol = selectedRow.Cells["Rol"].Value.ToString()
             };
 
@@ -356,7 +311,7 @@ namespace SALC
         {
             if (usersDataGridView.SelectedRows.Count == 0)
             {
-                MessageBox.Show("Por favor, seleccione un usuario para eliminar.", "Selección requerida", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Por favor, seleccione un usuario para desactivar.", "Selección requerida", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
@@ -366,55 +321,69 @@ namespace SALC
             string apellido = selectedRow.Cells["Apellido"].Value.ToString();
 
             var result = MessageBox.Show(
-                $"¿Está seguro que desea eliminar al usuario {nombre} {apellido} (DNI: {dni})?",
-                "Confirmar eliminación",
+                $"¿Está seguro que desea desactivar al usuario {nombre} {apellido} (DNI: {dni})?",
+                "Confirmar desactivacion",
                 MessageBoxButtons.YesNo,
                 MessageBoxIcon.Question
             );
 
             if (result == DialogResult.Yes)
             {
-                DeleteUser(dni);
-                LoadUsers();
+                try
+                {
+                    bool ok = UserData.DeleteUser(dni);
+                    if (ok)
+                        MessageBox.Show("Usuario desactivado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    else
+                        MessageBox.Show("No se pudo desactivar el usuario.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                    LoadUsers();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error al desactivar usuario: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
         }
 
-        private void DeleteUser(int dni)
+        private void ACtivateUserButton_Click(object sender, EventArgs e)
         {
-            string connectionString = ConfigurationManager.ConnectionStrings["SALCConnection"]?.ConnectionString;
-            if (string.IsNullOrEmpty(connectionString))
+            if (usersDataGridView.SelectedRows.Count == 0)
             {
-                MessageBox.Show("Error de configuración: Cadena de conexión no encontrada.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Por favor, seleccione un usuario para activar.", "Selección requerida", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
-            string query = "DELETE FROM usuario WHERE dni = @Dni";
+            DataGridViewRow selectedRow = usersDataGridView.SelectedRows[0];
+            int dni = Convert.ToInt32(selectedRow.Cells["DNI"].Value);
+            string nombre = selectedRow.Cells["Nombre"].Value.ToString();
+            string apellido = selectedRow.Cells["Apellido"].Value.ToString();
 
-            try
+            var result = MessageBox.Show(
+                $"¿Está seguro que desea activar al usuario {nombre} {apellido} (DNI: {dni})?",
+                "Confirmar activacion",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question
+            );
+
+            if (result == DialogResult.Yes)
             {
-                using (SqlConnection connection = new SqlConnection(connectionString))
+                try
                 {
-                    connection.Open();
-                    using (SqlCommand command = new SqlCommand(query, connection))
-                    {
-                        command.Parameters.AddWithValue("@Dni", dni);
-                        int rowsAffected = command.ExecuteNonQuery();
+                    bool ok = UserData.ActivateUser(dni);
+                    if (ok)
+                        MessageBox.Show("Usuario activado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    else
+                        MessageBox.Show("No se pudo activado el usuario.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
-                        if (rowsAffected > 0)
-                        {
-                            MessageBox.Show("Usuario eliminado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        }
-                        else
-                        {
-                            MessageBox.Show("No se pudo eliminar el usuario.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        }
-                    }
+                    LoadUsers();
                 }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error al eliminar usuario: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error al activar usuario: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
         }
     }
+
 }
