@@ -1,13 +1,11 @@
-
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
-using SALC.Data;
 
-namespace SALC
+namespace SALC.Views
 {
     public partial class UserManagementForm : Form
     {
@@ -142,19 +140,10 @@ namespace SALC
             {
                 Name = "ID_estado",
                 HeaderText = "ID_estado",
-                Visible = false,                 // oculto
+                Visible = false,
                 ValueType = typeof(int)
             };
             usersDataGridView.Columns.Add(colEstadoId);
-
-            /*var colEstadoNombre = new DataGridViewTextBoxColumn
-            {
-                Name = "Estado",
-                HeaderText = "Estado",           // visible para el usuario
-                Width = 120,
-                ValueType = typeof(string)
-            };
-            usersDataGridView.Columns.Add(colEstadoNombre);*/
 
             addUserButton = new Button
             {
@@ -217,7 +206,7 @@ namespace SALC
         {
             try
             {
-                rolesDictionary = UserData.LoadRoles();
+                rolesDictionary = SALC.UserData.LoadRoles();
                 roleFilterComboBox.Items.Clear();
                 roleFilterComboBox.Items.Add("Todos los roles");
                 foreach (var kv in rolesDictionary)
@@ -236,7 +225,7 @@ namespace SALC
         {
             try
             {
-                var usuarios = UserData.GetUsers(searchFilter, roleFilter);
+                var usuarios = SALC.UserData.GetUsers(searchFilter, roleFilter);
                 usersDataGridView.Rows.Clear();
                 foreach (var u in usuarios)
                 {
@@ -270,13 +259,7 @@ namespace SALC
 
         private void AddUserButton_Click(object sender, EventArgs e)
         {
-            using (UserEditForm editForm = new UserEditForm(null, rolesDictionary))
-            {
-                if (editForm.ShowDialog() == DialogResult.OK)
-                {
-                    LoadUsers();
-                }
-            }
+            MessageBox.Show("Alta de usuario (UI pendiente)");
         }
 
         private void EditUserButton_Click(object sender, EventArgs e)
@@ -286,25 +269,7 @@ namespace SALC
                 MessageBox.Show("Por favor, seleccione un usuario para editar.", "Selección requerida", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
-
-            DataGridViewRow selectedRow = usersDataGridView.SelectedRows[0];
-            Usuario selectedUser = new Usuario
-            {
-                Dni = Convert.ToInt32(selectedRow.Cells["DNI"].Value),
-                Nombre = selectedRow.Cells["Nombre"].Value.ToString(),
-                Apellido = selectedRow.Cells["Apellido"].Value.ToString(),
-                Email = selectedRow.Cells["Email"].Value?.ToString(),
-                Telefono = selectedRow.Cells["Telefono"].Value?.ToString(),
-                Rol = selectedRow.Cells["Rol"].Value.ToString()
-            };
-
-            using (UserEditForm editForm = new UserEditForm(selectedUser, rolesDictionary))
-            {
-                if (editForm.ShowDialog() == DialogResult.OK)
-                {
-                    LoadUsers();
-                }
-            }
+            MessageBox.Show("Edición de usuario (UI pendiente)");
         }
 
         private void DeleteUserButton_Click(object sender, EventArgs e)
@@ -331,7 +296,7 @@ namespace SALC
             {
                 try
                 {
-                    bool ok = UserData.DeleteUser(dni);
+                    bool ok = SALC.UserData.DeleteUser(dni);
                     if (ok)
                         MessageBox.Show("Usuario desactivado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     else
@@ -370,7 +335,7 @@ namespace SALC
             {
                 try
                 {
-                    bool ok = UserData.ActivateUser(dni);
+                    bool ok = SALC.UserData.ActivateUser(dni);
                     if (ok)
                         MessageBox.Show("Usuario activado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     else
@@ -385,5 +350,4 @@ namespace SALC
             }
         }
     }
-
 }

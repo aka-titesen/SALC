@@ -362,5 +362,5 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 
-# ERS
-SALC/ers-de-salc_ieee830.md
+# Docs
+SALC/Docs
