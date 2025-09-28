@@ -1,7 +1,7 @@
 ﻿// Views/MainDashboardForm.Designer.cs
 namespace SALC
 {
-    partial class MainDashboardForm // <-- Nombre de la clase debe coincidir
+    partial class MainDashboardForm
     {
         /// <summary>
         /// Variable del diseñador necesaria.
@@ -12,13 +12,13 @@ namespace SALC
         /// Limpiar los recursos que se estén usando.
         /// </summary>
         /// <param name="disposing">true si los recursos administrados se deben desechar; false en caso contrario.</param>
-        protected override void Dispose(bool disposing) // <-- Firma correcta del método Dispose
+        protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))
             {
                 components.Dispose();
             }
-            base.Dispose(disposing); // <-- Llamada a base.Dispose
+            base.Dispose(disposing);
         }
 
         #region Código generado por el Diseñador de Windows Forms
@@ -30,9 +30,13 @@ namespace SALC
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450); // Puede ser sobreescrito por InitializeComponents
-            this.Text = "MainDashboardForm"; // Puede ser sobreescrito por InitializeComponents
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
+            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+            this.BackColor = System.Drawing.Color.White;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.MinimumSize = new System.Drawing.Size(1024, 700);
+            this.Text = "SALC - Dashboard";
+            // Los controles se agregan dinámicamente en InitializeLayout()
         }
 
         #endregion

@@ -1,586 +1,401 @@
-﻿// Views/MainDashboardForm.cs
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
-using System.IO;
+using SALC.Presenters;
+using SALC.Views.Interfaces;
 
 namespace SALC
 {
-    public partial class MainDashboardForm : Form
+    public partial class MainDashboardForm : Form, IMainDashboardView
     {
-        private Panel sidebar;
-        private Panel mainContent;
-        private Panel topbar;
-        private Panel dashboardGrid;
-        private Panel recentOrdersPanel;
-        private Panel navigationPanel;
-        private Dictionary<string, Button> menuButtons = new Dictionary<string, Button>(StringComparer.OrdinalIgnoreCase);
-        private List<Panel> dashboardCards = new List<Panel>();
+        // Layout raíz
+        private TableLayoutPanel mainLayout;
 
-        private Dictionary<string, List<string>> RoleAccessMap = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase)
-        {
-            { "📊 Dashboard", new List<string> { "admin" } },
-            { "🏥 Gestión de Pacientes", new List<string> {"clinico", "asistente" } },
-            { "🧪 Gestión de Estudios", new List<string> { "asistente", "clinico" } },
-            { "⚗️ Carga de Resultados", new List<string> {"asistente", "clinico" } },
-            { "📄 Generar Informes", new List<string> { "asistente", "clinico" } },
-            { "🔔 Notificaciones", new List<string> { "asistente", "clinico" } },
-            { "📋 Historial de Órdenes", new List<string> {"clinico", "asistente" } },
-            { "👥 Gestión de Usuarios", new List<string> {"admin" } },
-            { "⚙️ Configuración del Sistema", new List<string> {"admin" } },
-            { "💾 Copias de Seguridad", new List<string> {"admin" } },
-            { "🔒 Supervisión de Seguridad", new List<string> {"admin" } },
-            { "Ver Pacientes", new List<string> { "asistente", "clinico" } },
-            { "Nueva Orden", new List<string> { "asistente", "clinico" } },
-            { "Cargar Resultados", new List<string> {"asistente", "clinico" } },
-            { "Ver Informes", new List<string> { "asistente", "clinico" } },
-            { "Enviar Notificación", new List<string> { "asistente", "clinico" } },
-            { "Ver Historial", new List<string> { "clinico", "asistente" } },
-            { "Configurar Parámetros", new List<string> {"admin" } },
-            { "Gestionar Copias", new List<string> {"admin" } },
-            { "Monitorear Seguridad", new List<string> {"admin" } },
-        };
+        // Header
+        private Panel headerPanel;
+        private Label headerTitleLabel;
+        private Label userInfoLabel;
+        private Button logoutButton;
+        private FlowLayoutPanel rightHeaderFlow;
+
+        // Ribbon
+        private Panel ribbonPanel;
+        private FlowLayoutPanel ribbonFlow;
+
+        // Cards grid
+        private FlowLayoutPanel cardsGrid;
+
+        // Estado
+        private IReadOnlyCollection<AppFeature> currentFeatures = Array.Empty<AppFeature>();
+
+        // Eventos
+        public event EventHandler LogoutRequested;
+        public event EventHandler PatientsRequested;
+        public event EventHandler StudiesRequested;
+        public event EventHandler ResultsRequested;
+        public event EventHandler ReportsRequested;
+        public event EventHandler NotificationsRequested;
+        public event EventHandler HistoryRequested;
+        public event EventHandler AppointmentsRequested;
+        public event EventHandler UserManagementRequested;
+        public event EventHandler SystemConfigRequested;
+        public event EventHandler BackupsRequested;
+        public event EventHandler SecurityRequested;
 
         public MainDashboardForm()
         {
             InitializeComponent();
-            InitializeComponents();
-            ApplyRoleBasedAccess();
+            InitializeLayout();
+
+            var _ = new MainDashboardPresenter(this);
         }
 
-        private void InitializeComponents()
+        private void InitializeLayout()
         {
-            this.Text = "SALC - Dashboard Clínico";
-            this.Size = new Size(1200, 800);
-            this.StartPosition = FormStartPosition.CenterScreen;
-            this.WindowState = FormWindowState.Maximized;
-            this.BackColor = Color.FromArgb(248, 249, 250);
+            Text = "SALC - Inicio";
+            BackColor = Color.FromArgb(248, 249, 250);
+            StartPosition = FormStartPosition.CenterScreen;
+            WindowState = FormWindowState.Maximized;
+            Padding = new Padding(0);
 
-            CreateSidebar();
-            CreateMainContent();
+            // Layout raíz: Header (auto), Ribbon (auto), Contenido (fill)
+            mainLayout = new TableLayoutPanel
+            {
+                Dock = DockStyle.Fill,
+                ColumnCount = 1,
+                RowCount = 3,
+                BackColor = this.BackColor,
+                Padding = new Padding(0),
+                Margin = new Padding(0)
+            };
+            mainLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            mainLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+            mainLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+            mainLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+            Controls.Add(mainLayout);
+
+            BuildHeader();
+            BuildRibbon();
+            BuildCardsGrid();
         }
 
-        private void CreateSidebar()
+        private void BuildHeader()
         {
-            sidebar = new Panel
+            headerPanel = new Panel
             {
-                Width = 250,
-                Dock = DockStyle.Left,
-                BackColor = Color.FromArgb(52, 58, 64),
-                Padding = new Padding(20)
+                Dock = DockStyle.Fill,
+                Height = 56,
+                BackColor = Color.White,
+                Padding = new Padding(0),
+                Margin = new Padding(0)
             };
 
-            Panel logoContainer = new Panel
+            // Título (ocupa el espacio restante)
+            headerTitleLabel = new Label
             {
-                Size = new Size(210, 120),
-                Location = new Point(20, 20),
-                BackColor = Color.Transparent
+                AutoSize = false,
+                Text = "Panel Principal",
+                Font = new Font("Microsoft Sans Serif", 16, FontStyle.Bold),
+                ForeColor = Color.FromArgb(0, 120, 215),
+                TextAlign = ContentAlignment.MiddleLeft,
+                Dock = DockStyle.Fill,
+                Padding = new Padding(16, 0, 0, 0),
+                Margin = new Padding(0)
             };
 
-            PictureBox logoBox = new PictureBox
+            // Panel derecho con flujo RTL para que el botón quede más a la derecha
+            rightHeaderFlow = new FlowLayoutPanel
             {
-                Size = new Size(80, 80),
-                Location = new Point(65, 10),
-                SizeMode = PictureBoxSizeMode.Zoom,
-                BackColor = Color.Transparent
+                Dock = DockStyle.Right,
+                AutoSize = true,
+                AutoSizeMode = AutoSizeMode.GrowAndShrink,
+                FlowDirection = FlowDirection.RightToLeft,
+                BackColor = Color.White,
+                Padding = new Padding(0),
+                Margin = new Padding(0),
+                WrapContents = false
             };
 
-            try
+            logoutButton = new Button
             {
-                string iconPath = Path.Combine(Application.StartupPath, "..", "..", "..", "icono.png");
-                if (File.Exists(iconPath))
-                {
-                    logoBox.Image = Image.FromFile(iconPath);
-                }
-            }
-            catch { /* Ignorar errores de carga de imagen */ }
-
-            Label logoLabel = new Label
-            {
-                Text = "SALC",
-                Font = new Font("Segoe UI", 16, FontStyle.Bold),
-                ForeColor = Color.White,
-                TextAlign = ContentAlignment.MiddleCenter,
-                Size = new Size(210, 30),
-                Location = new Point(0, 90)
-            };
-
-            logoContainer.Controls.AddRange(new Control[] { logoBox, logoLabel });
-
-            navigationPanel = new Panel
-            {
-                Size = new Size(210, 400),
-                Location = new Point(20, 160),
-                BackColor = Color.Transparent
-            };
-
-            var menuItems = new[]
-            {
-                new { Text = "📊 Dashboard", Action = new EventHandler(ShowDashboard) },
-                new { Text = "🏥 Gestión de Pacientes", Action = new EventHandler(ShowPatients) },
-                new { Text = "🧪 Gestión de Estudios", Action = new EventHandler(ShowStudies) },
-                new { Text = "⚗️ Carga de Resultados", Action = new EventHandler(ShowResults) },
-                new { Text = "📄 Generar Informes", Action = new EventHandler(ShowReports) },
-                new { Text = "🔔 Notificaciones", Action = new EventHandler(ShowNotifications) },
-                new { Text = "📋 Historial de Órdenes", Action = new EventHandler(ShowHistory) },
-                new { Text = "👥 Gestión de Usuarios", Action = new EventHandler(ShowUserManagement) },
-                new { Text = "⚙️ Configuración del Sistema", Action = new EventHandler(ShowSystemConfig) },
-                new { Text = "💾 Copias de Seguridad", Action = new EventHandler(ShowBackups) },
-                new { Text = "🔒 Supervisión de Seguridad", Action = new EventHandler(ShowSecurity) },
-            };
-
-            int yPosition = 0;
-            foreach (var item in menuItems)
-            {
-                Button menuButton = new Button
-                {
-                    Text = item.Text,
-                    Size = new Size(210, 45),
-                    Location = new Point(0, yPosition),
-                    Font = new Font("Segoe UI", 10, FontStyle.Regular),
-                    ForeColor = Color.FromArgb(173, 181, 189),
-                    BackColor = Color.Transparent,
-                    FlatStyle = FlatStyle.Flat,
-                    TextAlign = ContentAlignment.MiddleLeft,
-                    Cursor = Cursors.Hand,
-                    Tag = item.Text
-                };
-
-                menuButton.FlatAppearance.BorderSize = 0;
-                menuButton.Click += item.Action;
-
-                menuButton.MouseEnter += (s, e) =>
-                {
-                    if (((Button)s).BackColor == Color.Transparent)
-                        ((Button)s).BackColor = Color.FromArgb(0, 123, 255);
-                };
-                menuButton.MouseLeave += (s, e) =>
-                {
-                    // Lógica de "activo"
-                };
-
-                navigationPanel.Controls.Add(menuButton);
-                menuButtons[item.Text] = menuButton;
-                yPosition += 50;
-            }
-
-            Panel userInfo = new Panel
-            {
-                Size = new Size(210, 100),
-                Location = new Point(20, 600),
-                BackColor = Color.Transparent
-            };
-
-            Label userLabel = new Label
-            {
-                Text = $"👤 {UserAuthentication.CurrentUser?.Nombre ?? UserAuthentication.CurrentUser?.Apellido ?? "Usuario"}",
-                Font = new Font("Segoe UI", 10, FontStyle.Regular),
-                ForeColor = Color.FromArgb(173, 181, 189),
-                Size = new Size(210, 20),
-                Location = new Point(0, 0)
-            };
-
-            Label roleLabel = new Label
-            {
-                Text = $"Rol: {UserAuthentication.CurrentUser?.Rol ?? "No definido"}",
-                Font = new Font("Segoe UI", 9, FontStyle.Regular),
-                ForeColor = Color.FromArgb(173, 181, 189),
-                Size = new Size(210, 20),
-                Location = new Point(0, 25)
-            };
-
-            Button logoutButton = new Button
-            {
-                Text = "🚪 Cerrar Sesión",
-                Size = new Size(210, 35),
-                Location = new Point(0, 55),
-                Font = new Font("Segoe UI", 9, FontStyle.Bold),
+                Text = "Cerrar sesión",
+                AutoSize = true,
+                AutoSizeMode = AutoSizeMode.GrowAndShrink,
                 BackColor = Color.FromArgb(220, 53, 69),
                 ForeColor = Color.White,
                 FlatStyle = FlatStyle.Flat,
-                Cursor = Cursors.Hand
+                Margin = new Padding(0, 8, 8, 8),
+                Padding = new Padding(10, 5, 10, 5)
             };
-
             logoutButton.FlatAppearance.BorderSize = 0;
-            logoutButton.Click += LogoutButton_Click;
+            logoutButton.Click += (s, e) =>
+            {
+                var hasSubs = LogoutRequested != null;
+                LogoutRequested?.Invoke(this, EventArgs.Empty);
+                if (!hasSubs)
+                {
+                    UserAuthentication.Logout();
+                    Hide();
+                    var login = new LoginForm();
+                    login.Show();
+                    login.FormClosed += (ss, ee) => Application.Exit();
+                }
+            };
 
-            userInfo.Controls.AddRange(new Control[] { userLabel, roleLabel, logoutButton });
+            userInfoLabel = new Label
+            {
+                AutoSize = true,
+                Text = "Usuario",
+                Font = new Font("Microsoft Sans Serif", 9, FontStyle.Regular),
+                ForeColor = Color.FromArgb(73, 80, 87),
+                TextAlign = ContentAlignment.MiddleRight,
+                Margin = new Padding(0, 12, 12, 12)
+            };
 
-            sidebar.Controls.AddRange(new Control[] { logoContainer, navigationPanel, userInfo });
-            this.Controls.Add(sidebar);
+            rightHeaderFlow.Controls.Add(logoutButton);
+            rightHeaderFlow.Controls.Add(userInfoLabel);
+
+            headerPanel.Controls.Add(rightHeaderFlow);
+            headerPanel.Controls.Add(headerTitleLabel);
+
+            // Añadir a fila 0
+            mainLayout.Controls.Add(headerPanel, 0, 0);
         }
 
-        private void CreateMainContent()
+        private void BuildRibbon()
         {
-            mainContent = new Panel
+            ribbonPanel = new Panel
             {
-                Location = new Point(250, 0),
-                Size = new Size(this.Width - 250, this.Height),
-                BackColor = Color.FromArgb(248, 249, 250),
-                Padding = new Padding(30),
-                Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Bottom
+                Dock = DockStyle.Fill,
+                Height = 56,
+                BackColor = Color.FromArgb(241, 243, 245),
+                Padding = new Padding(8, 8, 8, 8),
+                Margin = new Padding(0)
             };
-
-            CreateTopbar();
-            CreateDashboardGrid();
-            CreateRecentOrdersPanel();
-
-            this.Controls.Add(mainContent);
-        }
-
-        private void CreateTopbar()
-        {
-            int topbarWidth = Math.Max(600, (this.Width - 250) - 60);
-
-            topbar = new Panel
+            ribbonFlow = new FlowLayoutPanel
             {
-                Size = new Size(topbarWidth, 80),
-                Location = new Point(30, 30),
-                BackColor = Color.White,
-                Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right
-            };
-
-            Label titleLabel = new Label
-            {
-                Text = "Dashboard Clínico",
-                Font = new Font("Segoe UI", 18, FontStyle.Bold),
-                ForeColor = Color.FromArgb(0, 123, 255),
-                Size = new Size(300, 30),
-                Location = new Point(20, 25)
-            };
-
-            Panel searchContainer = new Panel
-            {
-                Size = new Size(300, 30),
-                Location = new Point(Math.Max(400, topbar.Width - 320), 25),
+                Dock = DockStyle.Fill,
+                FlowDirection = FlowDirection.LeftToRight,
+                WrapContents = true, // saltar a nueva línea cuando no entra
+                AutoScroll = true,
                 BackColor = Color.Transparent,
-                Anchor = AnchorStyles.Top | AnchorStyles.Right
+                Margin = new Padding(0),
+                Padding = new Padding(0)
             };
+            ribbonPanel.Controls.Add(ribbonFlow);
 
-            TextBox searchBox = new TextBox
+            // Añadir a fila 1
+            mainLayout.Controls.Add(ribbonPanel, 0, 1);
+        }
+
+        private void BuildCardsGrid()
+        {
+            cardsGrid = new FlowLayoutPanel
             {
-                Text = "Buscar paciente o estudio...",
-                Size = new Size(250, 30),
-                Location = new Point(0, 0),
-                Font = new Font("Segoe UI", 10),
-                BorderStyle = BorderStyle.FixedSingle,
-                ForeColor = Color.Gray
+                Dock = DockStyle.Fill,
+                BackColor = Color.Transparent,
+                Padding = new Padding(16),
+                AutoScroll = true,
+                WrapContents = true,
+                FlowDirection = FlowDirection.LeftToRight,
+                Margin = new Padding(0)
             };
+            // Añadir a fila 2
+            mainLayout.Controls.Add(cardsGrid, 0, 2);
+        }
 
-            searchBox.GotFocus += (s, e) =>
-            {
-                if (searchBox.Text == "Buscar paciente o estudio...")
-                {
-                    searchBox.Text = "";
-                    searchBox.ForeColor = Color.Black;
-                }
-            };
+        // IMainDashboardView
+        public void SetHeaderTitle(string title)
+        {
+            headerTitleLabel.Text = string.IsNullOrWhiteSpace(title) ? "Panel Principal" : title;
+        }
 
-            searchBox.LostFocus += (s, e) =>
-            {
-                if (string.IsNullOrWhiteSpace(searchBox.Text))
-                {
-                    searchBox.Text = "Buscar paciente o estudio...";
-                    searchBox.ForeColor = Color.Gray;
-                }
-            };
+        public void SetUserInfo(string displayName, string role)
+        {
+            string name = string.IsNullOrWhiteSpace(displayName) ? "Usuario" : displayName;
+            string r = string.IsNullOrWhiteSpace(role) ? "-" : role;
+            userInfoLabel.Text = $"{name} | Rol: {r}";
+        }
 
-            Button searchButton = new Button
+        public void SetAvailableFeatures(IReadOnlyCollection<AppFeature> features)
+        {
+            currentFeatures = features ?? Array.Empty<AppFeature>();
+            BuildRibbonButtons(currentFeatures);
+            BuildFeatureCards(currentFeatures);
+        }
+
+        public void ShowMessage(string title, string message)
+        {
+            MessageBox.Show(message, title, MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void BuildRibbonButtons(IReadOnlyCollection<AppFeature> features)
+        {
+            ribbonFlow.SuspendLayout();
+            ribbonFlow.Controls.Clear();
+
+            foreach (var feature in features)
             {
-                Text = "🔍",
-                Size = new Size(40, 30),
-                Location = new Point(255, 0),
-                BackColor = Color.FromArgb(0, 123, 255),
-                ForeColor = Color.White,
+                var btn = CreateRibbonButton(feature);
+                ribbonFlow.Controls.Add(btn);
+            }
+            ribbonFlow.ResumeLayout();
+        }
+
+        private Button CreateRibbonButton(AppFeature feature)
+        {
+            var btn = new Button
+            {
+                Height = 32,
+                AutoSize = true,
+                AutoSizeMode = AutoSizeMode.GrowAndShrink,
+                Margin = new Padding(4),
+                Padding = new Padding(10, 4, 10, 4),
                 FlatStyle = FlatStyle.Flat,
-                Cursor = Cursors.Hand
+                BackColor = Color.FromArgb(0, 120, 215),
+                ForeColor = Color.White,
+                Font = new Font("Microsoft Sans Serif", 9, FontStyle.Bold),
+                Text = GetFeatureTitle(feature)
             };
-
-            searchButton.FlatAppearance.BorderSize = 0;
-
-            searchContainer.Controls.AddRange(new Control[] { searchBox, searchButton });
-            topbar.Controls.AddRange(new Control[] { titleLabel, searchContainer });
-
-            mainContent.Controls.Add(topbar);
+            btn.FlatAppearance.BorderSize = 0;
+            btn.Click += (s, e) => RaiseFeatureEvent(feature);
+            return btn;
         }
 
-        private void CreateDashboardGrid()
+        private void BuildFeatureCards(IReadOnlyCollection<AppFeature> features)
         {
-            int gridWidth = Math.Max(600, (this.Width - 250) - 60);
+            cardsGrid.SuspendLayout();
+            cardsGrid.Controls.Clear();
 
-            dashboardGrid = new Panel
+            foreach (var feature in features)
             {
-                Size = new Size(gridWidth, 300),
-                Location = new Point(30, 130),
-                BackColor = Color.Transparent,
-                Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right
-            };
-
-            var cardData = new[]
-            {
-                new { Title = "🏥 Gestión de Pacientes", Description = "Administra la información completa de los pacientes (CRUD).", ButtonText = "Ver Pacientes", Color = Color.FromArgb(23, 162, 184) },
-                new { Title = "🧪 Gestión de Estudios", Description = "Registra nuevas órdenes de análisis y asigna prioridades.", ButtonText = "Nueva Orden", Color = Color.FromArgb(0, 123, 255) },
-                new { Title = "⚗️ Carga de Resultados", Description = "Ingresa y valida los resultados de los análisis de laboratorio.", ButtonText = "Cargar Resultados", Color = Color.FromArgb(255, 193, 7) },
-                new { Title = "📄 Generación de Informes", Description = "Genera informes PDF de los estudios completados.", ButtonText = "Ver Informes", Color = Color.FromArgb(111, 66, 193) },
-                new { Title = "🔔 Notificaciones", Description = "Envía notificaciones automáticas a los pacientes.", ButtonText = "Enviar Notificación", Color = Color.FromArgb(253, 126, 20) },
-                new { Title = "📋 Historial de Órdenes", Description = "Consulta el historial completo de todas las órdenes de análisis.", ButtonText = "Ver Historial", Color = Color.FromArgb(40, 167, 69) },
-
-                new { Title = "👥 Gestión de Usuarios", Description = "Administracion de usuarios.", ButtonText = "Ver Usuarios", Color = Color.FromArgb(40, 167, 69) },
-
-                new { Title = "⚙️ Configuración del Sistema", Description = "Gestiona parámetros del sistema, tipos de estudios y rangos de referencia.", ButtonText = "Configurar Parámetros", Color = Color.FromArgb(108, 117, 125) },
-                new { Title = "💾 Copias de Seguridad", Description = "Crea, restaura y administra copias de seguridad de la base de datos.", ButtonText = "Gestionar Copias", Color = Color.FromArgb(52, 58, 64) },
-                new { Title = "🔒 Supervisión de Seguridad", Description = "Monitorea accesos, controla permisos y supervisa la seguridad del sistema.", ButtonText = "Monitorear Seguridad", Color = Color.FromArgb(220, 53, 69) }
-
-            };
-
-            int cardWidth = 350;
-            int cardHeight = 140;
-
-            int availableWidth = Math.Max(dashboardGrid.Width, 800);
-            int cardsPerRow = Math.Max(1, (availableWidth - 40) / (cardWidth + 20));
-
-            for (int i = 0; i < cardData.Length; i++)
-            {
-                int row = i / cardsPerRow;
-                int col = i % cardsPerRow;
-
-                Panel card = CreateDashboardCard(cardData[i].Title, cardData[i].Description, cardData[i].ButtonText, cardData[i].Color);
-                card.Tag = cardData[i].ButtonText;
-                card.Location = new Point(col * (cardWidth + 20), row * (cardHeight + 20));
-                dashboardGrid.Controls.Add(card);
-                dashboardCards.Add(card);
+                var card = CreateCard(feature);
+                cardsGrid.Controls.Add(card);
             }
 
-            mainContent.Controls.Add(dashboardGrid);
+            cardsGrid.ResumeLayout();
         }
 
-        private Panel CreateDashboardCard(string title, string description, string buttonText, Color color)
+        private Control CreateCard(AppFeature feature)
         {
-            Panel card = new Panel
+            var colors = GetFeatureColor(feature);
+
+            var panel = new Panel
             {
-                Size = new Size(340, 130),
+                Width = 320,
+                Height = 120,
                 BackColor = Color.White,
-                BorderStyle = BorderStyle.FixedSingle
+                BorderStyle = BorderStyle.FixedSingle,
+                Margin = new Padding(8)
             };
 
-            Label titleLabel = new Label
+            var titleLbl = new Label
             {
-                Text = title,
-                Font = new Font("Segoe UI", 12, FontStyle.Bold),
-                ForeColor = color,
-                Size = new Size(300, 25),
-                Location = new Point(15, 15)
+                Text = GetFeatureTitle(feature),
+                Font = new Font("Microsoft Sans Serif", 11, FontStyle.Bold),
+                ForeColor = colors.title,
+                Location = new Point(12, 12),
+                Size = new Size(296, 22)
             };
 
-            Label descLabel = new Label
+            var descLbl = new Label
             {
-                Text = description,
-                Font = new Font("Segoe UI", 9, FontStyle.Regular),
+                Text = GetFeatureDescription(feature),
+                Font = new Font("Microsoft Sans Serif", 9, FontStyle.Regular),
                 ForeColor = Color.FromArgb(52, 58, 64),
-                Size = new Size(300, 40),
-                Location = new Point(15, 45)
+                Location = new Point(12, 38),
+                Size = new Size(296, 36)
             };
 
-            Button actionButton = new Button
+            var btn = new Button
             {
-                Text = buttonText,
-                Size = new Size(300, 30),
-                Location = new Point(15, 90),
-                BackColor = color,
+                Text = "Abrir",
+                Font = new Font("Microsoft Sans Serif", 9, FontStyle.Bold),
+                BackColor = colors.button,
                 ForeColor = Color.White,
                 FlatStyle = FlatStyle.Flat,
-                Font = new Font("Segoe UI", 9, FontStyle.Bold),
-                Cursor = Cursors.Hand
+                Location = new Point(12, 82),
+                Size = new Size(296, 26)
             };
+            btn.FlatAppearance.BorderSize = 0;
+            btn.Click += (s, e) => RaiseFeatureEvent(feature);
 
-            actionButton.FlatAppearance.BorderSize = 0;
-
-            card.Controls.AddRange(new Control[] { titleLabel, descLabel, actionButton });
-            return card;
+            panel.Controls.Add(titleLbl);
+            panel.Controls.Add(descLbl);
+            panel.Controls.Add(btn);
+            return panel;
         }
 
-        private void CreateRecentOrdersPanel()
+        private string GetFeatureTitle(AppFeature f) => f switch
         {
-            int panelWidth = Math.Max(600, (this.Width - 250) - 60);
+            AppFeature.Dashboard => "Dashboard",
+            AppFeature.GestionPacientes => "Pacientes",
+            AppFeature.GestionEstudios => "Análisis",
+            AppFeature.CargaResultados => "Resultados",
+            AppFeature.GenerarInformes => "Informes",
+            AppFeature.Notificaciones => "Notificaciones",
+            AppFeature.HistorialOrdenes => "Historial",
+            AppFeature.Turnos => "Turnos",
+            AppFeature.GestionUsuarios => "Usuarios",
+            AppFeature.ConfigSistema => "Configuración",
+            AppFeature.CopiasSeguridad => "Backups",
+            AppFeature.Seguridad => "Seguridad",
+            _ => f.ToString()
+        };
 
-            recentOrdersPanel = new Panel
+        private string GetFeatureDescription(AppFeature f) => f switch
+        {
+            AppFeature.GestionPacientes => "Administrar la información de pacientes (CRUD).",
+            AppFeature.GestionEstudios => "Crear y gestionar órdenes de análisis.",
+            AppFeature.CargaResultados => "Cargar y validar resultados de estudios.",
+            AppFeature.GenerarInformes => "Generar y consultar informes PDF.",
+            AppFeature.Notificaciones => "Enviar notificaciones a pacientes.",
+            AppFeature.HistorialOrdenes => "Consultar historial de órdenes.",
+            AppFeature.Turnos => "Gestionar agenda y turnos.",
+            AppFeature.GestionUsuarios => "Administrar usuarios y roles.",
+            AppFeature.ConfigSistema => "Configurar parámetros del sistema.",
+            AppFeature.CopiasSeguridad => "Configurar y ejecutar backups.",
+            AppFeature.Seguridad => "Auditar accesos y permisos.",
+            _ => string.Empty
+        };
+
+        private (Color title, Color button) GetFeatureColor(AppFeature f)
+        {
+            return f switch
             {
-                Size = new Size(panelWidth, 250),
-                Location = new Point(30, 450),
-                BackColor = Color.White,
-                BorderStyle = BorderStyle.FixedSingle,
-                Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Bottom
+                AppFeature.GestionPacientes => (Color.FromArgb(23, 162, 184), Color.FromArgb(23, 162, 184)),
+                AppFeature.GestionEstudios => (Color.FromArgb(0, 120, 215), Color.FromArgb(0, 120, 215)),
+                AppFeature.CargaResultados => (Color.FromArgb(255, 193, 7), Color.FromArgb(255, 193, 7)),
+                AppFeature.GenerarInformes => (Color.FromArgb(111, 66, 193), Color.FromArgb(111, 66, 193)),
+                AppFeature.Notificaciones => (Color.FromArgb(253, 126, 20), Color.FromArgb(253, 126, 20)),
+                AppFeature.HistorialOrdenes => (Color.FromArgb(40, 167, 69), Color.FromArgb(40, 167, 69)),
+                AppFeature.Turnos => (Color.FromArgb(102, 16, 242), Color.FromArgb(102, 16, 242)),
+                AppFeature.GestionUsuarios => (Color.FromArgb(32, 201, 151), Color.FromArgb(32, 201, 151)),
+                AppFeature.ConfigSistema => (Color.FromArgb(108, 117, 125), Color.FromArgb(108, 117, 125)),
+                AppFeature.CopiasSeguridad => (Color.FromArgb(52, 58, 64), Color.FromArgb(52, 58, 64)),
+                AppFeature.Seguridad => (Color.FromArgb(220, 53, 69), Color.FromArgb(220, 53, 69)),
+                _ => (Color.FromArgb(0, 120, 215), Color.FromArgb(0, 120, 215))
             };
-
-            Label ordersTitle = new Label
-            {
-                Text = "📋 Órdenes Recientes / Pendientes",
-                Font = new Font("Segoe UI", 14, FontStyle.Bold),
-                ForeColor = Color.FromArgb(0, 123, 255),
-                Size = new Size(400, 30),
-                Location = new Point(20, 20)
-            };
-
-            CreateOrdersTable();
-
-            recentOrdersPanel.Controls.Add(ordersTitle);
-            mainContent.Controls.Add(recentOrdersPanel);
         }
 
-        private void CreateOrdersTable()
+        private void RaiseFeatureEvent(AppFeature feature)
         {
-            var headers = new[] { "ID Orden", "Paciente", "Estudio", "Fecha", "Estado" };
-            var sampleData = new[,]
+            switch (feature)
             {
-                { "#00123", "Ana García", "Hemograma Completo", "2025-09-01", "Pendiente" },
-                { "#00122", "Carlos Ruiz", "Glucosa, Colesterol", "2025-08-31", "En Proceso" },
-                { "#00121", "María López", "Uroanálisis", "2025-08-30", "Completado" },
-                { "#00120", "Pedro Sánchez", "Perfil Hepático", "2025-08-29", "Entregado" }
-            };
-
-            for (int i = 0; i < headers.Length; i++)
-            {
-                Label header = new Label
-                {
-                    Text = headers[i],
-                    Font = new Font("Segoe UI", 10, FontStyle.Bold),
-                    BackColor = Color.FromArgb(233, 236, 239),
-                    ForeColor = Color.FromArgb(52, 58, 64),
-                    Size = new Size(150, 30),
-                    Location = new Point(20 + i * 150, 60),
-                    TextAlign = ContentAlignment.MiddleLeft,
-                    BorderStyle = BorderStyle.FixedSingle
-                };
-                recentOrdersPanel.Controls.Add(header);
-            }
-
-            for (int row = 0; row < sampleData.GetLength(0); row++)
-            {
-                for (int col = 0; col < sampleData.GetLength(1); col++)
-                {
-                    Label cell = new Label
-                    {
-                        Text = sampleData[row, col],
-                        Font = new Font("Segoe UI", 9, FontStyle.Regular),
-                        BackColor = Color.White,
-                        ForeColor = Color.FromArgb(52, 58, 64),
-                        Size = new Size(150, 25),
-                        Location = new Point(20 + col * 150, 90 + row * 25),
-                        TextAlign = ContentAlignment.MiddleLeft,
-                        BorderStyle = BorderStyle.FixedSingle
-                    };
-
-                    if (col == 4)
-                    {
-                        switch (sampleData[row, col])
-                        {
-                            case "Pendiente":
-                                cell.BackColor = Color.FromArgb(255, 193, 7);
-                                break;
-                            case "En Proceso":
-                                cell.BackColor = Color.FromArgb(23, 162, 184);
-                                cell.ForeColor = Color.White;
-                                break;
-                            case "Completado":
-                                cell.BackColor = Color.FromArgb(40, 167, 69);
-                                cell.ForeColor = Color.White;
-                                break;
-                            case "Entregado":
-                                cell.BackColor = Color.FromArgb(0, 123, 255);
-                                cell.ForeColor = Color.White;
-                                break;
-                        }
-                    }
-
-                    recentOrdersPanel.Controls.Add(cell);
-                }
+                case AppFeature.GestionPacientes: PatientsRequested?.Invoke(this, EventArgs.Empty); break;
+                case AppFeature.GestionEstudios: StudiesRequested?.Invoke(this, EventArgs.Empty); break;
+                case AppFeature.CargaResultados: ResultsRequested?.Invoke(this, EventArgs.Empty); break;
+                case AppFeature.GenerarInformes: ReportsRequested?.Invoke(this, EventArgs.Empty); break;
+                case AppFeature.Notificaciones: NotificationsRequested?.Invoke(this, EventArgs.Empty); break;
+                case AppFeature.HistorialOrdenes: HistoryRequested?.Invoke(this, EventArgs.Empty); break;
+                case AppFeature.Turnos: AppointmentsRequested?.Invoke(this, EventArgs.Empty); break;
+                case AppFeature.GestionUsuarios: UserManagementRequested?.Invoke(this, EventArgs.Empty); break;
+                case AppFeature.ConfigSistema: SystemConfigRequested?.Invoke(this, EventArgs.Empty); break;
+                case AppFeature.CopiasSeguridad: BackupsRequested?.Invoke(this, EventArgs.Empty); break;
+                case AppFeature.Seguridad: SecurityRequested?.Invoke(this, EventArgs.Empty); break;
+                case AppFeature.Dashboard: break;
             }
         }
-
-        private void ShowDashboard(object sender, EventArgs e) => MessageBox.Show("Mostrando Dashboard");
-        private void ShowPatients(object sender, EventArgs e) => MessageBox.Show("Módulo de Gestión de Pacientes");
-        private void ShowStudies(object sender, EventArgs e) => MessageBox.Show("Módulo de Gestión de Estudios");
-        private void ShowResults(object sender, EventArgs e) => MessageBox.Show("Módulo de Carga de Resultados");
-        private void ShowReports(object sender, EventArgs e) => MessageBox.Show("Módulo de Generación de Informes");
-        private void ShowNotifications(object sender, EventArgs e) => MessageBox.Show("Módulo de Notificaciones");
-        private void ShowHistory(object sender, EventArgs e) => MessageBox.Show("Módulo de Historial de Órdenes");
-        private void ShowUserManagement(object sender, EventArgs e)
-        {
-            UserManagementForm userManagementForm = new UserManagementForm();
-            userManagementForm.ShowDialog();
-        }
-        private void ShowSystemConfig(object sender, EventArgs e) => MessageBox.Show("Módulo de Configuración del Sistema - Gestión de parámetros, tipos de estudios, rangos de referencia");
-        private void ShowBackups(object sender, EventArgs e) => MessageBox.Show("Módulo de Copias de Seguridad - Crear, restaurar y gestionar backups de base de datos");
-        private void ShowSecurity(object sender, EventArgs e) => MessageBox.Show("Módulo de Supervisión de Seguridad - Control de accesos y monitoreo de seguridad");
-
-
-        private void LogoutButton_Click(object sender, EventArgs e)
-        {
-            var result = MessageBox.Show("¿Está seguro que desea cerrar sesión?", "Confirmar Cierre de Sesión",
-                MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-
-            if (result == DialogResult.Yes)
-            {
-                UserAuthentication.Logout();
-                this.Hide();
-
-                LoginForm loginForm = new LoginForm();
-                loginForm.Show();
-                loginForm.FormClosed += (s, args) => Application.Exit();
-            }
-        }
-
-        private void ApplyRoleBasedAccess()
-        {
-            string currentUserRole = UserAuthentication.CurrentUser?.Rol?.ToLower();
-
-            if (string.IsNullOrEmpty(currentUserRole))
-            {
-                MessageBox.Show("Error de autenticación: Rol de usuario no definido.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-
-            foreach (var kvp in menuButtons)
-            {
-                string menuText = kvp.Key;
-                Button button = kvp.Value;
-
-                if (RoleAccessMap.ContainsKey(menuText))
-                {
-                    List<string> allowedRoles = RoleAccessMap[menuText];
-                    button.Visible = allowedRoles.Contains(currentUserRole);
-                }
-                else
-                {
-                    button.Visible = currentUserRole == "admin";
-                }
-            }
-
-            foreach (Panel card in dashboardCards)
-            {
-                string cardButtonText = card.Tag?.ToString();
-
-                if (!string.IsNullOrEmpty(cardButtonText))
-                {
-                    if (RoleAccessMap.ContainsKey(cardButtonText))
-                    {
-                        List<string> allowedRoles = RoleAccessMap[cardButtonText];
-                        card.Visible = allowedRoles.Contains(currentUserRole);
-                    }
-                    else
-                    {
-                        card.Visible = currentUserRole == "admin";
-                    }
-                }
-                else
-                {
-                    card.Visible = false;
-                }
-            }
-        }
-        // Fin del método ApplyRoleBasedAccess
-        // Fin de la clase MainDashboardForm
     }
-    // Fin del namespace SALC
 }

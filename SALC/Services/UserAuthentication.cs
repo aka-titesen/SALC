@@ -1,8 +1,8 @@
 // Services/UserAuthentication.cs
 using System;
-using System.Configuration; // Necesario para ConfigurationManager
+using System.Configuration;
 using System.Data;
-using System.Data.SqlClient; // Necesario para SQL Server
+using System.Data.SqlClient;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -19,183 +19,117 @@ namespace SALC
         public static Usuario CurrentUser { get; private set; } = null;
 
         /// <summary>
-        /// Authenticates a user against the database.
+        /// Authenticates a user against the database. Returns null if credentials/role/state are invalid.
         /// </summary>
-        /// <param name="username">The user's DNI (as a string).</param>
-        /// <param name="password">The plaintext password.</param>
-        /// <returns>The Usuario object if authentication is successful, null otherwise.</returns>
-        public static Usuario Authenticate(string username, string password)
+        public static Usuario Authenticate(string usernameOrEmail, string password)
         {
-            // Validación básica
-            if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
-            {
+            if (string.IsNullOrWhiteSpace(usernameOrEmail) || string.IsNullOrWhiteSpace(password))
                 return null;
-            }
 
-            // El DNI debe ser numérico
-            if (!int.TryParse(username, out int dniValue))
-            {
-                System.Windows.Forms.MessageBox.Show("El DNI debe ser numérico.", "Validación", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Warning);
-                return null;
-            }
-
-            // Obtener la cadena de conexión del App.config
             string connectionString = ConfigurationManager.ConnectionStrings["SALCConnection"]?.ConnectionString;
-
             if (string.IsNullOrEmpty(connectionString))
-            {
-                // Manejar error: cadena de conexión no encontrada
-                System.Windows.Forms.MessageBox.Show("Error de configuración: Cadena de conexión no encontrada.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
-                return null;
-            }
+                return null; // Sin cadena de conexión no se puede autenticar
 
-            // IMPORTANTE: Autenticación temporal con contraseña en texto plano
-            // string hashedInputPassword = HashPassword(password);
-            string plainPassword = password;
+            // Aceptar DNI numérico o Email
+            bool isDni = int.TryParse(usernameOrEmail, out int dniValue);
+            string emailValue = isDni ? null : usernameOrEmail.Trim();
 
-            // Consulta SQL para verificar credenciales y obtener datos del usuario y rol
             string query = @"
                 SELECT u.dni, u.nombre, u.apellido, u.email, u.telefono, r.[rol]
                 FROM usuario u
                 INNER JOIN roles r ON u.id_rol = r.id_rol
-                WHERE u.dni = @Dni AND u.[contraseña] = @Password AND u.estado_usuario = 1"; // 'contraseña' en texto plano en la BD
+                LEFT JOIN estado_usuarios eu ON u.estado_usuario = eu.id_estado
+                WHERE (u.dni = @Dni OR LOWER(u.email) = LOWER(@Email))
+                  AND u.[contraseña] = @Password
+                  AND (
+                        u.estado_usuario IS NULL
+                        OR u.estado_usuario = 1
+                        OR LOWER(eu.estado) IN ('activo','habilitado','active','enabled')
+                      )";
 
             try
             {
                 using (SqlConnection connection = new SqlConnection(connectionString))
+                using (SqlCommand command = new SqlCommand(query, connection))
                 {
+                    // Parámetros (DNI o Email)
+                    command.Parameters.Add("@Dni", SqlDbType.Int).Value = isDni ? (object)dniValue : DBNull.Value;
+                    command.Parameters.Add("@Email", SqlDbType.NVarChar, 150).Value = (object)(emailValue ?? (object)DBNull.Value);
+                    command.Parameters.Add("@Password", SqlDbType.NVarChar, 256).Value = password;
+
                     connection.Open();
-                    using (SqlCommand command = new SqlCommand(query, connection))
+                    using (SqlDataReader reader = command.ExecuteReader())
                     {
-                        // Parámetros tipados (evitar caracteres especiales en nombres de parámetros)
-                        command.Parameters.Add("@Dni", SqlDbType.Int).Value = dniValue;
-                        command.Parameters.Add("@Password", SqlDbType.NVarChar, 256).Value = plainPassword;
+                        if (!reader.Read()) return null;
 
-                        using (SqlDataReader reader = command.ExecuteReader())
+                        int ordDni = reader.GetOrdinal("dni");
+                        int ordNombre = reader.GetOrdinal("nombre");
+                        int ordApellido = reader.GetOrdinal("apellido");
+                        int ordEmail = reader.GetOrdinal("email");
+                        int ordTelefono = reader.GetOrdinal("telefono");
+                        int ordRol = reader.GetOrdinal("rol");
+
+                        string rawRol = reader.IsDBNull(ordRol) ? string.Empty : reader.GetString(ordRol);
+                        string normalizedRol = NormalizeRole(rawRol);
+                        if (normalizedRol != "admin" && normalizedRol != "clinico" && normalizedRol != "asistente")
+                            return null;
+
+                        return new Usuario
                         {
-                            if (reader.Read())
-                            {
-                                // Obtener ordinales de columnas
-                                int ordDni = reader.GetOrdinal("dni");
-                                int ordNombre = reader.GetOrdinal("nombre");
-                                int ordApellido = reader.GetOrdinal("apellido");
-                                int ordEmail = reader.GetOrdinal("email");
-                                int ordTelefono = reader.GetOrdinal("telefono");
-                                int ordRol = reader.GetOrdinal("rol");
-
-                                // Si se encuentra un usuario, crear el objeto Usuario
-                                string rawRol = reader.IsDBNull(ordRol) ? string.Empty : reader.GetString(ordRol);
-                                string normalizedRol = NormalizeRole(rawRol);
-
-                                Usuario authenticatedUser = new Usuario
-                                {
-                                    Dni = reader.GetInt32(ordDni),
-                                    Nombre = reader.IsDBNull(ordNombre) ? string.Empty : reader.GetString(ordNombre),
-                                    Apellido = reader.IsDBNull(ordApellido) ? string.Empty : reader.GetString(ordApellido),
-                                    Email = reader.IsDBNull(ordEmail) ? string.Empty : reader.GetString(ordEmail),
-                                    Telefono = reader.IsDBNull(ordTelefono) ? string.Empty : reader.GetString(ordTelefono),
-                                    Rol = normalizedRol
-                                };
-                                return authenticatedUser;
-                            }
-                            else
-                            {
-                                // Credenciales inválidas
-                                return null;
-                            }
-                        }
+                            Dni = reader.GetInt32(ordDni),
+                            Nombre = reader.IsDBNull(ordNombre) ? string.Empty : reader.GetString(ordNombre),
+                            Apellido = reader.IsDBNull(ordApellido) ? string.Empty : reader.GetString(ordApellido),
+                            Email = reader.IsDBNull(ordEmail) ? string.Empty : reader.GetString(ordEmail),
+                            Telefono = reader.IsDBNull(ordTelefono) ? string.Empty : reader.GetString(ordTelefono),
+                            Rol = normalizedRol
+                        };
                     }
                 }
             }
-            catch (SqlException sqlEx)
+            catch
             {
-                // Manejar errores específicos de SQL
-                System.Windows.Forms.MessageBox.Show($"Error de base de datos: {sqlEx.Message}", "Error de BD", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                return null;
             }
-            catch (Exception ex)
-            {
-                // Manejar otros errores inesperados
-                System.Windows.Forms.MessageBox.Show($"Error inesperado durante la autenticación: {ex.Message}", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
-            }
-
-            // Si llegamos aquí, hubo un error o las credenciales no coincidieron
-            return null;
         }
 
         /// <summary>
-        /// Performs user login, storing the authenticated user information.
+        /// Performs user login, storing the authenticated user information. Strict roles.
         /// </summary>
-        /// <param name="username">The user's DNI.</param>
-        /// <param name="password">The plaintext password.</param>
-        /// <returns>True if login was successful, False otherwise.</returns>
-        public static bool Login(string username, string password)
+        public static bool Login(string usernameOrEmail, string password)
         {
-            Usuario user = Authenticate(username, password);
-            if (user != null)
-            {
-                CurrentUser = user;
-                return true;
-            }
-            return false;
+            Usuario user = Authenticate(usernameOrEmail, password);
+            if (user == null) return false;
+            CurrentUser = user;
+            return true;
         }
 
-        /// <summary>
-        /// Logs out the current user.
-        /// </summary>
-        public static void Logout()
-        {
-            CurrentUser = null;
-        }
+        public static void Logout() => CurrentUser = null;
+        public static bool IsLoggedIn() => CurrentUser != null;
 
-        /// <summary>
-        /// Checks if a user is currently logged in.
-        /// </summary>
-        /// <returns>True if a user is logged in, False otherwise.</returns>
-        public static bool IsLoggedIn()
-        {
-            return CurrentUser != null;
-        }
-
-        /// <summary>
-        /// Hashes a password using SHA256. (Note: For production, use bcrypt/Argon2/PBKDF2).
-        /// </summary>
-        /// <param name="password">The plaintext password.</param>
-        /// <returns>The SHA256 hash as a hexadecimal string.</returns>
+        // SHA256 demo (reemplazar por BCrypt en producción)
         private static string HashPassword(string password)
         {
             using (SHA256 sha256Hash = SHA256.Create())
             {
                 byte[] bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(password));
                 StringBuilder builder = new StringBuilder();
-                for (int i = 0; i < bytes.Length; i++)
-                {
-                    builder.Append(bytes[i].ToString("x2")); // "x2" formatea como hexadecimal en minúsculas
-                }
+                for (int i = 0; i < bytes.Length; i++) builder.Append(bytes[i].ToString("x2"));
                 return builder.ToString();
             }
         }
 
-        /// <summary>
-        /// Normaliza el rol leído desde la base de datos a claves internas: "admin", "clinico", "tecnico".
-        /// </summary>
         private static string NormalizeRole(string role)
         {
             if (string.IsNullOrWhiteSpace(role)) return string.Empty;
-
             string r = role.Trim().ToLowerInvariant();
             switch (r)
             {
                 case "administrador":
-                case "admin":
-                    return "admin";
+                case "admin": return "admin";
                 case "clinico":
-                case "clínico":
-                    return "clinico";
-                case "tecnico":
-                case "técnico":
-                    return "tecnico";
-                default:
-                    return r; // dejar como está en minúsculas si es otro
+                case "clínico": return "clinico";
+                case "asistente": return "asistente";
+                default: return r;
             }
         }
     }

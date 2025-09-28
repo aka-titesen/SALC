@@ -56,8 +56,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <!-- Archivos en la carpeta Views -->
-    <Compile Include="Models\UserData.cs" />
+    <Compile Include="Presenters\AppFeature.cs" />
+    <!-- Formularios -->
     <Compile Include="Views\LoginForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -70,49 +70,75 @@
     <Compile Include="Views\MainDashboardForm.Designer.cs">
       <DependentUpon>MainDashboardForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Views\PanelAdmin.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Views\PanelAdmin.Designer.cs">
+      <DependentUpon>PanelAdmin.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Views\PatientsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Views\StudiesForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Views\ResultsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Views\AppointmentsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Views\ReportsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Views\NotificationsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Views\HistoryForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Views\UserManagementForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Views\UserEditForm.cs">
+    <Compile Include="Views\SystemConfigForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <!-- Archivos en la carpeta Services -->
+    <Compile Include="Views\BackupsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Views\SecurityForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <!-- Interfaces -->
+    <Compile Include="Views\Interfaces\ILoginView.cs" />
+    <Compile Include="Views\Interfaces\IPatientsView.cs" />
+    <Compile Include="Views\Interfaces\IResultsView.cs" />
+    <Compile Include="Views\Interfaces\IStudiesView.cs" />
+    <Compile Include="Views\Interfaces\IAppointmentsView.cs" />
+    <Compile Include="Views\Interfaces\IMainDashboardView.cs" />
+    <!-- Servicios -->
     <Compile Include="Services\UserAuthentication.cs" />
-    <!-- Archivos en la carpeta Models -->
+    <!-- Modelos -->
     <Compile Include="Models\Usuario.cs" />
-    <!-- Archivos en la carpeta Common -->
+    <Compile Include="Models\UserData.cs" />
+    <!-- Comunes -->
     <Compile Include="Common\SALCColors.cs" />
-    <!-- Archivos en la raíz -->
+    <!-- Presenters -->
+    <Compile Include="Presenters\LoginPresenter.cs" />
+    <Compile Include="Presenters\MainDashboardPresenter.cs" />
+    <!-- Entrada -->
     <Compile Include="Program.cs" />
-    <!-- Archivos de propiedades generados -->
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <EmbeddedResource Include="Views\LoginForm.resx">
-      <DependentUpon>LoginForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Views\MainDashboardForm.resx">
-      <DependentUpon>MainDashboardForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Views\LoginForm.resx">
+      <DependentUpon>LoginForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Views\PanelAdmin.resx">
+      <DependentUpon>PanelAdmin.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
