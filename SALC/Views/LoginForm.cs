@@ -1,8 +1,9 @@
 // Views/LoginForm.cs
 using System;
 using System.Drawing;
-using System.Windows.Forms;
 using System.IO;
+using System.Windows.Forms;
+using WindowsFormsApp1;
 
 namespace SALC
 {
@@ -222,8 +223,8 @@ namespace SALC
             {
                 MessageBox.Show($"¡Bienvenido, {UserAuthentication.CurrentUser.Nombre}!", "Inicio de Sesión Exitoso", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                MainDashboardForm mainForm = new MainDashboardForm();
-                mainForm.Show();
+                AdminForm adminForm = new AdminForm();
+                adminForm.Show();
                 this.Hide();
             }
             else
@@ -232,6 +233,11 @@ namespace SALC
                 passwordTextBox.Clear();
                 passwordTextBox.Focus();
             }
+        }
+
+        private void LoginForm_Load(object sender, EventArgs e)
+        {
+
         }
         // Fin del método LoginButton_Click
         // Fin de la clase LoginForm
