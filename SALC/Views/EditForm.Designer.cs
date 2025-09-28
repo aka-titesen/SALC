@@ -34,9 +34,9 @@
             this.btnGuardar = new System.Windows.Forms.Button();
             this.btnCancelar = new System.Windows.Forms.Button();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+            this.comboBox2 = new System.Windows.Forms.ComboBox();
             this.txtPass2 = new System.Windows.Forms.TextBox();
             this.label8 = new System.Windows.Forms.Label();
-            this.txtPass1 = new System.Windows.Forms.TextBox();
             this.txtEmail = new System.Windows.Forms.TextBox();
             this.txtTelefono = new System.Windows.Forms.TextBox();
             this.txtApellido = new System.Windows.Forms.TextBox();
@@ -62,6 +62,7 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(505, 60);
             this.panel1.TabIndex = 0;
+            this.panel1.Paint += new System.Windows.Forms.PaintEventHandler(this.panel1_Paint);
             // 
             // label1
             // 
@@ -102,6 +103,7 @@
             this.btnGuardar.TabIndex = 4;
             this.btnGuardar.Text = "Guardar";
             this.btnGuardar.UseVisualStyleBackColor = false;
+            this.btnGuardar.Click += new System.EventHandler(this.btnGuardar_Click);
             // 
             // btnCancelar
             // 
@@ -127,9 +129,9 @@
             this.tableLayoutPanel1.ColumnCount = 2;
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 35F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 65F));
+            this.tableLayoutPanel1.Controls.Add(this.comboBox2, 1, 5);
             this.tableLayoutPanel1.Controls.Add(this.txtPass2, 1, 6);
             this.tableLayoutPanel1.Controls.Add(this.label8, 0, 6);
-            this.tableLayoutPanel1.Controls.Add(this.txtPass1, 1, 5);
             this.tableLayoutPanel1.Controls.Add(this.txtEmail, 1, 4);
             this.tableLayoutPanel1.Controls.Add(this.txtTelefono, 1, 3);
             this.tableLayoutPanel1.Controls.Add(this.txtApellido, 1, 2);
@@ -156,13 +158,26 @@
             this.tableLayoutPanel1.Size = new System.Drawing.Size(502, 313);
             this.tableLayoutPanel1.TabIndex = 2;
             // 
+            // comboBox2
+            // 
+            this.comboBox2.FormattingEnabled = true;
+            this.comboBox2.Items.AddRange(new object[] {
+            "Administrador",
+            "Clinico",
+            "Asistente"});
+            this.comboBox2.Location = new System.Drawing.Point(178, 223);
+            this.comboBox2.Name = "comboBox2";
+            this.comboBox2.Size = new System.Drawing.Size(121, 24);
+            this.comboBox2.TabIndex = 15;
+            // 
             // txtPass2
             // 
             this.txtPass2.Location = new System.Drawing.Point(178, 267);
             this.txtPass2.Name = "txtPass2";
-            this.txtPass2.Size = new System.Drawing.Size(100, 22);
+            this.txtPass2.Size = new System.Drawing.Size(121, 22);
             this.txtPass2.TabIndex = 13;
             this.txtPass2.UseSystemPasswordChar = true;
+            this.txtPass2.TextChanged += new System.EventHandler(this.txtPass2_TextChanged);
             // 
             // label8
             // 
@@ -173,41 +188,37 @@
             this.label8.TabIndex = 12;
             this.label8.Text = "Contraseña";
             // 
-            // txtPass1
-            // 
-            this.txtPass1.Location = new System.Drawing.Point(178, 223);
-            this.txtPass1.Name = "txtPass1";
-            this.txtPass1.Size = new System.Drawing.Size(100, 22);
-            this.txtPass1.TabIndex = 11;
-            this.txtPass1.UseSystemPasswordChar = true;
-            // 
             // txtEmail
             // 
             this.txtEmail.Location = new System.Drawing.Point(178, 179);
             this.txtEmail.Name = "txtEmail";
-            this.txtEmail.Size = new System.Drawing.Size(100, 22);
+            this.txtEmail.Size = new System.Drawing.Size(121, 22);
             this.txtEmail.TabIndex = 10;
+            this.txtEmail.TextChanged += new System.EventHandler(this.txtEmail_TextChanged);
             // 
             // txtTelefono
             // 
             this.txtTelefono.Location = new System.Drawing.Point(178, 135);
             this.txtTelefono.Name = "txtTelefono";
-            this.txtTelefono.Size = new System.Drawing.Size(100, 22);
+            this.txtTelefono.Size = new System.Drawing.Size(121, 22);
             this.txtTelefono.TabIndex = 9;
+            this.txtTelefono.TextChanged += new System.EventHandler(this.txtTelefono_TextChanged);
             // 
             // txtApellido
             // 
             this.txtApellido.Location = new System.Drawing.Point(178, 91);
             this.txtApellido.Name = "txtApellido";
-            this.txtApellido.Size = new System.Drawing.Size(100, 22);
+            this.txtApellido.Size = new System.Drawing.Size(121, 22);
             this.txtApellido.TabIndex = 8;
+            this.txtApellido.TextChanged += new System.EventHandler(this.txtApellido_TextChanged);
             // 
             // txtNombre
             // 
             this.txtNombre.Location = new System.Drawing.Point(178, 47);
             this.txtNombre.Name = "txtNombre";
-            this.txtNombre.Size = new System.Drawing.Size(100, 22);
+            this.txtNombre.Size = new System.Drawing.Size(121, 22);
             this.txtNombre.TabIndex = 7;
+            this.txtNombre.TextChanged += new System.EventHandler(this.txtNombre_TextChanged);
             // 
             // label2
             // 
@@ -259,16 +270,17 @@
             this.label7.AutoSize = true;
             this.label7.Location = new System.Drawing.Point(3, 220);
             this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(76, 16);
+            this.label7.Size = new System.Drawing.Size(28, 16);
             this.label7.TabIndex = 5;
-            this.label7.Text = "Contraseña";
+            this.label7.Text = "Rol";
             // 
             // txtDni
             // 
             this.txtDni.Location = new System.Drawing.Point(178, 3);
             this.txtDni.Name = "txtDni";
-            this.txtDni.Size = new System.Drawing.Size(100, 22);
+            this.txtDni.Size = new System.Drawing.Size(121, 22);
             this.txtDni.TabIndex = 6;
+            this.txtDni.TextChanged += new System.EventHandler(this.txtDni_TextChanged);
             // 
             // EditForm
             // 
@@ -304,7 +316,6 @@
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.TextBox txtPass2;
         private System.Windows.Forms.Label label8;
-        private System.Windows.Forms.TextBox txtPass1;
         private System.Windows.Forms.TextBox txtEmail;
         private System.Windows.Forms.TextBox txtTelefono;
         private System.Windows.Forms.TextBox txtApellido;
@@ -318,5 +329,6 @@
         private System.Windows.Forms.TextBox txtDni;
         private System.Windows.Forms.Button btnGuardar;
         private System.Windows.Forms.Button btnCancelar;
+        private System.Windows.Forms.ComboBox comboBox2;
     }
 }

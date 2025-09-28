@@ -36,12 +36,12 @@ namespace WindowsFormsApp1
             LoadUsers();
         }
 
-        private void LoadUsers()
+        private void LoadUsers(string searchFilter = "", string roleFilter = "")
         {
             try
             {
                 // Acá llamás a tu lógica
-                var listaUsuarios = UserData.GetUsers();
+                var listaUsuarios = UserData.GetUsers(searchFilter, roleFilter);
 
                 // Lo asignás como origen de datos de la grilla
                 dgvUsers.DataSource = null;   // limpia cualquier binding anterior
@@ -87,7 +87,15 @@ namespace WindowsFormsApp1
         {
             if (dgvUsers.CurrentRow == null) { MessageBox.Show("Seleccioná un usuario."); return; }
 
-            using var editform = new EditForm();
+            var seleccionado = dgvUsers.CurrentRow.DataBoundItem as Usuario;
+            if (seleccionado == null)
+            {
+                MessageBox.Show("No se pudo obtener el usuario.");
+                return;
+            }
+
+
+            using var editform = new EditForm(seleccionado);
             editform.ShowDialog();
         }
 
@@ -95,6 +103,18 @@ namespace WindowsFormsApp1
         {
             using var addForm = new ADDForm();
             addForm.ShowDialog();
+        }
+
+        private void BtnBuscar_Click(object sender, EventArgs e)
+        {
+            string search = txtBuscar.Text.Trim();
+            LoadUsers(search);
+        }
+
+        private void btnRefrescar_Click(object sender, EventArgs e)
+        {
+            txtBuscar.Clear();
+            LoadUsers();
         }
     }
 }

@@ -29,7 +29,8 @@
         private void InitializeComponent()
         {
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            this.txtPass2 = new System.Windows.Forms.TextBox();
+            this.comboBox2 = new System.Windows.Forms.ComboBox();
+            this.txtPass = new System.Windows.Forms.TextBox();
             this.label8 = new System.Windows.Forms.Label();
             this.txtEmail = new System.Windows.Forms.TextBox();
             this.txtTelefono = new System.Windows.Forms.TextBox();
@@ -47,7 +48,6 @@
             this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
             this.btnGuardar = new System.Windows.Forms.Button();
             this.btnCancelar = new System.Windows.Forms.Button();
-            this.comboBox2 = new System.Windows.Forms.ComboBox();
             this.tableLayoutPanel1.SuspendLayout();
             this.panel1.SuspendLayout();
             this.flowLayoutPanel1.SuspendLayout();
@@ -59,7 +59,7 @@
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 35F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 65F));
             this.tableLayoutPanel1.Controls.Add(this.comboBox2, 1, 5);
-            this.tableLayoutPanel1.Controls.Add(this.txtPass2, 1, 6);
+            this.tableLayoutPanel1.Controls.Add(this.txtPass, 1, 6);
             this.tableLayoutPanel1.Controls.Add(this.label8, 0, 6);
             this.tableLayoutPanel1.Controls.Add(this.txtEmail, 1, 4);
             this.tableLayoutPanel1.Controls.Add(this.txtTelefono, 1, 3);
@@ -87,13 +87,26 @@
             this.tableLayoutPanel1.Size = new System.Drawing.Size(502, 320);
             this.tableLayoutPanel1.TabIndex = 3;
             // 
-            // txtPass2
+            // comboBox2
             // 
-            this.txtPass2.Location = new System.Drawing.Point(178, 273);
-            this.txtPass2.Name = "txtPass2";
-            this.txtPass2.Size = new System.Drawing.Size(121, 27);
-            this.txtPass2.TabIndex = 13;
-            this.txtPass2.UseSystemPasswordChar = true;
+            this.comboBox2.FormattingEnabled = true;
+            this.comboBox2.Items.AddRange(new object[] {
+            "Administrador",
+            "Clinico",
+            "Asistente"});
+            this.comboBox2.Location = new System.Drawing.Point(178, 228);
+            this.comboBox2.Name = "comboBox2";
+            this.comboBox2.Size = new System.Drawing.Size(121, 28);
+            this.comboBox2.TabIndex = 14;
+            this.comboBox2.SelectedIndexChanged += new System.EventHandler(this.comboBox2_SelectedIndexChanged);
+            // 
+            // txtPass
+            // 
+            this.txtPass.Location = new System.Drawing.Point(178, 273);
+            this.txtPass.Name = "txtPass";
+            this.txtPass.Size = new System.Drawing.Size(121, 27);
+            this.txtPass.TabIndex = 13;
+            this.txtPass.UseSystemPasswordChar = true;
             // 
             // label8
             // 
@@ -117,6 +130,7 @@
             this.txtTelefono.Name = "txtTelefono";
             this.txtTelefono.Size = new System.Drawing.Size(121, 27);
             this.txtTelefono.TabIndex = 9;
+            this.txtTelefono.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtTelefono_KeyPress);
             // 
             // txtApellido
             // 
@@ -192,6 +206,7 @@
             this.txtDni.Name = "txtDni";
             this.txtDni.Size = new System.Drawing.Size(121, 27);
             this.txtDni.TabIndex = 6;
+            this.txtDni.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtDni_KeyPress);
             // 
             // panel1
             // 
@@ -242,6 +257,7 @@
             this.btnGuardar.TabIndex = 5;
             this.btnGuardar.Text = "Guardar";
             this.btnGuardar.UseVisualStyleBackColor = false;
+            this.btnGuardar.Click += new System.EventHandler(this.btnGuardar_Click);
             // 
             // btnCancelar
             // 
@@ -261,19 +277,6 @@
             this.btnCancelar.TabIndex = 6;
             this.btnCancelar.Text = "Cancelar";
             this.btnCancelar.UseVisualStyleBackColor = false;
-            // 
-            // comboBox2
-            // 
-            this.comboBox2.FormattingEnabled = true;
-            this.comboBox2.Items.AddRange(new object[] {
-            "Administrador",
-            "Medico",
-            "Asistente"});
-            this.comboBox2.Location = new System.Drawing.Point(178, 228);
-            this.comboBox2.Name = "comboBox2";
-            this.comboBox2.Size = new System.Drawing.Size(121, 28);
-            this.comboBox2.TabIndex = 14;
-            this.comboBox2.SelectedIndexChanged += new System.EventHandler(this.comboBox2_SelectedIndexChanged);
             // 
             // ADDForm
             // 
@@ -305,7 +308,7 @@
         #endregion
 
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
-        private System.Windows.Forms.TextBox txtPass2;
+        private System.Windows.Forms.TextBox txtPass;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.TextBox txtEmail;
         private System.Windows.Forms.TextBox txtTelefono;

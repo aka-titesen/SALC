@@ -26,6 +26,8 @@ namespace SALC
 		/// </summary>
 		public string Rol { get; set; }
 
+		public int id_rol {  get; set; }
+
 		/// <summary>
 		/// Gets or sets the user's email address.
 		/// </summary>
@@ -41,5 +43,7 @@ namespace SALC
 
         public int ID_estado { get; set; }                    
         public string Estado { get; set; } = "";
+
+		public string Pass { get; set; }
     }
 }
