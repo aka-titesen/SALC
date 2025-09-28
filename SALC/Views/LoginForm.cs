@@ -223,9 +223,18 @@ namespace SALC
             {
                 MessageBox.Show($"¡Bienvenido, {UserAuthentication.CurrentUser.Nombre}!", "Inicio de Sesión Exitoso", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                AdminForm adminForm = new AdminForm();
-                adminForm.Show();
-                this.Hide();
+                if (UserAuthentication.CurrentUser.Rol == "admin")
+                {
+                    AdminForm adminForm = new AdminForm();
+                    adminForm.Show();
+                    this.Hide();
+                }else if (UserAuthentication.CurrentUser.Rol == "clinico" || UserAuthentication.CurrentUser.Rol == "asistente")
+                {
+                    PanelMedico panelMedico = new PanelMedico();
+                    panelMedico.Show();
+                    this.Hide();
+                }
+                
             }
             else
             {
@@ -234,6 +243,7 @@ namespace SALC
                 passwordTextBox.Focus();
             }
         }
+
 
         private void LoginForm_Load(object sender, EventArgs e)
         {

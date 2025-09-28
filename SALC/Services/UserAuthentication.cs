@@ -41,11 +41,7 @@ namespace SALC
                 LEFT JOIN estado_usuarios eu ON u.estado_usuario = eu.id_estado
                 WHERE (u.dni = @Dni OR LOWER(u.email) = LOWER(@Email))
                   AND u.[contraseña] = @Password
-                  AND (
-                        u.estado_usuario IS NULL
-                        OR u.estado_usuario = 1
-                        OR LOWER(eu.estado) IN ('activo','habilitado','active','enabled')
-                      )";
+                  AND u.estado_usuario = 1";
 
             try
             {

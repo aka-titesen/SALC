@@ -57,6 +57,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Presenters\AppFeature.cs" />
+    <Compile Include="Views\HistorialEstudiosForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Views\HistorialEstudiosForm.Designer.cs">
+      <DependentUpon>HistorialEstudiosForm.cs</DependentUpon>
+    </Compile>
     <!-- Formularios -->
     <Compile Include="Views\LoginForm.cs">
       <SubType>Form</SubType>
@@ -75,6 +81,12 @@
     </Compile>
     <Compile Include="Views\PanelAdmin.Designer.cs">
       <DependentUpon>PanelAdmin.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Views\PanelMedico.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Views\PanelMedico.Designer.cs">
+      <DependentUpon>PanelMedico.cs</DependentUpon>
     </Compile>
     <Compile Include="Views\PatientsForm.cs">
       <SubType>Form</SubType>
@@ -133,11 +145,17 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Views\HistorialEstudiosForm.resx">
+      <DependentUpon>HistorialEstudiosForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Views\LoginForm.resx">
       <DependentUpon>LoginForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Views\PanelAdmin.resx">
       <DependentUpon>PanelAdmin.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Views\PanelMedico.resx">
+      <DependentUpon>PanelMedico.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
