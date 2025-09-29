@@ -35,19 +35,20 @@ namespace WindowsFormsApp1
 
         private void btnDetalles_Click(object sender, EventArgs e)
         {
-            
+            detalleEstudio detalle = new detalleEstudio();
+            detalle.ShowDialog();
         }
 
         private void btnAgregar_Click(object sender, EventArgs e)
         {
             agregar_estudio estudio = new agregar_estudio();
-            estudio.Show();
+            estudio.ShowDialog();
         }
 
         private void btnEditar_Click(object sender, EventArgs e)
         {
             editarEstudio editar_estudio = new editarEstudio();
-            editar_estudio.Show();
+            editar_estudio.ShowDialog();
         }
     }
 }

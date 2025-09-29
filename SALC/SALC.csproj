@@ -57,17 +57,47 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Presenters\AppFeature.cs" />
+    <Compile Include="Views\AgregarMetrica.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Views\AgregarMetrica.Designer.cs">
+      <DependentUpon>AgregarMetrica.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Views\AgregarPaciente.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Views\AgregarPaciente.Designer.cs">
+      <DependentUpon>AgregarPaciente.cs</DependentUpon>
+    </Compile>
     <Compile Include="Views\agregar_estudio.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Views\agregar_estudio.Designer.cs">
       <DependentUpon>agregar_estudio.cs</DependentUpon>
     </Compile>
+    <Compile Include="Views\detalleEstudio.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Views\detalleEstudio.Designer.cs">
+      <DependentUpon>detalleEstudio.cs</DependentUpon>
+    </Compile>
     <Compile Include="Views\editarEstudio.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Views\editarEstudio.Designer.cs">
       <DependentUpon>editarEstudio.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Views\editarMetrica.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Views\editarMetrica.Designer.cs">
+      <DependentUpon>editarMetrica.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Views\EditarPaciente.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Views\EditarPaciente.Designer.cs">
+      <DependentUpon>EditarPaciente.cs</DependentUpon>
     </Compile>
     <Compile Include="Views\EditForm.cs">
       <SubType>Form</SubType>
@@ -169,11 +199,26 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Views\AgregarMetrica.resx">
+      <DependentUpon>AgregarMetrica.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Views\AgregarPaciente.resx">
+      <DependentUpon>AgregarPaciente.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Views\agregar_estudio.resx">
       <DependentUpon>agregar_estudio.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Views\detalleEstudio.resx">
+      <DependentUpon>detalleEstudio.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Views\editarEstudio.resx">
       <DependentUpon>editarEstudio.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Views\editarMetrica.resx">
+      <DependentUpon>editarMetrica.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Views\EditarPaciente.resx">
+      <DependentUpon>EditarPaciente.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Views\EditForm.resx">
       <DependentUpon>EditForm.cs</DependentUpon>
