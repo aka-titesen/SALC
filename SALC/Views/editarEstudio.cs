@@ -10,9 +10,9 @@ using System.Windows.Forms;
 
 namespace SALC.Views
 {
-    public partial class agregar_estudio : Form
+    public partial class editarEstudio : Form
     {
-        public agregar_estudio()
+        public editarEstudio()
         {
             InitializeComponent();
         }

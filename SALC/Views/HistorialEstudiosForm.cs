@@ -43,5 +43,11 @@ namespace WindowsFormsApp1
             agregar_estudio estudio = new agregar_estudio();
             estudio.Show();
         }
+
+        private void btnEditar_Click(object sender, EventArgs e)
+        {
+            editarEstudio editar_estudio = new editarEstudio();
+            editar_estudio.Show();
+        }
     }
 }

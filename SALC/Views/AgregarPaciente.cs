@@ -10,11 +10,16 @@ using System.Windows.Forms;
 
 namespace SALC.Views
 {
-    public partial class agregar_estudio : Form
+    public partial class AgregarPaciente : Form
     {
-        public agregar_estudio()
+        public AgregarPaciente()
         {
             InitializeComponent();
+        }
+
+        private void tableLayoutPanel1_Paint(object sender, PaintEventArgs e)
+        {
+
         }
 
         private void btnCancelar_Click(object sender, EventArgs e)

@@ -63,6 +63,12 @@
     <Compile Include="Views\agregar_estudio.Designer.cs">
       <DependentUpon>agregar_estudio.cs</DependentUpon>
     </Compile>
+    <Compile Include="Views\editarEstudio.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Views\editarEstudio.Designer.cs">
+      <DependentUpon>editarEstudio.cs</DependentUpon>
+    </Compile>
     <Compile Include="Views\EditForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -165,6 +171,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Views\agregar_estudio.resx">
       <DependentUpon>agregar_estudio.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Views\editarEstudio.resx">
+      <DependentUpon>editarEstudio.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Views\EditForm.resx">
       <DependentUpon>EditForm.cs</DependentUpon>

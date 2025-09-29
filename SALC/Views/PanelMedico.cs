@@ -1,4 +1,5 @@
 ﻿using SALC;
+using SALC.Views;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -38,6 +39,18 @@ namespace WindowsFormsApp1
 
             // 3. Cerrar este panel
             this.Close();
+        }
+
+        private void BtnAgregar_Click(object sender, EventArgs e)
+        {
+            AgregarPaciente paciente = new AgregarPaciente();
+            paciente.Show();
+        }
+
+        private void btnEditar_Click(object sender, EventArgs e)
+        {
+            EditarPaciente pacienteEdit = new EditarPaciente();
+            pacienteEdit.Show();
         }
     }
 }

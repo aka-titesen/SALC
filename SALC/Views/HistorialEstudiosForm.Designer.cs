@@ -28,9 +28,9 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             this.panel1 = new System.Windows.Forms.Panel();
             this.lblTitulo = new System.Windows.Forms.Label();
             this.lblPaciente = new System.Windows.Forms.Label();
@@ -50,14 +50,14 @@
             this.btnDetalles = new System.Windows.Forms.Button();
             this.btnVolver = new System.Windows.Forms.Button();
             this.dgvUsers = new System.Windows.Forms.DataGridView();
-            this.encargado_carga = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.observaciones = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.id_estad = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.diagnostico = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.medico = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.id_tipo_analisis = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.fecha = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.id_estudio = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.fecha = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.id_tipo_analisis = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.medico = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.diagnostico = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.id_estad = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.observaciones = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.encargado_carga = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.flowActions.SuspendLayout();
@@ -250,6 +250,7 @@
             this.btnEditar.TabIndex = 10;
             this.btnEditar.Text = "Editar";
             this.btnEditar.UseVisualStyleBackColor = false;
+            this.btnEditar.Click += new System.EventHandler(this.btnEditar_Click);
             // 
             // btnDescargar
             // 
@@ -309,19 +310,19 @@
             // 
             // dgvUsers
             // 
-            dataGridViewCellStyle4.BackColor = System.Drawing.Color.WhiteSmoke;
-            this.dgvUsers.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle4;
+            dataGridViewCellStyle1.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.dgvUsers.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
             this.dgvUsers.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.dgvUsers.BackgroundColor = System.Drawing.Color.White;
             this.dgvUsers.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle5.BackColor = System.Drawing.Color.DodgerBlue;
-            dataGridViewCellStyle5.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle5.ForeColor = System.Drawing.Color.White;
-            dataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dgvUsers.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle5;
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle2.BackColor = System.Drawing.Color.DodgerBlue;
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle2.ForeColor = System.Drawing.Color.White;
+            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dgvUsers.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
             this.dgvUsers.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvUsers.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.id_estudio,
@@ -332,14 +333,14 @@
             this.id_estad,
             this.observaciones,
             this.encargado_carga});
-            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle6.BackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle6.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle6.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle6.SelectionBackColor = System.Drawing.Color.LightSkyBlue;
-            dataGridViewCellStyle6.SelectionForeColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.dgvUsers.DefaultCellStyle = dataGridViewCellStyle6;
+            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle3.BackColor = System.Drawing.Color.White;
+            dataGridViewCellStyle3.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.Color.LightSkyBlue;
+            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.Color.Black;
+            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.dgvUsers.DefaultCellStyle = dataGridViewCellStyle3;
             this.dgvUsers.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dgvUsers.EnableHeadersVisualStyles = false;
             this.dgvUsers.GridColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
@@ -353,47 +354,12 @@
             this.dgvUsers.Size = new System.Drawing.Size(1348, 440);
             this.dgvUsers.TabIndex = 3;
             // 
-            // encargado_carga
+            // id_estudio
             // 
-            this.encargado_carga.HeaderText = "Cargado por";
-            this.encargado_carga.MinimumWidth = 6;
-            this.encargado_carga.Name = "encargado_carga";
-            this.encargado_carga.ReadOnly = true;
-            // 
-            // observaciones
-            // 
-            this.observaciones.HeaderText = "Observaciones";
-            this.observaciones.MinimumWidth = 6;
-            this.observaciones.Name = "observaciones";
-            this.observaciones.ReadOnly = true;
-            // 
-            // id_estad
-            // 
-            this.id_estad.HeaderText = "Estado";
-            this.id_estad.MinimumWidth = 6;
-            this.id_estad.Name = "id_estad";
-            this.id_estad.ReadOnly = true;
-            // 
-            // diagnostico
-            // 
-            this.diagnostico.HeaderText = "Diagnóstico";
-            this.diagnostico.MinimumWidth = 6;
-            this.diagnostico.Name = "diagnostico";
-            this.diagnostico.ReadOnly = true;
-            // 
-            // medico
-            // 
-            this.medico.HeaderText = "Médico";
-            this.medico.MinimumWidth = 6;
-            this.medico.Name = "medico";
-            this.medico.ReadOnly = true;
-            // 
-            // id_tipo_analisis
-            // 
-            this.id_tipo_analisis.HeaderText = "Tipo";
-            this.id_tipo_analisis.MinimumWidth = 6;
-            this.id_tipo_analisis.Name = "id_tipo_analisis";
-            this.id_tipo_analisis.ReadOnly = true;
+            this.id_estudio.HeaderText = "ID";
+            this.id_estudio.MinimumWidth = 6;
+            this.id_estudio.Name = "id_estudio";
+            this.id_estudio.ReadOnly = true;
             // 
             // fecha
             // 
@@ -402,12 +368,47 @@
             this.fecha.Name = "fecha";
             this.fecha.ReadOnly = true;
             // 
-            // id_estudio
+            // id_tipo_analisis
             // 
-            this.id_estudio.HeaderText = "ID";
-            this.id_estudio.MinimumWidth = 6;
-            this.id_estudio.Name = "id_estudio";
-            this.id_estudio.ReadOnly = true;
+            this.id_tipo_analisis.HeaderText = "Tipo";
+            this.id_tipo_analisis.MinimumWidth = 6;
+            this.id_tipo_analisis.Name = "id_tipo_analisis";
+            this.id_tipo_analisis.ReadOnly = true;
+            // 
+            // medico
+            // 
+            this.medico.HeaderText = "Médico";
+            this.medico.MinimumWidth = 6;
+            this.medico.Name = "medico";
+            this.medico.ReadOnly = true;
+            // 
+            // diagnostico
+            // 
+            this.diagnostico.HeaderText = "Diagnóstico";
+            this.diagnostico.MinimumWidth = 6;
+            this.diagnostico.Name = "diagnostico";
+            this.diagnostico.ReadOnly = true;
+            // 
+            // id_estad
+            // 
+            this.id_estad.HeaderText = "Estado";
+            this.id_estad.MinimumWidth = 6;
+            this.id_estad.Name = "id_estad";
+            this.id_estad.ReadOnly = true;
+            // 
+            // observaciones
+            // 
+            this.observaciones.HeaderText = "Observaciones";
+            this.observaciones.MinimumWidth = 6;
+            this.observaciones.Name = "observaciones";
+            this.observaciones.ReadOnly = true;
+            // 
+            // encargado_carga
+            // 
+            this.encargado_carga.HeaderText = "Cargado por";
+            this.encargado_carga.MinimumWidth = 6;
+            this.encargado_carga.Name = "encargado_carga";
+            this.encargado_carga.ReadOnly = true;
             // 
             // HistorialEstudiosForm
             // 
