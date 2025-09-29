@@ -48,7 +48,7 @@
             public static List<SALC.Usuario> GetUsers(string searchFilter = "", string roleFilter = "")
             {
                 string query = @"
-                    SELECT u.dni, u.nombre, u.apellido, u.email, u.telefono, r.rol, u.estado_usuario, e.estado AS estado
+                    SELECT u.dni, u.nombre, u.apellido, u.email, u.telefono, r.rol, u.estado_usuario AS id_estado, e.estado AS estado
                     FROM usuario u
                     INNER JOIN roles r ON u.id_rol = r.id_rol
                     LEFT  JOIN estado_usuarios e ON u.estado_usuario = e.id_estado

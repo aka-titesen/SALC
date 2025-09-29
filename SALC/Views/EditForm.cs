@@ -93,6 +93,17 @@ namespace SALC.Views
 
         private void btnGuardar_Click(object sender, EventArgs e)
         {
+            if (string.IsNullOrWhiteSpace(txtDni.Text) ||
+                string.IsNullOrWhiteSpace(txtNombre.Text) ||
+                string.IsNullOrWhiteSpace(txtApellido.Text) ||
+                string.IsNullOrWhiteSpace(txtTelefono.Text) ||
+                string.IsNullOrWhiteSpace(txtEmail.Text) ||
+                comboBox2.SelectedIndex == -1) 
+            {
+                MessageBox.Show("Por favor complete todos los campos antes de guardar.",
+                    "Campos incompletos", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
             var rol = "";
             var Roltext = comboBox2.Text.Trim();
             if(Roltext == "Administrador" )

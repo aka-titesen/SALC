@@ -17,7 +17,7 @@ namespace WindowsFormsApp1
         public AdminForm()
         {
             InitializeComponent();
-            
+            dgvUsers.AutoGenerateColumns = false;
             this.Load += AdminForm_Load;
 
         }
