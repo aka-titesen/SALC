@@ -40,6 +40,22 @@ namespace SALC.Views.Interfaces
         public string DoctorName { get; set; }
         public string Observations { get; set; }
         public List<AnalysisResult> Results { get; set; } = new List<AnalysisResult>();
+        
+        // Propiedades adicionales para el formulario de detalle
+        public string PatientPhone { get; set; }
+        public string Insurance { get; set; }
+        public string Priority { get; set; }
+        
+        // Propiedades de conveniencia para el formulario de detalle
+        public string PacienteDNI => PatientId;
+        public string PacienteNombre => PatientName;
+        public string PacienteTelefono => PatientPhone;
+        public string ObraSocial => Insurance;
+        public string TipoAnalisis => AnalysisType;
+        public string Estado => Status;
+        public string Prioridad => Priority;
+        public string DoctorNombre => DoctorName;
+        public DateTime FechaCreacion => AnalysisDate;
     }
 
     public class AnalysisResult

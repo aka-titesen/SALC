@@ -250,5 +250,65 @@ namespace SALC.Services
             Console.WriteLine($"Exportando a CSV: {report.PatientName} - {report.AnalysisDate}");
             // Lógica real de exportación a CSV iría aquí
         }
+
+        public AnalisisReport GetAnalysisDetails(int analysisId)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                connection.Open();
+                
+                var query = @"
+                    SELECT 
+                        a.id_analisis,
+                        p.dni,
+                        p.nombre + ' ' + p.apellido as PatientName,
+                        p.telefono as PatientPhone,
+                        os.nombre as Insurance,
+                        ta.descripcion as AnalysisType,
+                        a.fecha_creacion as AnalysisDate,
+                        e.tipo_estado as Status,
+                        d.nombre + ' ' + d.apellido as DoctorName,
+                        a.prioridad as Priority,
+                        a.observaciones as Observations
+                    FROM analisis a
+                    INNER JOIN paciente p ON a.doc_paciente = p.dni
+                    INNER JOIN tipo_analisis ta ON a.id_tipo_analisis = ta.id_tipo_analisis
+                    INNER JOIN estado e ON a.id_estado = e.id_estado
+                    INNER JOIN doctor d ON a.doctor_encargado = d.dni
+                    LEFT JOIN obra_social os ON p.id_obra_social = os.id_obra_social
+                    WHERE a.id_analisis = @analysisId";
+
+                using (var command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@analysisId", analysisId);
+                    
+                    using (var reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            var report = new AnalisisReport
+                            {
+                                ReportId = reader.GetInt32(0),
+                                PatientId = reader.GetInt32(1).ToString(),
+                                PatientName = reader.GetString(2),
+                                PatientPhone = reader.IsDBNull(3) ? string.Empty : reader.GetString(3),
+                                Insurance = reader.IsDBNull(4) ? "Sin obra social" : reader.GetString(4),
+                                AnalysisType = reader.GetString(5),
+                                AnalysisDate = reader.GetDateTime(6),
+                                Status = reader.GetString(7),
+                                DoctorName = reader.GetString(8),
+                                Priority = reader.IsDBNull(9) ? "Normal" : reader.GetString(9),
+                                Observations = reader.IsDBNull(10) ? string.Empty : reader.GetString(10)
+                            };
+
+                            report.Results = GetAnalysisResults(report.ReportId);
+                            return report;
+                        }
+                    }
+                }
+            }
+
+            return null;
+        }
     }
 }

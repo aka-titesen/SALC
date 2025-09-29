@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using SALC.Views.Interfaces;
+using SALC.Views;
 using SALC.Models;
 using SALC.Services;
 
@@ -80,14 +81,25 @@ namespace SALC.Presenters
                 if (reportIndex >= 0 && reportIndex < _view.Reports.Count)
                 {
                     var report = _view.Reports[reportIndex];
-                    // En una implementación real, esto abriría una ventana modal o navegaría
-                    // a una vista detallada del reporte
-                    _view.ShowMessage("Información", $"Viendo reporte completo de {report.PatientName}");
+                    
+                    // Obtener detalles completos del análisis
+                    var detailedReport = _reportsService.GetAnalysisDetails(report.ReportId);
+                    
+                    if (detailedReport != null)
+                    {
+                        // Abrir formulario de detalle
+                        var detailForm = new AnalysisDetailForm(detailedReport, detailedReport.Results);
+                        detailForm.ShowDialog();
+                    }
+                    else
+                    {
+                        _view.ShowMessage("Error", "No se pudieron cargar los detalles del análisis", System.Windows.Forms.MessageBoxIcon.Error);
+                    }
                 }
             }
             catch (Exception ex)
             {
-                _view.ShowMessage("Error", $"Error al ver reporte: {ex.Message}");
+                _view.ShowMessage("Error", $"Error al ver reporte: {ex.Message}", System.Windows.Forms.MessageBoxIcon.Error);
             }
         }
 
