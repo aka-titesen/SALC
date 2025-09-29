@@ -32,32 +32,32 @@
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
-            this.lblPaciente = new System.Windows.Forms.Label();
             this.lblTitulo = new System.Windows.Forms.Label();
+            this.lblPaciente = new System.Windows.Forms.Label();
+            this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
             this.panel2 = new System.Windows.Forms.Panel();
             this.flowActions = new System.Windows.Forms.FlowLayoutPanel();
-            this.dtpDesde = new System.Windows.Forms.DateTimePicker();
-            this.dateTimePicker1 = new System.Windows.Forms.DateTimePicker();
             this.label1 = new System.Windows.Forms.Label();
+            this.dtpDesde = new System.Windows.Forms.DateTimePicker();
             this.label2 = new System.Windows.Forms.Label();
+            this.dateTimePicker1 = new System.Windows.Forms.DateTimePicker();
             this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.comboBox2 = new System.Windows.Forms.ComboBox();
             this.BtnFiltar = new System.Windows.Forms.Button();
             this.btnAgregar = new System.Windows.Forms.Button();
             this.btnEditar = new System.Windows.Forms.Button();
             this.btnDescargar = new System.Windows.Forms.Button();
+            this.btnDetalles = new System.Windows.Forms.Button();
             this.btnVolver = new System.Windows.Forms.Button();
             this.dgvUsers = new System.Windows.Forms.DataGridView();
-            this.id_estudio = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.fecha = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.id_tipo_analisis = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.medico = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.diagnostico = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.btnDetalles = new System.Windows.Forms.Button();
-            this.id_estad = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.observaciones = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.encargado_carga = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.observaciones = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.id_estad = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.diagnostico = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.medico = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.id_tipo_analisis = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.fecha = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.id_estudio = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.flowActions.SuspendLayout();
@@ -75,23 +75,6 @@
             this.panel1.Size = new System.Drawing.Size(1348, 60);
             this.panel1.TabIndex = 0;
             // 
-            // flowLayoutPanel1
-            // 
-            this.flowLayoutPanel1.Location = new System.Drawing.Point(767, 246);
-            this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-            this.flowLayoutPanel1.Size = new System.Drawing.Size(8, 8);
-            this.flowLayoutPanel1.TabIndex = 1;
-            // 
-            // lblPaciente
-            // 
-            this.lblPaciente.AutoSize = true;
-            this.lblPaciente.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblPaciente.Location = new System.Drawing.Point(295, 25);
-            this.lblPaciente.Name = "lblPaciente";
-            this.lblPaciente.Size = new System.Drawing.Size(90, 20);
-            this.lblPaciente.TabIndex = 0;
-            this.lblPaciente.Text = "Paciente: —";
-            // 
             // lblTitulo
             // 
             this.lblTitulo.AutoSize = true;
@@ -103,6 +86,23 @@
             this.lblTitulo.TabIndex = 2;
             this.lblTitulo.Text = "Historial de estudios";
             this.lblTitulo.Click += new System.EventHandler(this.lblTitulo_Click);
+            // 
+            // lblPaciente
+            // 
+            this.lblPaciente.AutoSize = true;
+            this.lblPaciente.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblPaciente.Location = new System.Drawing.Point(295, 25);
+            this.lblPaciente.Name = "lblPaciente";
+            this.lblPaciente.Size = new System.Drawing.Size(90, 20);
+            this.lblPaciente.TabIndex = 0;
+            this.lblPaciente.Text = "Paciente: —";
+            // 
+            // flowLayoutPanel1
+            // 
+            this.flowLayoutPanel1.Location = new System.Drawing.Point(767, 246);
+            this.flowLayoutPanel1.Name = "flowLayoutPanel1";
+            this.flowLayoutPanel1.Size = new System.Drawing.Size(8, 8);
+            this.flowLayoutPanel1.TabIndex = 1;
             // 
             // panel2
             // 
@@ -134,22 +134,6 @@
             this.flowActions.Size = new System.Drawing.Size(1348, 60);
             this.flowActions.TabIndex = 0;
             // 
-            // dtpDesde
-            // 
-            this.dtpDesde.Format = System.Windows.Forms.DateTimePickerFormat.Short;
-            this.dtpDesde.Location = new System.Drawing.Point(57, 3);
-            this.dtpDesde.Name = "dtpDesde";
-            this.dtpDesde.Size = new System.Drawing.Size(117, 22);
-            this.dtpDesde.TabIndex = 1;
-            // 
-            // dateTimePicker1
-            // 
-            this.dateTimePicker1.Format = System.Windows.Forms.DateTimePickerFormat.Short;
-            this.dateTimePicker1.Location = new System.Drawing.Point(229, 3);
-            this.dateTimePicker1.Name = "dateTimePicker1";
-            this.dateTimePicker1.Size = new System.Drawing.Size(100, 22);
-            this.dateTimePicker1.TabIndex = 2;
-            // 
             // label1
             // 
             this.label1.AutoSize = true;
@@ -158,6 +142,14 @@
             this.label1.Size = new System.Drawing.Size(48, 16);
             this.label1.TabIndex = 3;
             this.label1.Text = "Desde";
+            // 
+            // dtpDesde
+            // 
+            this.dtpDesde.Format = System.Windows.Forms.DateTimePickerFormat.Short;
+            this.dtpDesde.Location = new System.Drawing.Point(57, 3);
+            this.dtpDesde.Name = "dtpDesde";
+            this.dtpDesde.Size = new System.Drawing.Size(117, 22);
+            this.dtpDesde.TabIndex = 1;
             // 
             // label2
             // 
@@ -168,6 +160,14 @@
             this.label2.TabIndex = 4;
             this.label2.Text = "Hasta";
             this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // dateTimePicker1
+            // 
+            this.dateTimePicker1.Format = System.Windows.Forms.DateTimePickerFormat.Short;
+            this.dateTimePicker1.Location = new System.Drawing.Point(229, 3);
+            this.dateTimePicker1.Name = "dateTimePicker1";
+            this.dateTimePicker1.Size = new System.Drawing.Size(100, 22);
+            this.dateTimePicker1.TabIndex = 2;
             // 
             // comboBox1
             // 
@@ -231,6 +231,7 @@
             this.btnAgregar.TabIndex = 9;
             this.btnAgregar.Text = "Agregar estudio";
             this.btnAgregar.UseVisualStyleBackColor = false;
+            this.btnAgregar.Click += new System.EventHandler(this.btnAgregar_Click);
             // 
             // btnEditar
             // 
@@ -267,6 +268,25 @@
             this.btnDescargar.TabIndex = 11;
             this.btnDescargar.Text = "Descargar";
             this.btnDescargar.UseVisualStyleBackColor = false;
+            // 
+            // btnDetalles
+            // 
+            this.btnDetalles.AutoSize = true;
+            this.btnDetalles.BackColor = System.Drawing.Color.MediumSeaGreen;
+            this.btnDetalles.FlatAppearance.BorderSize = 0;
+            this.btnDetalles.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            this.btnDetalles.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Gray;
+            this.btnDetalles.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnDetalles.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnDetalles.ForeColor = System.Drawing.Color.White;
+            this.btnDetalles.Location = new System.Drawing.Point(1012, 5);
+            this.btnDetalles.Margin = new System.Windows.Forms.Padding(5);
+            this.btnDetalles.Name = "btnDetalles";
+            this.btnDetalles.Size = new System.Drawing.Size(129, 30);
+            this.btnDetalles.TabIndex = 13;
+            this.btnDetalles.Text = "Ver Detalles";
+            this.btnDetalles.UseVisualStyleBackColor = false;
+            this.btnDetalles.Click += new System.EventHandler(this.btnDetalles_Click);
             // 
             // btnVolver
             // 
@@ -333,65 +353,12 @@
             this.dgvUsers.Size = new System.Drawing.Size(1348, 440);
             this.dgvUsers.TabIndex = 3;
             // 
-            // id_estudio
+            // encargado_carga
             // 
-            this.id_estudio.HeaderText = "ID";
-            this.id_estudio.MinimumWidth = 6;
-            this.id_estudio.Name = "id_estudio";
-            this.id_estudio.ReadOnly = true;
-            // 
-            // fecha
-            // 
-            this.fecha.HeaderText = "Fecha";
-            this.fecha.MinimumWidth = 6;
-            this.fecha.Name = "fecha";
-            this.fecha.ReadOnly = true;
-            // 
-            // id_tipo_analisis
-            // 
-            this.id_tipo_analisis.HeaderText = "Tipo";
-            this.id_tipo_analisis.MinimumWidth = 6;
-            this.id_tipo_analisis.Name = "id_tipo_analisis";
-            this.id_tipo_analisis.ReadOnly = true;
-            // 
-            // medico
-            // 
-            this.medico.HeaderText = "Médico";
-            this.medico.MinimumWidth = 6;
-            this.medico.Name = "medico";
-            this.medico.ReadOnly = true;
-            // 
-            // diagnostico
-            // 
-            this.diagnostico.HeaderText = "Diagnóstico";
-            this.diagnostico.MinimumWidth = 6;
-            this.diagnostico.Name = "diagnostico";
-            this.diagnostico.ReadOnly = true;
-            // 
-            // btnDetalles
-            // 
-            this.btnDetalles.AutoSize = true;
-            this.btnDetalles.BackColor = System.Drawing.Color.MediumSeaGreen;
-            this.btnDetalles.FlatAppearance.BorderSize = 0;
-            this.btnDetalles.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
-            this.btnDetalles.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Gray;
-            this.btnDetalles.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnDetalles.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnDetalles.ForeColor = System.Drawing.Color.White;
-            this.btnDetalles.Location = new System.Drawing.Point(1012, 5);
-            this.btnDetalles.Margin = new System.Windows.Forms.Padding(5);
-            this.btnDetalles.Name = "btnDetalles";
-            this.btnDetalles.Size = new System.Drawing.Size(129, 30);
-            this.btnDetalles.TabIndex = 13;
-            this.btnDetalles.Text = "Ver Detalles";
-            this.btnDetalles.UseVisualStyleBackColor = false;
-            // 
-            // id_estad
-            // 
-            this.id_estad.HeaderText = "Estado";
-            this.id_estad.MinimumWidth = 6;
-            this.id_estad.Name = "id_estad";
-            this.id_estad.ReadOnly = true;
+            this.encargado_carga.HeaderText = "Cargado por";
+            this.encargado_carga.MinimumWidth = 6;
+            this.encargado_carga.Name = "encargado_carga";
+            this.encargado_carga.ReadOnly = true;
             // 
             // observaciones
             // 
@@ -400,12 +367,47 @@
             this.observaciones.Name = "observaciones";
             this.observaciones.ReadOnly = true;
             // 
-            // encargado_carga
+            // id_estad
             // 
-            this.encargado_carga.HeaderText = "Cargado por";
-            this.encargado_carga.MinimumWidth = 6;
-            this.encargado_carga.Name = "encargado_carga";
-            this.encargado_carga.ReadOnly = true;
+            this.id_estad.HeaderText = "Estado";
+            this.id_estad.MinimumWidth = 6;
+            this.id_estad.Name = "id_estad";
+            this.id_estad.ReadOnly = true;
+            // 
+            // diagnostico
+            // 
+            this.diagnostico.HeaderText = "Diagnóstico";
+            this.diagnostico.MinimumWidth = 6;
+            this.diagnostico.Name = "diagnostico";
+            this.diagnostico.ReadOnly = true;
+            // 
+            // medico
+            // 
+            this.medico.HeaderText = "Médico";
+            this.medico.MinimumWidth = 6;
+            this.medico.Name = "medico";
+            this.medico.ReadOnly = true;
+            // 
+            // id_tipo_analisis
+            // 
+            this.id_tipo_analisis.HeaderText = "Tipo";
+            this.id_tipo_analisis.MinimumWidth = 6;
+            this.id_tipo_analisis.Name = "id_tipo_analisis";
+            this.id_tipo_analisis.ReadOnly = true;
+            // 
+            // fecha
+            // 
+            this.fecha.HeaderText = "Fecha";
+            this.fecha.MinimumWidth = 6;
+            this.fecha.Name = "fecha";
+            this.fecha.ReadOnly = true;
+            // 
+            // id_estudio
+            // 
+            this.id_estudio.HeaderText = "ID";
+            this.id_estudio.MinimumWidth = 6;
+            this.id_estudio.Name = "id_estudio";
+            this.id_estudio.ReadOnly = true;
             // 
             // HistorialEstudiosForm
             // 

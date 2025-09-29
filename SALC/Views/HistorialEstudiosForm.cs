@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SALC.Views;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -30,6 +31,17 @@ namespace WindowsFormsApp1
         private void btnVolver_Click(object sender, EventArgs e)
         {
             this.Close();
+        }
+
+        private void btnDetalles_Click(object sender, EventArgs e)
+        {
+            
+        }
+
+        private void btnAgregar_Click(object sender, EventArgs e)
+        {
+            agregar_estudio estudio = new agregar_estudio();
+            estudio.Show();
         }
     }
 }
