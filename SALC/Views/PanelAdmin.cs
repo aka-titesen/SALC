@@ -116,5 +116,17 @@ namespace WindowsFormsApp1
             txtBuscar.Clear();
             LoadUsers();
         }
+
+        private void btnCerrarSesion_Click(object sender, EventArgs e)
+        {
+            UserAuthentication.Logout();
+
+            // 2. Mostrar Login
+            LoginForm loginForm = new LoginForm();
+            loginForm.Show();
+
+            // 3. Cerrar este panel
+            this.Close();
+        }
     }
 }

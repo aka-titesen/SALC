@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             this.panel1 = new System.Windows.Forms.Panel();
             this.label1 = new System.Windows.Forms.Label();
             this.ActionPanel = new System.Windows.Forms.Panel();
@@ -52,6 +52,7 @@
             this.telefono = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.mail = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.id_obra_social = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.btnCerrarSesion = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             this.ActionPanel.SuspendLayout();
             this.flowActions.SuspendLayout();
@@ -97,6 +98,7 @@
             this.flowActions.Controls.Add(this.BtnAgregar);
             this.flowActions.Controls.Add(this.btnEditar);
             this.flowActions.Controls.Add(this.btnHistoricos);
+            this.flowActions.Controls.Add(this.btnCerrarSesion);
             this.flowActions.Dock = System.Windows.Forms.DockStyle.Fill;
             this.flowActions.Location = new System.Drawing.Point(0, 0);
             this.flowActions.Name = "flowActions";
@@ -201,14 +203,14 @@
             this.dgvPacientes.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.dgvPacientes.BackgroundColor = System.Drawing.Color.White;
             this.dgvPacientes.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle3.BackColor = System.Drawing.Color.DodgerBlue;
-            dataGridViewCellStyle3.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle3.ForeColor = System.Drawing.Color.White;
-            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dgvPacientes.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle2.BackColor = System.Drawing.Color.DodgerBlue;
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle2.ForeColor = System.Drawing.Color.White;
+            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dgvPacientes.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
             this.dgvPacientes.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvPacientes.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.nro_doc,
@@ -319,6 +321,25 @@
             this.id_obra_social.Name = "id_obra_social";
             this.id_obra_social.ReadOnly = true;
             // 
+            // btnCerrarSesion
+            // 
+            this.btnCerrarSesion.AutoSize = true;
+            this.btnCerrarSesion.BackColor = System.Drawing.Color.Red;
+            this.btnCerrarSesion.FlatAppearance.BorderSize = 0;
+            this.btnCerrarSesion.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            this.btnCerrarSesion.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Gray;
+            this.btnCerrarSesion.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnCerrarSesion.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnCerrarSesion.ForeColor = System.Drawing.Color.White;
+            this.btnCerrarSesion.Location = new System.Drawing.Point(915, 15);
+            this.btnCerrarSesion.Margin = new System.Windows.Forms.Padding(5);
+            this.btnCerrarSesion.Name = "btnCerrarSesion";
+            this.btnCerrarSesion.Size = new System.Drawing.Size(146, 30);
+            this.btnCerrarSesion.TabIndex = 11;
+            this.btnCerrarSesion.Text = "Cerrar Sesion";
+            this.btnCerrarSesion.UseVisualStyleBackColor = false;
+            this.btnCerrarSesion.Click += new System.EventHandler(this.btnCerrarSesion_Click);
+            // 
             // PanelMedico
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -365,5 +386,6 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn telefono;
         private System.Windows.Forms.DataGridViewTextBoxColumn mail;
         private System.Windows.Forms.DataGridViewTextBoxColumn id_obra_social;
+        private System.Windows.Forms.Button btnCerrarSesion;
     }
 }

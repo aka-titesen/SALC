@@ -96,6 +96,7 @@
             this.btnCerrarSesion.TabIndex = 5;
             this.btnCerrarSesion.Text = "Cerrar Sesion";
             this.btnCerrarSesion.UseVisualStyleBackColor = false;
+            this.btnCerrarSesion.Click += new System.EventHandler(this.btnCerrarSesion_Click);
             // 
             // txtBuscar
             // 

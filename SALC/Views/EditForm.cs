@@ -39,7 +39,7 @@ namespace SALC.Views
                 rol = "5";
             }
 
-            comboBox2.DisplayMember = _original.Rol; // lo que se ve
+            comboBox2.DisplayMember = _original.Rol;
             comboBox2.ValueMember = rol;
 
             txtDni.Text = _original.Dni.ToString();

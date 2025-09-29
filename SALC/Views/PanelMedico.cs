@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SALC;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -25,6 +26,18 @@ namespace WindowsFormsApp1
             f.ShowDialog(this);
 
             this.Show();
+        }
+
+        private void btnCerrarSesion_Click(object sender, EventArgs e)
+        {
+            UserAuthentication.Logout();
+
+            // 2. Mostrar Login
+            LoginForm loginForm = new LoginForm();
+            loginForm.Show();
+
+            // 3. Cerrar este panel
+            this.Close();
         }
     }
 }
