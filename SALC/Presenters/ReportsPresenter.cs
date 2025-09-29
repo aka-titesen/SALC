@@ -1,28 +1,141 @@
 // Presenters/ReportsPresenter.cs
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using SALC.Views.Interfaces;
+using SALC.Models;
+using SALC.Services;
 
 namespace SALC.Presenters
 {
     /// <summary>
-    /// Presenter para la generaci髇 de informes
-    /// Maneja la l骻ica de presentaci髇 entre la vista y los servicios de negocio
+    /// Presenter para la generaci贸n de informes de an谩lisis
+    /// Maneja la l贸gica de presentaci贸n entre la vista y los servicios de datos
     /// </summary>
     public class ReportsPresenter
     {
         private readonly IReportsView _view;
+        private readonly AnalysisReportsService _reportsService;
 
         public ReportsPresenter(IReportsView view)
         {
             _view = view ?? throw new ArgumentNullException(nameof(view));
+            _reportsService = new AnalysisReportsService();
+            
             SubscribeToViewEvents();
+            InitializeView();
         }
 
         private void SubscribeToViewEvents()
         {
-            // TODO: Suscribirse a eventos de la vista cuando se implemente IReportsView
+            _view.LoadReports += OnLoadReports;
+            _view.SearchReports += OnSearchReports;
+            _view.FilterReports += OnFilterReports;
+            _view.ViewFullReport += OnViewFullReport;
+            _view.ExportPdfReport += OnExportPdfReport;
+            _view.ExportCsvReport += OnExportCsvReport;
         }
 
-        // TODO: Implementar m閠odos del presenter para reportes
+        private void InitializeView()
+        {
+            // Cargar datos iniciales
+            LoadReportsData();
+        }
+
+        private void OnLoadReports(object sender, EventArgs e)
+        {
+            LoadReportsData();
+        }
+
+        private void OnSearchReports(object sender, string searchText)
+        {
+            try
+            {
+                var reports = _reportsService.SearchReports(searchText);
+                _view.LoadReportsData(reports);
+            }
+            catch (Exception ex)
+            {
+                _view.ShowMessage("Error en b煤squeda", $"Error al buscar reportes: {ex.Message}", System.Windows.Forms.MessageBoxIcon.Error);
+            }
+        }
+
+        private void OnFilterReports(object sender, ReportFilter filter)
+        {
+            try
+            {
+                var reports = _reportsService.FilterReports(filter);
+                _view.LoadReportsData(reports);
+            }
+            catch (Exception ex)
+            {
+                _view.ShowMessage("Error en filtros", $"Error al filtrar reportes: {ex.Message}", System.Windows.Forms.MessageBoxIcon.Error);
+            }
+        }
+
+        private void OnViewFullReport(object sender, int reportIndex)
+        {
+            try
+            {
+                if (reportIndex >= 0 && reportIndex < _view.Reports.Count)
+                {
+                    var report = _view.Reports[reportIndex];
+                    // En una implementaci贸n real, esto abrir铆a una ventana modal o navegar铆a
+                    // a una vista detallada del reporte
+                    _view.ShowMessage("Informaci贸n", $"Viendo reporte completo de {report.PatientName}");
+                }
+            }
+            catch (Exception ex)
+            {
+                _view.ShowMessage("Error", $"Error al ver reporte: {ex.Message}");
+            }
+        }
+
+        private void OnExportPdfReport(object sender, int reportIndex)
+        {
+            try
+            {
+                if (reportIndex >= 0 && reportIndex < _view.Reports.Count)
+                {
+                    var report = _view.Reports[reportIndex];
+                    _reportsService.ExportToPdf(report);
+                    _view.ShowMessage("Exportaci贸n Exitosa", $"Reporte de {report.PatientName} exportado a PDF correctamente", System.Windows.Forms.MessageBoxIcon.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                _view.ShowMessage("Error en Exportaci贸n", $"Error al exportar a PDF: {ex.Message}", System.Windows.Forms.MessageBoxIcon.Error);
+            }
+        }
+
+        private void OnExportCsvReport(object sender, int reportIndex)
+        {
+            try
+            {
+                if (reportIndex >= 0 && reportIndex < _view.Reports.Count)
+                {
+                    var report = _view.Reports[reportIndex];
+                    _reportsService.ExportToCsv(report);
+                    _view.ShowMessage("Exportaci贸n Exitosa", $"Reporte de {report.PatientName} exportado a CSV correctamente", System.Windows.Forms.MessageBoxIcon.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                _view.ShowMessage("Error en Exportaci贸n", $"Error al exportar a CSV: {ex.Message}", System.Windows.Forms.MessageBoxIcon.Error);
+            }
+        }
+
+        private void LoadReportsData()
+        {
+            try
+            {
+                var reports = _reportsService.GetAllReports();
+                _view.LoadReportsData(reports);
+            }
+            catch (Exception ex)
+            {
+                _view.ShowMessage("Error", $"Error al cargar reportes: {ex.Message}", System.Windows.Forms.MessageBoxIcon.Error);
+            }
+        }
     }
 }
