@@ -1,4 +1,7 @@
 // Models/Estado.cs
+using System;
+
+// Models/Estado.cs
 namespace SALC.Models
 {
     /// <summary>

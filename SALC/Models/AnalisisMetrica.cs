@@ -1,8 +1,11 @@
 // Models/AnalisisMetrica.cs
+using System;
+
+// Models/AnalisisMetrica.cs
 namespace SALC.Models
 {
     /// <summary>
-    /// Representa la relaciÛn entre un an·lisis y sus mÈtricas con valores
+    /// Representa la relaci√≥n entre un an√°lisis y sus m√©tricas con valores
     /// </summary>
     public class AnalisisMetrica
     {
@@ -10,7 +13,7 @@ namespace SALC.Models
         public int IdMetrica { get; set; }
         public decimal Valor { get; set; }
         
-        // Propiedades de navegaciÛn (opcional)
+        // Propiedades de navegaci√≥n (opcional)
         public Analisis Analisis { get; set; }
         public Metrica Metrica { get; set; }
     }

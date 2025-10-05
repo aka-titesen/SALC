@@ -1,4 +1,7 @@
 // Models/TipoAnalisis.cs
+using System;
+
+// Models/TipoAnalisis.cs
 namespace SALC.Models
 {
     /// <summary>

@@ -1,4 +1,7 @@
 // Models/Rol.cs
+using System;
+
+// Models/Rol.cs
 namespace SALC.Models
 {
     /// <summary>

@@ -1,4 +1,7 @@
 // Models/Usuario.cs
+using System;
+
+// Models/Usuario.cs
 namespace SALC
 {
 	/// <summary>

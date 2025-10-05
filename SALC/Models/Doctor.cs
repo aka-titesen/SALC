@@ -1,4 +1,7 @@
 // Models/Doctor.cs
+using System;
+
+// Models/Doctor.cs
 namespace SALC.Models
 {
     /// <summary>

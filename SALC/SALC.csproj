@@ -187,6 +187,16 @@
     <!-- Modelos -->
     <Compile Include="Models\Usuario.cs" />
     <Compile Include="Services\UserData.cs" />
+	<Compile Include="Models\Estado.cs" />
+	<Compile Include="Models\EstadoUsuario.cs" />
+	<Compile Include="Models\Rol.cs" />
+	<Compile Include="Models\Doctor.cs" />
+	<Compile Include="Models\Paciente.cs" />
+	<Compile Include="Models\ObraSocial.cs" />
+	<Compile Include="Models\TipoAnalisis.cs" />
+	<Compile Include="Models\Metrica.cs" />
+	<Compile Include="Models\Analisis.cs" />
+	<Compile Include="Models\AnalisisMetrica.cs" />
     <!-- Comunes -->
     <Compile Include="Common\SALCColors.cs" />
     <!-- Presenters -->

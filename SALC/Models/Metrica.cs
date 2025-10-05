@@ -1,4 +1,7 @@
 // Models/Metrica.cs
+using System;
+
+// Models/Metrica.cs
 namespace SALC.Models
 {
     /// <summary>
