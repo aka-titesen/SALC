@@ -1,4 +1,4 @@
-// Models/Paciente.cs
+﻿// Models/Paciente.cs
 using System;
 
 namespace SALC.Models
@@ -8,7 +8,7 @@ namespace SALC.Models
     /// </summary>
     public class Paciente
     {
-        public int dni { get; set; }
+        public int Dni { get; set; }  // ✅ CORREGIDO: era "NroDoc"
         public string TipoDoc { get; set; }
         public string Nombre { get; set; }
         public string Apellido { get; set; }
@@ -19,7 +19,9 @@ namespace SALC.Models
         public string Provincia { get; set; }
         public string Telefono { get; set; }
         public string Mail { get; set; }
-        public int? IdObraSocial { get; set; }
+        public int? IdObraSocial { get; set; }  // ✅ CORREGIDO: ahora nullable
+        
+        // Propiedades de navegación (opcional)
         public ObraSocial ObraSocial { get; set; }
         
         public string NombreCompleto => $"{Nombre} {Apellido}";

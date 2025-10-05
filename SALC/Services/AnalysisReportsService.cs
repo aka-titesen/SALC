@@ -206,7 +206,7 @@ namespace SALC.Services
                         m.nombre as Parameter,
                         am.valor as Value,
                         m.unidad as Unit,
-                        m.valor_minimo + ' - ' + m.valor_maximo as ReferenceRange
+                        ISNULL(CAST(m.valor_minimo AS VARCHAR), 'N/A') + ' - ' + ISNULL(CAST(m.valor_maximo AS VARCHAR), 'N/A') as ReferenceRange
                     FROM analisis_metrica am
                     INNER JOIN metrica m ON am.id_metrica = m.id_metrica
                     WHERE am.id_analisis = @analysisId";
@@ -224,7 +224,7 @@ namespace SALC.Services
                                 Parameter = reader.GetString(0),
                                 Value = reader.GetDecimal(1).ToString(),
                                 Unit = reader.GetString(2),
-                                ReferenceRange = reader.GetString(3)
+                                ReferenceRange = $"{reader.GetString(3)} - {reader.GetString(4)}"
                             };
 
                             results.Add(result);
