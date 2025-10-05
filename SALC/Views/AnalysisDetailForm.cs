@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using SALC.UI;
+using SALC.Views.Interfaces;
 
 namespace SALC.Views
 {
@@ -185,13 +186,13 @@ namespace SALC.Views
             AddInfoToPanel(patientInfoPanel, "Teléfono:", _analysisReport.PacienteTelefono);
 
             // Cargar datos del análisis
-            AddInfoToPanel(analysisInfoPanel, "ID Análisis:", _analysisReport.Id.ToString());
+            AddInfoToPanel(analysisInfoPanel, "ID Análisis:", _analysisReport.ReportId.ToString());
             AddInfoToPanel(analysisInfoPanel, "Tipo de Análisis:", _analysisReport.TipoAnalisis);
             AddInfoToPanel(analysisInfoPanel, "Estado:", _analysisReport.Estado);
             AddInfoToPanel(analysisInfoPanel, "Prioridad:", _analysisReport.Prioridad);
             AddInfoToPanel(analysisInfoPanel, "Fecha Creación:", _analysisReport.FechaCreacion.ToString("dd/MM/yyyy HH:mm"));
             AddInfoToPanel(analysisInfoPanel, "Doctor:", _analysisReport.DoctorNombre);
-            AddInfoToPanel(analysisInfoPanel, "Observaciones:", _analysisReport.Observaciones);
+            AddInfoToPanel(analysisInfoPanel, "Observaciones:", _analysisReport.Observations);
 
             // Configurar DataGridView para resultados
             dgvResults.Columns.Clear();
@@ -203,10 +204,10 @@ namespace SALC.Views
             foreach (var result in _analysisResults)
             {
                 dgvResults.Rows.Add(
-                    result.MetricaNombre,
-                    result.Valor,
-                    result.Unidad,
-                    result.FechaCarga.ToString("dd/MM/yyyy HH:mm")
+                    result.Parameter,
+                    result.Value,
+                    result.Unit,
+                    result.ReferenceRange
                 );
             }
         }
@@ -236,13 +237,5 @@ namespace SALC.Views
             panel.Controls.Add(labelControl);
             panel.Controls.Add(valueControl);
         }
-    }
-
-    public class AnalysisResult
-    {
-        public string MetricaNombre { get; set; }
-        public string Valor { get; set; }
-        public string Unidad { get; set; }
-        public DateTime FechaCarga { get; set; }
     }
 }

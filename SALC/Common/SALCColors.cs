@@ -119,6 +119,11 @@ namespace SALC.UI
         /// Fondo del formulario de login
         /// </summary>
         public static readonly Color LoginBackground = Color.FromArgb(233, 236, 239);
+        
+        /// <summary>
+        /// Fondo claro para paneles de filtros
+        /// </summary>
+        public static readonly Color BackgroundLight = Color.FromArgb(240, 242, 245);
 
         // ============================================
         // COLORES DE SIDEBAR

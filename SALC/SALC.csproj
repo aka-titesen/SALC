@@ -56,6 +56,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <!-- Comunes -->
+    <Compile Include="Common\SALCColors.cs" />
     <Compile Include="Presenters\AppFeature.cs" />
     <Compile Include="Views\AgregarMetrica.cs">
       <SubType>Form</SubType>
@@ -151,10 +153,19 @@
     <Compile Include="Views\ResultsForm.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Views\RecepcionMuestrasForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Views\AppointmentsForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Views\ReportsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Views\AnalysisReportsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Views\AnalysisDetailForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Views\NotificationsForm.cs">
@@ -179,29 +190,40 @@
     <Compile Include="Views\Interfaces\ILoginView.cs" />
     <Compile Include="Views\Interfaces\IPatientsView.cs" />
     <Compile Include="Views\Interfaces\IResultsView.cs" />
+    <Compile Include="Views\Interfaces\IReportsView.cs" />
     <Compile Include="Views\Interfaces\IStudiesView.cs" />
     <Compile Include="Views\Interfaces\IAppointmentsView.cs" />
     <Compile Include="Views\Interfaces\IMainDashboardView.cs" />
+    <Compile Include="Views\Interfaces\INotificationsView.cs" />
+    <Compile Include="Views\Interfaces\IMetricsView.cs" />
+    <Compile Include="Views\Interfaces\IUserManagementView.cs" />
+    <Compile Include="Views\Interfaces\ISystemConfigView.cs" />
+    <Compile Include="Views\Interfaces\IBackupsView.cs" />
+    <Compile Include="Views\Interfaces\ISecurityView.cs" />
+    <Compile Include="Views\Interfaces\IHistoryView.cs" />
     <!-- Servicios -->
     <Compile Include="Services\UserAuthentication.cs" />
+    <Compile Include="Services\UserData.cs" />
+    <Compile Include="Services\AnalysisReportsService.cs" />
     <!-- Modelos -->
     <Compile Include="Models\Usuario.cs" />
-    <Compile Include="Services\UserData.cs" />
 	<Compile Include="Models\Estado.cs" />
 	<Compile Include="Models\EstadoUsuario.cs" />
 	<Compile Include="Models\Rol.cs" />
 	<Compile Include="Models\Doctor.cs" />
+	<Compile Include="Models\Asistente.cs" />
+	<Compile Include="Models\DoctorExterno.cs" />
 	<Compile Include="Models\Paciente.cs" />
 	<Compile Include="Models\ObraSocial.cs" />
 	<Compile Include="Models\TipoAnalisis.cs" />
 	<Compile Include="Models\Metrica.cs" />
 	<Compile Include="Models\Analisis.cs" />
 	<Compile Include="Models\AnalisisMetrica.cs" />
-    <!-- Comunes -->
-    <Compile Include="Common\SALCColors.cs" />
+	<Compile Include="Models\ResultadoAnalisis.cs" />
     <!-- Presenters -->
     <Compile Include="Presenters\LoginPresenter.cs" />
     <Compile Include="Presenters\MainDashboardPresenter.cs" />
+    <Compile Include="Presenters\ReportsPresenter.cs" />
     <!-- Entrada -->
     <Compile Include="Program.cs" />
   </ItemGroup>

@@ -34,10 +34,11 @@ namespace SALC
         public event EventHandler PatientsRequested;
         public event EventHandler StudiesRequested;
         public event EventHandler ResultsRequested;
+        public event EventHandler RecepcionMuestrasRequested;  // Nuevo evento para asistentes (RF-17)
         public event EventHandler ReportsRequested;
         public event EventHandler NotificationsRequested;
         public event EventHandler HistoryRequested;
-        public event EventHandler AppointmentsRequested;
+        // NOTA: AppointmentsRequested eliminado - Turnos NO existe en SALC
         public event EventHandler UserManagementRequested;
         public event EventHandler SystemConfigRequested;
         public event EventHandler BackupsRequested;
@@ -333,10 +334,10 @@ namespace SALC
             AppFeature.GestionPacientes => "Pacientes",
             AppFeature.GestionEstudios => "Análisis",
             AppFeature.CargaResultados => "Resultados",
+            AppFeature.RecepcionMuestras => "Recepción de Muestras",
             AppFeature.GenerarInformes => "Informes",
             AppFeature.Notificaciones => "Notificaciones",
             AppFeature.HistorialOrdenes => "Historial",
-            AppFeature.Turnos => "Turnos",
             AppFeature.GestionUsuarios => "Usuarios",
             AppFeature.ConfigSistema => "Configuración",
             AppFeature.CopiasSeguridad => "Backups",
@@ -349,10 +350,10 @@ namespace SALC
             AppFeature.GestionPacientes => "Administrar la información de pacientes (CRUD).",
             AppFeature.GestionEstudios => "Crear y gestionar órdenes de análisis.",
             AppFeature.CargaResultados => "Cargar y validar resultados de estudios.",
+            AppFeature.RecepcionMuestras => "Recepcionar muestras de análisis (RF-17).",
             AppFeature.GenerarInformes => "Generar y consultar informes PDF.",
             AppFeature.Notificaciones => "Enviar notificaciones a pacientes.",
             AppFeature.HistorialOrdenes => "Consultar historial de órdenes.",
-            AppFeature.Turnos => "Gestionar agenda y turnos.",
             AppFeature.GestionUsuarios => "Administrar usuarios y roles.",
             AppFeature.ConfigSistema => "Configurar parámetros del sistema.",
             AppFeature.CopiasSeguridad => "Configurar y ejecutar backups.",
@@ -367,10 +368,10 @@ namespace SALC
                 AppFeature.GestionPacientes => (Color.FromArgb(23, 162, 184), Color.FromArgb(23, 162, 184)),
                 AppFeature.GestionEstudios => (Color.FromArgb(0, 120, 215), Color.FromArgb(0, 120, 215)),
                 AppFeature.CargaResultados => (Color.FromArgb(255, 193, 7), Color.FromArgb(255, 193, 7)),
+                AppFeature.RecepcionMuestras => (Color.FromArgb(32, 201, 151), Color.FromArgb(32, 201, 151)),  // Verde turquesa
                 AppFeature.GenerarInformes => (Color.FromArgb(111, 66, 193), Color.FromArgb(111, 66, 193)),
                 AppFeature.Notificaciones => (Color.FromArgb(253, 126, 20), Color.FromArgb(253, 126, 20)),
                 AppFeature.HistorialOrdenes => (Color.FromArgb(40, 167, 69), Color.FromArgb(40, 167, 69)),
-                AppFeature.Turnos => (Color.FromArgb(102, 16, 242), Color.FromArgb(102, 16, 242)),
                 AppFeature.GestionUsuarios => (Color.FromArgb(32, 201, 151), Color.FromArgb(32, 201, 151)),
                 AppFeature.ConfigSistema => (Color.FromArgb(108, 117, 125), Color.FromArgb(108, 117, 125)),
                 AppFeature.CopiasSeguridad => (Color.FromArgb(52, 58, 64), Color.FromArgb(52, 58, 64)),
@@ -386,10 +387,10 @@ namespace SALC
                 case AppFeature.GestionPacientes: PatientsRequested?.Invoke(this, EventArgs.Empty); break;
                 case AppFeature.GestionEstudios: StudiesRequested?.Invoke(this, EventArgs.Empty); break;
                 case AppFeature.CargaResultados: ResultsRequested?.Invoke(this, EventArgs.Empty); break;
+                case AppFeature.RecepcionMuestras: RecepcionMuestrasRequested?.Invoke(this, EventArgs.Empty); break;
                 case AppFeature.GenerarInformes: ReportsRequested?.Invoke(this, EventArgs.Empty); break;
                 case AppFeature.Notificaciones: NotificationsRequested?.Invoke(this, EventArgs.Empty); break;
                 case AppFeature.HistorialOrdenes: HistoryRequested?.Invoke(this, EventArgs.Empty); break;
-                case AppFeature.Turnos: AppointmentsRequested?.Invoke(this, EventArgs.Empty); break;
                 case AppFeature.GestionUsuarios: UserManagementRequested?.Invoke(this, EventArgs.Empty); break;
                 case AppFeature.ConfigSistema: SystemConfigRequested?.Invoke(this, EventArgs.Empty); break;
                 case AppFeature.CopiasSeguridad: BackupsRequested?.Invoke(this, EventArgs.Empty); break;

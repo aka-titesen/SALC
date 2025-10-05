@@ -7,8 +7,20 @@ using SALC.UI;
 
 namespace SALC.Views
 {
+    /// <summary>
+    /// Formulario para carga y validación de resultados de análisis.
+    /// RESTRICCIÓN IMPORTANTE (RF-18):
+    /// - Solo los CLÍNICOS pueden acceder a esta pantalla
+    /// - Solo los CLÍNICOS pueden VALIDAR resultados (botón "Validar" visible)
+    /// - Los ASISTENTES NO pueden acceder a esta funcionalidad
+    /// </summary>
     public class ResultsForm : Form
     {
+        // Información del usuario actual
+        private string _userRole;
+        private int _dniUsuario;
+        private string _nombreUsuario;
+
         // Datos locales de UI (placeholders)
         private List<Analisis> PendingStudies { get; set; } = new List<Analisis>();
         private Analisis SelectedStudy { get; set; }
@@ -26,12 +38,32 @@ namespace SALC.Views
         private Button btnSearch;
         private Button btnLoadResults;
         private Button btnSaveResult;
+        private Button btnValidate;  // SOLO VISIBLE PARA CLÍNICOS (RF-18)
         private Button btnCompleteStudy;
         private Label lblSelectedStudy;
+        private Label lblValidationStatus;  // Muestra si está validado y por quién
         private Panel metricsPanel;
 
-        public ResultsForm()
+        public ResultsForm(string userRole, int dniUsuario, string nombreUsuario)
         {
+            _userRole = userRole;
+            _dniUsuario = dniUsuario;
+            _nombreUsuario = nombreUsuario;
+
+            // CONTROL DE ACCESO: Solo Clínicos pueden acceder (RF-18)
+            if (_userRole?.ToLower() != "clinico")
+            {
+                MessageBox.Show(
+                    "Acceso denegado.\n\n" +
+                    "Solo los usuarios con rol CLÍNICO pueden cargar y validar resultados de análisis.\n\n" +
+                    "Los asistentes deben usar la funcionalidad de 'Recepción de Muestras'.",
+                    "SALC - Acceso Restringido",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                this.Load += (s, e) => this.Close();
+                return;
+            }
+
             InitializeComponent();
             InitializeCustomComponents();
         }
@@ -57,7 +89,7 @@ namespace SALC.Views
         {
             topPanel = new Panel
             {
-                Height = 80,
+                Height = 100,
                 Dock = DockStyle.Top,
                 BackColor = SALCColors.CardBackground,
                 Padding = new Padding(20)
@@ -65,11 +97,31 @@ namespace SALC.Views
 
             Label titleLabel = new Label
             {
-                Text = "Carga de Resultados de Análisis",
+                Text = "CARGA Y VALIDACIÓN DE RESULTADOS DE ANÁLISIS",
                 Font = new Font("Microsoft Sans Serif", 16, FontStyle.Bold),
                 ForeColor = SALCColors.Results,
-                Size = new Size(400, 40),
-                Location = new Point(20, 20)
+                Size = new Size(700, 30),
+                Location = new Point(20, 15)
+            };
+
+            // Etiqueta de rol (solo Clínicos)
+            Label lblRol = new Label
+            {
+                Text = $"????? Clínico: {_nombreUsuario}",
+                Font = new Font("Microsoft Sans Serif", 10, FontStyle.Bold),
+                ForeColor = SALCColors.TextPrimary,
+                AutoSize = true,
+                Location = new Point(20, 50)
+            };
+
+            // Nota informativa sobre validación
+            Label lblInfo = new Label
+            {
+                Text = "?? Solo usted puede VALIDAR resultados (RF-18). La validación es obligatoria antes de imprimir o notificar.",
+                Font = new Font("Microsoft Sans Serif", 9, FontStyle.Italic),
+                ForeColor = SALCColors.Warning,
+                AutoSize = true,
+                Location = new Point(20, 72)
             };
 
             Panel searchPanel = new Panel
@@ -81,24 +133,21 @@ namespace SALC.Views
 
             txtSearch = new TextBox
             {
+                Text = "Buscar por paciente o ID...",
+                ForeColor = Color.Gray,
                 Size = new Size(300, 30),
                 Location = new Point(0, 5),
                 Font = new Font("Microsoft Sans Serif", 10),
                 BorderStyle = BorderStyle.FixedSingle
             };
-            // Placeholder manual para .NET Framework
-            txtSearch.Text = "Buscar por paciente o ID...";
-            txtSearch.ForeColor = Color.Gray;
-            txtSearch.GotFocus += (s, e) =>
-            {
+            txtSearch.GotFocus += (s, e) => {
                 if (txtSearch.Text == "Buscar por paciente o ID...")
                 {
-                    txtSearch.Text = string.Empty;
+                    txtSearch.Text = "";
                     txtSearch.ForeColor = Color.Black;
                 }
             };
-            txtSearch.LostFocus += (s, e) =>
-            {
+            txtSearch.LostFocus += (s, e) => {
                 if (string.IsNullOrWhiteSpace(txtSearch.Text))
                 {
                     txtSearch.Text = "Buscar por paciente o ID...";
@@ -120,7 +169,7 @@ namespace SALC.Views
             btnSearch.Click += (s, e) => { /* Solo UI */ };
 
             searchPanel.Controls.AddRange(new Control[] { txtSearch, btnSearch });
-            topPanel.Controls.AddRange(new Control[] { titleLabel, searchPanel });
+            topPanel.Controls.AddRange(new Control[] { titleLabel, lblRol, lblInfo, searchPanel });
             this.Controls.Add(topPanel);
         }
 
@@ -159,7 +208,7 @@ namespace SALC.Views
         {
             Label studiesTitle = new Label
             {
-                Text = "Estudios Pendientes",
+                Text = "Estudios Pendientes de Validación",
                 Font = new Font("Microsoft Sans Serif", 12, FontStyle.Bold),
                 ForeColor = SALCColors.TextPrimary,
                 Size = new Size(480, 25),
@@ -193,6 +242,8 @@ namespace SALC.Views
                 {
                     CreateMetricsControls();
                     btnSaveResult.Enabled = true;
+                    // IMPORTANTE: Solo habilitar validación si hay resultados guardados
+                    btnValidate.Enabled = StudyResults.Count > 0;
                 }
                 else
                 {
@@ -200,12 +251,27 @@ namespace SALC.Views
                 }
             };
 
-            btnCompleteStudy = new Button
+            // BOTÓN VALIDAR: Solo visible para Clínicos (RF-18)
+            btnValidate = new Button
             {
-                Text = "Completar Estudio",
-                Size = new Size(130, 30),
+                Text = "? VALIDAR Resultado",
+                Size = new Size(150, 30),
                 Location = new Point(170, 5),
                 BackColor = SALCColors.Primary,
+                ForeColor = Color.White,
+                FlatStyle = FlatStyle.Flat,
+                Font = new Font("Microsoft Sans Serif", 9, FontStyle.Bold),
+                Enabled = false
+            };
+            btnValidate.FlatAppearance.BorderSize = 0;
+            btnValidate.Click += BtnValidate_Click;
+
+            btnCompleteStudy = new Button
+            {
+                Text = "Ver Detalles",
+                Size = new Size(130, 30),
+                Location = new Point(330, 5),
+                BackColor = SALCColors.Info,
                 ForeColor = Color.White,
                 FlatStyle = FlatStyle.Flat,
                 Font = new Font("Microsoft Sans Serif", 9)
@@ -215,23 +281,11 @@ namespace SALC.Views
             {
                 if (SelectedStudy != null)
                 {
-                    var result = MessageBox.Show(
-                        $"¿Está seguro que desea marcar como completado el estudio ID {SelectedStudy.Id}?",
-                        "Confirmar Completar Estudio",
-                        MessageBoxButtons.YesNo,
-                        MessageBoxIcon.Question);
-                    if (result == DialogResult.Yes)
-                    {
-                        MessageBox.Show("Estudio marcado como completado (solo UI)");
-                    }
-                }
-                else
-                {
-                    MessageBox.Show("Seleccione un estudio para completar.");
+                    MessageBox.Show($"Ver detalles completos del análisis ID {SelectedStudy.Id} (solo UI)");
                 }
             };
 
-            buttonPanel.Controls.AddRange(new Control[] { btnLoadResults, btnCompleteStudy });
+            buttonPanel.Controls.AddRange(new Control[] { btnLoadResults, btnValidate, btnCompleteStudy });
 
             // DataGridView para estudios pendientes
             dgvPendingStudies = new DataGridView
@@ -253,7 +307,7 @@ namespace SALC.Views
                 new DataGridViewTextBoxColumn { Name = "Id", HeaderText = "ID", Width = 60 },
                 new DataGridViewTextBoxColumn { Name = "Paciente", HeaderText = "Paciente", Width = 150 },
                 new DataGridViewTextBoxColumn { Name = "TipoAnalisis", HeaderText = "Tipo", Width = 120 },
-                new DataGridViewTextBoxColumn { Name = "Prioridad", HeaderText = "Prioridad", Width = 80 },
+                new DataGridViewTextBoxColumn { Name = "Estado", HeaderText = "Estado", Width = 100 },
                 new DataGridViewTextBoxColumn { Name = "Fecha", HeaderText = "Fecha", Width = 90 }
             });
 
@@ -268,7 +322,12 @@ namespace SALC.Views
                     if (SelectedStudy != null)
                     {
                         lblSelectedStudy.Text = $"Estudio ID: {SelectedStudy.Id} - {SelectedStudy.Paciente?.Nombre} {SelectedStudy.Paciente?.Apellido} - {SelectedStudy.TipoAnalisis?.Descripcion}";
+                        
+                        // Actualizar estado de validación
+                        UpdateValidationStatus();
+                        
                         btnSaveResult.Enabled = false;
+                        btnValidate.Enabled = false;
                         ClearMetricsPanel();
                     }
                 }
@@ -284,9 +343,21 @@ namespace SALC.Views
                 Text = "Seleccione un estudio para cargar resultados",
                 Font = new Font("Microsoft Sans Serif", 12, FontStyle.Bold),
                 ForeColor = SALCColors.TextPrimary,
-                Size = new Size(600, 25),
+                Size = new Size(800, 25),
                 Location = new Point(20, 20),
                 Dock = DockStyle.Top
+            };
+
+            // Estado de validación
+            lblValidationStatus = new Label
+            {
+                Text = "",
+                Font = new Font("Microsoft Sans Serif", 10, FontStyle.Bold),
+                ForeColor = SALCColors.Warning,
+                Size = new Size(800, 25),
+                Location = new Point(20, 50),
+                Dock = DockStyle.Top,
+                Visible = false
             };
 
             // Panel para métricas dinámicas
@@ -328,7 +399,8 @@ namespace SALC.Views
                     var resultados = CollectMetricsValues();
                     StudyResults.AddRange(resultados);
                     RefreshResultsList();
-                    MessageBox.Show("Resultados guardados (solo UI)");
+                    MessageBox.Show("Resultados guardados. Ahora puede VALIDAR el análisis.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    btnValidate.Enabled = true;
                 }
             };
 
@@ -348,7 +420,6 @@ namespace SALC.Views
                 Font = new Font("Microsoft Sans Serif", 9)
             };
 
-            // Configurar columnas para resultados
             dgvResults.Columns.AddRange(new DataGridViewColumn[]
             {
                 new DataGridViewTextBoxColumn { Name = "Metrica", HeaderText = "Métrica", Width = 200 },
@@ -369,8 +440,91 @@ namespace SALC.Views
             };
 
             resultsPanel.Controls.AddRange(new Control[] { 
-                lblSelectedStudy, metricsPanel, actionPanel, resultsTitle, dgvResults 
+                lblSelectedStudy, lblValidationStatus, metricsPanel, actionPanel, resultsTitle, dgvResults 
             });
+        }
+
+        /// <summary>
+        /// RF-18: Validar resultado (solo Clínicos)
+        /// Actualiza analisis: estado = 2 (Verificado), dni_firma = dniUsuario, fecha_firma = NOW()
+        /// </summary>
+        private void BtnValidate_Click(object sender, EventArgs e)
+        {
+            if (SelectedStudy == null)
+            {
+                MessageBox.Show("No hay un estudio seleccionado.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            if (StudyResults.Count == 0)
+            {
+                MessageBox.Show("Debe cargar al menos un resultado antes de validar.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            var confirmResult = MessageBox.Show(
+                $"¿Confirma la VALIDACIÓN del análisis ID {SelectedStudy.Id}?\n\n" +
+                $"Paciente: {SelectedStudy.Paciente?.Nombre} {SelectedStudy.Paciente?.Apellido}\n" +
+                $"Tipo: {SelectedStudy.TipoAnalisis?.Descripcion}\n" +
+                $"Resultados: {StudyResults.Count} métricas cargadas\n\n" +
+                "?? Esta acción cambiará el estado a 'Verificado' y registrará su firma digital.\n" +
+                "Después de validar, NO se podrán modificar los resultados.",
+                "Confirmar Validación (RF-18)",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question);
+
+            if (confirmResult == DialogResult.Yes)
+            {
+                // TODO: Ejecutar RF-18
+                // UPDATE analisis 
+                // SET id_estado = 2,  -- "Verificado"
+                //     dni_firma = @DniClinico,
+                //     fecha_firma = GETDATE()
+                // WHERE id_analisis = @IdAnalisis
+
+                MessageBox.Show(
+                    $"? Análisis VALIDADO exitosamente\n\n" +
+                    $"ID: {SelectedStudy.Id}\n" +
+                    $"Validado por: Dr. {_nombreUsuario}\n" +
+                    $"DNI: {_dniUsuario}\n" +
+                    $"Fecha: {DateTime.Now:dd/MM/yyyy HH:mm}\n\n" +
+                    "El análisis ahora puede ser impreso y notificado al paciente.",
+                    "Validación Exitosa",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+
+                // Actualizar estado local
+                SelectedStudy.IdEstado = 2;
+                SelectedStudy.DniFirma = _dniUsuario;
+                SelectedStudy.FechaFirma = DateTime.Now;
+
+                UpdateValidationStatus();
+                btnValidate.Enabled = false;
+                btnSaveResult.Enabled = false;
+                ClearMetricsPanel();
+            }
+        }
+
+        private void UpdateValidationStatus()
+        {
+            if (SelectedStudy == null)
+            {
+                lblValidationStatus.Visible = false;
+                return;
+            }
+
+            if (SelectedStudy.IdEstado == 2 && SelectedStudy.DniFirma.HasValue)
+            {
+                lblValidationStatus.Text = $"? Validado por: Dr. {_nombreUsuario} - {SelectedStudy.FechaFirma:dd/MM/yyyy HH:mm}";
+                lblValidationStatus.ForeColor = SALCColors.Success;
+                lblValidationStatus.Visible = true;
+            }
+            else
+            {
+                lblValidationStatus.Text = "?? SIN VALIDAR - Debe validar antes de imprimir o notificar";
+                lblValidationStatus.ForeColor = SALCColors.Warning;
+                lblValidationStatus.Visible = true;
+            }
         }
 
         private void RefreshResultsList()
@@ -566,6 +720,9 @@ namespace SALC.Views
         {
             public int Id { get; set; }
             public int IdTipoAnalisis { get; set; }
+            public int IdEstado { get; set; }
+            public int? DniFirma { get; set; }
+            public DateTime? FechaFirma { get; set; }
             public Paciente Paciente { get; set; }
             public TipoAnalisis TipoAnalisis { get; set; }
             public DateTime FechaCreacion { get; set; }

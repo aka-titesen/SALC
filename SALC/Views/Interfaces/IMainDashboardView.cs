@@ -18,10 +18,10 @@ namespace SALC.Views.Interfaces
         event EventHandler PatientsRequested;
         event EventHandler StudiesRequested;
         event EventHandler ResultsRequested;
+        event EventHandler RecepcionMuestrasRequested;  // Nuevo evento para asistentes (RF-17)
         event EventHandler ReportsRequested;
         event EventHandler NotificationsRequested;
         event EventHandler HistoryRequested;
-        event EventHandler AppointmentsRequested; // Turnos
         event EventHandler UserManagementRequested;
         event EventHandler SystemConfigRequested;
         event EventHandler BackupsRequested;

@@ -98,7 +98,7 @@ namespace SALC
             Label userLabel = new Label
             {
                 Text = "👤 Usuario (DNI)",
-                Font = new Font("Segoe UI", 11, FontStyle.Bold),
+               Font = new Font("Segoe UI", 11, FontStyle.Bold),
                 ForeColor = Color.FromArgb(52, 58, 64),
                 Size = new Size(150, 25),
                 Location = new Point(50, 270)
@@ -228,10 +228,12 @@ namespace SALC
                     AdminForm adminForm = new AdminForm();
                     adminForm.Show();
                     this.Hide();
-                }else if (UserAuthentication.CurrentUser.Rol == "clinico" || UserAuthentication.CurrentUser.Rol == "asistente")
+                }
+                else if (UserAuthentication.CurrentUser.Rol == "clinico" || UserAuthentication.CurrentUser.Rol == "asistente")
                 {
-                    PanelMedico panelMedico = new PanelMedico();
-                    panelMedico.Show();
+                    // Mostrar MainDashboardForm que tiene separación correcta de funcionalidades
+                    MainDashboardForm dashboard = new MainDashboardForm();
+                    dashboard.Show();
                     this.Hide();
                 }
                 

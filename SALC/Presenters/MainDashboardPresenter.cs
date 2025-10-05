@@ -21,22 +21,23 @@ namespace SALC.Presenters
             { "clinico", new HashSet<AppFeature>
                 {
                     AppFeature.GestionPacientes,
-                    AppFeature.GestionEstudios,
-                    AppFeature.CargaResultados,
-                    AppFeature.GenerarInformes,
-                    AppFeature.Notificaciones,
-                    AppFeature.HistorialOrdenes,
-                    AppFeature.Turnos
+                    AppFeature.GestionEstudios,      // Clínicos pueden CREAR análisis (RF-06)
+                    AppFeature.CargaResultados,       // Clínicos pueden CARGAR y VALIDAR resultados (RF-07, RF-18)
+                    AppFeature.GenerarInformes,       // Clínicos pueden imprimir informes validados
+                    AppFeature.Notificaciones,        // Clínicos pueden notificar pacientes (RF-16)
+                    AppFeature.HistorialOrdenes
+                    // NOTA: Turnos NO existe en el sistema SALC
                 }
             },
             { "asistente", new HashSet<AppFeature>
                 {
-                    AppFeature.GestionPacientes,
-                    // Sin GestionEstudios para asistente (ERS RF2.1)
-                    AppFeature.GenerarInformes,
-                    AppFeature.Notificaciones,
-                    AppFeature.HistorialOrdenes,
-                    AppFeature.Turnos
+                    AppFeature.GestionPacientes,      // Asistentes pueden gestionar pacientes (RF-03, RF-04)
+                    // IMPORTANTE: Asistentes NO tienen GestionEstudios (no pueden crear análisis)
+                    // IMPORTANTE: Asistentes NO tienen CargaResultados (no pueden validar)
+                    AppFeature.RecepcionMuestras,     // Nueva feature: solo para asistentes (RF-17)
+                    AppFeature.GenerarInformes,       // Asistentes pueden IMPRIMIR informes ya validados
+                    AppFeature.HistorialOrdenes       // Asistentes pueden ver historial
+                    // NOTA: Turnos NO existe en el sistema SALC
                 }
             }
         };

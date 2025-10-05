@@ -9,6 +9,8 @@ namespace SALC.Models
     public class Paciente
     {
         public int dni { get; set; }
+        public int Dni => dni; // Alias para compatibilidad
+        public int NroDoc => dni; // Alias para compatibilidad con código legacy
         public string TipoDoc { get; set; }
         public string Nombre { get; set; }
         public string Apellido { get; set; }

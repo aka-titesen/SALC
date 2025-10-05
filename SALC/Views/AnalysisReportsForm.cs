@@ -20,15 +20,15 @@ namespace SALC.Views
         #region Eventos personalizados
         public event EventHandler LoadReports;
         public event EventHandler<string> SearchReports;
-        public event EventHandler<ReportFilter> FilterReports;
+        public event EventHandler<Interfaces.ReportFilter> FilterReports;
         public event EventHandler<int> ViewFullReport;
         public event EventHandler<int> ExportPdfReport;
         public event EventHandler<int> ExportCsvReport;
         #endregion
 
         #region Propiedades
-        public List<AnalisisReport> Reports { get; set; } = new List<AnalisisReport>();
-        public AnalisisReport SelectedReport { get; set; }
+        public List<Interfaces.AnalisisReport> Reports { get; set; } = new List<Interfaces.AnalisisReport>();
+        public Interfaces.AnalisisReport SelectedReport { get; set; }
         public string CurrentUserRole { get; set; }
         #endregion
 
@@ -122,9 +122,24 @@ namespace SALC.Views
 
             txtSearch = new TextBox
             {
-                PlaceholderText = "Buscar por nombre o ID de paciente...",
+                Text = "Buscar por nombre o ID de paciente...",
+                ForeColor = Color.Gray,
                 Size = new Size(300, 30),
                 Location = new Point(400, 20)
+            };
+            txtSearch.GotFocus += (s, e) => {
+                if (txtSearch.Text == "Buscar por nombre o ID de paciente...")
+                {
+                    txtSearch.Text = "";
+                    txtSearch.ForeColor = Color.Black;
+                }
+            };
+            txtSearch.LostFocus += (s, e) => {
+                if (string.IsNullOrWhiteSpace(txtSearch.Text))
+                {
+                    txtSearch.Text = "Buscar por nombre o ID de paciente...";
+                    txtSearch.ForeColor = Color.Gray;
+                }
             };
 
             btnSearch = CreateButton("Buscar", SALCColors.Secondary, new Point(710, 20));
@@ -487,7 +502,7 @@ namespace SALC.Views
 
         private void ApplyFilters()
         {
-            var filter = new ReportFilter
+            var filter = new Interfaces.ReportFilter
             {
                 FromDate = dtpFromDate.Value,
                 ToDate = dtpToDate.Value,
@@ -521,7 +536,7 @@ namespace SALC.Views
             dgvResults.DataSource = SelectedReport.Results;
         }
 
-        public void LoadReportsData(List<AnalisisReport> reports)
+        public void LoadReportsData(List<Interfaces.AnalisisReport> reports)
         {
             Reports = reports;
             dgvReports.DataSource = reports;
@@ -532,35 +547,4 @@ namespace SALC.Views
             MessageBox.Show(message, title, MessageBoxButtons.OK, icon);
         }
     }
-
-    #region Clases de apoyo
-    public class AnalisisReport
-    {
-        public int ReportId { get; set; }
-        public string PatientName { get; set; }
-        public string PatientId { get; set; }
-        public string AnalysisType { get; set; }
-        public DateTime AnalysisDate { get; set; }
-        public string Status { get; set; }
-        public string DoctorName { get; set; }
-        public string Observations { get; set; }
-        public List<AnalysisResult> Results { get; set; } = new List<AnalysisResult>();
-    }
-
-    public class AnalysisResult
-    {
-        public string Parameter { get; set; }
-        public string Value { get; set; }
-        public string Unit { get; set; }
-        public string ReferenceRange { get; set; }
-    }
-
-    public class ReportFilter
-    {
-        public DateTime FromDate { get; set; }
-        public DateTime ToDate { get; set; }
-        public string AnalysisType { get; set; }
-        public string PatientStatus { get; set; }
-    }
-    #endregion
 }

@@ -22,7 +22,7 @@ namespace SALC.Views
             Load += UserEditDialog_Load;
         }
 
-        private void UserEditDialog_Load(object? sender, EventArgs e)
+        private void UserEditDialog_Load(object sender, EventArgs e)
         {
             var rol = "";
             var Roltext = _original.Rol;
