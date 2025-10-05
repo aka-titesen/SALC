@@ -36,10 +36,11 @@ namespace SALC.Views.Interfaces
         event EventHandler RolesRequested;               // ABM rol
         
         // EVENTOS CONFIGURACIÓN Y SISTEMA (Solo Administrador)
-        event EventHandler SystemConfigRequested;        // Configuración general
+        // TODO: Eventos deshabilitados temporalmente - no soportados en ERS v1.0
+        // event EventHandler SystemConfigRequested;        // Configuración general
         event EventHandler BackupsRequested;             // Backup y restore
-        event EventHandler SecurityRequested;            // Auditoría y logs
-        event EventHandler AuditRequested;               // Logs de accesos
+        // event EventHandler SecurityRequested;            // Auditoría y logs
+        // event EventHandler AuditRequested;               // Logs de accesos
 
         void ShowMessage(string title, string message);
     }

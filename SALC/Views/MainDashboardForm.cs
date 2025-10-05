@@ -53,10 +53,11 @@ namespace SALC
         public event EventHandler RolesRequested;
         
         // EVENTOS CONFIGURACIÓN Y SISTEMA
-        public event EventHandler SystemConfigRequested;
+        // TODO: Eventos deshabilitados temporalmente - no soportados en ERS v1.0
+        // public event EventHandler SystemConfigRequested;
         public event EventHandler BackupsRequested;
-        public event EventHandler SecurityRequested;
-        public event EventHandler AuditRequested;
+        // public event EventHandler SecurityRequested;
+        // public event EventHandler AuditRequested;
 
         public MainDashboardForm()
         {
@@ -344,7 +345,8 @@ namespace SALC
 
         private string GetFeatureTitle(AppFeature f) => f switch
         {
-            AppFeature.Dashboard => "Dashboard",
+            // TODO: Dashboard deshabilitado temporalmente - no definido en ERS v1.0
+            // AppFeature.Dashboard => "Dashboard",
             AppFeature.GestionPacientes => "Pacientes",
             AppFeature.GestionEstudios => "Análisis",
             AppFeature.CargaResultados => "Resultados",
@@ -366,10 +368,11 @@ namespace SALC
             AppFeature.GestionRoles => "Roles",
             
             // CONFIGURACIÓN Y SISTEMA
-            AppFeature.ConfigSistema => "Configuración",
+            // TODO: Funcionalidades deshabilitadas temporalmente - no soportadas en ERS v1.0
+            // AppFeature.ConfigSistema => "Configuración",
             AppFeature.CopiasSeguridad => "Backups",
-            AppFeature.Seguridad => "Seguridad",
-            AppFeature.AuditoriaAccesos => "Auditoría",
+            // AppFeature.Seguridad => "Seguridad",
+            // AppFeature.AuditoriaAccesos => "Auditoría",
             
             _ => f.ToString()
         };
@@ -397,10 +400,11 @@ namespace SALC
             AppFeature.GestionRoles => "ABM roles del sistema.",
             
             // CONFIGURACIÓN Y SISTEMA
-            AppFeature.ConfigSistema => "Configurar parámetros del sistema.",
+            // TODO: Descripciones deshabilitadas temporalmente - no soportadas en ERS v1.0
+            // AppFeature.ConfigSistema => "Configurar parámetros del sistema.",
             AppFeature.CopiasSeguridad => "Configurar y ejecutar backups.",
-            AppFeature.Seguridad => "Auditar accesos y permisos.",
-            AppFeature.AuditoriaAccesos => "Ver logs de accesos de usuarios.",
+            // AppFeature.Seguridad => "Auditar accesos y permisos.",
+            // AppFeature.AuditoriaAccesos => "Ver logs de accesos de usuarios.",
             
             _ => string.Empty
         };
@@ -430,10 +434,11 @@ namespace SALC
                 AppFeature.GestionRoles => (Color.FromArgb(142, 36, 170), Color.FromArgb(142, 36, 170)),
                 
                 // CONFIGURACIÓN Y SISTEMA - Tonos grises/rojos
-                AppFeature.ConfigSistema => (Color.FromArgb(108, 117, 125), Color.FromArgb(108, 117, 125)),
+                // TODO: Colores deshabilitados temporalmente - funcionalidades no soportadas
+                // AppFeature.ConfigSistema => (Color.FromArgb(108, 117, 125), Color.FromArgb(108, 117, 125)),
                 AppFeature.CopiasSeguridad => (Color.FromArgb(52, 58, 64), Color.FromArgb(52, 58, 64)),
-                AppFeature.Seguridad => (Color.FromArgb(220, 53, 69), Color.FromArgb(220, 53, 69)),
-                AppFeature.AuditoriaAccesos => (Color.FromArgb(220, 53, 69), Color.FromArgb(220, 53, 69)),
+                // AppFeature.Seguridad => (Color.FromArgb(220, 53, 69), Color.FromArgb(220, 53, 69)),
+                // AppFeature.AuditoriaAccesos => (Color.FromArgb(220, 53, 69), Color.FromArgb(220, 53, 69)),
                 
                 _ => (Color.FromArgb(0, 120, 215), Color.FromArgb(0, 120, 215))
             };
@@ -464,12 +469,14 @@ namespace SALC
                 case AppFeature.GestionRoles: RolesRequested?.Invoke(this, EventArgs.Empty); break;
                 
                 // CONFIGURACIÓN Y SISTEMA
-                case AppFeature.ConfigSistema: SystemConfigRequested?.Invoke(this, EventArgs.Empty); break;
+                // TODO: Funcionalidades deshabilitadas temporalmente - no soportadas en ERS v1.0
+                // case AppFeature.ConfigSistema: SystemConfigRequested?.Invoke(this, EventArgs.Empty); break;
                 case AppFeature.CopiasSeguridad: BackupsRequested?.Invoke(this, EventArgs.Empty); break;
-                case AppFeature.Seguridad: SecurityRequested?.Invoke(this, EventArgs.Empty); break;
-                case AppFeature.AuditoriaAccesos: AuditRequested?.Invoke(this, EventArgs.Empty); break;
+                // case AppFeature.Seguridad: SecurityRequested?.Invoke(this, EventArgs.Empty); break;
+                // case AppFeature.AuditoriaAccesos: AuditRequested?.Invoke(this, EventArgs.Empty); break;
                 
-                case AppFeature.Dashboard: break;
+                // TODO: Dashboard deshabilitado temporalmente - no definido en ERS v1.0
+                // case AppFeature.Dashboard: break;
             }
         }
     }

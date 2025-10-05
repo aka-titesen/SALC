@@ -11,7 +11,8 @@ namespace SALC.Presenters
         {
             { "admin", new HashSet<AppFeature>
                 {
-                    AppFeature.Dashboard,
+                    // TODO: Dashboard deshabilitado temporalmente - no definido en ERS v1.0
+                    // AppFeature.Dashboard,
                     
                     // GESTIÓN DE USUARIOS Y ENTIDADES
                     AppFeature.GestionUsuarios,          // ABM usuarios internos (usuario, doctor, asistente) 
@@ -26,10 +27,11 @@ namespace SALC.Presenters
                     AppFeature.GestionRoles,             // ABM rol
                     
                     // CONFIGURACIÓN Y SISTEMA
-                    AppFeature.ConfigSistema,            // Configuración general
+                    // TODO: Funcionalidades deshabilitadas temporalmente - no soportadas en ERS v1.0
+                    // AppFeature.ConfigSistema,            // Configuración general
                     AppFeature.CopiasSeguridad,          // Backup y restore
-                    AppFeature.Seguridad,                // Auditoría y logs
-                    AppFeature.AuditoriaAccesos          // Logs de accesos de usuarios
+                    // AppFeature.Seguridad,                // Auditoría y logs
+                    // AppFeature.AuditoriaAccesos          // Logs de accesos de usuarios
                 }
             },
             { "clinico", new HashSet<AppFeature>
