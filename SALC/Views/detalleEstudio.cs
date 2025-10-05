@@ -30,8 +30,9 @@ namespace SALC.Views
 
         private void btnEditar_Click(object sender, EventArgs e)
         {
-            editarMetrica metricaEditar = new editarMetrica();
-            metricaEditar.ShowDialog();
+            // TODO: Implementar formulario de edición de métricas
+            // Referencia a editarMetrica eliminada - archivo obsoleto
+            MessageBox.Show("Funcionalidad de edición de métrica en desarrollo.", "En desarrollo", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
     }
 }
