@@ -37,10 +37,10 @@ namespace SALC
             string query = @"
                 SELECT u.dni, u.nombre, u.apellido, u.email, u.telefono, r.[rol]
                 FROM usuario u
-                INNER JOIN roles r ON u.id_rol = r.id_rol
-                LEFT JOIN estado_usuarios eu ON u.estado_usuario = eu.id_estado
+                INNER JOIN rol r ON u.id_rol = r.id_rol
+                LEFT JOIN estado_usuario eu ON u.estado_usuario = eu.id_estado
                 WHERE (u.dni = @Dni OR LOWER(u.email) = LOWER(@Email))
-                  AND u.[contraseña] = @Password
+                  AND u.[password] = @Password
                   AND u.estado_usuario = 1";
 
             try

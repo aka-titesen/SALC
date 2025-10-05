@@ -129,7 +129,8 @@ namespace SALC.Views
             };
             if (!string.IsNullOrWhiteSpace(txtPass2.Text))
             {
-                EditedUser.Pass = txtPass2.Text;
+                // Cambiado Pass a password
+                EditedUser.password = txtPass2.Text;
                 ShouldChangePassword = true;
             }
             else

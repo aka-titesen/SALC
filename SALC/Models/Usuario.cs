@@ -38,12 +38,13 @@ namespace SALC
 		/// </summary>
 		public string Telefono { get; set; }
 
-        // Puedes agregar m�s propiedades si las necesitas en el futuro
-        // You can add more properties if needed in the future
+        // Cambiado de ID_estado a estado_usuario para coincidir con la BD
+		public int? estado_usuario { get; set; }
 
-        public int ID_estado { get; set; }                    
-        public string Estado { get; set; } = "";
+		// Cambiado de Pass a password para coincidir con la BD
+		public string password { get; set; }
 
-		public string Pass { get; set; }
+		// Propiedad calculada para el nombre del estado (opcional)
+		public string Estado { get; set; } = "";
     }
 }

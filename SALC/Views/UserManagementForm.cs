@@ -229,7 +229,8 @@ namespace SALC.Views
                 usersDataGridView.Rows.Clear();
                 foreach (var u in usuarios)
                 {
-                    usersDataGridView.Rows.Add(u.Dni, u.Nombre, u.Apellido, u.Email ?? "", u.Telefono ?? "", u.Rol, u.Estado, u.ID_estado);
+                    // Cambiado ID_estado a estado_usuario
+                    usersDataGridView.Rows.Add(u.Dni, u.Nombre, u.Apellido, u.Email ?? "", u.Telefono ?? "", u.Rol, u.Estado, u.estado_usuario);
                 }
             }
             catch (Exception ex)

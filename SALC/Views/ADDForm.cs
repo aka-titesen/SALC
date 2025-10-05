@@ -60,7 +60,8 @@ namespace SALC.Views
                 Email = txtEmail.Text.Trim(),
                 Telefono = txtTelefono.Text.Trim(),
                 id_rol = rol,
-                Pass = txtPass.Text.Trim(),
+                // Cambiado Pass a password
+                password = txtPass.Text.Trim(),
 
             };
 

@@ -381,8 +381,9 @@ namespace SALC
             int dni = int.Parse(dniTextBox.Text);
             var selectedRole = (KeyValuePair<int, string>)rolComboBox.SelectedItem;
 
+            // Cambiado 'contraseña' a 'password' para coincidir con la BD
             string query = @"
-                INSERT INTO usuario (dni, nombre, apellido, email, telefono, contraseña, id_rol)
+                INSERT INTO usuario (dni, nombre, apellido, email, telefono, password, id_rol)
                 VALUES (@Dni, @Nombre, @Apellido, @Email, @Telefono, @Password, @IdRol)";
 
             using (SqlConnection connection = new SqlConnection(connectionString))
@@ -422,9 +423,10 @@ namespace SALC
             // Update password only if provided
             if (!string.IsNullOrWhiteSpace(passwordTextBox.Text))
             {
+                // Cambiado 'contraseña' a 'password' para coincidir con la BD
                 query = @"
                     UPDATE usuario
-                    SET nombre = @Nombre, apellido = @Apellido, email = @Email, telefono = @Telefono, contraseña = @Password, id_rol = @IdRol
+                    SET nombre = @Nombre, apellido = @Apellido, email = @Email, telefono = @Telefono, password = @Password, id_rol = @IdRol
                     WHERE dni = @Dni";
             }
 
