@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using SALC.Presenters;
 using SALC.Views.Interfaces;
+using SALC.Views;
 
 namespace SALC
 {
@@ -64,8 +65,92 @@ namespace SALC
             InitializeComponent();
             InitializeLayout();
 
-            var _ = new MainDashboardPresenter(this);
+            // Inicializar presenter principal
+            var dashboardPresenter = new MainDashboardPresenter(this);
+            
+            // Si es administrador, inicializar los eventos de administración
+            if (UserAuthentication.CurrentUser?.Rol?.ToLower() == "admin")
+            {
+                // Conectar eventos administrativos directamente
+                ConnectAdminEvents();
+            }
         }
+
+        private void ConnectAdminEvents()
+        {
+            // Conectar eventos administrativos directamente
+            this.UserManagementRequested += OnUserManagementRequested;
+            this.PatientsAdminRequested += OnPatientsAdminRequested;
+            this.ExternalDoctorsRequested += OnExternalDoctorsRequested;
+            this.AnalysisTypesRequested += OnCatalogRequested;
+            this.MetricsRequested += OnCatalogRequested;
+            this.InsuranceRequested += OnCatalogRequested;
+            this.StatesRequested += OnCatalogRequested;
+            this.RolesRequested += OnCatalogRequested;
+            this.BackupsRequested += OnBackupsRequested;
+        }
+
+        #region Admin Event Handlers
+
+        private void OnUserManagementRequested(object sender, EventArgs e)
+        {
+            try
+            {
+                var userForm = new UserManagementForm();
+                userForm.ShowDialog();
+            }
+            catch (Exception ex)
+            {
+                ShowMessage("Error", $"Error al abrir gestión de usuarios: {ex.Message}");
+            }
+        }
+
+        private void OnPatientsAdminRequested(object sender, EventArgs e)
+        {
+            try
+            {
+                var patientsForm = new PatientsForm();
+                patientsForm.ShowDialog();
+            }
+            catch (Exception ex)
+            {
+                ShowMessage("Error", $"Error al abrir gestión de pacientes: {ex.Message}");
+            }
+        }
+
+        private void OnExternalDoctorsRequested(object sender, EventArgs e)
+        {
+            ShowMessage("Funcionalidad en Desarrollo", 
+                "La gestión de doctores externos estará disponible en la próxima versión.");
+        }
+
+        private void OnCatalogRequested(object sender, EventArgs e)
+        {
+            try
+            {
+                var catalogForm = new AdminCatalogFormStub();
+                catalogForm.ShowDialog();
+            }
+            catch (Exception ex)
+            {
+                ShowMessage("Error", $"Error al abrir gestión de catálogos: {ex.Message}");
+            }
+        }
+
+        private void OnBackupsRequested(object sender, EventArgs e)
+        {
+            try
+            {
+                var backupForm = new BackupManagementFormStub();
+                backupForm.ShowDialog();
+            }
+            catch (Exception ex)
+            {
+                ShowMessage("Error", $"Error al abrir gestión de backups: {ex.Message}");
+            }
+        }
+
+        #endregion
 
         private void InitializeLayout()
         {

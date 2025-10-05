@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -159,6 +158,12 @@
     <Compile Include="Views\BackupsForm.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Views\AdminCatalogFormStub.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Views\BackupManagementFormStub.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <!-- Interfaces -->
     <Compile Include="Views\Interfaces\ILoginView.cs" />
     <Compile Include="Views\Interfaces\IPatientsView.cs" />
@@ -178,19 +183,19 @@
     <Compile Include="Services\AnalysisReportsService.cs" />
     <!-- Modelos -->
     <Compile Include="Models\Usuario.cs" />
-	<Compile Include="Models\Estado.cs" />
-	<Compile Include="Models\EstadoUsuario.cs" />
-	<Compile Include="Models\Rol.cs" />
-	<Compile Include="Models\Doctor.cs" />
-	<Compile Include="Models\Asistente.cs" />
-	<Compile Include="Models\DoctorExterno.cs" />
-	<Compile Include="Models\Paciente.cs" />
-	<Compile Include="Models\ObraSocial.cs" />
-	<Compile Include="Models\TipoAnalisis.cs" />
-	<Compile Include="Models\Metrica.cs" />
-	<Compile Include="Models\Analisis.cs" />
-	<Compile Include="Models\AnalisisMetrica.cs" />
-	<Compile Include="Models\ResultadoAnalisis.cs" />
+    <Compile Include="Models\Estado.cs" />
+    <Compile Include="Models\EstadoUsuario.cs" />
+    <Compile Include="Models\Rol.cs" />
+    <Compile Include="Models\Doctor.cs" />
+    <Compile Include="Models\Asistente.cs" />
+    <Compile Include="Models\DoctorExterno.cs" />
+    <Compile Include="Models\Paciente.cs" />
+    <Compile Include="Models\ObraSocial.cs" />
+    <Compile Include="Models\TipoAnalisis.cs" />
+    <Compile Include="Models\Metrica.cs" />
+    <Compile Include="Models\Analisis.cs" />
+    <Compile Include="Models\AnalisisMetrica.cs" />
+    <Compile Include="Models\ResultadoAnalisis.cs" />
     <!-- Presenters -->
     <Compile Include="Presenters\LoginPresenter.cs" />
     <Compile Include="Presenters\MainDashboardPresenter.cs" />

@@ -9,7 +9,7 @@ namespace SALC.Models
     /// </summary>
     public class Estado
     {
-        public int Id { get; set; }
+        public int IdEstado { get; set; }
         public string TipoEstado { get; set; }
     }
 }
