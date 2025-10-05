@@ -89,7 +89,6 @@
     <Compile Include="Views\editarEstudio.Designer.cs">
       <DependentUpon>editarEstudio.cs</DependentUpon>
     </Compile>
-    <!-- ELIMINADO: editarMetrica.cs - archivo obsoleto sin implementación -->
     <Compile Include="Views\EditarPaciente.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -127,7 +126,6 @@
     <Compile Include="Views\MainDashboardForm.Designer.cs">
       <DependentUpon>MainDashboardForm.cs</DependentUpon>
     </Compile>
-    <!-- ELIMINADO: PanelAdmin.cs y PanelMedico.cs - reemplazados por MainDashboardForm -->
     <Compile Include="Views\PatientsForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -140,7 +138,6 @@
     <Compile Include="Views\RecepcionMuestrasForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <!-- ELIMINADO: AppointmentsForm.cs - Turnos NO existen en SALC -->
     <Compile Include="Views\ReportsForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -159,7 +156,6 @@
     <Compile Include="Views\UserManagementForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <!-- ELIMINADO: SystemConfigForm.cs y SecurityForm.cs - funcionalidades deshabilitadas -->
     <Compile Include="Views\BackupsForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -169,7 +165,6 @@
     <Compile Include="Views\Interfaces\IResultsView.cs" />
     <Compile Include="Views\Interfaces\IReportsView.cs" />
     <Compile Include="Views\Interfaces\IStudiesView.cs" />
-    <!-- ELIMINADO: IAppointmentsView.cs, ISystemConfigView.cs, ISecurityView.cs - funcionalidades deshabilitadas -->
     <Compile Include="Views\Interfaces\IMainDashboardView.cs" />
     <Compile Include="Views\Interfaces\INotificationsView.cs" />
     <Compile Include="Views\Interfaces\IMetricsView.cs" />
@@ -226,7 +221,6 @@
     <EmbeddedResource Include="Views\editarEstudio.resx">
       <DependentUpon>editarEstudio.cs</DependentUpon>
     </EmbeddedResource>
-    <!-- ELIMINADO: editarMetrica.resx, PanelAdmin.resx, PanelMedico.resx - archivos obsoletos -->
     <EmbeddedResource Include="Views\EditarPaciente.resx">
       <DependentUpon>EditarPaciente.cs</DependentUpon>
     </EmbeddedResource>
@@ -241,6 +235,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Views\LoginForm.resx">
       <DependentUpon>LoginForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Views\MainDashboardForm.resx">
+      <DependentUpon>MainDashboardForm.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
