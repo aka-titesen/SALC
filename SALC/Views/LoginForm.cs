@@ -223,20 +223,10 @@ namespace SALC
             {
                 MessageBox.Show($"¡Bienvenido, {UserAuthentication.CurrentUser.Nombre}!", "Inicio de Sesión Exitoso", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                if (UserAuthentication.CurrentUser.Rol == "admin")
-                {
-                    AdminForm adminForm = new AdminForm();
-                    adminForm.Show();
-                    this.Hide();
-                }
-                else if (UserAuthentication.CurrentUser.Rol == "clinico" || UserAuthentication.CurrentUser.Rol == "asistente")
-                {
-                    // Mostrar MainDashboardForm que tiene separación correcta de funcionalidades
-                    MainDashboardForm dashboard = new MainDashboardForm();
-                    dashboard.Show();
-                    this.Hide();
-                }
-                
+                // TODOS los roles usan MainDashboardForm que tiene separación correcta
+                MainDashboardForm dashboard = new MainDashboardForm();
+                dashboard.Show();
+                this.Hide();
             }
             else
             {

@@ -39,10 +39,24 @@ namespace SALC
         public event EventHandler NotificationsRequested;
         public event EventHandler HistoryRequested;
         // NOTA: AppointmentsRequested eliminado - Turnos NO existe en SALC
+        
+        // EVENTOS ADMINISTRACIÓN DE USUARIOS
         public event EventHandler UserManagementRequested;
+        public event EventHandler PatientsAdminRequested;
+        public event EventHandler ExternalDoctorsRequested;
+        
+        // EVENTOS ADMINISTRACIÓN DE CATÁLOGOS  
+        public event EventHandler AnalysisTypesRequested;
+        public event EventHandler MetricsRequested;
+        public event EventHandler InsuranceRequested;
+        public event EventHandler StatesRequested;
+        public event EventHandler RolesRequested;
+        
+        // EVENTOS CONFIGURACIÓN Y SISTEMA
         public event EventHandler SystemConfigRequested;
         public event EventHandler BackupsRequested;
         public event EventHandler SecurityRequested;
+        public event EventHandler AuditRequested;
 
         public MainDashboardForm()
         {
@@ -338,10 +352,25 @@ namespace SALC
             AppFeature.GenerarInformes => "Informes",
             AppFeature.Notificaciones => "Notificaciones",
             AppFeature.HistorialOrdenes => "Historial",
-            AppFeature.GestionUsuarios => "Usuarios",
+            
+            // ADMINISTRACIÓN DE USUARIOS
+            AppFeature.GestionUsuarios => "Usuarios del Sistema",
+            AppFeature.GestionPacientesAdmin => "Gestión de Pacientes",
+            AppFeature.GestionDoctoresExternos => "Doctores Externos",
+            
+            // ADMINISTRACIÓN DE CATÁLOGOS
+            AppFeature.GestionTiposAnalisis => "Tipos de Análisis",
+            AppFeature.GestionMetricas => "Métricas",
+            AppFeature.GestionObrasSociales => "Obras Sociales",
+            AppFeature.GestionEstados => "Estados",
+            AppFeature.GestionRoles => "Roles",
+            
+            // CONFIGURACIÓN Y SISTEMA
             AppFeature.ConfigSistema => "Configuración",
             AppFeature.CopiasSeguridad => "Backups",
             AppFeature.Seguridad => "Seguridad",
+            AppFeature.AuditoriaAccesos => "Auditoría",
+            
             _ => f.ToString()
         };
 
@@ -354,10 +383,25 @@ namespace SALC
             AppFeature.GenerarInformes => "Generar y consultar informes PDF.",
             AppFeature.Notificaciones => "Enviar notificaciones a pacientes.",
             AppFeature.HistorialOrdenes => "Consultar historial de órdenes.",
-            AppFeature.GestionUsuarios => "Administrar usuarios y roles.",
+            
+            // ADMINISTRACIÓN DE USUARIOS
+            AppFeature.GestionUsuarios => "ABM usuarios internos: administradores, clínicos, asistentes.",
+            AppFeature.GestionPacientesAdmin => "ABM completo de pacientes con vista administrativa.",
+            AppFeature.GestionDoctoresExternos => "ABM doctores externos que solicitan análisis.",
+            
+            // ADMINISTRACIÓN DE CATÁLOGOS
+            AppFeature.GestionTiposAnalisis => "ABM tipos de análisis disponibles en el laboratorio.",
+            AppFeature.GestionMetricas => "ABM métricas y parámetros de análisis.",
+            AppFeature.GestionObrasSociales => "ABM obras sociales y prepagas.",
+            AppFeature.GestionEstados => "ABM estados de análisis y usuarios.",
+            AppFeature.GestionRoles => "ABM roles del sistema.",
+            
+            // CONFIGURACIÓN Y SISTEMA
             AppFeature.ConfigSistema => "Configurar parámetros del sistema.",
             AppFeature.CopiasSeguridad => "Configurar y ejecutar backups.",
             AppFeature.Seguridad => "Auditar accesos y permisos.",
+            AppFeature.AuditoriaAccesos => "Ver logs de accesos de usuarios.",
+            
             _ => string.Empty
         };
 
@@ -372,10 +416,25 @@ namespace SALC
                 AppFeature.GenerarInformes => (Color.FromArgb(111, 66, 193), Color.FromArgb(111, 66, 193)),
                 AppFeature.Notificaciones => (Color.FromArgb(253, 126, 20), Color.FromArgb(253, 126, 20)),
                 AppFeature.HistorialOrdenes => (Color.FromArgb(40, 167, 69), Color.FromArgb(40, 167, 69)),
+                
+                // ADMINISTRACIÓN DE USUARIOS - Tonos azules
                 AppFeature.GestionUsuarios => (Color.FromArgb(32, 201, 151), Color.FromArgb(32, 201, 151)),
+                AppFeature.GestionPacientesAdmin => (Color.FromArgb(0, 123, 255), Color.FromArgb(0, 123, 255)),
+                AppFeature.GestionDoctoresExternos => (Color.FromArgb(23, 162, 184), Color.FromArgb(23, 162, 184)),
+                
+                // ADMINISTRACIÓN DE CATÁLOGOS - Tonos violetas/morados
+                AppFeature.GestionTiposAnalisis => (Color.FromArgb(111, 66, 193), Color.FromArgb(111, 66, 193)),
+                AppFeature.GestionMetricas => (Color.FromArgb(102, 16, 242), Color.FromArgb(102, 16, 242)),
+                AppFeature.GestionObrasSociales => (Color.FromArgb(156, 39, 176), Color.FromArgb(156, 39, 176)),
+                AppFeature.GestionEstados => (Color.FromArgb(123, 31, 162), Color.FromArgb(123, 31, 162)),
+                AppFeature.GestionRoles => (Color.FromArgb(142, 36, 170), Color.FromArgb(142, 36, 170)),
+                
+                // CONFIGURACIÓN Y SISTEMA - Tonos grises/rojos
                 AppFeature.ConfigSistema => (Color.FromArgb(108, 117, 125), Color.FromArgb(108, 117, 125)),
                 AppFeature.CopiasSeguridad => (Color.FromArgb(52, 58, 64), Color.FromArgb(52, 58, 64)),
                 AppFeature.Seguridad => (Color.FromArgb(220, 53, 69), Color.FromArgb(220, 53, 69)),
+                AppFeature.AuditoriaAccesos => (Color.FromArgb(220, 53, 69), Color.FromArgb(220, 53, 69)),
+                
                 _ => (Color.FromArgb(0, 120, 215), Color.FromArgb(0, 120, 215))
             };
         }
@@ -391,10 +450,25 @@ namespace SALC
                 case AppFeature.GenerarInformes: ReportsRequested?.Invoke(this, EventArgs.Empty); break;
                 case AppFeature.Notificaciones: NotificationsRequested?.Invoke(this, EventArgs.Empty); break;
                 case AppFeature.HistorialOrdenes: HistoryRequested?.Invoke(this, EventArgs.Empty); break;
+                
+                // ADMINISTRACIÓN DE USUARIOS
                 case AppFeature.GestionUsuarios: UserManagementRequested?.Invoke(this, EventArgs.Empty); break;
+                case AppFeature.GestionPacientesAdmin: PatientsAdminRequested?.Invoke(this, EventArgs.Empty); break;
+                case AppFeature.GestionDoctoresExternos: ExternalDoctorsRequested?.Invoke(this, EventArgs.Empty); break;
+                
+                // ADMINISTRACIÓN DE CATÁLOGOS
+                case AppFeature.GestionTiposAnalisis: AnalysisTypesRequested?.Invoke(this, EventArgs.Empty); break;
+                case AppFeature.GestionMetricas: MetricsRequested?.Invoke(this, EventArgs.Empty); break;
+                case AppFeature.GestionObrasSociales: InsuranceRequested?.Invoke(this, EventArgs.Empty); break;
+                case AppFeature.GestionEstados: StatesRequested?.Invoke(this, EventArgs.Empty); break;
+                case AppFeature.GestionRoles: RolesRequested?.Invoke(this, EventArgs.Empty); break;
+                
+                // CONFIGURACIÓN Y SISTEMA
                 case AppFeature.ConfigSistema: SystemConfigRequested?.Invoke(this, EventArgs.Empty); break;
                 case AppFeature.CopiasSeguridad: BackupsRequested?.Invoke(this, EventArgs.Empty); break;
                 case AppFeature.Seguridad: SecurityRequested?.Invoke(this, EventArgs.Empty); break;
+                case AppFeature.AuditoriaAccesos: AuditRequested?.Invoke(this, EventArgs.Empty); break;
+                
                 case AppFeature.Dashboard: break;
             }
         }

@@ -22,10 +22,24 @@ namespace SALC.Views.Interfaces
         event EventHandler ReportsRequested;
         event EventHandler NotificationsRequested;
         event EventHandler HistoryRequested;
-        event EventHandler UserManagementRequested;
-        event EventHandler SystemConfigRequested;
-        event EventHandler BackupsRequested;
-        event EventHandler SecurityRequested;
+        
+        // EVENTOS ADMINISTRACIÓN DE USUARIOS (Solo Administrador)
+        event EventHandler UserManagementRequested;      // ABM usuarios internos
+        event EventHandler PatientsAdminRequested;       // ABM pacientes (vista admin)
+        event EventHandler ExternalDoctorsRequested;     // ABM doctores externos
+        
+        // EVENTOS ADMINISTRACIÓN DE CATÁLOGOS (Solo Administrador)
+        event EventHandler AnalysisTypesRequested;       // ABM tipo_analisis
+        event EventHandler MetricsRequested;             // ABM metrica
+        event EventHandler InsuranceRequested;           // ABM obra_social
+        event EventHandler StatesRequested;              // ABM estado y estado_usuario
+        event EventHandler RolesRequested;               // ABM rol
+        
+        // EVENTOS CONFIGURACIÓN Y SISTEMA (Solo Administrador)
+        event EventHandler SystemConfigRequested;        // Configuración general
+        event EventHandler BackupsRequested;             // Backup y restore
+        event EventHandler SecurityRequested;            // Auditoría y logs
+        event EventHandler AuditRequested;               // Logs de accesos
 
         void ShowMessage(string title, string message);
     }

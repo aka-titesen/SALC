@@ -12,10 +12,24 @@ namespace SALC.Presenters
             { "admin", new HashSet<AppFeature>
                 {
                     AppFeature.Dashboard,
-                    AppFeature.GestionUsuarios,
-                    AppFeature.ConfigSistema,
-                    AppFeature.CopiasSeguridad,
-                    AppFeature.Seguridad
+                    
+                    // GESTIÓN DE USUARIOS Y ENTIDADES
+                    AppFeature.GestionUsuarios,          // ABM usuarios internos (usuario, doctor, asistente) 
+                    AppFeature.GestionPacientesAdmin,    // ABM pacientes (vista administrativa completa)
+                    AppFeature.GestionDoctoresExternos,  // ABM doctores externos
+                    
+                    // GESTIÓN DE CATÁLOGOS
+                    AppFeature.GestionTiposAnalisis,     // ABM tipo_analisis
+                    AppFeature.GestionMetricas,          // ABM metrica  
+                    AppFeature.GestionObrasSociales,     // ABM obra_social
+                    AppFeature.GestionEstados,           // ABM estado y estado_usuario
+                    AppFeature.GestionRoles,             // ABM rol
+                    
+                    // CONFIGURACIÓN Y SISTEMA
+                    AppFeature.ConfigSistema,            // Configuración general
+                    AppFeature.CopiasSeguridad,          // Backup y restore
+                    AppFeature.Seguridad,                // Auditoría y logs
+                    AppFeature.AuditoriaAccesos          // Logs de accesos de usuarios
                 }
             },
             { "clinico", new HashSet<AppFeature>
