@@ -206,7 +206,7 @@ namespace SALC.Views
         {
             try
             {
-                rolesDictionary = SALC.UserData.LoadRoles();
+                rolesDictionary = UserData.LoadRoles();
                 roleFilterComboBox.Items.Clear();
                 roleFilterComboBox.Items.Add("Todos los roles");
                 foreach (var kv in rolesDictionary)
@@ -225,7 +225,7 @@ namespace SALC.Views
         {
             try
             {
-                var usuarios = SALC.UserData.GetUsers(searchFilter, roleFilter);
+                var usuarios = UserData.GetUsers(searchFilter, roleFilter);
                 usersDataGridView.Rows.Clear();
                 foreach (var u in usuarios)
                 {
@@ -260,17 +260,91 @@ namespace SALC.Views
 
         private void AddUserButton_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Alta de usuario (UI pendiente)");
+            try
+            {
+                // Usar el nuevo servicio de gestión de usuarios
+                var userService = new SALC.Services.UserManagementService();
+                var roles = userService.GetRoles();
+                var supervisores = userService.GetDoctoresParaSupervisor();
+
+                // Crear y configurar el diálogo para creación
+                var dialog = new UserFormDialog();
+                dialog.ConfigurarParaCreacion(roles, supervisores);
+
+                // Mostrar el diálogo y procesar resultado
+                if (dialog.ShowDialog() == DialogResult.OK)
+                {
+                    var usuario = dialog.Usuario;
+                    userService.CrearUsuario(usuario);
+
+                    MessageBox.Show("Usuario creado exitosamente.", "Éxito",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                    // Actualizar la lista de usuarios
+                    LoadUsers();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error al crear usuario: {ex.Message}", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void EditUserButton_Click(object sender, EventArgs e)
         {
             if (usersDataGridView.SelectedRows.Count == 0)
             {
-                MessageBox.Show("Por favor, seleccione un usuario para editar.", "Selección requerida", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Por favor, seleccione un usuario para editar.", "Selección requerida", 
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
-            MessageBox.Show("Edición de usuario (UI pendiente)");
+
+            try
+            {
+                // Obtener el DNI del usuario seleccionado
+                DataGridViewRow selectedRow = usersDataGridView.SelectedRows[0];
+                int dni = Convert.ToInt32(selectedRow.Cells["DNI"].Value);
+
+                // Usar el nuevo servicio para obtener datos completos del usuario
+                var userService = new SALC.Services.UserManagementService();
+                var usuario = userService.GetUsuario(dni);
+                
+                if (usuario == null)
+                {
+                    MessageBox.Show("No se encontró el usuario seleccionado.", "Error", 
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                // Obtener roles y supervisores disponibles
+                var roles = userService.GetRoles();
+                var supervisores = userService.GetDoctoresParaSupervisor();
+
+                // Crear y configurar el diálogo para edición
+                var dialog = new UserFormDialog();
+                dialog.ConfigurarParaEdicion(usuario, roles, supervisores);
+
+                // Mostrar el diálogo y procesar resultado
+                if (dialog.ShowDialog() == DialogResult.OK)
+                {
+                    var usuarioEditado = dialog.Usuario;
+                    bool cambiarPassword = !string.IsNullOrEmpty(usuarioEditado.password);
+                    
+                    userService.ActualizarUsuario(usuarioEditado, cambiarPassword);
+
+                    MessageBox.Show("Usuario actualizado exitosamente.", "Éxito", 
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    
+                    // Actualizar la lista de usuarios
+                    LoadUsers();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error al editar usuario: {ex.Message}", "Error", 
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void DeleteUserButton_Click(object sender, EventArgs e)
@@ -297,7 +371,7 @@ namespace SALC.Views
             {
                 try
                 {
-                    bool ok = SALC.UserData.DeleteUser(dni);
+                    bool ok = UserData.DeleteUser(dni);
                     if (ok)
                         MessageBox.Show("Usuario desactivado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     else
@@ -336,7 +410,7 @@ namespace SALC.Views
             {
                 try
                 {
-                    bool ok = SALC.UserData.ActivateUser(dni);
+                    bool ok = UserData.ActivateUser(dni);
                     if (ok)
                         MessageBox.Show("Usuario activado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     else

@@ -164,6 +164,9 @@
     <Compile Include="Views\BackupManagementFormStub.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Views\UserFormDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <!-- Interfaces -->
     <Compile Include="Views\Interfaces\ILoginView.cs" />
     <Compile Include="Views\Interfaces\IPatientsView.cs" />

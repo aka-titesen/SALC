@@ -27,7 +27,7 @@ namespace SALC.Presenters
                 return;
             }
 
-            var ok = SALC.UserAuthentication.Login(username, password);
+            var ok = UserAuthentication.Login(username, password);
             if (!ok)
             {
                 _view.ShowLoginError("Usuario o contraseña incorrectos.");

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using SALC;
 
 namespace SALC.Views.Interfaces
 {
@@ -11,7 +10,7 @@ namespace SALC.Views.Interfaces
         void SetUserInfo(string displayName, string role);
 
         // Definir features disponibles (Presenter -> View)
-        void SetAvailableFeatures(IReadOnlyCollection<SALC.AppFeature> features);
+        void SetAvailableFeatures(IReadOnlyCollection<AppFeature> features);
 
         // Eventos comunes (View -> Presenter / app)
         event EventHandler LogoutRequested;
