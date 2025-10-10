@@ -2,14 +2,17 @@ using System;
 
 namespace SALC.Views.Interfaces
 {
-    public interface IStudiesView
+    /// <summary>
+    /// Interfaz para la vista de gestión de estudios/análisis según ERS v2.7
+    /// </summary>
+    public interface IVistaEstudios
     {
-        event EventHandler CreateRequested;
-        event EventHandler EditRequested;
-        event EventHandler DeleteRequested;
-        event EventHandler SearchRequested;
-        event EventHandler CloseRequested;
-        string SearchText { get; }
-        void ShowMessage(string title, string message);
+        event EventHandler CreacionSolicitada;
+        event EventHandler EdicionSolicitada;
+        event EventHandler EliminacionSolicitada;
+        event EventHandler BusquedaSolicitada;
+        event EventHandler CierreSolicitado;
+        string TextoBusqueda { get; }
+        void MostrarMensaje(string titulo, string mensaje);
     }
 }

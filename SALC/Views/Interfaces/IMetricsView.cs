@@ -2,12 +2,15 @@ using System;
 
 namespace SALC.Views.Interfaces
 {
-    public interface IMetricsView
+    /// <summary>
+    /// Interfaz para la vista de gestión de métricas según ERS v2.7
+    /// </summary>
+    public interface IVistaMetricas
     {
-        event EventHandler CreateRequested;
-        event EventHandler EditRequested;
-        event EventHandler DeleteRequested;
-        event EventHandler CloseRequested;
-        void ShowMessage(string title, string message);
+        event EventHandler CreacionSolicitada;
+        event EventHandler EdicionSolicitada;
+        event EventHandler EliminacionSolicitada;
+        event EventHandler CierreSolicitado;
+        void MostrarMensaje(string titulo, string mensaje);
     }
 }

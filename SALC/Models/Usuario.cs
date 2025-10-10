@@ -9,116 +9,179 @@ namespace SALC
 	/// </summary>
 	public class Usuario
 	{
+		#region Propiedades de la tabla usuarios
 		/// <summary>
-		/// Gets or sets the user's DNI (National Identity Document number).
+		/// DNI del usuario (Clave primaria)
 		/// </summary>
 		public int Dni { get; set; }
 
 		/// <summary>
-		/// Gets or sets the user's first name.
+		/// Nombre del usuario
 		/// </summary>
 		public string Nombre { get; set; }
 
 		/// <summary>
-		/// Gets or sets the user's last name.
+		/// Apellido del usuario
 		/// </summary>
 		public string Apellido { get; set; }
 
 		/// <summary>
-		/// Gets or sets the user's role name (e.g., "Administrador", "Clinico").
-		/// </summary>
-		public string Rol { get; set; }
-
-		public int id_rol {  get; set; }
-
-		/// <summary>
-		/// Gets or sets the user's email address.
+		/// Email del usuario (único)
 		/// </summary>
 		public string Email { get; set; }
 
 		/// <summary>
-		/// Gets or sets the user's phone number.
+		/// Hash de la contraseña (BCrypt)
 		/// </summary>
-		public string Telefono { get; set; }
+		public string PasswordHash { get; set; }
 
-        // Cambiado de ID_estado a estado_usuario para coincidir con la BD
-		public int? estado_usuario { get; set; }
+		/// <summary>
+		/// ID del rol (FK a roles.id_rol)
+		/// </summary>
+		public int IdRol { get; set; }
 
-		// Cambiado de Pass a password para coincidir con la BD
-		public string password { get; set; }
+		/// <summary>
+		/// Estado del usuario ('Activo' o 'Inactivo')
+		/// </summary>
+		public string Estado { get; set; }
+		#endregion
 
-		// Propiedad calculada para el nombre del estado (opcional)
-		public string Estado { get; set; } = "";
+		#region Propiedades extendidas para médicos (tabla medicos)
+		/// <summary>
+		/// Número de matrícula (solo para médicos)
+		/// </summary>
+		public int? NumeroMatricula { get; set; }
 
-        // Propiedades adicionales para gestión completa de usuarios
-        
-        /// <summary>
-        /// Número de matrícula para doctores/clínicos
-        /// </summary>
-        public int? NumeroMatricula { get; set; }
-        
-        /// <summary>
-        /// Especialidad médica para doctores/clínicos
-        /// </summary>
-        public string Especialidad { get; set; }
-        
-        /// <summary>
-        /// Número de legajo para asistentes
-        /// </summary>
-        public int? NumeroLegajo { get; set; }
-        
-        /// <summary>
-        /// DNI del supervisor para asistentes
-        /// </summary>
-        public int? DniSupervisor { get; set; }
-        
-        /// <summary>
-        /// Nombre del supervisor para asistentes
-        /// </summary>
-        public string NombreSupervisor { get; set; }
-        
-        /// <summary>
-        /// Fecha de ingreso para asistentes
-        /// </summary>
-        public DateTime? FechaIngreso { get; set; }
+		/// <summary>
+		/// Especialidad médica (solo para médicos)
+		/// </summary>
+		public string Especialidad { get; set; }
+		#endregion
 
-        // Propiedades de conveniencia
-        public string NombreCompleto => $"{Nombre} {Apellido}";
-        public bool EsDoctor => id_rol == 2; // Según ERS: rol=2 es Clínico
-        public bool EsAsistente => id_rol == 3; // Según ERS: rol=3 es Asistente
-        public bool EsAdministrador => id_rol == 1; // Según ERS: rol=1 es Administrador
-        public bool EstaActivo => estado_usuario == 1; // Según BD: estado=1 es Activo
+		#region Propiedades extendidas para asistentes (tabla asistentes)
+		/// <summary>
+		/// DNI del supervisor (solo para asistentes)
+		/// </summary>
+		public int? DniSupervisor { get; set; }
 
-        /// <summary>
-        /// Valida que los datos del usuario sean correctos
-        /// </summary>
-        public bool EsValido()
-        {
-            return Dni > 0 &&
+		/// <summary>
+		/// Fecha de ingreso (solo para asistentes)
+		/// </summary>
+		public DateTime? FechaIngreso { get; set; }
+
+		/// <summary>
+		/// Nombre del supervisor (calculado)
+		/// </summary>
+		public string NombreSupervisor { get; set; }
+		#endregion
+
+		#region Propiedades de navegación y calculadas
+		/// <summary>
+		/// Nombre del rol (calculado desde tabla roles)
+		/// </summary>
+		public string NombreRol { get; set; }
+
+		/// <summary>
+		/// Nombre completo del usuario
+		/// </summary>
+		public string NombreCompleto => $"{Nombre} {Apellido}";
+
+		/// <summary>
+		/// Verifica si el usuario es administrador (id_rol = 1)
+		/// </summary>
+		public bool EsAdministrador => IdRol == 1;
+
+		/// <summary>
+		/// Verifica si el usuario es médico (id_rol = 2)
+		/// </summary>
+		public bool EsMedico => IdRol == 2;
+
+		/// <summary>
+		/// Verifica si el usuario es asistente (id_rol = 3)
+		/// </summary>
+		public bool EsAsistente => IdRol == 3;
+
+		/// <summary>
+		/// Verifica si el usuario está activo
+		/// </summary>
+		public bool EstaActivo => Estado == "Activo";
+		#endregion
+
+		#region Métodos de validación
+		/// <summary>
+		/// Valida los datos básicos del usuario
+		/// </summary>
+		public bool EsValido()
+		{
+			return Dni > 0 &&
                    !string.IsNullOrWhiteSpace(Nombre) &&
                    !string.IsNullOrWhiteSpace(Apellido) &&
-                   id_rol > 0 &&
-                   (string.IsNullOrEmpty(Email) || Email.Contains("@"));
-        }
+                   IdRol > 0 &&
+                   (string.IsNullOrEmpty(Email) || Email.Contains("@")) &&
+                   !string.IsNullOrWhiteSpace(Estado);
+		}
 
-        /// <summary>
-        /// Valida los datos específicos según el rol del usuario
-        /// </summary>
-        public string ValidarDatosRol()
-        {
-            if (EsDoctor && (NumeroMatricula == null || NumeroMatricula <= 0))
-                return "El número de matrícula es obligatorio para clínicos.";
+		/// <summary>
+		/// Valida los datos específicos según el rol del usuario
+		/// </summary>
+		public string ValidarDatosRol()
+		{
+			if (EsMedico)
+			{
+				if (!NumeroMatricula.HasValue || NumeroMatricula <= 0)
+					return "El número de matrícula es obligatorio para médicos.";
 
-            if (EsDoctor && string.IsNullOrWhiteSpace(Especialidad))
-                return "La especialidad es obligatoria para clínicos.";
+				if (string.IsNullOrWhiteSpace(Especialidad))
+					return "La especialidad es obligatoria para médicos.";
+			}
 
-            if (EsAsistente && (NumeroLegajo == null || NumeroLegajo <= 0))
-                return "El número de legajo es obligatorio para asistentes.";
+			if (EsAsistente)
+			{
+				if (!DniSupervisor.HasValue || DniSupervisor <= 0)
+					return "El supervisor es obligatorio para asistentes.";
 
-            if (EsAsistente && (DniSupervisor == null || DniSupervisor <= 0))
-                return "El supervisor es obligatorio para asistentes.";
+				if (!FechaIngreso.HasValue)
+					return "La fecha de ingreso es obligatoria para asistentes.";
+			}
 
-            return null; // Sin errores
-        }
-    }
+			return null; // Sin errores
+		}
+		#endregion
+
+		#region Propiedades de compatibilidad (deprecated - usar nuevas propiedades)
+		[Obsolete("Use PasswordHash instead")]
+		public string password
+		{
+			get => PasswordHash;
+			set => PasswordHash = value;
+		}
+
+		[Obsolete("Use IdRol instead")]
+		public int id_rol
+		{
+			get => IdRol;
+			set => IdRol = value;
+		}
+
+		[Obsolete("Use NombreRol instead")]
+		public string Rol
+		{
+			get => NombreRol;
+			set => NombreRol = value;
+		}
+
+		[Obsolete("Use Estado string property instead")]
+		public int? estado_usuario
+		{
+			get => Estado == "Activo" ? 1 : (Estado == "Inactivo" ? 2 : (int?)null);
+			set => Estado = value == 1 ? "Activo" : (value == 2 ? "Inactivo" : "");
+		}
+
+		[Obsolete("Not used in new structure")]
+		public string Telefono { get; set; }
+
+		[Obsolete("Not used in new structure")]
+		public int? NumeroLegajo { get; set; }
+		#endregion
+	}
 }

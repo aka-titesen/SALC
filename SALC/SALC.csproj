@@ -34,15 +34,16 @@
     <WarningLevel>4</WarningLevel>
     <LangVersion>8.0</LangVersion>
   </PropertyGroup>
-  <!-- Eliminado PreBuildEvent que podÃ­a fallar la compilaciÃ³n si no hay proceso SALC.exe. Usamos Target BeforeBuild con ContinueOnError. -->
+  
+  <!-- Target para cerrar procesos SALC.exe antes de compilar -->
   <Target Name="BeforeBuild">
-    <Message Importance="High" Text="Finalizando procesos SALC.exe si existen..." />
+    <Message Importance="High" Text="Cerrando procesos SALC.exe si existen..." />
     <Exec Command="taskkill /F /IM SALC.exe /T" ContinueOnError="true" />
   </Target>
+  
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
-    <!-- Agregado -->
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -54,65 +55,63 @@
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
   </ItemGroup>
+  
   <ItemGroup>
-    <!-- Comunes -->
-    <Compile Include="Common\SALCColors.cs" />
+    <!-- ==== CAPA DE ACCESO A DATOS (Repository Pattern) - 100% ESPAÑOL ==== -->
+    <Compile Include="DataAccess\DatabaseConnection.cs" />
+    <Compile Include="DataAccess\Repositories\UsuarioRepository.cs" />
+    <Compile Include="DataAccess\Repositories\RolRepository.cs" />
+    <Compile Include="DataAccess\Repositories\PacienteRepository.cs" />
+    <Compile Include="DataAccess\Repositories\ObraSocialRepository.cs" />
+    <Compile Include="DataAccess\Repositories\MetricaRepository.cs" />
+    <Compile Include="DataAccess\Repositories\TipoAnalisisRepository.cs" />
+    <Compile Include="DataAccess\Repositories\AnalisisRepository.cs" />
+    
+    <!-- ==== MODELOS (Actualizados para ERS v2.7) - 100% ESPAÑOL ==== -->
+    <Compile Include="Models\Usuario.cs" />
+    <Compile Include="Models\Medico.cs" />
+    <Compile Include="Models\Asistente.cs" />
+    <Compile Include="Models\Paciente.cs" />
+    <Compile Include="Models\ObraSocial.cs" />
+    <Compile Include="Models\TipoAnalisis.cs" />
+    <Compile Include="Models\Metrica.cs" />
+    <Compile Include="Models\Analisis.cs" />
+    <Compile Include="Models\AnalisisMetrica.cs" />
+    <Compile Include="Models\EstadoAnalisis.cs" />
+    <Compile Include="Models\Rol.cs" />
+    
+    <!-- ==== CAPA DE LÓGICA DE NEGOCIO (Services) - 100% ESPAÑOL ==== -->
+    <Compile Include="Services\UserAuthentication.cs" />
+    <Compile Include="Services\UserData.cs" />
+    <Compile Include="Services\PacienteService.cs" />
+    <Compile Include="Services\MetricaService.cs" />
+    <Compile Include="Services\AnalisisService.cs" />
+    <Compile Include="Services\ServicioReportesAnalisis.cs" />
+    
+    <!-- ==== PRESENTADORES (MVP Pattern) - 100% ESPAÑOL ==== -->
     <Compile Include="Presenters\AppFeature.cs" />
-    <Compile Include="Views\AgregarMetrica.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Views\AgregarMetrica.Designer.cs">
-      <DependentUpon>AgregarMetrica.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Views\AgregarPaciente.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Views\AgregarPaciente.Designer.cs">
-      <DependentUpon>AgregarPaciente.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Views\agregar_estudio.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Views\agregar_estudio.Designer.cs">
-      <DependentUpon>agregar_estudio.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Views\detalleEstudio.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Views\detalleEstudio.Designer.cs">
-      <DependentUpon>detalleEstudio.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Views\editarEstudio.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Views\editarEstudio.Designer.cs">
-      <DependentUpon>editarEstudio.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Views\EditarPaciente.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Views\EditarPaciente.Designer.cs">
-      <DependentUpon>EditarPaciente.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Views\EditForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Views\EditForm.Designer.cs">
-      <DependentUpon>EditForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Views\ADDForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Views\ADDForm.Designer.cs">
-      <DependentUpon>ADDForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Views\HistorialEstudiosForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Views\HistorialEstudiosForm.Designer.cs">
-      <DependentUpon>HistorialEstudiosForm.cs</DependentUpon>
-    </Compile>
-    <!-- Formularios -->
+    <Compile Include="Presenters\LoginPresenter.cs" />
+    <Compile Include="Presenters\MainDashboardPresenter.cs" />
+    <Compile Include="Presenters\ReportsPresenter.cs" />
+    
+    <!-- ==== INTERFACES DE VISTA (MVP Pattern) - 100% ESPAÑOL ==== -->
+    <Compile Include="Views\Interfaces\ILoginView.cs" />
+    <Compile Include="Views\Interfaces\IPacientesView.cs" />
+    <Compile Include="Views\Interfaces\IResultsView.cs" />
+    <Compile Include="Views\Interfaces\IReportsView.cs" />
+    <Compile Include="Views\Interfaces\IVistaEstudios.cs" />
+    <Compile Include="Views\Interfaces\IMainDashboardView.cs" />
+    <Compile Include="Views\Interfaces\INotificationsView.cs" />
+    <Compile Include="Views\Interfaces\IVistaMetricas.cs" />
+    <Compile Include="Views\Interfaces\IUserManagementView.cs" />
+    <Compile Include="Views\Interfaces\IBackupsView.cs" />
+    <Compile Include="Views\Interfaces\ISocialWorksView.cs" />
+    <Compile Include="Views\Interfaces\IHistoryView.cs" />
+    <Compile Include="Views\Interfaces\IAdminCatalogView.cs" />
+    <Compile Include="Views\Interfaces\IBackupManagementView.cs" />
+    <Compile Include="Views\Interfaces\ISystemConfigView.cs" />
+    
+    <!-- ==== FORMULARIOS PRINCIPALES ==== -->
     <Compile Include="Views\LoginForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -125,25 +124,24 @@
     <Compile Include="Views\MainDashboardForm.Designer.cs">
       <DependentUpon>MainDashboardForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Views\PatientsForm.cs">
+    
+    <!-- ==== FORMULARIOS DE GESTIÓN (100% ESPAÑOL) ==== -->
+    <Compile Include="Views\PacientesForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Views\StudiesForm.cs">
+    <Compile Include="Views\EstudiosForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Views\ResultsForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Views\RecepcionMuestrasForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="Views\ReportsForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Views\AnalysisReportsForm.cs">
+    <Compile Include="Views\GestionUsuariosForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Views\AnalysisDetailForm.cs">
+    <Compile Include="Views\BackupsForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Views\NotificationsForm.cs">
@@ -152,10 +150,67 @@
     <Compile Include="Views\HistoryForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Views\UserManagementForm.cs">
+    
+    <!-- ==== FORMULARIOS DE REPORTES (100% ESPAÑOL) ==== -->
+    <Compile Include="Views\ReportesAnalisisForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Views\BackupsForm.cs">
+    <Compile Include="Views\DetalleAnalisisForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    
+    <!-- ==== FORMULARIOS DE DIÁLOGO (100% ESPAÑOL) ==== -->
+    <Compile Include="Views\DialogoFormularioUsuario.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Views\EditarUsuarioForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Views\AgregarPaciente.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Views\AgregarPaciente.Designer.cs">
+      <DependentUpon>AgregarPaciente.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Views\EditarPaciente.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Views\EditarPaciente.Designer.cs">
+      <DependentUpon>EditarPaciente.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Views\AgregarMetrica.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Views\AgregarMetrica.Designer.cs">
+      <DependentUpon>AgregarMetrica.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Views\AgregarEstudio.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Views\AgregarEstudio.Designer.cs">
+      <DependentUpon>AgregarEstudio.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Views\DetalleEstudio.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Views\DetalleEstudio.Designer.cs">
+      <DependentUpon>DetalleEstudio.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Views\EditarEstudio.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Views\EditarEstudio.Designer.cs">
+      <DependentUpon>EditarEstudio.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Views\HistorialEstudiosForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Views\HistorialEstudiosForm.Designer.cs">
+      <DependentUpon>HistorialEstudiosForm.cs</DependentUpon>
+    </Compile>
+    
+    <!-- ==== FORMULARIOS AUXILIARES ==== -->
+    <Compile Include="Views\RecepcionMuestrasForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Views\AdminCatalogFormStub.cs">
@@ -164,89 +219,57 @@
     <Compile Include="Views\BackupManagementFormStub.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Views\UserFormDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <!-- Interfaces -->
-    <Compile Include="Views\Interfaces\ILoginView.cs" />
-    <Compile Include="Views\Interfaces\IPatientsView.cs" />
-    <Compile Include="Views\Interfaces\IResultsView.cs" />
-    <Compile Include="Views\Interfaces\IReportsView.cs" />
-    <Compile Include="Views\Interfaces\IStudiesView.cs" />
-    <Compile Include="Views\Interfaces\IMainDashboardView.cs" />
-    <Compile Include="Views\Interfaces\INotificationsView.cs" />
-    <Compile Include="Views\Interfaces\IMetricsView.cs" />
-    <Compile Include="Views\Interfaces\IUserManagementView.cs" />
-    <Compile Include="Views\Interfaces\IBackupsView.cs" />
-    <Compile Include="Views\Interfaces\ISocialWorksView.cs" />
-    <Compile Include="Views\Interfaces\IHistoryView.cs" />
-    <!-- Servicios -->
-    <Compile Include="Services\UserAuthentication.cs" />
-    <Compile Include="Services\UserData.cs" />
-    <Compile Include="Services\AnalysisReportsService.cs" />
-    <!-- Modelos -->
-    <Compile Include="Models\Usuario.cs" />
-    <Compile Include="Models\Estado.cs" />
-    <Compile Include="Models\EstadoUsuario.cs" />
-    <Compile Include="Models\Rol.cs" />
-    <Compile Include="Models\Doctor.cs" />
-    <Compile Include="Models\Asistente.cs" />
-    <Compile Include="Models\DoctorExterno.cs" />
-    <Compile Include="Models\Paciente.cs" />
-    <Compile Include="Models\ObraSocial.cs" />
-    <Compile Include="Models\TipoAnalisis.cs" />
-    <Compile Include="Models\Metrica.cs" />
-    <Compile Include="Models\Analisis.cs" />
-    <Compile Include="Models\AnalisisMetrica.cs" />
-    <Compile Include="Models\ResultadoAnalisis.cs" />
-    <!-- Presenters -->
-    <Compile Include="Presenters\LoginPresenter.cs" />
-    <Compile Include="Presenters\MainDashboardPresenter.cs" />
-    <Compile Include="Presenters\ReportsPresenter.cs" />
-    <!-- Entrada -->
+    
+    <!-- ==== UTILIDADES Y COMUNES ==== -->
+    <Compile Include="Common\SALCColors.cs" />
+    
+    <!-- ==== PUNTO DE ENTRADA DE LA APLICACIÓN ==== -->
     <Compile Include="Program.cs" />
-    <!-- UserEditForm temporal - TODO: refactorizar con arquitectura MVP -->
-    <Compile Include="Views\UserEditForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
   </ItemGroup>
+  
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  
   <ItemGroup>
-    <EmbeddedResource Include="Views\AgregarMetrica.resx">
-      <DependentUpon>AgregarMetrica.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Views\AgregarPaciente.resx">
-      <DependentUpon>AgregarPaciente.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Views\agregar_estudio.resx">
-      <DependentUpon>agregar_estudio.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Views\detalleEstudio.resx">
-      <DependentUpon>detalleEstudio.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Views\editarEstudio.resx">
-      <DependentUpon>editarEstudio.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Views\EditarPaciente.resx">
-      <DependentUpon>EditarPaciente.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Views\EditForm.resx">
-      <DependentUpon>EditForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Views\ADDForm.resx">
-      <DependentUpon>ADDForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Views\HistorialEstudiosForm.resx">
-      <DependentUpon>HistorialEstudiosForm.cs</DependentUpon>
-    </EmbeddedResource>
+    <!-- ==== RECURSOS DE FORMULARIOS ==== -->
     <EmbeddedResource Include="Views\LoginForm.resx">
       <DependentUpon>LoginForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Views\MainDashboardForm.resx">
       <DependentUpon>MainDashboardForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Views\AgregarPaciente.resx">
+      <DependentUpon>AgregarPaciente.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Views\AgregarMetrica.resx">
+      <DependentUpon>AgregarMetrica.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Views\AgregarEstudio.resx">
+      <DependentUpon>AgregarEstudio.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
+  
+  <!-- ==== DOCUMENTACIÓN DEL PROYECTO ==== -->
+  <ItemGroup>
+    <None Include="Docs\ERS-SALC_IEEEv2.7.md" />
+    <None Include="Docs\estructura-salc.sql" />
+    <None Include="Docs\lote-salc.sql" />
+    <None Include="Docs\VERIFICACION_FINAL_ESPAÑOL.md" />
+  </ItemGroup>
+  
+  <!-- ==== ESTRUCTURA DE CARPETAS ==== -->
+  <ItemGroup>
+    <Folder Include="DataAccess\" />
+    <Folder Include="DataAccess\Repositories\" />
+    <Folder Include="Services\" />
+    <Folder Include="Models\" />
+    <Folder Include="Presenters\" />
+    <Folder Include="Views\" />
+    <Folder Include="Views\Interfaces\" />
+    <Folder Include="Common\" />
+    <Folder Include="Docs\" />
+  </ItemGroup>
+  
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

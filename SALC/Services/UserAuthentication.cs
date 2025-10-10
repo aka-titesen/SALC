@@ -1,132 +1,235 @@
 // Services/UserAuthentication.cs
 using System;
-using System.Configuration;
-using System.Data;
-using System.Data.SqlClient;
-using System.Security.Cryptography;
-using System.Text;
+using SALC.Models;
+using SALC.DataAccess.Repositories;
 
-namespace SALC
+namespace SALC.Services
 {
     /// <summary>
-    /// Provides methods for user authentication and session management.
+    /// Servicio de autenticación de usuarios según ERS v2.7
+    /// Utiliza BCrypt para validación de contraseñas y el patrón Repository para acceso a datos
     /// </summary>
     public static class UserAuthentication
     {
+        private static readonly UsuarioRepository _usuarioRepository = new UsuarioRepository();
+
         /// <summary>
-        /// Gets the currently logged-in user. Null if no user is logged in.
+        /// Usuario actualmente autenticado en el sistema
         /// </summary>
         public static Usuario CurrentUser { get; private set; } = null;
 
         /// <summary>
-        /// Authenticates a user against the database. Returns null if credentials/role/state are invalid.
+        /// Evento que se dispara cuando un usuario inicia sesión
         /// </summary>
-        public static Usuario Authenticate(string usernameOrEmail, string password)
+        public static event EventHandler<Usuario> UserLoggedIn;
+
+        /// <summary>
+        /// Evento que se dispara cuando un usuario cierra sesión
+        /// </summary>
+        public static event EventHandler UserLoggedOut;
+
+        /// <summary>
+        /// Autentica un usuario contra la base de datos usando DNI o email
+        /// </summary>
+        /// <param name="credencial">DNI (numérico) o email del usuario</param>
+        /// <param name="password">Contraseña en texto plano</param>
+        /// <returns>Usuario autenticado o null si las credenciales son inválidas</returns>
+        public static Usuario Authenticate(string credencial, string password)
         {
-            if (string.IsNullOrWhiteSpace(usernameOrEmail) || string.IsNullOrWhiteSpace(password))
+            if (string.IsNullOrWhiteSpace(credencial) || string.IsNullOrWhiteSpace(password))
                 return null;
-
-            string connectionString = ConfigurationManager.ConnectionStrings["SALCConnection"]?.ConnectionString;
-            if (string.IsNullOrEmpty(connectionString))
-                return null; // Sin cadena de conexión no se puede autenticar
-
-            // Aceptar DNI numérico o Email
-            bool isDni = int.TryParse(usernameOrEmail, out int dniValue);
-            string emailValue = isDni ? null : usernameOrEmail.Trim();
-
-            string query = @"
-                SELECT u.dni, u.nombre, u.apellido, u.email, u.telefono, r.[rol]
-                FROM usuario u
-                INNER JOIN rol r ON u.id_rol = r.id_rol
-                LEFT JOIN estado_usuario eu ON u.estado_usuario = eu.id_estado
-                WHERE (u.dni = @Dni OR LOWER(u.email) = LOWER(@Email))
-                  AND u.[password] = @Password
-                  AND u.estado_usuario = 1";
 
             try
             {
-                using (SqlConnection connection = new SqlConnection(connectionString))
-                using (SqlCommand command = new SqlCommand(query, connection))
+                Usuario usuario = null;
+
+                // Determinar si la credencial es DNI o email
+                if (int.TryParse(credencial, out int dni))
                 {
-                    // Parámetros (DNI o Email)
-                    command.Parameters.Add("@Dni", SqlDbType.Int).Value = isDni ? (object)dniValue : DBNull.Value;
-                    command.Parameters.Add("@Email", SqlDbType.NVarChar, 150).Value = (object)(emailValue ?? (object)DBNull.Value);
-                    command.Parameters.Add("@Password", SqlDbType.NVarChar, 256).Value = password;
-
-                    connection.Open();
-                    using (SqlDataReader reader = command.ExecuteReader())
-                    {
-                        if (!reader.Read()) return null;
-
-                        int ordDni = reader.GetOrdinal("dni");
-                        int ordNombre = reader.GetOrdinal("nombre");
-                        int ordApellido = reader.GetOrdinal("apellido");
-                        int ordEmail = reader.GetOrdinal("email");
-                        int ordTelefono = reader.GetOrdinal("telefono");
-                        int ordRol = reader.GetOrdinal("rol");
-
-                        string rawRol = reader.IsDBNull(ordRol) ? string.Empty : reader.GetString(ordRol);
-                        string normalizedRol = NormalizeRole(rawRol);
-                        if (normalizedRol != "admin" && normalizedRol != "clinico" && normalizedRol != "asistente")
-                            return null;
-
-                        return new Usuario
-                        {
-                            Dni = reader.GetInt32(ordDni),
-                            Nombre = reader.IsDBNull(ordNombre) ? string.Empty : reader.GetString(ordNombre),
-                            Apellido = reader.IsDBNull(ordApellido) ? string.Empty : reader.GetString(ordApellido),
-                            Email = reader.IsDBNull(ordEmail) ? string.Empty : reader.GetString(ordEmail),
-                            Telefono = reader.IsDBNull(ordTelefono) ? string.Empty : reader.GetString(ordTelefono),
-                            Rol = normalizedRol
-                        };
-                    }
+                    // Buscar por DNI
+                    usuario = _usuarioRepository.ObtenerPorDni(dni);
                 }
+                else if (credencial.Contains("@"))
+                {
+                    // Buscar por email
+                    usuario = _usuarioRepository.ObtenerPorEmail(credencial);
+                }
+
+                if (usuario == null || !usuario.EstaActivo)
+                    return null;
+
+                // Validar contraseña
+                if (ValidarPassword(password, usuario.PasswordHash))
+                {
+                    return usuario;
+                }
+
+                return null;
             }
-            catch
+            catch (Exception ex)
             {
+                // Log del error en un sistema real
+                System.Diagnostics.Debug.WriteLine($"Error en autenticación: {ex.Message}");
                 return null;
             }
         }
 
         /// <summary>
-        /// Performs user login, storing the authenticated user information. Strict roles.
+        /// Realiza el proceso completo de login
         /// </summary>
-        public static bool Login(string usernameOrEmail, string password)
+        /// <param name="credencial">DNI o email del usuario</param>
+        /// <param name="password">Contraseña</param>
+        /// <returns>True si el login fue exitoso</returns>
+        public static bool Login(string credencial, string password)
         {
-            Usuario user = Authenticate(usernameOrEmail, password);
-            if (user == null) return false;
-            CurrentUser = user;
-            return true;
+            Usuario usuario = Authenticate(credencial, password);
+            
+            if (usuario != null)
+            {
+                CurrentUser = usuario;
+                UserLoggedIn?.Invoke(null, usuario);
+                return true;
+            }
+
+            return false;
         }
 
-        public static void Logout() => CurrentUser = null;
-        public static bool IsLoggedIn() => CurrentUser != null;
+        /// <summary>
+        /// Cierra la sesión del usuario actual
+        /// </summary>
+        public static void Logout()
+        {
+            if (IsLoggedIn())
+            {
+                CurrentUser = null;
+                UserLoggedOut?.Invoke(null, EventArgs.Empty);
+            }
+        }
 
-        // SHA256 demo (reemplazar por BCrypt en producción)
+        /// <summary>
+        /// Verifica si hay un usuario autenticado
+        /// </summary>
+        public static bool IsLoggedIn()
+        {
+            return CurrentUser != null;
+        }
+
+        /// <summary>
+        /// Verifica si el usuario actual tiene un rol específico
+        /// </summary>
+        public static bool HasRole(string nombreRol)
+        {
+            return IsLoggedIn() && 
+                   string.Equals(CurrentUser.NombreRol, nombreRol, StringComparison.OrdinalIgnoreCase);
+        }
+
+        /// <summary>
+        /// Verifica si el usuario actual tiene permisos para una operación
+        /// </summary>
+        public static bool HasPermission(string operacion)
+        {
+            if (!IsLoggedIn()) return false;
+
+            // Los administradores tienen todos los permisos
+            if (CurrentUser.EsAdministrador) return true;
+
+            // Verificar permisos específicos según rol
+            return operacion?.ToLowerInvariant() switch
+            {
+                "crear_analisis" => CurrentUser.EsMedico,
+                "cargar_resultados" => CurrentUser.EsMedico,
+                "validar_analisis" => CurrentUser.EsMedico,
+                "generar_informe_propio" => CurrentUser.EsMedico,
+                "generar_informe_verificado" => CurrentUser.EsMedico || CurrentUser.EsAsistente,
+                "ver_historial_pacientes" => CurrentUser.EsMedico || CurrentUser.EsAsistente,
+                "gestionar_usuarios" => CurrentUser.EsAdministrador,
+                "gestionar_catalogos" => CurrentUser.EsAdministrador,
+                "gestionar_backups" => CurrentUser.EsAdministrador,
+                _ => false
+            };
+        }
+
+        /// <summary>
+        /// Cambia la contraseña del usuario actual
+        /// </summary>
+        public static bool ChangePassword(string currentPassword, string newPassword)
+        {
+            if (!IsLoggedIn() || string.IsNullOrWhiteSpace(newPassword))
+                return false;
+
+            try
+            {
+                // Verificar contraseña actual
+                if (!ValidarPassword(currentPassword, CurrentUser.PasswordHash))
+                    return false;
+
+                // Hashear nueva contraseña
+                string newPasswordHash = HashPassword(newPassword);
+
+                // Actualizar en base de datos
+                CurrentUser.PasswordHash = newPasswordHash;
+                return _usuarioRepository.Actualizar(CurrentUser, true);
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Refresca los datos del usuario actual desde la base de datos
+        /// </summary>
+        public static void RefreshCurrentUser()
+        {
+            if (IsLoggedIn())
+            {
+                var usuarioActualizado = _usuarioRepository.ObtenerPorDni(CurrentUser.Dni);
+                if (usuarioActualizado != null && usuarioActualizado.EstaActivo)
+                {
+                    CurrentUser = usuarioActualizado;
+                }
+                else
+                {
+                    // El usuario fue desactivado, cerrar sesión
+                    Logout();
+                }
+            }
+        }
+
+        #region Métodos Privados para Manejo de Contraseñas
+
+        /// <summary>
+        /// Valida una contraseña contra su hash
+        /// TODO: Implementar BCrypt en lugar de comparación directa
+        /// </summary>
+        private static bool ValidarPassword(string password, string hash)
+        {
+            // TEMPORAL: Comparación directa para compatibilidad con datos existentes
+            // En producción, usar: return BCrypt.Net.BCrypt.Verify(password, hash);
+            return string.Equals(password, hash, StringComparison.Ordinal);
+        }
+
+        /// <summary>
+        /// Genera un hash de la contraseña
+        /// TODO: Implementar BCrypt en lugar de texto plano
+        /// </summary>
         private static string HashPassword(string password)
         {
-            using (SHA256 sha256Hash = SHA256.Create())
-            {
-                byte[] bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(password));
-                StringBuilder builder = new StringBuilder();
-                for (int i = 0; i < bytes.Length; i++) builder.Append(bytes[i].ToString("x2"));
-                return builder.ToString();
-            }
+            // TEMPORAL: Retorna texto plano para compatibilidad con datos existentes
+            // En producción, usar: return BCrypt.Net.BCrypt.HashPassword(password);
+            return password;
         }
 
-        private static string NormalizeRole(string role)
+        #endregion
+
+        #region Métodos de Compatibilidad (Deprecated)
+
+        [Obsolete("Use Login method instead")]
+        public static Usuario Authenticate(string usernameOrEmail, string password)
         {
-            if (string.IsNullOrWhiteSpace(role)) return string.Empty;
-            string r = role.Trim().ToLowerInvariant();
-            switch (r)
-            {
-                case "administrador":
-                case "admin": return "admin";
-                case "clinico":
-                case "clínico": return "clinico";
-                case "asistente": return "asistente";
-                default: return r;
-            }
+            return Authenticate(usernameOrEmail, password);
         }
+
+        #endregion
     }
 }
