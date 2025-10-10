@@ -13,18 +13,18 @@ namespace SALC.Views
     /// Formulario para gestión de pacientes según ERS v2.7
     /// Implementa RF-03: ABM de Pacientes
     /// </summary>
-    public partial class PacientesForm : Form, IPatientsView
+    public partial class PacientesForm : Form, IVistaPacientes
     {
-        #region Eventos de la Interfaz IPatientsView
-        public event EventHandler CreateRequested;
-        public event EventHandler EditRequested;
-        public event EventHandler DeleteRequested;
-        public event EventHandler SearchRequested;
-        public event EventHandler CloseRequested;
+        #region Eventos de la Interfaz IVistaPacientes (CORREGIDO AL ESPAÑOL)
+        public event EventHandler CreacionSolicitada;
+        public event EventHandler EdicionSolicitada;
+        public event EventHandler EliminacionSolicitada;
+        public event EventHandler BusquedaSolicitada;
+        public event EventHandler CierreSolicitado;
         #endregion
 
-        #region Propiedades de la Interfaz IPatientsView
-        public string SearchText => txtBuscar.Text;
+        #region Propiedades de la Interfaz IVistaPacientes (CORREGIDO AL ESPAÑOL)
+        public string TextoBusqueda => txtBuscar.Text == "Buscar por DNI, nombre o apellido..." ? "" : txtBuscar.Text;
         #endregion
 
         #region Eventos personalizados para funcionalidad extendida
@@ -441,12 +441,14 @@ namespace SALC.Views
 
         private void BtnBuscar_Click(object sender, EventArgs e)
         {
-            string textoBusqueda = txtBuscar.Text == "Buscar por DNI, nombre o apellido..." ? "" : txtBuscar.Text;
+            BusquedaSolicitada?.Invoke(this, EventArgs.Empty);
+            string textoBusqueda = TextoBusqueda;
             BuscarPaciente?.Invoke(this, textoBusqueda);
         }
 
         private void BtnNuevo_Click(object sender, EventArgs e)
         {
+            CreacionSolicitada?.Invoke(this, EventArgs.Empty);
             EstaEditando = false;
             LimpiarFormulario();
             HabilitarFormulario(true);
@@ -456,6 +458,7 @@ namespace SALC.Views
         {
             if (PacienteSeleccionado != null)
             {
+                EdicionSolicitada?.Invoke(this, EventArgs.Empty);
                 EstaEditando = true;
                 CargarDatosPaciente(PacienteSeleccionado);
                 HabilitarFormulario(true);
@@ -463,7 +466,7 @@ namespace SALC.Views
             }
             else
             {
-                MostrarMensaje("Seleccione un paciente para editar.");
+                MostrarMensaje("Información", "Seleccione un paciente para editar.");
             }
         }
 
@@ -471,6 +474,7 @@ namespace SALC.Views
         {
             if (PacienteSeleccionado != null)
             {
+                EliminacionSolicitada?.Invoke(this, EventArgs.Empty);
                 var resultado = MessageBox.Show(
                     $"¿Está seguro que desea eliminar al paciente {PacienteSeleccionado.Nombre} {PacienteSeleccionado.Apellido}?",
                     "Confirmar Eliminación",
@@ -484,7 +488,7 @@ namespace SALC.Views
             }
             else
             {
-                MostrarMensaje("Seleccione un paciente para eliminar.");
+                MostrarMensaje("Información", "Seleccione un paciente para eliminar.");
             }
         }
 
@@ -568,21 +572,16 @@ namespace SALC.Views
 
         #endregion
 
-        #region Implementación de la Interfaz
+        #region Implementación de la Interfaz IVistaPacientes (CORREGIDO AL ESPAÑOL)
 
-        public void ShowMessage(string title, string message)
+        public void MostrarMensaje(string titulo, string mensaje)
         {
-            MessageBox.Show(message, title, MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show(mensaje, titulo, MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
-        public void MostrarMensaje(string mensaje)
+        public void MostrarError(string mensaje)
         {
-            ShowMessage("Información", mensaje);
-        }
-
-        public void MostrarError(string error)
-        {
-            MessageBox.Show(error, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show(mensaje, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 
         public void LimpiarFormulario()
@@ -596,6 +595,29 @@ namespace SALC.Views
             txtEmail.Clear();
             cmbObraSocial.SelectedIndex = 0;
             HabilitarFormulario(false);
+        }
+
+        public void HabilitarFormulario(bool habilitado)
+        {
+            txtDni.Enabled = habilitado && !EstaEditando; // El DNI no se puede editar
+            txtNombre.Enabled = habilitado;
+            txtApellido.Enabled = habilitado;
+            cmbSexo.Enabled = habilitado;
+            dtpFechaNacimiento.Enabled = habilitado;
+            txtTelefono.Enabled = habilitado;
+            txtEmail.Enabled = habilitado;
+            cmbObraSocial.Enabled = habilitado;
+            btnGuardar.Enabled = habilitado;
+            btnCancelar.Enabled = habilitado;
+
+            if (!habilitado && EstaEditando)
+            {
+                txtDni.BackColor = SystemColors.Control;
+            }
+            else
+            {
+                txtDni.BackColor = SystemColors.Window;
+            }
         }
 
         public void CargarDatosPaciente(Paciente paciente)

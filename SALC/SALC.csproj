@@ -94,22 +94,21 @@
     <Compile Include="Presenters\MainDashboardPresenter.cs" />
     <Compile Include="Presenters\ReportsPresenter.cs" />
     
-    <!-- ==== INTERFACES DE VISTA (MVP Pattern) - 100% ESPAÑOL ==== -->
-    <Compile Include="Views\Interfaces\ILoginView.cs" />
-    <Compile Include="Views\Interfaces\IPacientesView.cs" />
-    <Compile Include="Views\Interfaces\IResultsView.cs" />
-    <Compile Include="Views\Interfaces\IReportsView.cs" />
+    <!-- ==== INTERFACES DE VISTA (MVP Pattern) - 100% ESPAÑOL COMPLETADO ==== -->
+    <Compile Include="Views\Interfaces\IVistaInicioSesion.cs" />
+    <Compile Include="Views\Interfaces\IVistaPacientes.cs" />
+    <Compile Include="Views\Interfaces\IVistaResultados.cs" />
+    <Compile Include="Views\Interfaces\IVistaReportes.cs" />
     <Compile Include="Views\Interfaces\IVistaEstudios.cs" />
-    <Compile Include="Views\Interfaces\IMainDashboardView.cs" />
-    <Compile Include="Views\Interfaces\INotificationsView.cs" />
+    <Compile Include="Views\Interfaces\IVistaPanelPrincipal.cs" />
+    <Compile Include="Views\Interfaces\IVistaNotificaciones.cs" />
     <Compile Include="Views\Interfaces\IVistaMetricas.cs" />
-    <Compile Include="Views\Interfaces\IUserManagementView.cs" />
-    <Compile Include="Views\Interfaces\IBackupsView.cs" />
-    <Compile Include="Views\Interfaces\ISocialWorksView.cs" />
-    <Compile Include="Views\Interfaces\IHistoryView.cs" />
-    <Compile Include="Views\Interfaces\IAdminCatalogView.cs" />
-    <Compile Include="Views\Interfaces\IBackupManagementView.cs" />
-    <Compile Include="Views\Interfaces\ISystemConfigView.cs" />
+    <Compile Include="Views\Interfaces\IVistaGestionUsuarios.cs" />
+    <Compile Include="Views\Interfaces\IVistaGestionCopiasSeguridad.cs" />
+    <Compile Include="Views\Interfaces\IVistaObrasSociales.cs" />
+    <Compile Include="Views\Interfaces\IVistaHistorial.cs" />
+    <Compile Include="Views\Interfaces\IVistaAdministracionCatalogos.cs" />
+    <Compile Include="Views\Interfaces\IVistaConfiguracionSistema.cs" />
     
     <!-- ==== FORMULARIOS PRINCIPALES ==== -->
     <Compile Include="Views\LoginForm.cs">
@@ -209,17 +208,6 @@
       <DependentUpon>HistorialEstudiosForm.cs</DependentUpon>
     </Compile>
     
-    <!-- ==== FORMULARIOS AUXILIARES ==== -->
-    <Compile Include="Views\RecepcionMuestrasForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Views\AdminCatalogFormStub.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Views\BackupManagementFormStub.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    
     <!-- ==== UTILIDADES Y COMUNES ==== -->
     <Compile Include="Common\SALCColors.cs" />
     
@@ -255,7 +243,9 @@
     <None Include="Docs\ERS-SALC_IEEEv2.7.md" />
     <None Include="Docs\estructura-salc.sql" />
     <None Include="Docs\lote-salc.sql" />
-    <None Include="Docs\VERIFICACION_FINAL_ESPAÑOL.md" />
+    <None Include="Docs\REFACTORIZACION_COMPLETADA_EXITOSAMENTE.md" />
+    <None Include="Docs\ANALISIS_REFACTORIZACION_INCOMPLETA.md" />
+    <None Include="Docs\REFACTORIZACION_FINAL_COMPLETA.md" />
   </ItemGroup>
   
   <!-- ==== ESTRUCTURA DE CARPETAS ==== -->
@@ -272,4 +262,4 @@
   </ItemGroup>
   
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-</Project>
+</Project></Project>
