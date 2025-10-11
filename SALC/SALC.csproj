@@ -1,4 +1,3 @@
-
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
@@ -59,6 +58,7 @@
     <Compile Include="Views\FrmPrincipal.cs" />
     <Compile Include="Presenters\PanelAsistentePresenter.cs" />
     <Compile Include="Presenters\PanelMedicoPresenter.cs" />
+  <Compile Include="Presenters\ResultadoEdicionDto.cs" />
     <Compile Include="Presenters\PanelAdministradorPresenter.cs" />
     <Compile Include="Presenters\LoginPresenter.cs" />
     <Compile Include="Presenters\ViewsContracts\IPanelAsistenteView.cs" />

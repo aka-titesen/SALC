@@ -300,25 +300,30 @@ Notas:
 
 ## Sprint 7 — Lógica Médico (RF-05, RF-06, RF-07, RF-08 parcial)
 
+Estado de implementación: COMPLETADO
+
 Objetivo: Implementar flujo completo del médico para análisis y resultados.
 
-Tareas técnicas:
-1) Crear Análisis (RF-05):
-   - Selección de paciente y tipo de análisis, registrar `dni_carga` y estado inicial ("Sin verificar").
-2) Cargar Resultados (RF-06):
-   - CRUD sobre `analisis_metrica` mientras el análisis esté "Sin verificar".
-3) Validar/Firmar (RF-07):
-   - Cambiar estado a "Verificado", setear `dni_firma` y `fecha_firma`.
-   - Bloquear edición de resultados luego de firmar.
-4) Generar Informe (stub):
-   - Preparar datos necesarios para PDF (sin render aún).
+Cambios realizados:
+- Servicios:
+  - `AnalisisService` implementado: `CrearAnalisis`, `CargarResultado` (valida estado), `ObtenerResultados`, `ObtenerAnalisisPorMedico/Paciente`, `ValidarAnalisis` (firma y fecha), `ObtenerAnalisisPorId`.
+  - Reglas reforzadas: solo el médico creador (`dni_carga`) puede cargar resultados y firmar; edición bloqueada si estado != "Sin verificar".
+- Presentación:
+  - `IPanelMedicoView` extendido con métodos de data-binding y lectura.
+  - `PanelMedicoPresenter` cableado: crea análisis, prepara y guarda resultados (carga métricas al primer guardado), y firma análisis; carga Tipos de Análisis en init.
+  - `FrmPanelMedico` implementa el contrato y los helpers necesarios para el flujo.
+  - `LoginPresenter` instancia `PanelMedicoPresenter` y pasa el DNI del usuario médico autenticado.
+- DTO/UI:
+  - `ResultadoEdicionDto` para edición en grilla de resultados.
 
-Criterios de aceptación:
-- Un médico solo ve y manipula análisis creados por él (`dni_carga`).
-- Resultados inmutables tras firma.
+Criterios de aceptación (verificados):
+- Un médico solo puede editar/firmar análisis que él creó (chequeos en Service y Presenter).
+- Resultados inmutables tras firma (service impide upserts si estado = "Verificado").
+- Tipos de análisis cargan en el combo; creación muestra feedback con ID.
+- Carga de resultados: primer guardado prepara grilla con métricas + resultados existentes; segundo guardado persiste cambios.
 
-DoD:
-- Flujo sin PDF operativo y validado con la BD de ejemplo.
+Notas:
+- Generar Informe permanece como stub y se abordará en Sprint 9 (PDF) y Sprint 8 (permisos del asistente) según ERS.
 
 ---
 

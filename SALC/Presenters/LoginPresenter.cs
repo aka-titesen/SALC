@@ -47,7 +47,11 @@ namespace SALC.Presenters
                     var pav = (Views.PanelAdministrador.FrmPanelAdministrador)next;
                     var adminPresenter = new PanelAdministradorPresenter(pav);
                     break;
-                case 2: next = new Views.PanelMedico.FrmPanelMedico(); break;
+                case 2:
+                    next = new Views.PanelMedico.FrmPanelMedico();
+                    var pmv = (Views.PanelMedico.FrmPanelMedico)next;
+                    var medicoPresenter = new PanelMedicoPresenter(pmv, usuario.Dni);
+                    break;
                 case 3: next = new Views.PanelAsistente.FrmPanelAsistente(); break;
                 default:
                     _view.MostrarError("Rol de usuario no reconocido.");
