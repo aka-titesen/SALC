@@ -53,11 +53,16 @@ GO
 -- Las contraseñas son un HASH generado por la aplicación (ej. BCrypt).
 -- El texto es solo un ejemplo, no la contraseña real.
 INSERT INTO usuarios (dni, nombre, apellido, id_rol, email, password_hash, estado) VALUES
-(30000001,'Juan','Pérez',1,'jperez@lab.com','$2a$10$abcdefghijklmnopqrstuv.wxyz', 'Activo'),     -- Rol: Administrador
-(30000002,'María','González',2,'mgonzalez@lab.com','$2a$10$abcdefghijklmnopqrstuv.wxyz', 'Activo'),  -- Rol: Médico
-(30000003,'Sofía','Gundisalvo',2,'sofiagun@lab.com','$2a$10$abcdefghijklmnopqrstuv.wxyz', 'Activo'),   -- Rol: Médico
-(30000004,'Carlos','Ramírez',3,'cramirez@lab.com','$2a$10$abcdefghijklmnopqrstuv.wxyz', 'Activo'),     -- Rol: Asistente
-(30000005,'Erika','Miralles',3,'erikamir@lab.com','$2a$10$abcdefghijklmnopqrstuv.wxyz', 'Activo');      -- Rol: Asistente
+--Contrseña plana: "9ffe8/5<7X1}"
+(30000001,'Juan','Pérez',1,'jperez@lab.com','$2a$12$URP1nbn2iSYn5/cEFwcaMeN8N.8SR1TaL3FMwFvYthH6c7DAfxWWm', 'Activo'),     -- Rol: Administrador
+-- Contraseña plana: "5kA5GM^087C`"
+(30000002,'María','González',2,'mgonzalez@lab.com','$2a$12$xR2X4M31NjPdlYXefWGhVO/mhEY4wEcHGtrIT09zPWFyjcH49k7.q', 'Activo'),  -- Rol: Médico
+-- Contraseña plana: "0Z1AiD'-65-*"
+(30000003,'Sofía','Gundisalvo',2,'sofiagun@lab.com','$2a$12$o7V3ylw3QSIO2qk2QagJKubqaJFVoomZv3lTo3mVjeUuCTz6xTUsO', 'Activo'),   -- Rol: Médico
+-- Contraseña plana: "&8A2Ve9&#Xmi"
+(30000004,'Carlos','Ramírez',3,'cramirez@lab.com','$2a$12$y98vRL/bjbV.U2.DPSpciOLaqSBPNxQk.0uY.fBe.FZDdP3KVKm8a', 'Activo'),     -- Rol: Asistente
+-- Contraseña plana: "GGeI((h71485"
+(30000005,'Erika','Miralles',3,'erikamir@lab.com','$2a$12$PTg6.zjtrOe1NcGegfAl/elM95qtmTOEmHrAetH39m7lQw5wXKq9.', 'Activo');      -- Rol: Asistente
 GO
 
 -- 7. MEDICOS (Datos específicos) ------------------------

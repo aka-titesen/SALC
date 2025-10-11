@@ -74,6 +74,7 @@
     <Compile Include="BLL\IUsuarioService.cs" />
     <Compile Include="BLL\AutenticacionService.cs" />
     <Compile Include="BLL\IAutenticacionService.cs" />
+  <Compile Include="DAL\UsuarioTransaccionesRepositorio.cs" />
     <Compile Include="DAL\UsuarioRepositorio.cs" />
     <Compile Include="DAL\PacienteRepositorio.cs" />
     <Compile Include="DAL\CatalogoRepositorio.cs" />
@@ -83,6 +84,7 @@
     <Compile Include="DAL\AsistenteRepositorio.cs" />
     <Compile Include="DAL\IRepositorioBase.cs" />
     <Compile Include="Infraestructura\DbConexion.cs" />
+  <Compile Include="Infraestructura\DbHealth.cs" />
     <Compile Include="Domain\EstadoAnalisis.cs" />
     <Compile Include="Domain\Rol.cs" />
     <Compile Include="Domain\AnalisisMetrica.cs" />

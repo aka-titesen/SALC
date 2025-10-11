@@ -8,6 +8,11 @@
 			"problemMatcher": [
 				"$msbuild"
 			]
+		},
+		{
+			"label": "Build SALC solution",
+			"type": "shell",
+			"command": "dotnet build SALC.sln -c Debug"
 		}
 	]
 }

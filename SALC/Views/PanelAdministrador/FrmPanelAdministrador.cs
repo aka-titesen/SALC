@@ -131,10 +131,13 @@ namespace SALC.Views.PanelAdministrador
             var tab = new TabPage("Backups");
             var btnEjecutar = new Button { Text = "Ejecutar backup ahora", Left = 20, Top = 20, Width = 220 };
             var btnProgramar = new Button { Text = "Programar backup...", Left = 20, Top = 60, Width = 220 };
+            var btnProbarConexion = new Button { Text = "Probar conexión a BD", Left = 20, Top = 100, Width = 220 };
             btnEjecutar.Click += (s, e) => EjecutarBackupClick?.Invoke(this, EventArgs.Empty);
             btnProgramar.Click += (s, e) => ProgramarBackupClick?.Invoke(this, EventArgs.Empty);
+            btnProbarConexion.Click += (s, e) => ProbarConexionClick?.Invoke(this, EventArgs.Empty);
             tab.Controls.Add(btnEjecutar);
             tab.Controls.Add(btnProgramar);
+            tab.Controls.Add(btnProbarConexion);
             tabs.TabPages.Add(tab);
         }
 
@@ -160,5 +163,6 @@ namespace SALC.Views.PanelAdministrador
         public event EventHandler<string> MetricasBuscarTextoChanged;
         public event EventHandler EjecutarBackupClick;
         public event EventHandler ProgramarBackupClick;
+        public event EventHandler ProbarConexionClick;
     }
 }

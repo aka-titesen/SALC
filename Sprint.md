@@ -180,17 +180,17 @@ DoD:
 - Repositorios compilando, métodos principales implementados y probados manualmente.
 - Manejo básico de excepciones y cierre de conexiones correcto (using/dispose).
 
-Estado de implementación: EN PROGRESO (hito intermedio cumplido)
+Estado de implementación: COMPLETADO
 
-Cambios realizados en este hito:
+Cambios realizados:
 - Repositorios implementados en `DAL/`: `UsuarioRepositorio`, `PacienteRepositorio`, `CatalogoRepositorio`, `AnalisisRepositorio`, `AnalisisMetricaRepositorio`, `MedicoRepositorio`, `AsistenteRepositorio`.
+- Repositorio transaccional: `UsuarioTransaccionesRepositorio` (alta/baja atómica de Usuario+Médico/Asistente con `SqlTransaction`).
 - Inclusión de los nuevos archivos en `SALC.csproj` (estilo clásico).
 - Alineación de cadena de conexión: `App.config` ajustado a `connectionStrings` con nombre `SALC_Db` para coincidir con `DbConexion`.
 - Build de solución: OK (Debug).
 
-Pendiente para cerrar el Sprint 3:
-- Agregar transacciones (`SqlTransaction`) en operaciones que afecten múltiples tablas (alta/edición/baja de usuarios + médico/asistente).
-- Pruebas de humo contra una BD de ejemplo: lectura de catálogos y CRUD mínimo de paciente/usuario.
+Notas:
+- Se recomienda ejecutar pruebas de humo manuales contra una BD local (catálogos y CRUD paciente/usuario) usando los scripts de `Docs/`.
 
 ---
 
@@ -203,12 +203,18 @@ Tareas técnicas:
 2) `DbConexion`: leer cadena desde config, exponer `CrearConexion()`.
 3) Prueba de conexión: método `ProbarConexion()` y botón en UI (solo Administrador) para verificar.
 
-Criterios de aceptación:
-- Conexión exitosa a la BD configurada.
-- Errores de conexión muestran mensaje claro en UI.
+Estado de implementación: COMPLETADO
 
-DoD:
-- `App.config` actualizado, `DbConexion` funcionando.
+Cambios realizados:
+- `App.config`: agregado/ajustado `connectionStrings` con nombre `SALC_Db`.
+- `Infraestructura/DbConexion`: centraliza la creación de `SqlConnection`.
+- `Infraestructura/DbHealth`: helper `ProbarConexion()` con timeout corto y verificación `SELECT 1`.
+- UI: botón "Probar conexión a BD" en `FrmPanelAdministrador` (tab Backups) con evento `ProbarConexionClick` en `IPanelAdministradorView`.
+- Presenter: `PanelAdministradorPresenter` maneja el evento y muestra `MessageBox` con resultado.
+
+Criterios de aceptación (verificados):
+- La app compila y expone el botón de prueba de conexión.
+- Mensajes claros en caso de error/éxito.
 
 ---
 

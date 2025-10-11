@@ -35,5 +35,8 @@ namespace SALC.Presenters.ViewsContracts
         // Backups
         event EventHandler EjecutarBackupClick;
         event EventHandler ProgramarBackupClick;
+
+        // Salud de BD
+        event EventHandler ProbarConexionClick;
     }
 }
