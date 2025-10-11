@@ -1,0 +1,290 @@
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{698AD26E-F881-48F0-8D83-D9A6912EC957}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>SALC</RootNamespace>
+    <AssemblyName>SALC</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+    <LangVersion>8.0</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <LangVersion>8.0</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <LangVersion>8.0</LangVersion>
+  </PropertyGroup>
+
+  <!-- Target para cerrar procesos SALC.exe antes de compilar -->
+  <Target Name="BeforeBuild">
+    <Message Importance="High" Text="Cerrando procesos SALC.exe si existen..." />
+    <Exec Command="taskkill /F /IM SALC.exe /T" ContinueOnError="true" />
+  </Target>
+
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- ==================== NUEVA ARQUITECTURA - ARCHIVOS BASE ==================== -->
+    <!-- Base classes para la arquitectura mejorada -->
+    <Compile Include="Models\BaseEntity.cs" />
+    <Compile Include="DataAccess\Repositories\BaseRepository.cs" />
+    <Compile Include="Services\BaseService.cs" />
+    <Compile Include="Presenters\BasePresenter.cs" />
+    <Compile Include="Views\Interfaces\IBaseView.cs" />
+
+    <!-- Common utilities -->
+    <Compile Include="Common\Constants\SALCConstants.cs" />
+    <Compile Include="Common\Enums\UserRole.cs" />
+    <Compile Include="Common\Enums\AnalisisState.cs" />
+    <Compile Include="Common\Helpers\ValidationHelper.cs" />
+    <Compile Include="Common\Helpers\DateTimeHelper.cs" />
+    <Compile Include="Common\Helpers\SecurityHelper.cs" />
+
+    <!-- Configuration -->
+    <Compile Include="Configuration\DatabaseConfig.cs" />
+    <Compile Include="Configuration\AppSettings.cs" />
+
+    <!-- Factory Pattern -->
+    <Compile Include="Factory\PresenterFactory.cs" />
+    <Compile Include="Factory\ServiceFactory.cs" />
+
+    <!-- ==================== ARCHIVOS LEGACY EXISTENTES ==================== -->
+    <!-- DataAccess existente -->
+    <Compile Include="SALC\DataAccess\DatabaseConnection.cs" />
+    <Compile Include="SALC\DataAccess\Repositories\UsuarioRepository.cs" />
+    <Compile Include="SALC\DataAccess\Repositories\RolRepository.cs" />
+    <Compile Include="SALC\DataAccess\Repositories\PacienteRepository.cs" />
+    <Compile Include="SALC\DataAccess\Repositories\ObraSocialRepository.cs" />
+    <Compile Include="SALC\DataAccess\Repositories\MetricaRepository.cs" />
+    <Compile Include="SALC\DataAccess\Repositories\TipoAnalisisRepository.cs" />
+
+    <!-- Models existentes -->
+    <Compile Include="SALC\Models\Usuario.cs" />
+    <Compile Include="SALC\Models\Medico.cs" />
+    <Compile Include="SALC\Models\Asistente.cs" />
+    <Compile Include="SALC\Models\Paciente.cs" />
+    <Compile Include="SALC\Models\Analisis.cs" />
+    <Compile Include="SALC\Models\AnalisisMetrica.cs" />
+    <Compile Include="SALC\Models\Rol.cs" />
+    <Compile Include="SALC\Models\EstadoAnalisis.cs" />
+    <Compile Include="SALC\Models\ObraSocial.cs" />
+    <Compile Include="SALC\Models\TipoAnalisis.cs" />
+    <Compile Include="SALC\Models\Metrica.cs" />
+
+    <!-- Services existentes -->
+    <Compile Include="SALC\Services\UserAuthentication.cs" />
+    <Compile Include="SALC\Services\UserData.cs" />
+    <Compile Include="SALC\Services\PacienteService.cs" />
+    <Compile Include="SALC\Services\AnalisisService.cs" />
+    <Compile Include="SALC\Services\MetricaService.cs" />
+    <Compile Include="SALC\Services\AdminCatalogService.cs" />
+    <Compile Include="SALC\Services\BackupService.cs" />
+    <Compile Include="SALC\Services\SystemConfigService.cs" />
+    <Compile Include="SALC\Services\ServicioReportesAnalisis.cs" />
+
+    <!-- Presenters existentes -->
+    <Compile Include="SALC\Presenters\AppFeature.cs" />
+    <Compile Include="SALC\Presenters\LoginPresenter.cs" />
+    <Compile Include="SALC\Presenters\MainDashboardPresenter.cs" />
+    <Compile Include="SALC\Presenters\ReportsPresenter.cs" />
+    <Compile Include="SALC\Presenters\BackupManagementPresenter.cs" />
+    <Compile Include="SALC\Presenters\SystemConfigPresenter.cs" />
+
+    <!-- Interfaces existentes -->
+    <Compile Include="SALC\Views\Interfaces\IVistaInicioSesion.cs" />
+    <Compile Include="SALC\Views\Interfaces\IVistaPanelPrincipal.cs" />
+    <Compile Include="SALC\Views\Interfaces\IVistaPacientes.cs" />
+    <Compile Include="SALC\Views\Interfaces\IVistaEstudios.cs" />
+    <Compile Include="SALC\Views\Interfaces\IVistaResultados.cs" />
+    <Compile Include="SALC\Views\Interfaces\IVistaHistorial.cs" />
+    <Compile Include="SALC\Views\Interfaces\IVistaReportes.cs" />
+    <Compile Include="SALC\Views\Interfaces\IVistaGestionUsuarios.cs" />
+    <Compile Include="SALC\Views\Interfaces\IVistaAdministracionCatalogos.cs" />
+    <Compile Include="SALC\Views\Interfaces\IVistaMetricas.cs" />
+    <Compile Include="SALC\Views\Interfaces\IVistaObrasSociales.cs" />
+    <Compile Include="SALC\Views\Interfaces\IVistaGestionCopiasSeguridad.cs" />
+    <Compile Include="SALC\Views\Interfaces\IVistaConfiguracionSistema.cs" />
+    <Compile Include="SALC\Views\Interfaces\IVistaNotificaciones.cs" />
+
+    <!-- Forms existentes -->
+    <!-- Eliminado: SALC\Views\Common\LoginForm.* (reemplazado por src\Views\Common\InicioSesionForm.cs) -->
+    <Compile Include="SALC\Views\MainDashboardForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SALC\Views\MainDashboardForm.Designer.cs">
+      <DependentUpon>MainDashboardForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SALC\Views\GestionUsuariosForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SALC\Views\DialogoFormularioUsuario.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SALC\Views\EditarUsuarioForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SALC\Views\PacientesForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SALC\Views\AgregarPaciente.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SALC\Views\AgregarPaciente.Designer.cs">
+      <DependentUpon>AgregarPaciente.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SALC\Views\EstudiosForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SALC\Views\AgregarEstudio.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SALC\Views\AgregarEstudio.Designer.cs">
+      <DependentUpon>AgregarEstudio.cs</DependentUpon>
+    </Compile>
+    <!-- Eliminado: ResultsForm.cs (en inglés) -->
+    <Compile Include="SALC\Views\AgregarMetrica.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SALC\Views\AgregarMetrica.Designer.cs">
+      <DependentUpon>AgregarMetrica.cs</DependentUpon>
+    </Compile>
+    <!-- Eliminado: HistoryForm.cs (en inglés) -->
+    <!-- Eliminado: ReportsForm.cs (en inglés) -->
+    <Compile Include="SALC\Views\ReportesAnalisisForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SALC\Views\DetalleAnalisisForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <!-- Eliminado: BackupsForm.cs (en inglés) -->
+    <!-- Eliminado: NotificationsForm.cs (en inglés) -->
+
+    <!-- Utilities existentes -->
+    <Compile Include="SALC\Common\SALCColors.cs" />
+
+    <!-- Entry point -->
+    <Compile Include="SALC\Program.cs" />
+    <Compile Include="SALC\Properties\AssemblyInfo.cs" />
+    <Compile Include="SALC\Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="SALC\Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="SALC\Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Resources existentes -->
+    <!-- Eliminado: SALC\Views\Common\LoginForm.resx -->
+    <EmbeddedResource Include="SALC\Views\MainDashboardForm.resx">
+      <DependentUpon>MainDashboardForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SALC\Views\AgregarPaciente.resx">
+      <DependentUpon>AgregarPaciente.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SALC\Views\AgregarMetrica.resx">
+      <DependentUpon>AgregarMetrica.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SALC\Views\agregar_estudio.resx">
+      <DependentUpon>AgregarEstudio.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SALC\Views\EditarPaciente.resx" />
+    <EmbeddedResource Include="SALC\Views\detalleEstudio.resx" />
+    <EmbeddedResource Include="SALC\Views\editarEstudio.resx" />
+    <EmbeddedResource Include="SALC\Views\HistorialEstudiosForm.resx" />
+    <EmbeddedResource Include="SALC\Views\ADDForm.resx" />
+    <EmbeddedResource Include="SALC\Views\EditForm.resx" />
+    <EmbeddedResource Include="SALC\Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <!-- Documentation -->
+  <ItemGroup>
+    <None Include="Docs\ERS-SALC_IEEEv2.7.md" />
+    <None Include="Docs\estructura-salc.sql" />
+    <None Include="Docs\lote-salc.sql" />
+    <None Include="Docs\README.md" />
+    <None Include="Docs\ARCHITECTURE.md" />
+  </ItemGroup>
+
+  <!-- Folder structure -->
+  <ItemGroup>
+    <!-- Nueva arquitectura -->
+    <Folder Include="DataAccess\" />
+    <Folder Include="DataAccess\Repositories\" />
+    <Folder Include="Services\" />
+    <Folder Include="Models\" />
+    <Folder Include="Presenters\" />
+    <Folder Include="Views\" />
+    <Folder Include="Views\Interfaces\" />
+    <Folder Include="Common\" />
+    <Folder Include="Common\Constants\" />
+    <Folder Include="Common\Enums\" />
+    <Folder Include="Common\Helpers\" />
+    <Folder Include="Configuration\" />
+    <Folder Include="Factory\" />
+    <Folder Include="Docs\" />
+
+    <!-- Legacy structure -->
+    <Folder Include="SALC\" />
+    <Folder Include="SALC\DataAccess\" />
+    <Folder Include="SALC\DataAccess\Repositories\" />
+    <Folder Include="SALC\Services\" />
+    <Folder Include="SALC\Models\" />
+    <Folder Include="SALC\Presenters\" />
+    <Folder Include="SALC\Views\" />
+    <Folder Include="SALC\Views\Interfaces\" />
+    <Folder Include="SALC\Views\Common\" />
+    <Folder Include="SALC\Common\" />
+    <Folder Include="SALC\Properties\" />
+  </ItemGroup>
+
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
