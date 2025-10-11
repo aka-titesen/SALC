@@ -94,6 +94,8 @@ Definición de Hecho (DoD):
 
 ## Sprint 2 — Interfaces gráficas sin lógica
 
+Estado de implementación: COMPLETADO
+
 Objetivo: Crear todas las interfaces (formularios y controles) sin implementar la lógica. Vistas compactas y organizadas por panel.
 
 Tareas técnicas:
@@ -130,6 +132,17 @@ Criterios de aceptación:
 DoD:
 - Diseño de formularios y tabs completo, sin lógica.
 - Interfaces de vistas exponen eventos (ej. `AccederClick`, `NuevoClick`, etc.).
+
+Cambios realizados:
+- `FrmPanelAdministrador` con `TabControl` y tabs: Usuarios, Pacientes, Catálogos (subtabs: Obras Sociales, Tipos de Análisis, Métricas), Backups. ToolStrips con botones y eventos expuestos en la vista.
+- `FrmPanelMedico` con `TabControl` y tabs: Crear Análisis, Cargar Resultados, Validar/Firmar, Generar Informe. Uso de controles compartidos de selección.
+- `FrmPanelAsistente` con `TabControl` y tabs: Historial de Pacientes, Generar Informe Verificado.
+- Controles compartidos: `SeleccionPacienteControl`, `SeleccionAnalisisControl` en `Views/Compartidos/`.
+- Contratos de vistas enriquecidos con eventos: `IPanelAdministradorView`, `IPanelMedicoView`, `IPanelAsistenteView`.
+
+Verificación rápida:
+- Compila: OK.
+- Formularios abren sin excepciones y renderizan tabs/controles: OK.
 
 ---
 

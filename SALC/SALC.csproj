@@ -50,6 +50,8 @@
     <Compile Include="Views\PanelAsistente\FrmPanelAsistente.cs" />
     <Compile Include="Views\PanelMedico\FrmPanelMedico.cs" />
     <Compile Include="Views\PanelAdministrador\FrmPanelAdministrador.cs" />
+  <Compile Include="Views\Compartidos\SeleccionAnalisisControl.cs" />
+  <Compile Include="Views\Compartidos\SeleccionPacienteControl.cs" />
     <Compile Include="Views\FrmLogin.cs" />
     <Compile Include="Views\FrmPrincipal.cs" />
     <Compile Include="Presenters\PanelAsistentePresenter.cs" />
