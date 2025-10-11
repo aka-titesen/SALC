@@ -2,41 +2,37 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data.SqlClient;
-using System.Linq;
-using SALC.Models;
+using SALC.Views.Interfaces;
 
 namespace SALC.Services
 {
     /// <summary>
-    /// Servicio para gestión de reportes de análisis según ERS v2.7
+    /// Servicio para gestiÃ³n de informes de anÃ¡lisis segÃºn ERS v2.7
     /// Implementa RF-08: Generar y Enviar Informe y RF-09: Visualizar Historial
     /// </summary>
-    public class ServicioReportesAnalisis
+    public class InformesAnalisisService
     {
         private readonly string _cadenaConexion;
 
-        public ServicioReportesAnalisis()
+        public InformesAnalisisService()
         {
             _cadenaConexion = ConfigurationManager.ConnectionStrings["SALCConnection"]?.ConnectionString;
             if (string.IsNullOrEmpty(_cadenaConexion))
-                throw new InvalidOperationException("Error de configuración: Cadena de conexión 'SALCConnection' no encontrada.");
+                throw new InvalidOperationException("Error de configuraciÃ³n: Cadena de conexiÃ³n 'SALCConnection' no encontrada.");
         }
 
         #region Operaciones de Consulta
 
-        /// <summary>
-        /// Obtiene todos los reportes de análisis
-        /// </summary>
-        public List<ReporteAnalisis> ObtenerTodosLosReportes()
+        public List<InformeAnalisis> ObtenerTodosLosInformes()
         {
-            var reportes = new List<ReporteAnalisis>();
+            var informes = new List<InformeAnalisis>();
 
             using (var conexion = new SqlConnection(_cadenaConexion))
             {
                 conexion.Open();
-                
+
                 var consulta = @"
-                    SELECT 
+                    SELECT
                         a.id_analisis,
                         p.dni,
                         p.nombre + ' ' + p.apellido as NombrePaciente,
@@ -57,7 +53,7 @@ namespace SALC.Services
                 {
                     while (lector.Read())
                     {
-                        var reporte = new ReporteAnalisis
+                        var informe = new InformeAnalisis
                         {
                             IdReporte = lector.GetInt32("id_analisis"),
                             IdPaciente = lector.GetInt32("dni").ToString(),
@@ -69,33 +65,28 @@ namespace SALC.Services
                             Observaciones = lector.IsDBNull("observaciones") ? string.Empty : lector.GetString("observaciones")
                         };
 
-                        // Cargar resultados del análisis
-                        reporte.Resultados = ObtenerResultadosAnalisis(reporte.IdReporte);
-                        
-                        reportes.Add(reporte);
+                        informe.Resultados = ObtenerResultadosAnalisis(informe.IdReporte);
+                        informes.Add(informe);
                     }
                 }
             }
 
-            return reportes;
+            return informes;
         }
 
-        /// <summary>
-        /// Busca reportes por texto
-        /// </summary>
-        public List<ReporteAnalisis> BuscarReportes(string textoBusqueda)
+        public List<InformeAnalisis> BuscarInformes(string textoBusqueda)
         {
             if (string.IsNullOrWhiteSpace(textoBusqueda))
-                return ObtenerTodosLosReportes();
+                return ObtenerTodosLosInformes();
 
-            var reportes = new List<ReporteAnalisis>();
+            var informes = new List<InformeAnalisis>();
 
             using (var conexion = new SqlConnection(_cadenaConexion))
             {
                 conexion.Open();
-                
+
                 var consulta = @"
-                    SELECT 
+                    SELECT
                         a.id_analisis,
                         p.dni,
                         p.nombre + ' ' + p.apellido as NombrePaciente,
@@ -115,12 +106,12 @@ namespace SALC.Services
                 using (var comando = new SqlCommand(consulta, conexion))
                 {
                     comando.Parameters.AddWithValue("@busqueda", $"%{textoBusqueda}%");
-                    
+
                     using (var lector = comando.ExecuteReader())
                     {
                         while (lector.Read())
                         {
-                            var reporte = new ReporteAnalisis
+                            var informe = new InformeAnalisis
                             {
                                 IdReporte = lector.GetInt32("id_analisis"),
                                 IdPaciente = lector.GetInt32("dni").ToString(),
@@ -132,29 +123,26 @@ namespace SALC.Services
                                 Observaciones = lector.IsDBNull("observaciones") ? string.Empty : lector.GetString("observaciones")
                             };
 
-                            reporte.Resultados = ObtenerResultadosAnalisis(reporte.IdReporte);
-                            reportes.Add(reporte);
+                            informe.Resultados = ObtenerResultadosAnalisis(informe.IdReporte);
+                            informes.Add(informe);
                         }
                     }
                 }
             }
 
-            return reportes;
+            return informes;
         }
 
-        /// <summary>
-        /// Filtra reportes por criterios específicos
-        /// </summary>
-        public List<ReporteAnalisis> FiltrarReportes(FiltroReporte filtro)
+        public List<InformeAnalisis> FiltrarInformes(FiltroInforme filtro)
         {
-            var reportes = new List<ReporteAnalisis>();
+            var informes = new List<InformeAnalisis>();
 
             using (var conexion = new SqlConnection(_cadenaConexion))
             {
                 conexion.Open();
-                
+
                 var consulta = @"
-                    SELECT 
+                    SELECT
                         a.id_analisis,
                         p.dni,
                         p.nombre + ' ' + p.apellido as NombrePaciente,
@@ -176,15 +164,15 @@ namespace SALC.Services
                 using (var comando = new SqlCommand(consulta, conexion))
                 {
                     comando.Parameters.AddWithValue("@fechaDesde", filtro.FechaDesde);
-                    comando.Parameters.AddWithValue("@fechaHasta", filtro.FechaHasta.AddDays(1)); // Incluir el día completo
+                    comando.Parameters.AddWithValue("@fechaHasta", filtro.FechaHasta.AddDays(1));
                     comando.Parameters.AddWithValue("@tipoAnalisis", filtro.TipoAnalisis ?? "Todos");
                     comando.Parameters.AddWithValue("@estadoPaciente", filtro.EstadoAnalisis ?? "Todos");
-                    
+
                     using (var lector = comando.ExecuteReader())
                     {
                         while (lector.Read())
                         {
-                            var reporte = new ReporteAnalisis
+                            var informe = new InformeAnalisis
                             {
                                 IdReporte = lector.GetInt32("id_analisis"),
                                 IdPaciente = lector.GetInt32("dni").ToString(),
@@ -196,27 +184,24 @@ namespace SALC.Services
                                 Observaciones = lector.IsDBNull("observaciones") ? string.Empty : lector.GetString("observaciones")
                             };
 
-                            reporte.Resultados = ObtenerResultadosAnalisis(reporte.IdReporte);
-                            reportes.Add(reporte);
+                            informe.Resultados = ObtenerResultadosAnalisis(informe.IdReporte);
+                            informes.Add(informe);
                         }
                     }
                 }
             }
 
-            return reportes;
+            return informes;
         }
 
-        /// <summary>
-        /// Obtiene los detalles completos de un análisis específico
-        /// </summary>
-        public ReporteAnalisis ObtenerDetallesAnalisis(int idAnalisis)
+        public InformeAnalisis ObtenerDetallesAnalisis(int idAnalisis)
         {
             using (var conexion = new SqlConnection(_cadenaConexion))
             {
                 conexion.Open();
-                
+
                 var consulta = @"
-                    SELECT 
+                    SELECT
                         a.id_analisis,
                         p.dni,
                         p.nombre + ' ' + p.apellido as NombrePaciente,
@@ -238,12 +223,12 @@ namespace SALC.Services
                 using (var comando = new SqlCommand(consulta, conexion))
                 {
                     comando.Parameters.AddWithValue("@idAnalisis", idAnalisis);
-                    
+
                     using (var lector = comando.ExecuteReader())
                     {
                         if (lector.Read())
                         {
-                            var reporte = new ReporteAnalisis
+                            var informe = new InformeAnalisis
                             {
                                 IdReporte = lector.GetInt32("id_analisis"),
                                 IdPaciente = lector.GetInt32("dni").ToString(),
@@ -257,8 +242,8 @@ namespace SALC.Services
                                 Observaciones = lector.IsDBNull("Observaciones") ? string.Empty : lector.GetString("Observaciones")
                             };
 
-                            reporte.Resultados = ObtenerResultadosAnalisis(reporte.IdReporte);
-                            return reporte;
+                            informe.Resultados = ObtenerResultadosAnalisis(informe.IdReporte);
+                            return informe;
                         }
                     }
                 }
@@ -269,46 +254,27 @@ namespace SALC.Services
 
         #endregion
 
-        #region Operaciones de Exportación
+        #region Operaciones de ExportaciÃ³n
 
-        /// <summary>
-        /// Exporta un reporte a formato PDF (RF-08)
-        /// </summary>
-        public void ExportarAPdf(ReporteAnalisis reporte)
+        public void ExportarAPdf(InformeAnalisis informe)
         {
-            // Implementación básica de exportación a PDF
-            // En una implementación real, se usaría una librería como iTextSharp o QuestPDF
-            Console.WriteLine($"Exportando a PDF: {reporte.NombrePaciente} - {reporte.FechaAnalisis}");
-            // Lógica real de exportación a PDF iría aquí
+            Console.WriteLine($"Exportando a PDF: {informe.NombrePaciente} - {informe.FechaAnalisis}");
         }
 
-        /// <summary>
-        /// Exporta un reporte a formato CSV
-        /// </summary>
-        public void ExportarACsv(ReporteAnalisis reporte)
+        public void ExportarACsv(InformeAnalisis informe)
         {
-            // Implementación básica de exportación a CSV
-            Console.WriteLine($"Exportando a CSV: {reporte.NombrePaciente} - {reporte.FechaAnalisis}");
-            // Lógica real de exportación a CSV iría aquí
+            Console.WriteLine($"Exportando a CSV: {informe.NombrePaciente} - {informe.FechaAnalisis}");
         }
 
-        /// <summary>
-        /// Envía reporte por email (RF-08)
-        /// </summary>
-        public void EnviarPorEmail(ReporteAnalisis reporte, string emailDestino)
+        public void EnviarPorEmail(InformeAnalisis informe, string emailDestino)
         {
-            // Implementación básica de envío por email
-            Console.WriteLine($"Enviando reporte por email a {emailDestino}: {reporte.NombrePaciente}");
-            // Lógica real de envío por email iría aquí
+            Console.WriteLine($"Enviando informe por email a {emailDestino}: {informe.NombrePaciente}");
         }
 
         #endregion
 
-        #region Métodos Privados
+        #region MÃ©todos Privados
 
-        /// <summary>
-        /// Obtiene los resultados de métricas de un análisis específico
-        /// </summary>
         private List<ResultadoAnalisis> ObtenerResultadosAnalisis(int idAnalisis)
         {
             var resultados = new List<ResultadoAnalisis>();
@@ -316,9 +282,9 @@ namespace SALC.Services
             using (var conexion = new SqlConnection(_cadenaConexion))
             {
                 conexion.Open();
-                
+
                 var consulta = @"
-                    SELECT 
+                    SELECT
                         m.nombre as Parametro,
                         am.resultado as Valor,
                         m.unidad_medida as Unidad,
@@ -331,7 +297,7 @@ namespace SALC.Services
                 using (var comando = new SqlCommand(consulta, conexion))
                 {
                     comando.Parameters.AddWithValue("@idAnalisis", idAnalisis);
-                    
+
                     using (var lector = comando.ExecuteReader())
                     {
                         while (lector.Read())
@@ -355,19 +321,16 @@ namespace SALC.Services
 
         #endregion
 
-        #region Métodos de Validación
+        #region MÃ©todos de ValidaciÃ³n
 
-        /// <summary>
-        /// Verifica si un usuario puede generar reportes para un análisis específico (RF-08, RF-09)
-        /// </summary>
-        public bool PuedeGenerarReporte(int idAnalisis, int dniUsuario, string rolUsuario)
+        public bool PuedeGenerarInforme(int idAnalisis, int dniUsuario, string rolUsuario)
         {
             try
             {
                 using (var conexion = new SqlConnection(_cadenaConexion))
                 {
                     conexion.Open();
-                    
+
                     var consulta = @"
                         SELECT a.dni_carga, ea.descripcion as estado
                         FROM analisis a
@@ -377,7 +340,7 @@ namespace SALC.Services
                     using (var comando = new SqlCommand(consulta, conexion))
                     {
                         comando.Parameters.AddWithValue("@idAnalisis", idAnalisis);
-                        
+
                         using (var lector = comando.ExecuteReader())
                         {
                             if (lector.Read())
@@ -385,10 +348,7 @@ namespace SALC.Services
                                 int dniMedicoCarga = lector.GetInt32("dni_carga");
                                 string estadoAnalisis = lector.GetString("estado");
 
-                                // Reglas según ERS v2.7:
-                                // - Médico: puede generar reportes de análisis que él cargó
-                                // - Asistente: solo puede generar reportes de análisis verificados
-                                if (rolUsuario == "Médico")
+                                if (rolUsuario == "MÃ©dico")
                                 {
                                     return dniMedicoCarga == dniUsuario;
                                 }
@@ -398,7 +358,7 @@ namespace SALC.Services
                                 }
                                 else if (rolUsuario == "Administrador")
                                 {
-                                    return true; // Administrador puede generar cualquier reporte
+                                    return true;
                                 }
                             }
                         }
@@ -407,7 +367,7 @@ namespace SALC.Services
             }
             catch (Exception ex)
             {
-                throw new InvalidOperationException($"Error al verificar permisos de reporte: {ex.Message}", ex);
+                throw new InvalidOperationException($"Error al verificar permisos de informe: {ex.Message}", ex);
             }
 
             return false;
@@ -415,48 +375,4 @@ namespace SALC.Services
 
         #endregion
     }
-
-    #region Modelos de Soporte
-
-    /// <summary>
-    /// Representa un reporte de análisis según ERS v2.7
-    /// </summary>
-    public class ReporteAnalisis
-    {
-        public int IdReporte { get; set; }
-        public string IdPaciente { get; set; }
-        public string NombrePaciente { get; set; }
-        public string TelefonoPaciente { get; set; }
-        public string ObraSocial { get; set; }
-        public string TipoAnalisis { get; set; }
-        public DateTime FechaAnalisis { get; set; }
-        public string Estado { get; set; }
-        public string NombreMedico { get; set; }
-        public string Observaciones { get; set; }
-        public List<ResultadoAnalisis> Resultados { get; set; } = new List<ResultadoAnalisis>();
-    }
-
-    /// <summary>
-    /// Representa el resultado de una métrica en un análisis
-    /// </summary>
-    public class ResultadoAnalisis
-    {
-        public string Parametro { get; set; }
-        public string Valor { get; set; }
-        public string Unidad { get; set; }
-        public string RangoReferencia { get; set; }
-    }
-
-    /// <summary>
-    /// Filtro para búsqueda de reportes
-    /// </summary>
-    public class FiltroReporte
-    {
-        public DateTime FechaDesde { get; set; }
-        public DateTime FechaHasta { get; set; }
-        public string TipoAnalisis { get; set; }
-        public string EstadoAnalisis { get; set; }
-    }
-
-    #endregion
 }

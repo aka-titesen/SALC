@@ -4,49 +4,48 @@ using System.Collections.Generic;
 namespace SALC.Views.Interfaces
 {
     /// <summary>
-    /// Interfaz para la vista del panel principal (dashboard) según ERS v2.7
-    /// Implementa el patrón MVP (Model-View-Presenter) para la navegación principal
+    /// Interfaz para la vista del panel principal (dashboard) segï¿½n ERS v2.7
+    /// Implementa el patrï¿½n MVP (Model-View-Presenter) para la navegaciï¿½n principal
     /// </summary>
     public interface IVistaPanelPrincipal
     {
-        #region Métodos de Configuración (en español)
+        #region Mï¿½todos de Configuraciï¿½n (en espaï¿½ol)
         void EstablecerTituloEncabezado(string titulo);
         void EstablecerInformacionUsuario(string nombreCompleto, string rol);
         void EstablecerFuncionalidadesDisponibles(IReadOnlyCollection<AppFeature> funcionalidades);
         #endregion
 
-        #region Eventos Comunes (en español)
-        event EventHandler CierreSesionSolicitado;
-        event EventHandler PacientesSolicitado;
-        event EventHandler EstudiosSolicitado;
-        event EventHandler ResultadosSolicitado;
-        event EventHandler ReportesSolicitado;
-        event EventHandler NotificacionesSolicitado;
-        event EventHandler HistorialSolicitado;
+        #region Eventos Comunes (en espaï¿½ol)
+    event EventHandler CierreSesionSolicitado;
+    event EventHandler PacientesSolicitado;
+    event EventHandler EstudiosSolicitado;
+    event EventHandler ResultadosSolicitado;
+    event EventHandler RecepcionMuestrasSolicitado;
+    event EventHandler InformesSolicitado;
+    event EventHandler NotificacionesSolicitado;
+    event EventHandler HistorialSolicitado;
         #endregion
 
-        #region Eventos de Administración de Usuarios (Solo Administrador - en español)
-        event EventHandler GestionUsuariosSolicitada;
-        event EventHandler PacientesAdminSolicitado;
+        #region Eventos de Administraciï¿½n de Usuarios (Solo Administrador - en espaï¿½ol)
+    event EventHandler GestionUsuariosSolicitada;
+    event EventHandler PacientesAdminSolicitado;
+    event EventHandler DoctoresExternosSolicitado;
         #endregion
 
-        #region Eventos de Administración de Catálogos (Solo Administrador - en español)
-        event EventHandler TiposAnalisisSolicitado;
-        event EventHandler MetricasSolicitado;
-        event EventHandler ObrasSocialesSolicitado;
-        event EventHandler EstadosSolicitado;
-        event EventHandler RolesSolicitado;
+        #region Eventos de Administraciï¿½n de Catï¿½logos (Solo Administrador - en espaï¿½ol)
+    event EventHandler TiposAnalisisSolicitado;
+    event EventHandler MetricasSolicitado;
+    event EventHandler ObrasSocialesSolicitado;
+    event EventHandler EstadosSolicitado;
+    event EventHandler RolesSolicitado;
         #endregion
 
-        #region Eventos de Configuración y Sistema (Solo Administrador - en español)
-        event EventHandler CopiasSeguridad
-
-
-;
-        event EventHandler ConfiguracionSistemaSolicitada;
+        #region Eventos de Configuraciï¿½n y Sistema (Solo Administrador - en espaï¿½ol)
+    event EventHandler CopiasSeguridadSolicitado;
+    event EventHandler ConfiguracionSistemaSolicitada;
         #endregion
 
-        #region Métodos de la Vista (en español)
+        #region Mï¿½todos de la Vista (en espaï¿½ol)
         void MostrarMensaje(string titulo, string mensaje);
         void MostrarError(string mensaje);
         void ActualizarEstadoUsuario(string estado);

@@ -35,7 +35,7 @@ namespace SALC
         public event EventHandler EstudiosSolicitado;
         public event EventHandler ResultadosSolicitado;
         public event EventHandler RecepcionMuestrasSolicitado;
-        public event EventHandler ReportesSolicitado;
+    public event EventHandler InformesSolicitado;
         public event EventHandler NotificacionesSolicitado;
         public event EventHandler HistorialSolicitado;
 
@@ -61,9 +61,11 @@ namespace SALC
 
             // Inicializar presentador del panel principal
             var presentador = new PanelPrincipalPresenter(this);
+            this.InformesSolicitado += OnInformesSolicitado;
 
             // Conectar eventos administrativos si es admin
-            if (UserAuthentication.CurrentUser?.Rol?.ToLower() == "admin")
+            var auth = new SALC.Services.AutenticacionService();
+            if (auth.UsuarioActual?.Rol?.ToLower() == "admin")
             {
                 ConectarEventosAdministrativos();
             }
@@ -226,7 +228,8 @@ namespace SALC
                 CierreSesionSolicitado?.Invoke(this, EventArgs.Empty);
                 if (!hasSubs)
                 {
-                    UserAuthentication.Logout();
+                    var auth = new SALC.Services.AutenticacionService();
+                    auth.CerrarSesion();
                     Hide();
                     var login = new InicioSesionForm();
                     login.Show();
@@ -525,7 +528,7 @@ namespace SALC
                 case AppFeature.GestionEstudios: EstudiosSolicitado?.Invoke(this, EventArgs.Empty); break;
                 case AppFeature.CargaResultados: ResultadosSolicitado?.Invoke(this, EventArgs.Empty); break;
                 case AppFeature.RecepcionMuestras: RecepcionMuestrasSolicitado?.Invoke(this, EventArgs.Empty); break;
-                case AppFeature.GenerarInformes: ReportesSolicitado?.Invoke(this, EventArgs.Empty); break;
+                case AppFeature.GenerarInformes: InformesSolicitado?.Invoke(this, EventArgs.Empty); break;
                 case AppFeature.Notificaciones: NotificacionesSolicitado?.Invoke(this, EventArgs.Empty); break;
                 case AppFeature.HistorialOrdenes: HistorialSolicitado?.Invoke(this, EventArgs.Empty); break;
 
@@ -542,6 +545,22 @@ namespace SALC
                 case AppFeature.GestionRoles: RolesSolicitado?.Invoke(this, EventArgs.Empty); break;
 
                 case AppFeature.CopiasSeguridad: CopiasSeguridadSolicitado?.Invoke(this, EventArgs.Empty); break;
+            }
+        }
+
+        private void OnInformesSolicitado(object sender, EventArgs e)
+        {
+            try
+            {
+                var auth = new SALC.Services.AutenticacionService();
+                var rol = auth.UsuarioActual?.Rol ?? string.Empty;
+                var frm = new SALC.Views.InformesAnalisisForm(rol);
+                frm.MdiParent = this.MdiParent ?? this;
+                frm.Show();
+            }
+            catch (Exception ex)
+            {
+                MostrarMensaje("Error", $"No se pudo abrir Informes: {ex.Message}");
             }
         }
     }

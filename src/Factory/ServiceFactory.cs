@@ -1,23 +1,20 @@
 using System;
 using System.Collections.Generic;
-using SALC.Services.Auth;
-using SALC.Services.Core;
-using SALC.Services.Admin;
-using SALC.Services.Reports;
 using SALC.DataAccess.Repositories;
+using SALC.Services;
 
 namespace SALC.Factory
 {
     /// <summary>
     /// Factory para crear instancias de servicios.
-    /// Implementa el patrón Factory y básicamente Dependency Injection manual.
+    /// Implementa el patrï¿½n Factory y bï¿½sicamente Dependency Injection manual.
     /// </summary>
     public static class ServiceFactory
     {
-        private static readonly Dictionary<Type, Func<object>> _serviceFactories = 
+        private static readonly Dictionary<Type, Func<object>> _serviceFactories =
             new Dictionary<Type, Func<object>>();
 
-        private static readonly Dictionary<Type, object> _singletonInstances = 
+        private static readonly Dictionary<Type, object> _singletonInstances =
             new Dictionary<Type, object>();
 
         /// <summary>
@@ -33,26 +30,23 @@ namespace SALC.Factory
         /// </summary>
         private static void RegisterServiceFactories()
         {
-            // Authentication Services (Singleton)
+            // Servicios de AutenticaciÃ³n (Singleton)
             RegisterSingleton<UserAuthentication>(() => new UserAuthentication());
-            RegisterSingleton<AuthorizationService>(() => new AuthorizationService());
-            RegisterSingleton<SessionManager>(() => new SessionManager());
+            RegisterSingleton<AutenticacionService>(() => new AutenticacionService());
 
-            // Core Business Services (Transient)
-            RegisterTransient<UsuarioService>(() => new UsuarioService());
+            // Core Business Services (Transient) - versiones en espaÃ±ol con sufijo 'Service'
             RegisterTransient<PacienteService>(() => new PacienteService());
             RegisterTransient<AnalisisService>(() => new AnalisisService());
-            RegisterTransient<MetricaService>(() => new MetricaService());
+            RegisterTransient<MetricasService>(() => new MetricasService());
+            RegisterTransient<UsuariosService>(() => new UsuariosService());
 
-            // Administrative Services (Transient)
-            RegisterTransient<AdminCatalogService>(() => new AdminCatalogService());
-            RegisterTransient<BackupService>(() => new BackupService());
-            RegisterTransient<SystemConfigService>(() => new SystemConfigService());
+            // Servicios Administrativos (Transient)
+            RegisterTransient<AdministracionCatalogosService>(() => new AdministracionCatalogosService());
+            RegisterTransient<CopiaSeguridadService>(() => new CopiaSeguridadService());
+            RegisterTransient<ConfiguracionSistemaService>(() => new ConfiguracionSistemaService());
 
-            // Report Services (Transient)
-            RegisterTransient<ReportService>(() => new ReportService());
-            RegisterTransient<PDFGeneratorService>(() => new PDFGeneratorService());
-            RegisterTransient<EmailService>(() => new EmailService());
+            // Servicios de Informes
+            RegisterTransient<InformesAnalisisService>(() => new InformesAnalisisService());
 
             // Repository Services (Transient)
             RegisterTransient<UsuarioRepository>(() => new UsuarioRepository());
@@ -71,7 +65,7 @@ namespace SALC.Factory
         /// <param name="factory">Factory function</param>
         private static void RegisterSingleton<T>(Func<T> factory) where T : class
         {
-            _serviceFactories[typeof(T)] = () => 
+            _serviceFactories[typeof(T)] = () =>
             {
                 if (!_singletonInstances.TryGetValue(typeof(T), out var instance))
                 {
@@ -100,7 +94,7 @@ namespace SALC.Factory
         public static T GetService<T>() where T : class
         {
             var serviceType = typeof(T);
-            
+
             if (_serviceFactories.TryGetValue(serviceType, out var factory))
             {
                 return factory() as T;
@@ -153,7 +147,7 @@ namespace SALC.Factory
         }
 
         /// <summary>
-        /// Limpia todas las instancias singleton (útil para testing)
+        /// Limpia todas las instancias singleton (ï¿½til para testing)
         /// </summary>
         public static void ClearSingletons()
         {

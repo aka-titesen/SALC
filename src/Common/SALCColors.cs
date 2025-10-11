@@ -17,32 +17,32 @@ namespace SALC.UI
         // COLORES PRINCIPALES
         // ============================================
 
-        
+
         /// <summary>
         /// Azul principal del sistema - representa confianza y profesionalismo médico
         /// </summary>
         public static readonly Color Primary = Color.FromArgb(0, 123, 255);
-        
+
         /// <summary>
         /// Gris secundario para elementos neutros
         /// </summary>
         public static readonly Color Secondary = Color.FromArgb(108, 117, 125);
-        
+
         /// <summary>
         /// Fondo general del sistema - gris muy claro
         /// </summary>
         public static readonly Color Background = Color.FromArgb(248, 249, 250);
-        
+
         /// <summary>
         /// Fondo de tarjetas y paneles principales
         /// </summary>
         public static readonly Color CardBackground = Color.White;
-        
+
         /// <summary>
         /// Color de texto principal
         /// </summary>
         public static readonly Color TextPrimary = Color.FromArgb(52, 58, 64);
-        
+
         /// <summary>
         /// Color de texto secundario
         /// </summary>
@@ -51,22 +51,22 @@ namespace SALC.UI
         // ============================================
         // COLORES DE ESTADO
         // ============================================
-        
+
         /// <summary>
         /// Verde para éxito, completado, activo
         /// </summary>
         public static readonly Color Success = Color.FromArgb(40, 167, 69);
-        
+
         /// <summary>
         /// Amarillo para advertencias, pendiente
         /// </summary>
         public static readonly Color Warning = Color.FromArgb(255, 193, 7);
-        
+
         /// <summary>
         /// Rojo para errores, crítico, peligro
         /// </summary>
         public static readonly Color Danger = Color.FromArgb(220, 53, 69);
-        
+
         /// <summary>
         /// Azul claro para información
         /// </summary>
@@ -75,32 +75,32 @@ namespace SALC.UI
         // ============================================
         // COLORES DE MÓDULOS
         // ============================================
-        
+
         /// <summary>
         /// Color para el módulo de Gestión de Pacientes
         /// </summary>
         public static readonly Color Patients = Color.FromArgb(23, 162, 184);
-        
+
         /// <summary>
         /// Color para el módulo de Gestión de Estudios
         /// </summary>
         public static readonly Color Studies = Color.FromArgb(0, 123, 255);
-        
+
         /// <summary>
         /// Color para el módulo de Carga de Resultados
         /// </summary>
         public static readonly Color Results = Color.FromArgb(255, 193, 7);
-        
-        /// <summary>
-        /// Color para el módulo de Generación de Informes
-        /// </summary>
-        public static readonly Color Reports = Color.FromArgb(111, 66, 193);
-        
+
+    /// <summary>
+    /// Color para el módulo de Generación de Informes
+    /// </summary>
+    public static readonly Color Informes = Color.FromArgb(111, 66, 193);
+
         /// <summary>
         /// Color para el módulo de Notificaciones
         /// </summary>
         public static readonly Color Notifications = Color.FromArgb(253, 126, 20);
-        
+
         /// <summary>
         /// Color para el módulo de Historial de Órdenes
         /// </summary>
@@ -109,17 +109,17 @@ namespace SALC.UI
         // ============================================
         // COLORES DE LOGIN
         // ============================================
-        
+
         /// <summary>
         /// Fondo de la caja de login
         /// </summary>
         public static readonly Color LoginBoxBackground = Color.FromArgb(248, 249, 250);
-        
+
         /// <summary>
         /// Fondo del formulario de login
         /// </summary>
         public static readonly Color LoginBackground = Color.FromArgb(233, 236, 239);
-        
+
         /// <summary>
         /// Fondo claro para paneles de filtros
         /// </summary>
@@ -128,17 +128,17 @@ namespace SALC.UI
         // ============================================
         // COLORES DE SIDEBAR
         // ============================================
-        
+
         /// <summary>
         /// Fondo del sidebar de navegación
         /// </summary>
         public static readonly Color SidebarBackground = Color.FromArgb(52, 58, 64);
-        
+
         /// <summary>
         /// Color de texto del sidebar (inactivo)
         /// </summary>
         public static readonly Color SidebarText = Color.FromArgb(173, 181, 189);
-        
+
         /// <summary>
         /// Color de texto del sidebar (activo)
         /// </summary>
@@ -147,12 +147,12 @@ namespace SALC.UI
         // ============================================
         // COLORES DE BORDES
         // ============================================
-        
+
         /// <summary>
         /// Color de borde estándar
         /// </summary>
         public static readonly Color Border = Color.FromArgb(222, 226, 230);
-        
+
         /// <summary>
         /// Color de borde para elementos con foco
         /// </summary>
@@ -161,17 +161,17 @@ namespace SALC.UI
         // ============================================
         // COLORES DE HOVER/INTERACCIÓN
         // ============================================
-        
+
         /// <summary>
         /// Color primario para estado hover
         /// </summary>
         public static readonly Color PrimaryHover = Color.FromArgb(0, 86, 179);
-        
+
         /// <summary>
         /// Color de fondo para hover en filas de tabla
         /// </summary>
         public static readonly Color TableRowHover = Color.FromArgb(241, 243, 245);
-        
+
         /// <summary>
         /// Color de fondo para encabezados de tabla
         /// </summary>
@@ -180,7 +180,7 @@ namespace SALC.UI
         // ============================================
         // MÉTODOS AUXILIARES
         // ============================================
-        
+
         /// <summary>
         /// Obtiene un color con transparencia ajustada
         /// </summary>
@@ -191,7 +191,7 @@ namespace SALC.UI
         {
             return Color.FromArgb(alpha, color.R, color.G, color.B);
         }
-        
+
         /// <summary>
         /// Oscurece un color en un porcentaje determinado
         /// </summary>
@@ -208,7 +208,7 @@ namespace SALC.UI
                 (int)(color.B * factor)
             );
         }
-        
+
         /// <summary>
         /// Aclara un color en un porcentaje determinado
         /// </summary>
@@ -228,7 +228,7 @@ namespace SALC.UI
         // ============================================
         // ESTADOS DE ÓRDENES
         // ============================================
-        
+
         /// <summary>
         /// Obtiene el color correspondiente a un estado de orden
         /// </summary>
@@ -253,7 +253,7 @@ namespace SALC.UI
                     return Secondary;
             }
         }
-        
+
         /// <summary>
         /// Obtiene el color de texto correspondiente a un estado de orden
         /// </summary>

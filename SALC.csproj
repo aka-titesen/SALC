@@ -113,7 +113,7 @@
     <Compile Include="SALC\Services\AdminCatalogService.cs" />
     <Compile Include="SALC\Services\BackupService.cs" />
     <Compile Include="SALC\Services\SystemConfigService.cs" />
-    <Compile Include="SALC\Services\ServicioReportesAnalisis.cs" />
+  <Compile Include="SALC\Services\ServicioInformesAnalisis.cs" />
 
     <!-- Presenters existentes -->
     <Compile Include="SALC\Presenters\AppFeature.cs" />
@@ -130,7 +130,7 @@
     <Compile Include="SALC\Views\Interfaces\IVistaEstudios.cs" />
     <Compile Include="SALC\Views\Interfaces\IVistaResultados.cs" />
     <Compile Include="SALC\Views\Interfaces\IVistaHistorial.cs" />
-    <Compile Include="SALC\Views\Interfaces\IVistaReportes.cs" />
+  <Compile Include="SALC\Views\Interfaces\IVistaInformes.cs" />
     <Compile Include="SALC\Views\Interfaces\IVistaGestionUsuarios.cs" />
     <Compile Include="SALC\Views\Interfaces\IVistaAdministracionCatalogos.cs" />
     <Compile Include="SALC\Views\Interfaces\IVistaMetricas.cs" />
@@ -183,7 +183,7 @@
     </Compile>
     <!-- Eliminado: HistoryForm.cs (en inglés) -->
     <!-- Eliminado: ReportsForm.cs (en inglés) -->
-    <Compile Include="SALC\Views\ReportesAnalisisForm.cs">
+    <Compile Include="SALC\Views\Informes\InformesAnalisisForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="SALC\Views\DetalleAnalisisForm.cs">

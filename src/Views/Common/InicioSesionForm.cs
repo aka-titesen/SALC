@@ -213,11 +213,12 @@ namespace SALC
                 return;
             }
 
-            bool loginSuccessful = UserAuthentication.Login(username, password);
+            var auth = new SALC.Services.AutenticacionService();
+            bool loginSuccessful = auth.IniciarSesion(username, password);
 
             if (loginSuccessful)
             {
-                MessageBox.Show($"¡Bienvenido, {UserAuthentication.CurrentUser.Nombre}!", "Inicio de Sesión Exitoso", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show($"¡Bienvenido, {auth.UsuarioActual.Nombre}!", "Inicio de Sesión Exitoso", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
                 PanelPrincipalForm dashboard = new PanelPrincipalForm();
                 dashboard.Show();

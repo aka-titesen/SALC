@@ -9,14 +9,14 @@ using SALC.Common;
 namespace SALC.Views
 {
     /// <summary>
-    /// Formulario para agregar nuevas métricas al sistema
-    /// Implementa RF-04: ABM de Catálogos según ERS v2.7
-    /// Sigue el patrón MVP (Model-View-Presenter)
+    /// Formulario para agregar nuevas mï¿½tricas al sistema
+    /// Implementa RF-04: ABM de Catï¿½logos segï¿½n ERS v2.7
+    /// Sigue el patrï¿½n MVP (Model-View-Presenter)
     /// </summary>
     public partial class AgregarMetrica : Form
     {
         #region Campos privados
-        private readonly MetricaService _metricaService;
+    private readonly MetricasService _metricaService;
         private ErrorProvider _proveedorErrores;
         #endregion
 
@@ -24,13 +24,13 @@ namespace SALC.Views
         public AgregarMetrica()
         {
             InitializeComponent();
-            _metricaService = new MetricaService();
+            _metricaService = new MetricasService();
             InicializarProveedorErrores();
             ConfigurarValidacionesTiempoReal();
         }
         #endregion
 
-        #region Inicialización
+        #region Inicializaciï¿½n
         private void InicializarProveedorErrores()
         {
             _proveedorErrores = new ErrorProvider();
@@ -39,7 +39,7 @@ namespace SALC.Views
 
         private void ConfigurarValidacionesTiempoReal()
         {
-            // Validación en tiempo real para campos numéricos
+            // Validaciï¿½n en tiempo real para campos numï¿½ricos
             txtValorMinimo.Validating += TxtValorMinimo_Validating;
             txtValorMaximo.Validating += TxtValorMaximo_Validating;
             txtNombre.Validating += TxtNombre_Validating;
@@ -47,13 +47,13 @@ namespace SALC.Views
         }
         #endregion
 
-        #region Eventos de Validación en Tiempo Real (Patrón MVP - Vista)
+        #region Eventos de Validaciï¿½n en Tiempo Real (Patrï¿½n MVP - Vista)
         private void TxtNombre_Validating(object sender, CancelEventArgs e)
         {
             var textBox = sender as TextBox;
             if (string.IsNullOrWhiteSpace(textBox.Text))
             {
-                _proveedorErrores.SetError(textBox, "El nombre de la métrica es obligatorio.");
+                _proveedorErrores.SetError(textBox, "El nombre de la mï¿½trica es obligatorio.");
                 e.Cancel = true;
             }
             else
@@ -83,13 +83,13 @@ namespace SALC.Views
             {
                 if (!decimal.TryParse(textBox.Text, out decimal valor))
                 {
-                    _proveedorErrores.SetError(textBox, "El valor mínimo debe ser un número válido.");
+                    _proveedorErrores.SetError(textBox, "El valor mï¿½nimo debe ser un nï¿½mero vï¿½lido.");
                     e.Cancel = true;
                 }
                 else
                 {
                     _proveedorErrores.SetError(textBox, "");
-                    ValidarRangoValores(); // Validar el rango cuando cambie el mínimo
+                    ValidarRangoValores(); // Validar el rango cuando cambie el mï¿½nimo
                 }
             }
             else
@@ -105,13 +105,13 @@ namespace SALC.Views
             {
                 if (!decimal.TryParse(textBox.Text, out decimal valor))
                 {
-                    _proveedorErrores.SetError(textBox, "El valor máximo debe ser un número válido.");
+                    _proveedorErrores.SetError(textBox, "El valor mï¿½ximo debe ser un nï¿½mero vï¿½lido.");
                     e.Cancel = true;
                 }
                 else
                 {
                     _proveedorErrores.SetError(textBox, "");
-                    ValidarRangoValores(); // Validar el rango cuando cambie el máximo
+                    ValidarRangoValores(); // Validar el rango cuando cambie el mï¿½ximo
                 }
             }
             else
@@ -122,15 +122,15 @@ namespace SALC.Views
 
         private void ValidarRangoValores()
         {
-            if (!string.IsNullOrWhiteSpace(txtValorMinimo.Text) && 
+            if (!string.IsNullOrWhiteSpace(txtValorMinimo.Text) &&
                 !string.IsNullOrWhiteSpace(txtValorMaximo.Text) &&
                 decimal.TryParse(txtValorMinimo.Text, out decimal valorMin) &&
                 decimal.TryParse(txtValorMaximo.Text, out decimal valorMax))
             {
                 if (valorMin >= valorMax)
                 {
-                    _proveedorErrores.SetError(txtValorMinimo, "El valor mínimo debe ser menor al valor máximo.");
-                    _proveedorErrores.SetError(txtValorMaximo, "El valor máximo debe ser mayor al valor mínimo.");
+                    _proveedorErrores.SetError(txtValorMinimo, "El valor mï¿½nimo debe ser menor al valor mï¿½ximo.");
+                    _proveedorErrores.SetError(txtValorMaximo, "El valor mï¿½ximo debe ser mayor al valor mï¿½nimo.");
                 }
                 else
                 {
@@ -146,28 +146,28 @@ namespace SALC.Views
         {
             try
             {
-                // Forzar validación de todos los campos antes de guardar
+                // Forzar validaciï¿½n de todos los campos antes de guardar
                 if (!ValidarFormularioCompleto())
                 {
                     MostrarMensajeError("Por favor, corrija los errores antes de continuar.");
                     return;
                 }
 
-                // Crear el modelo usando datos validados (Patrón MVP - Model)
+                // Crear el modelo usando datos validados (Patrï¿½n MVP - Model)
                 var metrica = CrearModeloMetrica();
 
-                // Usar el servicio para validar y guardar (Patrón MVP - delegando al Service)
+                // Usar el servicio para validar y guardar (Patrï¿½n MVP - delegando al Service)
                 bool exito = _metricaService.CrearMetrica(metrica);
 
                 if (exito)
                 {
-                    MostrarMensajeExito("Métrica agregada exitosamente.");
+                    MostrarMensajeExito("Mï¿½trica agregada exitosamente.");
                     this.DialogResult = DialogResult.OK;
                     this.Close();
                 }
                 else
                 {
-                    MostrarMensajeError("Error al agregar la métrica. Verifique que el nombre no esté duplicado.");
+                    MostrarMensajeError("Error al agregar la mï¿½trica. Verifique que el nombre no estï¿½ duplicado.");
                 }
             }
             catch (Exception ex)
@@ -183,7 +183,7 @@ namespace SALC.Views
         }
         #endregion
 
-        #region Métodos de Validación (Patrón MVP - Vista)
+        #region Mï¿½todos de Validaciï¿½n (Patrï¿½n MVP - Vista)
         private bool ValidarFormularioCompleto()
         {
             bool esValido = true;
@@ -200,10 +200,10 @@ namespace SALC.Views
                 }
             }
 
-            // Validaciones adicionales específicas del formulario
+            // Validaciones adicionales especï¿½ficas del formulario
             if (string.IsNullOrWhiteSpace(txtNombre.Text))
             {
-                _proveedorErrores.SetError(txtNombre, "El nombre de la métrica es obligatorio.");
+                _proveedorErrores.SetError(txtNombre, "El nombre de la mï¿½trica es obligatorio.");
                 esValido = false;
             }
 
@@ -222,31 +222,31 @@ namespace SALC.Views
             {
                 Nombre = txtNombre.Text.Trim(),
                 UnidadMedida = txtUnidadMedida.Text.Trim(),
-                ValorMinimo = string.IsNullOrWhiteSpace(txtValorMinimo.Text) ? 
-                             (decimal?)null : 
+                ValorMinimo = string.IsNullOrWhiteSpace(txtValorMinimo.Text) ?
+                             (decimal?)null :
                              decimal.Parse(txtValorMinimo.Text),
-                ValorMaximo = string.IsNullOrWhiteSpace(txtValorMaximo.Text) ? 
-                             (decimal?)null : 
+                ValorMaximo = string.IsNullOrWhiteSpace(txtValorMaximo.Text) ?
+                             (decimal?)null :
                              decimal.Parse(txtValorMaximo.Text)
             };
         }
         #endregion
 
-        #region Métodos de Interfaz de Usuario (Patrón MVP - Vista)
+        #region Mï¿½todos de Interfaz de Usuario (Patrï¿½n MVP - Vista)
         private void MostrarMensajeExito(string mensaje)
         {
-            MessageBox.Show(mensaje, "Éxito", 
+            MessageBox.Show(mensaje, "ï¿½xito",
                 MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void MostrarMensajeError(string mensaje)
         {
-            MessageBox.Show(mensaje, "Error", 
+            MessageBox.Show(mensaje, "Error",
                 MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
         #endregion
 
-        #region Validación de Entrada de Datos (KeyPress)
+        #region Validaciï¿½n de Entrada de Datos (KeyPress)
         private void txtValorMinimo_KeyPress(object sender, KeyPressEventArgs e)
         {
             ValidarEntradaNumerica(sender, e);
@@ -259,8 +259,8 @@ namespace SALC.Views
 
         private void ValidarEntradaNumerica(object sender, KeyPressEventArgs e)
         {
-            // Permitir solo números, punto decimal, coma decimal y teclas de control
-            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar) && 
+            // Permitir solo nï¿½meros, punto decimal, coma decimal y teclas de control
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar) &&
                 e.KeyChar != '.' && e.KeyChar != ',')
             {
                 e.Handled = true;
@@ -268,7 +268,7 @@ namespace SALC.Views
 
             // Permitir solo un separador decimal
             var textBox = sender as TextBox;
-            if ((e.KeyChar == '.' || e.KeyChar == ',') && 
+            if ((e.KeyChar == '.' || e.KeyChar == ',') &&
                 (textBox.Text.Contains('.') || textBox.Text.Contains(',')))
             {
                 e.Handled = true;

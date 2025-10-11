@@ -13,7 +13,7 @@ namespace SALC.Views
     /// </summary>
     public partial class EditarUsuarioForm : Form
     {
-        private readonly UserDataService _servicioUsuarios;
+    private readonly SALC.Services.UsuariosService _servicioUsuarios;
         private Usuario _usuarioEnEdicion;
         private Dictionary<int, string> _roles;
         private List<Medico> _supervisores;
@@ -39,7 +39,7 @@ namespace SALC.Views
 
         public EditarUsuarioForm(Usuario usuario)
         {
-            _servicioUsuarios = new UserDataService();
+            _servicioUsuarios = new SALC.Services.UsuariosService();
             _usuarioEnEdicion = usuario;
             InitializeComponent();
             CargarDatos();

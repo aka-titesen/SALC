@@ -37,7 +37,7 @@ namespace SALC.Views
         #endregion
 
         #region Propiedades de la Interfaz
-        private readonly PacienteService _serviciosPacientes;
+    private readonly PacienteService _serviciosPacientes;
         public List<Paciente> Pacientes { get; set; } = new List<Paciente>();
         public Paciente PacienteSeleccionado { get; set; }
         public bool EstaEditando { get; set; }

@@ -38,8 +38,8 @@ namespace SALC.Views
         #endregion
 
         #region Propiedades
-        private readonly AnalisisService _servicioAnalisis;
-        private readonly PacienteService _servicioPacientes;
+    private readonly AnalisisService _servicioAnalisis;
+    private readonly PacienteService _servicioPacientes;
         public List<Analisis> Estudios { get; set; } = new List<Analisis>();
         public Analisis EstudioSeleccionado { get; set; }
         public bool EstaEditando { get; set; }

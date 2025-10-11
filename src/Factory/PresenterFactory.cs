@@ -4,7 +4,8 @@ using SALC.Presenters.Auth;
 using SALC.Presenters.Dashboard;
 using SALC.Presenters.Patients;
 using SALC.Presenters.Analysis;
-using SALC.Presenters.Reports;
+// using SALC.Presenters.Reports; // Obsoleto: usar PresentadorInformes
+using SALC.Presenters;
 using SALC.Presenters.Admin;
 using SALC.Views.Interfaces;
 
@@ -44,8 +45,8 @@ namespace SALC.Factory
             _presenterFactories[typeof(IAnalisisView)] = view => new AnalisisPresenter(view as IAnalisisView);
             _presenterFactories[typeof(IResultadosView)] = view => new ResultadosPresenter(view as IResultadosView);
 
-            // Reportes (español)
-            _presenterFactories[typeof(IVistaReportes)] = view => new PresentadorReportes(view as IVistaReportes);
+            // Informes (renombrado desde "Reportes")
+            _presenterFactories[typeof(IVistaInformes)] = view => new PresentadorInformes(view as IVistaInformes);
 
             // Administración (migración a español pendiente si se requiere fábrica centralizada)
         }

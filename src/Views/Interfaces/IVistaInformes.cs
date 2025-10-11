@@ -4,41 +4,41 @@ using System.Collections.Generic;
 namespace SALC.Views.Interfaces
 {
     /// <summary>
-    /// Interfaz para la vista de reportes de an·lisis seg˙n ERS v2.7
-    /// Implementa el patrÛn MVP (Model-View-Presenter) para RF-08: Generar y Enviar Informe
+    /// Interfaz para la vista de informes de an√°lisis seg√∫n ERS v2.7
+    /// Implementa el patr√≥n MVP (Model-View-Presenter) para RF-08: Generar y Enviar Informe
     /// </summary>
-    public interface IVistaReportes
+    public interface IVistaInformes
     {
-        #region Eventos de la Vista (en espaÒol)
+        #region Eventos de la Vista (en espa√±ol)
         event EventHandler GeneracionSolicitada;
         event EventHandler ExportacionPdfSolicitada;
         event EventHandler CierreSolicitado;
-        event EventHandler CargarReportes;
-        event EventHandler<string> BuscarReportes;
-        event EventHandler<FiltroReporte> FiltrarReportes;
-        event EventHandler<int> VerReporteCompleto;
-        event EventHandler<int> ExportarReportePdf;
-        event EventHandler<int> ExportarReporteCsv;
+        event EventHandler CargarInformes;
+        event EventHandler<string> BuscarInformes;
+        event EventHandler<FiltroInforme> FiltrarInformes;
+        event EventHandler<int> VerInformeCompleto;
+        event EventHandler<int> ExportarInformePdf;
+        event EventHandler<int> ExportarInformeCsv;
         #endregion
 
-        #region Propiedades de la Vista (en espaÒol)
-        List<ReporteAnalisis> Reportes { get; set; }
-        ReporteAnalisis ReporteSeleccionado { get; set; }
+        #region Propiedades de la Vista (en espa√±ol)
+        List<InformeAnalisis> Informes { get; set; }
+        InformeAnalisis InformeSeleccionado { get; set; }
         string RolUsuarioActual { get; set; }
         #endregion
 
-        #region MÈtodos de la Vista (en espaÒol)
-        void CargarDatosReportes(List<ReporteAnalisis> reportes);
+        #region M√©todos de la Vista (en espa√±ol)
+        void CargarDatosInformes(List<InformeAnalisis> informes);
         void MostrarMensaje(string titulo, string mensaje);
         void MostrarError(string mensaje);
         #endregion
     }
 
-    #region Clases de apoyo para la interfaz (en espaÒol)
+    #region Clases de apoyo para la interfaz (en espa√±ol)
     /// <summary>
-    /// Representa un reporte de an·lisis seg˙n la estructura ERS v2.7
+    /// Representa un informe de an√°lisis seg√∫n la estructura ERS v2.7
     /// </summary>
-    public class ReporteAnalisis
+    public class InformeAnalisis
     {
         public int IdReporte { get; set; }
         public string NombrePaciente { get; set; }
@@ -49,7 +49,7 @@ namespace SALC.Views.Interfaces
         public string NombreMedico { get; set; }
         public string Observaciones { get; set; }
         public List<ResultadoAnalisis> Resultados { get; set; } = new List<ResultadoAnalisis>();
-        
+
         // Propiedades adicionales
         public string TelefonoPaciente { get; set; }
         public string ObraSocial { get; set; }
@@ -57,7 +57,7 @@ namespace SALC.Views.Interfaces
     }
 
     /// <summary>
-    /// Representa el resultado de una mÈtrica especÌfica de un an·lisis
+    /// Representa el resultado de una m√©trica espec√≠fica de un an√°lisis
     /// </summary>
     public class ResultadoAnalisis
     {
@@ -68,9 +68,9 @@ namespace SALC.Views.Interfaces
     }
 
     /// <summary>
-    /// Filtro para b˙squedas en reportes de an·lisis
+    /// Filtro para b√∫squedas en informes de an√°lisis
     /// </summary>
-    public class FiltroReporte
+    public class FiltroInforme
     {
         public DateTime FechaDesde { get; set; }
         public DateTime FechaHasta { get; set; }

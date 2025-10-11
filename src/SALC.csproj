@@ -73,18 +73,16 @@
 
   <!-- Views (all forms and designers) -->
   <Compile Include="Views\\**\\*.cs" />
-  <!-- Excluir formularios con nombres en inglés (mientras se eliminan físicamente) -->
-  <Compile Remove="Views\\ResultsForm.cs" />
-  <Compile Remove="Views\\ReportsForm.cs" />
-  <Compile Remove="Views\\NotificationsForm.cs" />
-  <Compile Remove="Views\\BackupsForm.cs" />
-  <Compile Remove="Views\\HistoryForm.cs" />
-  <!-- Excluir LoginForm (reemplazado por InicioSesionForm) -->
-  <Compile Remove="Views\\Common\\LoginForm.cs" />
-  <Compile Remove="Views\\Common\\LoginForm.Designer.cs" />
-  <!-- Excluir MainDashboardForm (reemplazado por PanelPrincipalForm) -->
-  <Compile Remove="Views\\MainDashboardForm.cs" />
-  <Compile Remove="Views\\MainDashboardForm.Designer.cs" />
+  <!-- Excluir formularios legacy en inglés (ya removidos) -->
+  <!-- Excluir explícitamente archivos legacy de 'Reportes' y duplicados -->
+  <Compile Remove="Views\ReportesAnalisisForm.cs" />
+  <Compile Remove="Views\Interfaces\IVistaReportes.cs" />
+  <Compile Remove="Presenters\PresentadorReportes.cs" />
+    <!-- Limpieza: los servicios legacy en inglés y prefijo 'Servicio*' ya fueron eliminados físicamente, por lo que no es necesario excluirlos aquí. -->
+  <Compile Remove="Views\DetalleAnalisisForm.cs" />
+  <Compile Remove="Views\InformesForm.cs" />
+  <!-- Excluir servicios con nombres en inglés (mientras migramos a español) -->
+  <!-- (Sin exclusiones: Services\*.cs compila solo los servicios actuales en español) -->
 
     <!-- Common helpers/constants -->
     <Compile Include="Common\**\*.cs" />
@@ -119,9 +117,6 @@
   <ItemGroup>
     <!-- Resources -->
   <EmbeddedResource Include="Views\**\*.resx" />
-    <!-- Excluir recursos del formulario en inglés -->
-    <EmbeddedResource Remove="Views\\Common\\LoginForm.resx" />
-  <EmbeddedResource Remove="Views\\MainDashboardForm.resx" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

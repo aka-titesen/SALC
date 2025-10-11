@@ -15,8 +15,8 @@ namespace SALC.Views
     public partial class DetalleAnalisisForm : Form
     {
     private readonly InformesAnalisisService _servicioInformes;
-    private InformeAnalisis _informeAnalisis;
-    private List<ResultadoAnalisis> _resultadosAnalisis;
+        private InformeAnalisis _informeAnalisis;
+        private List<ResultadoAnalisis> _resultadosAnalisis;
 
         // Controles de la interfaz
         private Panel panelEncabezado;

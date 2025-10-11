@@ -34,10 +34,10 @@ namespace SALC.Configuration
             GetSetting("DefaultDateTimeFormat", Common.Constants.SALCConstants.UI.DefaultDateTimeFormat);
 
         /// <summary>
-        /// Obtiene la ruta por defecto para los reportes PDF
+        /// Obtiene la ruta por defecto para los informes PDF
         /// </summary>
-        public static string ReportsPath =>
-            GetSetting("ReportsPath", Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SALC\\Reportes");
+        public static string InformesPath =>
+            GetSetting("InformesPath", Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SALC\\Informes");
 
         /// <summary>
         /// Obtiene la ruta por defecto para las copias de seguridad

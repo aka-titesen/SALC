@@ -27,12 +27,12 @@ namespace SALC.Views
         private Label lblFiltroRol;
         private Panel panelFiltros;
 
-        private readonly UserDataService _servicioUsuarios;
+    private readonly UsuariosService _servicioUsuarios;
         private Dictionary<int, string> diccionarioRoles = new Dictionary<int, string>();
 
         public GestionUsuariosForm()
         {
-            _servicioUsuarios = new UserDataService();
+            _servicioUsuarios = new UsuariosService();
             InitializeComponent();
             CargarRoles();
             CargarUsuarios();

@@ -13,13 +13,13 @@ using SALC.Services;
 namespace SALC.Views
 {
     /// <summary>
-    /// Formulario para agregar nuevos análisis al sistema
-    /// Implementa RF-05: Crear Análisis según ERS v2.7
+    /// Formulario para agregar nuevos anï¿½lisis al sistema
+    /// Implementa RF-05: Crear Anï¿½lisis segï¿½n ERS v2.7
     /// </summary>
     public partial class AgregarEstudio : Form
     {
-        private readonly AnalisisService _analisisService;
-        private readonly PacienteService _pacienteService;
+    private readonly AnalisisService _analisisService;
+    private readonly PacienteService _pacienteService;
         private List<Paciente> _pacientes;
         private List<TipoAnalisis> _tiposAnalisis;
         private int _dniMedicoActual;
@@ -42,7 +42,7 @@ namespace SALC.Views
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error al cargar datos: {ex.Message}", "Error", 
+                MessageBox.Show($"Error al cargar datos: {ex.Message}", "Error",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
@@ -50,31 +50,31 @@ namespace SALC.Views
         private void CargarPacientes()
         {
             _pacientes = _pacienteService.ObtenerPacientes();
-            
+
             cmbPaciente.Items.Clear();
             cmbPaciente.Items.Add(new ElementoComboBox("Seleccionar paciente...", 0));
-            
+
             foreach (var paciente in _pacientes)
             {
                 string texto = $"{paciente.NombreCompleto} - DNI: {paciente.Dni}";
                 cmbPaciente.Items.Add(new ElementoComboBox(texto, paciente.Dni));
             }
-            
+
             cmbPaciente.SelectedIndex = 0;
         }
 
         private void CargarTiposAnalisis()
         {
             _tiposAnalisis = _analisisService.ObtenerTiposAnalisis();
-            
+
             cmbTipoAnalisis.Items.Clear();
-            cmbTipoAnalisis.Items.Add(new ElementoComboBox("Seleccionar tipo de análisis...", 0));
-            
+            cmbTipoAnalisis.Items.Add(new ElementoComboBox("Seleccionar tipo de anï¿½lisis...", 0));
+
             foreach (var tipo in _tiposAnalisis)
             {
                 cmbTipoAnalisis.Items.Add(new ElementoComboBox(tipo.Descripcion, tipo.IdTipoAnalisis));
             }
-            
+
             cmbTipoAnalisis.SelectedIndex = 0;
         }
 
@@ -94,7 +94,7 @@ namespace SALC.Views
                         DniPaciente = (int)pacienteSeleccionado.Valor,
                         DniCarga = _dniMedicoActual,
                         FechaCreacion = DateTime.Now,
-                        Observaciones = string.IsNullOrWhiteSpace(txtObservaciones.Text) ? 
+                        Observaciones = string.IsNullOrWhiteSpace(txtObservaciones.Text) ?
                                        null : txtObservaciones.Text.Trim()
                     };
 
@@ -102,21 +102,21 @@ namespace SALC.Views
 
                     if (exito)
                     {
-                        MessageBox.Show("Análisis creado exitosamente.", "Éxito", 
+                        MessageBox.Show("Anï¿½lisis creado exitosamente.", "ï¿½xito",
                             MessageBoxButtons.OK, MessageBoxIcon.Information);
                         this.DialogResult = DialogResult.OK;
                         this.Close();
                     }
                     else
                     {
-                        MessageBox.Show("Error al crear el análisis.", "Error", 
+                        MessageBox.Show("Error al crear el anï¿½lisis.", "Error",
                             MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error inesperado: {ex.Message}", "Error", 
+                MessageBox.Show($"Error inesperado: {ex.Message}", "Error",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
@@ -132,16 +132,16 @@ namespace SALC.Views
             // Validar paciente seleccionado
             if (cmbPaciente.SelectedIndex <= 0)
             {
-                MessageBox.Show("Debe seleccionar un paciente.", "Validación", 
+                MessageBox.Show("Debe seleccionar un paciente.", "Validaciï¿½n",
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 cmbPaciente.Focus();
                 return false;
             }
 
-            // Validar tipo de análisis seleccionado
+            // Validar tipo de anï¿½lisis seleccionado
             if (cmbTipoAnalisis.SelectedIndex <= 0)
             {
-                MessageBox.Show("Debe seleccionar un tipo de análisis.", "Validación", 
+                MessageBox.Show("Debe seleccionar un tipo de anï¿½lisis.", "Validaciï¿½n",
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 cmbTipoAnalisis.Focus();
                 return false;
