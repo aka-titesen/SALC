@@ -17,7 +17,7 @@ namespace SALC.Infraestructura
             try
             {
                 // Tomar la cadena actual y forzar un timeout corto para la prueba
-                var original = System.Configuration.ConfigurationManager.ConnectionStrings["SALC_Db"].ConnectionString;
+                var original = System.Configuration.ConfigurationManager.ConnectionStrings["SALC"].ConnectionString;
                 var builder = new SqlConnectionStringBuilder(original) { ConnectTimeout = timeoutSegundos };
                 using (var cn = new SqlConnection(builder.ToString()))
                 {

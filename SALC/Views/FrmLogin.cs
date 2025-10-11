@@ -9,25 +9,20 @@ namespace SALC.Views
         private TextBox txtDni;
         private TextBox txtContrasenia;
         private Button btnAcceder;
-        private Button btnEntrarAdmin;
-        private Button btnEntrarMedico;
-        private Button btnEntrarAsistente;
         private ErrorProvider errorProvider;
 
         public FrmLogin()
         {
-            Text = "Inicio de Sesión";
-            Width = 400;
-            Height = 220;
+            Text = "SALC - Inicio de Sesión";
+            Width = 350;
+            Height = 180;
             FormBorderStyle = FormBorderStyle.FixedDialog;
             MaximizeBox = false;
+            StartPosition = FormStartPosition.CenterScreen;
 
             txtDni = new TextBox { Left = 130, Top = 20, Width = 200, TabIndex = 0 };
             txtContrasenia = new TextBox { Left = 130, Top = 60, Width = 200, PasswordChar = '•', TabIndex = 1 };
-            btnAcceder = new Button { Left = 230, Top = 110, Width = 100, Text = "Acceder", TabIndex = 2 };
-            btnEntrarAdmin = new Button { Left = 20, Top = 150, Width = 150, Text = "Entrar como Admin" };
-            btnEntrarMedico = new Button { Left = 175, Top = 150, Width = 150, Text = "Entrar como Médico" };
-            btnEntrarAsistente = new Button { Left = 330, Top = 150, Width = 150, Text = "Entrar como Asistente" };
+            btnAcceder = new Button { Left = 230, Top = 100, Width = 100, Text = "Acceder", TabIndex = 2 };
             errorProvider = new ErrorProvider();
 
             Controls.Add(new Label { Left = 20, Top = 23, Width = 100, Text = "DNI:" });
@@ -35,14 +30,15 @@ namespace SALC.Views
             Controls.Add(txtDni);
             Controls.Add(txtContrasenia);
             Controls.Add(btnAcceder);
-            Controls.Add(btnEntrarAdmin);
-            Controls.Add(btnEntrarMedico);
-            Controls.Add(btnEntrarAsistente);
 
+            // Hacer que Enter en los TextBox active el botón Acceder
+            txtDni.KeyDown += (s, e) => { if (e.KeyCode == Keys.Enter) { e.SuppressKeyPress = true; btnAcceder.PerformClick(); } };
+            txtContrasenia.KeyDown += (s, e) => { if (e.KeyCode == Keys.Enter) { e.SuppressKeyPress = true; btnAcceder.PerformClick(); } };
+            
             btnAcceder.Click += (s, e) => AccederClick?.Invoke(this, EventArgs.Empty);
-            btnEntrarAdmin.Click += (s, e) => AbrirPanel(new PanelAdministrador.FrmPanelAdministrador());
-            btnEntrarMedico.Click += (s, e) => AbrirPanel(new PanelMedico.FrmPanelMedico());
-            btnEntrarAsistente.Click += (s, e) => AbrirPanel(new PanelAsistente.FrmPanelAsistente());
+
+            // Hacer que el botón sea el botón por defecto
+            AcceptButton = btnAcceder;
         }
 
         public string DniTexto => txtDni.Text?.Trim();
@@ -52,7 +48,8 @@ namespace SALC.Views
 
         public void MostrarError(string mensaje)
         {
-            MessageBox.Show(this, mensaje, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            errorProvider.Clear();
+            MessageBox.Show(this, mensaje, "Error de Autenticación", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 
         public void Cerrar()
@@ -60,20 +57,12 @@ namespace SALC.Views
             Close();
         }
 
-        private void AbrirPanel(Form panel)
+        public void LimpiarCampos()
         {
-            if (this.MdiParent != null)
-            {
-                panel.MdiParent = this.MdiParent;
-                panel.Show();
-                this.Close();
-            }
-            else
-            {
-                // Fallback por si no hay MDI parent (no debería ocurrir)
-                panel.Show();
-                this.Close();
-            }
+            txtDni.Clear();
+            txtContrasenia.Clear();
+            txtDni.Focus();
+            errorProvider.Clear();
         }
     }
 }

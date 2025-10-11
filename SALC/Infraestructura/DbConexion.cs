@@ -5,7 +5,7 @@ namespace SALC.Infraestructura
 {
     public static class DbConexion
     {
-        private const string NombreConexion = "SALC_Db";
+        private const string NombreConexion = "SALC";
 
         public static SqlConnection CrearConexion()
         {

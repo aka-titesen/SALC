@@ -9,5 +9,6 @@ namespace SALC.Presenters.ViewsContracts
         event EventHandler AccederClick;
         void MostrarError(string mensaje);
         void Cerrar();
+        void LimpiarCampos();
     }
 }
