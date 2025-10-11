@@ -74,7 +74,6 @@
     <Compile Include="BLL\IUsuarioService.cs" />
     <Compile Include="BLL\AutenticacionService.cs" />
     <Compile Include="BLL\IAutenticacionService.cs" />
-  <Compile Include="DAL\UsuarioTransaccionesRepositorio.cs" />
     <Compile Include="DAL\UsuarioRepositorio.cs" />
     <Compile Include="DAL\PacienteRepositorio.cs" />
     <Compile Include="DAL\CatalogoRepositorio.cs" />
