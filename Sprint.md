@@ -180,6 +180,18 @@ DoD:
 - Repositorios compilando, métodos principales implementados y probados manualmente.
 - Manejo básico de excepciones y cierre de conexiones correcto (using/dispose).
 
+Estado de implementación: EN PROGRESO (hito intermedio cumplido)
+
+Cambios realizados en este hito:
+- Repositorios implementados en `DAL/`: `UsuarioRepositorio`, `PacienteRepositorio`, `CatalogoRepositorio`, `AnalisisRepositorio`, `AnalisisMetricaRepositorio`, `MedicoRepositorio`, `AsistenteRepositorio`.
+- Inclusión de los nuevos archivos en `SALC.csproj` (estilo clásico).
+- Alineación de cadena de conexión: `App.config` ajustado a `connectionStrings` con nombre `SALC_Db` para coincidir con `DbConexion`.
+- Build de solución: OK (Debug).
+
+Pendiente para cerrar el Sprint 3:
+- Agregar transacciones (`SqlTransaction`) en operaciones que afecten múltiples tablas (alta/edición/baja de usuarios + médico/asistente).
+- Pruebas de humo contra una BD de ejemplo: lectura de catálogos y CRUD mínimo de paciente/usuario.
+
 ---
 
 ## Sprint 4 — Conexión a la BD (App.config + DbConexion)
