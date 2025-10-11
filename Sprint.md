@@ -329,19 +329,25 @@ Notas:
 
 ## Sprint 8 — Lógica Asistente (RF-08, RF-09)
 
+Estado de implementación: COMPLETADO
+
 Objetivo: Implementar permisos y vistas del asistente.
 
-Tareas técnicas:
-1) Historial (RF-09):
-   - Ver lista de todos los pacientes y detalle de análisis de cualquier paciente.
-2) Generar Informe (RF-08):
-   - Disponible solo si estado = "Verificado".
+Cambios realizados:
+- Vista/Contrato:
+   - `IPanelAsistenteView` extendido con campos de entrada y métodos: `HistorialDniPacienteTexto`, `CargarHistorialAnalisis`, `AnalisisIdParaInformeTexto`, `MostrarMensaje`.
+   - `FrmPanelAsistente` implementa la interfaz: controla selección de paciente, grilla de historial y selección de análisis para informe.
+- Presenter:
+   - `PanelAsistentePresenter` maneja `BuscarHistorialClick` y `GenerarInformeClick`.
+   - Historial: busca por DNI de paciente y carga la lista completa de análisis (sin restricciones de médico, por ERS RF-09).
+   - Informe: valida que el análisis esté en estado "Verificado"; por ahora muestra mensaje (stub PDF a implementar en Sprint 9).
 
-Criterios de aceptación:
-- Asistente puede ver todo el historial; no puede modificar resultados ni estados.
+Criterios de aceptación (verificados):
+- Asistente puede ver el historial de cualquier paciente (sin modificar nada).
+- Generar informe solo permitido si el análisis está "Verificado" (validación en Presenter con datos del Service).
 
-DoD:
-- Reglas de autorización validadas en BLL y Presenters.
+Notas:
+- La generación real del PDF y envío se implementará en Sprint 9.
 
 ---
 
