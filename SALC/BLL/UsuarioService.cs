@@ -29,6 +29,17 @@ namespace SALC.BLL
             }
         }
 
+        // Sobrecarga para actualizar solo los datos base del usuario (útil para cambios de estado)
+        public void ActualizarUsuario(Usuario usuario)
+        {
+            // Si PasswordHash trae una contraseña plana (heurística), la hasheamos
+            if (!string.IsNullOrEmpty(usuario.PasswordHash) && !usuario.PasswordHash.StartsWith("$2"))
+            {
+                usuario.PasswordHash = _hasher.Hash(usuario.PasswordHash);
+            }
+            _usuarios.Actualizar(usuario);
+        }
+
         public void CrearUsuario(Usuario usuario, Medico medico = null, Asistente asistente = null)
         {
             // Hash de contraseña

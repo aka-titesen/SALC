@@ -6,9 +6,48 @@ using SALC.Domain;
 using System.Linq;
 using System.Collections.Generic;
 using System;
+using SALC.DAL;
+using SALC.Views.PanelAdministrador;
 
 namespace SALC.Presenters
 {
+    // ViewModel para mostrar información enriquecida de usuarios en la grilla
+    public class UsuarioViewModel
+    {
+        public int Dni { get; set; }
+        public string Nombre { get; set; }
+        public string Apellido { get; set; }
+        public string Email { get; set; }
+        public string NombreRol { get; set; }
+        public string Estado { get; set; }
+        public string DatosEspecificos { get; set; }
+
+        public static UsuarioViewModel FromUsuario(Usuario usuario, string datosEspecificos = "")
+        {
+            return new UsuarioViewModel
+            {
+                Dni = usuario.Dni,
+                Nombre = usuario.Nombre,
+                Apellido = usuario.Apellido,
+                Email = usuario.Email,
+                NombreRol = ObtenerNombreRol(usuario.IdRol),
+                Estado = usuario.Estado,
+                DatosEspecificos = datosEspecificos
+            };
+        }
+
+        private static string ObtenerNombreRol(int idRol)
+        {
+            switch (idRol)
+            {
+                case 1: return "Administrador";
+                case 2: return "Médico";
+                case 3: return "Asistente";
+                default: return "Desconocido";
+            }
+        }
+    }
+
     public class PanelAdministradorPresenter
     {
         private readonly IPanelAdministradorView _view;
@@ -17,7 +56,11 @@ namespace SALC.Presenters
         private List<Paciente> _pacientes = new List<Paciente>();
         private readonly IUsuarioService _usuarioService = new UsuarioService();
         private List<Usuario> _usuarios = new List<Usuario>();
+        private List<UsuarioViewModel> _usuariosViewModel = new List<UsuarioViewModel>();
         private readonly ICatalogoService _catalogoService = new CatalogoService();
+        private readonly MedicoRepositorio _medicoRepo = new MedicoRepositorio();
+        private readonly AsistenteRepositorio _asistenteRepo = new AsistenteRepositorio();
+        private string _filtroEstadoActual = "Todos";
 
         public PanelAdministradorPresenter(IPanelAdministradorView view)
         {
@@ -43,6 +86,8 @@ namespace SALC.Presenters
             _view.UsuariosEditarClick += (s, e) => OnUsuariosEditar();
             _view.UsuariosEliminarClick += (s, e) => OnUsuariosEliminar();
             _view.UsuariosBuscarTextoChanged += (s, txt) => OnUsuariosBuscar(txt);
+            _view.UsuariosDetalleClick += (s, e) => OnUsuariosDetalle();
+            _view.UsuariosFiltroEstadoChanged += (s, filtro) => OnUsuariosFiltroEstado(filtro);
 
             // Catálogos
             _view.ObrasSocialesNuevoClick += (s, e) => OnObrasSocialesNuevo();
@@ -94,12 +139,66 @@ namespace SALC.Presenters
             try
             {
                 _usuarios = _usuarioService.ObtenerTodos().OrderBy(u => u.Apellido).ThenBy(u => u.Nombre).ToList();
-                _view.CargarUsuarios(_usuarios);
+                GenerarViewModelsUsuarios();
+                AplicarFiltrosUsuarios();
             }
             catch (System.Exception ex)
             {
                 _view.MostrarMensaje("Error cargando usuarios: " + ex.Message, "Usuarios", true);
             }
+        }
+
+        private void GenerarViewModelsUsuarios()
+        {
+            _usuariosViewModel = new List<UsuarioViewModel>();
+            foreach (var usuario in _usuarios)
+            {
+                string datosEspecificos = "";
+                try
+                {
+                    switch (usuario.IdRol)
+                    {
+                        case 2: // Médico
+                            var medico = _medicoRepo.ObtenerPorId(usuario.Dni);
+                            if (medico != null)
+                                datosEspecificos = $"Mat: {medico.NroMatricula} - {medico.Especialidad}";
+                            break;
+                        case 3: // Asistente
+                            var asistente = _asistenteRepo.ObtenerPorId(usuario.Dni);
+                            if (asistente != null)
+                                datosEspecificos = $"Supervisor: {asistente.DniSupervisor} - Ingreso: {asistente.FechaIngreso:dd/MM/yyyy}";
+                            break;
+                        case 1: // Administrador
+                            datosEspecificos = "Acceso completo al sistema";
+                            break;
+                    }
+                }
+                catch (Exception)
+                {
+                    datosEspecificos = "Error al cargar datos específicos";
+                }
+
+                _usuariosViewModel.Add(UsuarioViewModel.FromUsuario(usuario, datosEspecificos));
+            }
+        }
+
+        private void AplicarFiltrosUsuarios()
+        {
+            IEnumerable<UsuarioViewModel> usuariosFiltrados = _usuariosViewModel;
+
+            // Filtro por estado
+            if (_filtroEstadoActual != "Todos")
+            {
+                usuariosFiltrados = usuariosFiltrados.Where(u => u.Estado == _filtroEstadoActual);
+            }
+
+            _view.CargarUsuarios(usuariosFiltrados.ToList());
+        }
+
+        private void OnUsuariosFiltroEstado(string filtro)
+        {
+            _filtroEstadoActual = filtro ?? "Todos";
+            AplicarFiltrosUsuarios();
         }
 
         private void CargarCatalogos()
@@ -206,20 +305,29 @@ namespace SALC.Presenters
         private void OnUsuariosBuscar(string txt)
         {
             var q = txt?.Trim().ToLowerInvariant();
-            IEnumerable<Usuario> src = _usuarios;
+            IEnumerable<UsuarioViewModel> src = _usuariosViewModel;
+
+            // Aplicar filtro de estado
+            if (_filtroEstadoActual != "Todos")
+            {
+                src = src.Where(u => u.Estado == _filtroEstadoActual);
+            }
+
+            // Aplicar filtro de búsqueda
             if (!string.IsNullOrEmpty(q))
             {
-                src = _usuarios.Where(u => u.Apellido.ToLowerInvariant().Contains(q)
+                src = src.Where(u => u.Apellido.ToLowerInvariant().Contains(q)
                     || u.Nombre.ToLowerInvariant().Contains(q)
                     || u.Email.ToLowerInvariant().Contains(q)
                     || u.Dni.ToString().Contains(q));
             }
+            
             _view.CargarUsuarios(src.ToList());
         }
 
         private void OnUsuariosNuevo()
         {
-            using (var dlg = new Views.PanelAdministrador.FrmUsuarioEdit())
+            using (var dlg = new SALC.Views.PanelAdministrador.FrmUsuarioEdit())
             {
                 if (dlg.ShowDialog() == DialogResult.OK)
                 {
@@ -247,7 +355,7 @@ namespace SALC.Presenters
                 return;
             }
             var existente = _usuarios.FirstOrDefault(u => u.Dni == dni.Value);
-            using (var dlg = new Views.PanelAdministrador.FrmUsuarioEdit(existente))
+            using (var dlg = new SALC.Views.PanelAdministrador.FrmUsuarioEdit(existente))
             {
                 if (dlg.ShowDialog() == DialogResult.OK)
                 {
@@ -274,17 +382,72 @@ namespace SALC.Presenters
                 _view.MostrarMensaje("Seleccione un usuario para eliminar.", "Usuarios");
                 return;
             }
-            var confirm = MessageBox.Show($"¿Eliminar usuario DNI {dni}?", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-            if (confirm != DialogResult.Yes) return;
+
+            var usuario = _usuarios.FirstOrDefault(u => u.Dni == dni.Value);
+            if (usuario == null) return;
+
+            // Preguntar si quiere eliminar físicamente o desactivar
+            var resultado = MessageBox.Show(
+                $"¿Cómo desea proceder con el usuario {usuario.Nombre} {usuario.Apellido}?\n\n" +
+                "• SÍ: Desactivar usuario (recomendado)\n" +
+                "• NO: Eliminar físicamente\n" +
+                "• CANCELAR: No hacer nada",
+                "Eliminar Usuario",
+                MessageBoxButtons.YesNoCancel,
+                MessageBoxIcon.Question);
+
+            if (resultado == DialogResult.Cancel) return;
+
             try
             {
-                _usuarioService.EliminarUsuario(dni.Value);
-                CargarListadoUsuarios();
-                _view.MostrarMensaje("Usuario eliminado.", "Usuarios");
+                if (resultado == DialogResult.Yes)
+                {
+                    // Eliminación lógica (desactivar)
+                    usuario.Estado = "Inactivo";
+                    _usuarioService.ActualizarUsuario(usuario);
+                    CargarListadoUsuarios();
+                    _view.MostrarMensaje("Usuario desactivado correctamente.", "Usuarios");
+                }
+                else
+                {
+                    // Eliminación física
+                    _usuarioService.EliminarUsuario(dni.Value);
+                    CargarListadoUsuarios();
+                    _view.MostrarMensaje("Usuario eliminado físicamente.", "Usuarios");
+                }
             }
             catch (System.Exception ex)
             {
-                _view.MostrarMensaje("Error al eliminar usuario: " + ex.Message, "Usuarios", true);
+                _view.MostrarMensaje("Error al procesar usuario: " + ex.Message, "Usuarios", true);
+            }
+        }
+
+        private void OnUsuariosDetalle()
+        {
+            var dni = _view.ObtenerUsuarioSeleccionadoDni();
+            if (dni == null)
+            {
+                _view.MostrarMensaje("Seleccione un usuario para ver los detalles.", "Usuarios");
+                return;
+            }
+
+            var usuario = _usuarios.FirstOrDefault(u => u.Dni == dni.Value);
+            if (usuario == null)
+            {
+                _view.MostrarMensaje("No se encontró el usuario seleccionado.", "Usuarios", true);
+                return;
+            }
+
+            try
+            {
+                using (var dlg = new SALC.Views.PanelAdministrador.FrmUsuarioDetalle(usuario))
+                {
+                    dlg.ShowDialog();
+                }
+            }
+            catch (System.Exception ex)
+            {
+                _view.MostrarMensaje("Error al mostrar detalles del usuario: " + ex.Message, "Usuarios", true);
             }
         }
 
@@ -316,7 +479,7 @@ namespace SALC.Presenters
 
         private void OnPacientesNuevo()
         {
-            using (var dlg = new Views.PanelAdministrador.FrmPacienteEdit())
+            using (var dlg = new SALC.Views.PanelAdministrador.FrmPacienteEdit())
             {
                 if (dlg.ShowDialog() == DialogResult.OK)
                 {
@@ -345,7 +508,7 @@ namespace SALC.Presenters
             }
             var existente = _pacientes.FirstOrDefault(p => p.Dni == dni.Value);
             if (existente == null) return;
-            using (var dlg = new Views.PanelAdministrador.FrmPacienteEdit(existente))
+            using (var dlg = new SALC.Views.PanelAdministrador.FrmPacienteEdit(existente))
             {
                 if (dlg.ShowDialog() == DialogResult.OK)
                 {

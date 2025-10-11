@@ -14,10 +14,13 @@ namespace SALC.Views.PanelAdministrador
         private DataGridView gridTiposAnalisis;
         private DataGridView gridMetricas;
 
+        // Controles adicionales para usuarios
+        private ComboBox cboFiltroEstadoUsuarios;
+
         public FrmPanelAdministrador()
         {
             Text = "Panel de Administrador";
-            Width = 1000;
+            Width = 1200;
             Height = 700;
 
             tabs = new TabControl { Dock = DockStyle.Fill };
@@ -36,13 +39,42 @@ namespace SALC.Views.PanelAdministrador
             var btnNuevo = new ToolStripButton("Nuevo");
             var btnEditar = new ToolStripButton("Editar");
             var btnEliminar = new ToolStripButton("Eliminar");
+            var btnDetalle = new ToolStripButton("Ver Detalle");
             var txtBuscar = new ToolStripTextBox { Width = 200, ToolTipText = "Buscar por DNI/Apellido/Email" };
-            tool.Items.AddRange(new ToolStripItem[] { btnNuevo, btnEditar, btnEliminar, new ToolStripSeparator(), new ToolStripLabel("Buscar:"), txtBuscar });
-            gridUsuarios = new DataGridView { Dock = DockStyle.Fill, ReadOnly = true, AllowUserToAddRows = false, SelectionMode = DataGridViewSelectionMode.FullRowSelect, MultiSelect = false, AutoGenerateColumns = true };
+            
+            // Filtro de estado
+            var lblFiltroEstado = new ToolStripLabel("Estado:");
+            var cboFiltroEstadoHost = new ToolStripControlHost(cboFiltroEstadoUsuarios = new ComboBox
+            {
+                DropDownStyle = ComboBoxStyle.DropDownList,
+                Width = 100
+            });
+            cboFiltroEstadoUsuarios.Items.AddRange(new object[] { "Todos", "Activo", "Inactivo" });
+            cboFiltroEstadoUsuarios.SelectedIndex = 0;
+            cboFiltroEstadoUsuarios.SelectedIndexChanged += (s, e) => UsuariosFiltroEstadoChanged?.Invoke(this, cboFiltroEstadoUsuarios.SelectedItem.ToString());
+
+            tool.Items.AddRange(new ToolStripItem[] { 
+                btnNuevo, btnEditar, btnEliminar, btnDetalle,
+                new ToolStripSeparator(), 
+                new ToolStripLabel("Buscar:"), txtBuscar,
+                new ToolStripSeparator(),
+                lblFiltroEstado, cboFiltroEstadoHost
+            });
+            
+            gridUsuarios = new DataGridView { 
+                Dock = DockStyle.Fill, 
+                ReadOnly = true, 
+                AllowUserToAddRows = false, 
+                SelectionMode = DataGridViewSelectionMode.FullRowSelect, 
+                MultiSelect = false, 
+                AutoGenerateColumns = true,
+                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
+            };
 
             btnNuevo.Click += (s, e) => UsuariosNuevoClick?.Invoke(this, EventArgs.Empty);
             btnEditar.Click += (s, e) => UsuariosEditarClick?.Invoke(this, EventArgs.Empty);
             btnEliminar.Click += (s, e) => UsuariosEliminarClick?.Invoke(this, EventArgs.Empty);
+            btnDetalle.Click += (s, e) => UsuariosDetalleClick?.Invoke(this, EventArgs.Empty);
             txtBuscar.TextChanged += (s, e) => UsuariosBuscarTextoChanged?.Invoke(this, txtBuscar.Text);
 
             var panel = new Panel { Dock = DockStyle.Fill };
@@ -62,7 +94,15 @@ namespace SALC.Views.PanelAdministrador
             var btnEliminar = new ToolStripButton("Eliminar");
             var txtBuscar = new ToolStripTextBox { Width = 200, ToolTipText = "Buscar por DNI/Apellido" };
             tool.Items.AddRange(new ToolStripItem[] { btnNuevo, btnEditar, btnEliminar, new ToolStripSeparator(), new ToolStripLabel("Buscar:"), txtBuscar });
-            gridPacientes = new DataGridView { Dock = DockStyle.Fill, ReadOnly = true, AllowUserToAddRows = false, SelectionMode = DataGridViewSelectionMode.FullRowSelect, MultiSelect = false, AutoGenerateColumns = true };
+            gridPacientes = new DataGridView { 
+                Dock = DockStyle.Fill, 
+                ReadOnly = true, 
+                AllowUserToAddRows = false, 
+                SelectionMode = DataGridViewSelectionMode.FullRowSelect, 
+                MultiSelect = false, 
+                AutoGenerateColumns = true,
+                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
+            };
 
             btnNuevo.Click += (s, e) => PacientesNuevoClick?.Invoke(this, EventArgs.Empty);
             btnEditar.Click += (s, e) => PacientesEditarClick?.Invoke(this, EventArgs.Empty);
@@ -117,7 +157,15 @@ namespace SALC.Views.PanelAdministrador
             var btnEliminar = new ToolStripButton("Eliminar");
             var txtBuscar = new ToolStripTextBox { Width = 200, ToolTipText = "Buscar" };
             tool.Items.AddRange(new ToolStripItem[] { btnNuevo, btnEditar, btnEliminar, new ToolStripSeparator(), new ToolStripLabel("Buscar:"), txtBuscar });
-            var grid = new DataGridView { Dock = DockStyle.Fill, ReadOnly = true, AllowUserToAddRows = false, SelectionMode = DataGridViewSelectionMode.FullRowSelect, MultiSelect = false, AutoGenerateColumns = true };
+            var grid = new DataGridView { 
+                Dock = DockStyle.Fill, 
+                ReadOnly = true, 
+                AllowUserToAddRows = false, 
+                SelectionMode = DataGridViewSelectionMode.FullRowSelect, 
+                MultiSelect = false, 
+                AutoGenerateColumns = true,
+                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
+            };
 
             // Guardar referencia según el título
             if (titulo.StartsWith("Obras")) gridObrasSociales = grid;
@@ -152,10 +200,16 @@ namespace SALC.Views.PanelAdministrador
             tabs.TabPages.Add(tab);
         }
 
+        // Eventos existentes
         public event EventHandler UsuariosNuevoClick;
         public event EventHandler UsuariosEditarClick;
         public event EventHandler UsuariosEliminarClick;
         public event EventHandler<string> UsuariosBuscarTextoChanged;
+        
+        // Nuevos eventos para usuarios
+        public event EventHandler UsuariosDetalleClick;
+        public event EventHandler<string> UsuariosFiltroEstadoChanged;
+        
         public event EventHandler PacientesNuevoClick;
         public event EventHandler PacientesEditarClick;
         public event EventHandler PacientesEliminarClick;

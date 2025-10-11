@@ -5,10 +5,11 @@ namespace SALC.BLL
 {
     public interface IUsuarioService
     {
-        Usuario ObtenerPorDni(int dni);
-        IEnumerable<Usuario> ObtenerTodos();
         void CrearUsuario(Usuario usuario, Medico medico = null, Asistente asistente = null);
         void ActualizarUsuario(Usuario usuario, Medico medico = null, Asistente asistente = null);
+        void ActualizarUsuario(Usuario usuario); // Sobrecarga para actualizar solo datos base
         void EliminarUsuario(int dni);
+        Usuario ObtenerPorDni(int dni);
+        IEnumerable<Usuario> ObtenerTodos();
     }
 }

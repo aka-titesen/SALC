@@ -9,6 +9,8 @@ namespace SALC.Presenters.ViewsContracts
         event EventHandler UsuariosEditarClick;
         event EventHandler UsuariosEliminarClick;
         event EventHandler<string> UsuariosBuscarTextoChanged;
+        event EventHandler UsuariosDetalleClick;
+        event EventHandler<string> UsuariosFiltroEstadoChanged;
 
         // Datos/selección Usuarios
         void CargarUsuarios(System.Collections.IEnumerable usuarios);
