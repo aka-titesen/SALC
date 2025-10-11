@@ -13,6 +13,56 @@
 			"label": "Build SALC solution",
 			"type": "shell",
 			"command": "dotnet build SALC.sln -c Debug"
+		},
+		{
+			"label": "Build SALC solution",
+			"type": "shell",
+			"command": "dotnet build SALC.sln -c Debug"
+		},
+		{
+			"label": "Build SALC solution",
+			"type": "shell",
+			"command": "dotnet build SALC.sln -c Debug"
+		},
+		{
+			"label": "Build SALC solution",
+			"type": "shell",
+			"command": "dotnet build SALC.sln -c Debug"
+		},
+		{
+			"label": "Build SALC solution",
+			"type": "shell",
+			"command": "dotnet build SALC.sln -c Debug"
+		},
+		{
+			"label": "Build SALC solution",
+			"type": "shell",
+			"command": "dotnet build SALC.sln -c Debug"
+		},
+		{
+			"label": "Build SALC solution",
+			"type": "shell",
+			"command": "dotnet build SALC.sln -c Debug"
+		},
+		{
+			"label": "Build SALC solution",
+			"type": "shell",
+			"command": "dotnet build SALC.sln -c Debug"
+		},
+		{
+			"label": "Build SALC solution",
+			"type": "shell",
+			"command": "dotnet build SALC.sln -c Debug"
+		},
+		{
+			"label": "Build SALC solution",
+			"type": "shell",
+			"command": "dotnet build SALC.sln -c Debug"
+		},
+		{
+			"label": "Build SALC solution",
+			"type": "shell",
+			"command": "dotnet build SALC.sln -c Debug"
 		}
 	]
 }

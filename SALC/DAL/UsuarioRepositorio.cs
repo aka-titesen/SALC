@@ -178,10 +178,11 @@ namespace SALC.DAL
                             cmd.ExecuteNonQuery();
                         }
 
-                        using (var cmd = new SqlCommand("INSERT INTO asistentes (dni, legajo) VALUES (@dni, @leg)", cn, tx))
+                        using (var cmd = new SqlCommand("INSERT INTO asistentes (dni, dni_supervisor, fecha_ingreso) VALUES (@dni, @sup, @ing)", cn, tx))
                         {
                             cmd.Parameters.AddWithValue("@dni", asistente.Dni);
-                            cmd.Parameters.AddWithValue("@leg", asistente.Legajo);
+                            cmd.Parameters.AddWithValue("@sup", asistente.DniSupervisor);
+                            cmd.Parameters.AddWithValue("@ing", asistente.FechaIngreso);
                             cmd.ExecuteNonQuery();
                         }
 

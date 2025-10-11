@@ -7,6 +7,12 @@ namespace SALC.Views.PanelAdministrador
     public class FrmPanelAdministrador : Form, IPanelAdministradorView
     {
         private TabControl tabs;
+        // Grillas por sección
+        private DataGridView gridUsuarios;
+        private DataGridView gridPacientes;
+        private DataGridView gridObrasSociales;
+        private DataGridView gridTiposAnalisis;
+        private DataGridView gridMetricas;
 
         public FrmPanelAdministrador()
         {
@@ -32,7 +38,7 @@ namespace SALC.Views.PanelAdministrador
             var btnEliminar = new ToolStripButton("Eliminar");
             var txtBuscar = new ToolStripTextBox { Width = 200, ToolTipText = "Buscar por DNI/Apellido/Email" };
             tool.Items.AddRange(new ToolStripItem[] { btnNuevo, btnEditar, btnEliminar, new ToolStripSeparator(), new ToolStripLabel("Buscar:"), txtBuscar });
-            var grid = new DataGridView { Dock = DockStyle.Fill, ReadOnly = true, AllowUserToAddRows = false };
+            gridUsuarios = new DataGridView { Dock = DockStyle.Fill, ReadOnly = true, AllowUserToAddRows = false, SelectionMode = DataGridViewSelectionMode.FullRowSelect, MultiSelect = false, AutoGenerateColumns = true };
 
             btnNuevo.Click += (s, e) => UsuariosNuevoClick?.Invoke(this, EventArgs.Empty);
             btnEditar.Click += (s, e) => UsuariosEditarClick?.Invoke(this, EventArgs.Empty);
@@ -41,7 +47,7 @@ namespace SALC.Views.PanelAdministrador
 
             var panel = new Panel { Dock = DockStyle.Fill };
             tool.Dock = DockStyle.Top;
-            panel.Controls.Add(grid);
+            panel.Controls.Add(gridUsuarios);
             panel.Controls.Add(tool);
             tab.Controls.Add(panel);
             tabs.TabPages.Add(tab);
@@ -56,7 +62,7 @@ namespace SALC.Views.PanelAdministrador
             var btnEliminar = new ToolStripButton("Eliminar");
             var txtBuscar = new ToolStripTextBox { Width = 200, ToolTipText = "Buscar por DNI/Apellido" };
             tool.Items.AddRange(new ToolStripItem[] { btnNuevo, btnEditar, btnEliminar, new ToolStripSeparator(), new ToolStripLabel("Buscar:"), txtBuscar });
-            var grid = new DataGridView { Dock = DockStyle.Fill, ReadOnly = true, AllowUserToAddRows = false };
+            gridPacientes = new DataGridView { Dock = DockStyle.Fill, ReadOnly = true, AllowUserToAddRows = false, SelectionMode = DataGridViewSelectionMode.FullRowSelect, MultiSelect = false, AutoGenerateColumns = true };
 
             btnNuevo.Click += (s, e) => PacientesNuevoClick?.Invoke(this, EventArgs.Empty);
             btnEditar.Click += (s, e) => PacientesEditarClick?.Invoke(this, EventArgs.Empty);
@@ -65,7 +71,7 @@ namespace SALC.Views.PanelAdministrador
 
             var panel = new Panel { Dock = DockStyle.Fill };
             tool.Dock = DockStyle.Top;
-            panel.Controls.Add(grid);
+            panel.Controls.Add(gridPacientes);
             panel.Controls.Add(tool);
             tab.Controls.Add(panel);
             tabs.TabPages.Add(tab);
@@ -111,7 +117,12 @@ namespace SALC.Views.PanelAdministrador
             var btnEliminar = new ToolStripButton("Eliminar");
             var txtBuscar = new ToolStripTextBox { Width = 200, ToolTipText = "Buscar" };
             tool.Items.AddRange(new ToolStripItem[] { btnNuevo, btnEditar, btnEliminar, new ToolStripSeparator(), new ToolStripLabel("Buscar:"), txtBuscar });
-            var grid = new DataGridView { Dock = DockStyle.Fill, ReadOnly = true, AllowUserToAddRows = false };
+            var grid = new DataGridView { Dock = DockStyle.Fill, ReadOnly = true, AllowUserToAddRows = false, SelectionMode = DataGridViewSelectionMode.FullRowSelect, MultiSelect = false, AutoGenerateColumns = true };
+
+            // Guardar referencia según el título
+            if (titulo.StartsWith("Obras")) gridObrasSociales = grid;
+            else if (titulo.StartsWith("Tipos")) gridTiposAnalisis = grid;
+            else if (titulo.StartsWith("Métricas")) gridMetricas = grid;
 
             btnNuevo.Click += onNuevo;
             btnEditar.Click += onEditar;
@@ -164,5 +175,86 @@ namespace SALC.Views.PanelAdministrador
         public event EventHandler EjecutarBackupClick;
         public event EventHandler ProgramarBackupClick;
         public event EventHandler ProbarConexionClick;
+
+        // Implementación de métodos de datos/selección
+        public void CargarUsuarios(System.Collections.IEnumerable usuarios)
+        {
+            if (gridUsuarios != null) gridUsuarios.DataSource = usuarios;
+        }
+
+        public int? ObtenerUsuarioSeleccionadoDni()
+        {
+            if (gridUsuarios?.CurrentRow?.DataBoundItem == null) return null;
+            var row = gridUsuarios.CurrentRow.DataBoundItem;
+            var dniProp = row.GetType().GetProperty("Dni");
+            if (dniProp == null) return null;
+            var val = dniProp.GetValue(row);
+            return val as int? ?? (val != null ? (int?)System.Convert.ToInt32(val) : null);
+        }
+
+        public void CargarPacientes(System.Collections.IEnumerable pacientes)
+        {
+            if (gridPacientes != null) gridPacientes.DataSource = pacientes;
+        }
+
+        public int? ObtenerPacienteSeleccionadoDni()
+        {
+            if (gridPacientes?.CurrentRow?.DataBoundItem == null) return null;
+            var row = gridPacientes.CurrentRow.DataBoundItem;
+            var dniProp = row.GetType().GetProperty("Dni");
+            if (dniProp == null) return null;
+            var val = dniProp.GetValue(row);
+            return val as int? ?? (val != null ? (int?)System.Convert.ToInt32(val) : null);
+        }
+
+        public void CargarObrasSociales(System.Collections.IEnumerable obrasSociales)
+        {
+            if (gridObrasSociales != null) gridObrasSociales.DataSource = obrasSociales;
+        }
+
+        public int? ObtenerObraSocialSeleccionadaId()
+        {
+            if (gridObrasSociales?.CurrentRow?.DataBoundItem == null) return null;
+            var row = gridObrasSociales.CurrentRow.DataBoundItem;
+            var idProp = row.GetType().GetProperty("IdObraSocial");
+            if (idProp == null) return null;
+            var val = idProp.GetValue(row);
+            return val as int? ?? (val != null ? (int?)System.Convert.ToInt32(val) : null);
+        }
+
+        public void CargarTiposAnalisis(System.Collections.IEnumerable tiposAnalisis)
+        {
+            if (gridTiposAnalisis != null) gridTiposAnalisis.DataSource = tiposAnalisis;
+        }
+
+        public int? ObtenerTipoAnalisisSeleccionadoId()
+        {
+            if (gridTiposAnalisis?.CurrentRow?.DataBoundItem == null) return null;
+            var row = gridTiposAnalisis.CurrentRow.DataBoundItem;
+            var idProp = row.GetType().GetProperty("IdTipoAnalisis");
+            if (idProp == null) return null;
+            var val = idProp.GetValue(row);
+            return val as int? ?? (val != null ? (int?)System.Convert.ToInt32(val) : null);
+        }
+
+        public void CargarMetricas(System.Collections.IEnumerable metricas)
+        {
+            if (gridMetricas != null) gridMetricas.DataSource = metricas;
+        }
+
+        public int? ObtenerMetricaSeleccionadaId()
+        {
+            if (gridMetricas?.CurrentRow?.DataBoundItem == null) return null;
+            var row = gridMetricas.CurrentRow.DataBoundItem;
+            var idProp = row.GetType().GetProperty("IdMetrica");
+            if (idProp == null) return null;
+            var val = idProp.GetValue(row);
+            return val as int? ?? (val != null ? (int?)System.Convert.ToInt32(val) : null);
+        }
+
+        public void MostrarMensaje(string texto, string titulo = "SALC", bool esError = false)
+        {
+            MessageBox.Show(texto, titulo, MessageBoxButtons.OK, esError ? MessageBoxIcon.Error : MessageBoxIcon.Information);
+        }
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using SALC.Domain;
@@ -10,10 +11,11 @@ namespace SALC.DAL
         public void Crear(Asistente a)
         {
             using (var cn = DbConexion.CrearConexion())
-            using (var cmd = new SqlCommand("INSERT INTO asistentes (dni, legajo) VALUES (@dni, @leg)", cn))
+            using (var cmd = new SqlCommand("INSERT INTO asistentes (dni, dni_supervisor, fecha_ingreso) VALUES (@dni, @sup, @ing)", cn))
             {
                 cmd.Parameters.AddWithValue("@dni", a.Dni);
-                cmd.Parameters.AddWithValue("@leg", a.Legajo);
+                cmd.Parameters.AddWithValue("@sup", a.DniSupervisor);
+                cmd.Parameters.AddWithValue("@ing", a.FechaIngreso);
                 cn.Open();
                 cmd.ExecuteNonQuery();
             }
@@ -22,10 +24,11 @@ namespace SALC.DAL
         public void Actualizar(Asistente a)
         {
             using (var cn = DbConexion.CrearConexion())
-            using (var cmd = new SqlCommand("UPDATE asistentes SET legajo=@leg WHERE dni=@dni", cn))
+            using (var cmd = new SqlCommand("UPDATE asistentes SET dni_supervisor=@sup, fecha_ingreso=@ing WHERE dni=@dni", cn))
             {
                 cmd.Parameters.AddWithValue("@dni", a.Dni);
-                cmd.Parameters.AddWithValue("@leg", a.Legajo);
+                cmd.Parameters.AddWithValue("@sup", a.DniSupervisor);
+                cmd.Parameters.AddWithValue("@ing", a.FechaIngreso);
                 cn.Open();
                 cmd.ExecuteNonQuery();
             }
@@ -45,7 +48,7 @@ namespace SALC.DAL
         public Asistente ObtenerPorId(object id)
         {
             using (var cn = DbConexion.CrearConexion())
-            using (var cmd = new SqlCommand("SELECT dni, legajo FROM asistentes WHERE dni=@dni", cn))
+            using (var cmd = new SqlCommand("SELECT dni, dni_supervisor, fecha_ingreso FROM asistentes WHERE dni=@dni", cn))
             {
                 cmd.Parameters.AddWithValue("@dni", (int)id);
                 cn.Open();
@@ -55,7 +58,8 @@ namespace SALC.DAL
                         return new Asistente
                         {
                             Dni = rd.GetInt32(0),
-                            Legajo = rd.GetInt32(1)
+                            DniSupervisor = rd.GetInt32(1),
+                            FechaIngreso = rd.GetDateTime(2)
                         };
                 }
             }
@@ -65,7 +69,7 @@ namespace SALC.DAL
         public IEnumerable<Asistente> ObtenerTodos()
         {
             using (var cn = DbConexion.CrearConexion())
-            using (var cmd = new SqlCommand("SELECT dni, legajo FROM asistentes", cn))
+            using (var cmd = new SqlCommand("SELECT dni, dni_supervisor, fecha_ingreso FROM asistentes", cn))
             {
                 cn.Open();
                 using (var rd = cmd.ExecuteReader())
@@ -74,7 +78,8 @@ namespace SALC.DAL
                         yield return new Asistente
                         {
                             Dni = rd.GetInt32(0),
-                            Legajo = rd.GetInt32(1)
+                            DniSupervisor = rd.GetInt32(1),
+                            FechaIngreso = rd.GetDateTime(2)
                         };
                 }
             }

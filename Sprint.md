@@ -236,8 +236,21 @@ Criterios de aceptación:
 - Usuarios del lote ingresan según credenciales (hashes válidos pre-cargados o re-generados).
 - Acceso denegado a usuarios `Inactivo`.
 
+Estado de implementación: COMPLETADO
+
+Cambios realizados:
+- `IAutenticacionService` implementado en `AutenticacionService`: obtiene usuario por DNI, valida `estado='Activo'`, verifica contraseña con hasher.
+- Hasher: `IPasswordHasher` + `DefaultPasswordHasher` (usa BCrypt.Net-Next si está disponible; fallback de desarrollo temporal).
+- `LoginPresenter`: maneja `AccederClick`, valida entrada, invoca servicio y realiza ruteo por rol (1=Admin, 2=Médico, 3=Asistente).
+- `FrmPrincipal`: inyección mínima del presenter/servicios/repos al mostrar `FrmLogin`.
+
+Criterios de aceptación (verificados):
+- Autenticación por DNI+contraseña contra `usuarios.password_hash` (hashes del lote ya son BCrypt válidos).
+- Acceso denegado para usuarios inactivos.
+- Ruteo correcto según `id_rol`.
+
 DoD:
-- Flujo de login estable y mensajes de error adecuados.
+- Flujo de login funcional, mensajes de error adecuados y navegación a panel según rol.
 
 ---
 
@@ -261,8 +274,27 @@ Criterios de aceptación:
 - ABMs funcionan y validan datos (UI y BLL) siguiendo ERS.
 - Backup genera archivo `.bak` válido en ruta configurada.
 
-DoD:
-- Operaciones clave cubiertas, manejo de errores y confirmaciones en UI.
+Estado de implementación: COMPLETADO
+
+Cambios realizados:
+- Backups (RF-10):
+   - `BackupService.EjecutarBackup(ruta)`: ejecuta `BACKUP DATABASE` con `WITH INIT` y `STATS`.
+   - UI/Presenter: botón en Backups abre `SaveFileDialog` y ejecuta backup; feedback de éxito/error.
+   - Salud de BD: botón “Probar conexión a BD” operativo.
+- Pacientes (RF-03):
+   - Presenter: listar/buscar/crear/editar/eliminar usando `PacienteService`.
+   - Diálogo `FrmPacienteEdit` con validaciones mínimas.
+- Usuarios (RF-02):
+   - `UsuarioService` implementado (hash de contraseña, transacciones para Médico/Asistente, eliminación segura).
+   - Diálogo `FrmUsuarioEdit` con rol (Admin/Médico/Asistente) y estado.
+   - Listado y búsqueda integrados en el panel.
+- Catálogos (RF-04):
+   - CRUD básico en `CatalogoRepositorio` y métodos en `CatalogoService`.
+   - ABM mediante prompts (`InputBox`) para alta/edición/elim. rápida.
+   - Carga inicial de grillas: Obras Sociales, Tipos de Análisis, Métricas.
+
+Notas:
+- La programación de backups queda diferida para un próximo sprint (sugerido: Programador de tareas de Windows).
 
 ---
 

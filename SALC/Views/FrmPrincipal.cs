@@ -1,5 +1,7 @@
 using System;
 using System.Windows.Forms;
+using SALC.BLL;
+using SALC.DAL;
 
 namespace SALC.Views
 {
@@ -16,6 +18,11 @@ namespace SALC.Views
         private void FrmPrincipal_Load(object sender, EventArgs e)
         {
             var login = new FrmLogin { MdiParent = this };
+            // Inyección manual mínima
+            var usuariosRepo = new UsuarioRepositorio();
+            var hasher = new DefaultPasswordHasher();
+            var auth = new AutenticacionService(usuariosRepo, hasher);
+            var presenter = new SALC.Presenters.LoginPresenter(login, auth);
             login.Show();
         }
     }

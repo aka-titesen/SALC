@@ -145,13 +145,13 @@ Opción B — CLI (PowerShell)
 ## Flujos funcionales clave
 
 - Autenticación (RF-01): DNI + contraseña → verificación de hash BCrypt contra `usuarios.password_hash` → acceso según `id_rol`.
-- ABM de Usuarios/Pacientes/Catálogos (RF-02/03/04): desde grillas, altas/ediciones/eliminaciones con validaciones.
+- ABM de Usuarios/Pacientes/Catálogos (RF-02/03/04): desde grillas, altas/ediciones/eliminaciones con validaciones. En catálogos se usan diálogos rápidos (InputBox) para alta/edición.
 - Crear Análisis (RF-05): Médico selecciona paciente y tipo; se registra `dni_carga` y estado inicial.
 - Cargar Resultados (RF-06): Médico edita `analisis_metrica` en estado "Sin verificar".
 - Validar/Firmar (RF-07): cambia `id_estado` a "Verificado", registra `dni_firma` y `fecha_firma`; los resultados quedan inmutables.
 - Generar/Enviar Informe PDF (RF-08): Médico (sus análisis) o Asistente (solo verificados).
 - Historial (RF-09): Asistente ve todos; Médico ve detalle solo de pacientes asociados a análisis que él cargó.
-- Backups (RF-10): interfaz para ejecutar/programar respaldos de la BD.
+- Backups (RF-10): interfaz para ejecutar respaldos manuales de la BD; la programación se sugiere realizarla con el Programador de Tareas de Windows (pendiente de integración nativa).
 
 ---
 
