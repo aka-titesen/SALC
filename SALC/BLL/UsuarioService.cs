@@ -16,7 +16,7 @@ namespace SALC.BLL
             // Si PasswordHash trae una contraseña plana (heurística), la hasheamos
             if (!string.IsNullOrEmpty(usuario.PasswordHash) && !usuario.PasswordHash.StartsWith("$2"))
             {
-                usuario.PasswordHash = _hasher.HashPassword(usuario.PasswordHash);
+                usuario.PasswordHash = _hasher.Hash(usuario.PasswordHash);
             }
             _usuarios.Actualizar(usuario);
             if (usuario.IdRol == 2 && medico != null)
@@ -32,7 +32,7 @@ namespace SALC.BLL
         public void CrearUsuario(Usuario usuario, Medico medico = null, Asistente asistente = null)
         {
             // Hash de contraseña
-            usuario.PasswordHash = _hasher.HashPassword(usuario.PasswordHash);
+            usuario.PasswordHash = _hasher.Hash(usuario.PasswordHash);
             if (usuario.IdRol == 2 && medico != null)
             {
                 _usuarios.CrearUsuarioMedico(usuario, medico);

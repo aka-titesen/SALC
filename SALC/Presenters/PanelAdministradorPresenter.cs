@@ -4,18 +4,20 @@ using SALC.Infraestructura;
 using SALC.BLL;
 using SALC.Domain;
 using System.Linq;
+using System.Collections.Generic;
+using System;
 
 namespace SALC.Presenters
 {
     public class PanelAdministradorPresenter
     {
         private readonly IPanelAdministradorView _view;
-    private readonly IBackupService _backupService;
+        private readonly IBackupService _backupService;
         private readonly IPacienteService _pacienteService;
         private List<Paciente> _pacientes = new List<Paciente>();
-    private readonly IUsuarioService _usuarioService = new UsuarioService();
-    private List<Usuario> _usuarios = new List<Usuario>();
-    private readonly ICatalogoService _catalogoService = new CatalogoService();
+        private readonly IUsuarioService _usuarioService = new UsuarioService();
+        private List<Usuario> _usuarios = new List<Usuario>();
+        private readonly ICatalogoService _catalogoService = new CatalogoService();
 
         public PanelAdministradorPresenter(IPanelAdministradorView view)
         {
@@ -130,38 +132,38 @@ namespace SALC.Presenters
             var id = _view.ObtenerObraSocialSeleccionadaId(); if (id == null) { _view.MostrarMensaje("Seleccione una Obra Social."); return; }
             var nombre = PromptInput("Nuevo nombre:"); if (string.IsNullOrWhiteSpace(nombre)) return;
             var cuit = PromptInput("Nuevo CUIT:"); if (string.IsNullOrWhiteSpace(cuit)) return;
-            try { _catalogoService.ActualizarObraSocial(new ObraSocial { IdObraSocial = id.Value, Nombre = nombre.Trim(), Cuit = cuit.Trim() }); CargarCatalogos(); _view.MostrarMensaje("Obra Social actualizada."); }
-            catch (System.Exception ex) { _view.MostrarMensaje("Error: " + ex.Message, true: true); }
+            try { _catalogoService.ActualizarObraSocial(new ObraSocial { IdObraSocial = id.Value, Nombre = nombre.Trim(), Cuit = cuit.Trim() }); CargarCatalogos(); _view.MostrarMensaje("Obra Social actualizada.", "Catálogos"); }
+            catch (System.Exception ex) { _view.MostrarMensaje("Error: " + ex.Message, "Catálogos", true); }
         }
 
         private void OnObrasSocialesEliminar()
         {
             var id = _view.ObtenerObraSocialSeleccionadaId(); if (id == null) { _view.MostrarMensaje("Seleccione una Obra Social."); return; }
             if (MessageBox.Show("¿Eliminar Obra Social?", "Confirmar", MessageBoxButtons.YesNo) != DialogResult.Yes) return;
-            try { _catalogoService.EliminarObraSocial(id.Value); CargarCatalogos(); _view.MostrarMensaje("Obra Social eliminada."); }
-            catch (System.Exception ex) { _view.MostrarMensaje("Error: " + ex.Message, true: true); }
+            try { _catalogoService.EliminarObraSocial(id.Value); CargarCatalogos(); _view.MostrarMensaje("Obra Social eliminada.", "Catálogos"); }
+            catch (System.Exception ex) { _view.MostrarMensaje("Error: " + ex.Message, "Catálogos", true); }
         }
 
         // Catálogos — Tipos de Análisis
         private void OnTiposAnalisisNuevo()
         {
             var desc = PromptInput("Descripción del tipo de análisis:"); if (string.IsNullOrWhiteSpace(desc)) return;
-            try { _catalogoService.CrearTipoAnalisis(new TipoAnalisis { Descripcion = desc.Trim() }); CargarCatalogos(); _view.MostrarMensaje("Tipo de análisis creado."); }
-            catch (System.Exception ex) { _view.MostrarMensaje("Error: " + ex.Message, true: true); }
+            try { _catalogoService.CrearTipoAnalisis(new TipoAnalisis { Descripcion = desc.Trim() }); CargarCatalogos(); _view.MostrarMensaje("Tipo de análisis creado.", "Catálogos"); }
+            catch (System.Exception ex) { _view.MostrarMensaje("Error: " + ex.Message, "Catálogos", true); }
         }
         private void OnTiposAnalisisEditar()
         {
             var id = _view.ObtenerTipoAnalisisSeleccionadoId(); if (id == null) { _view.MostrarMensaje("Seleccione un tipo de análisis."); return; }
             var desc = PromptInput("Nueva descripción:"); if (string.IsNullOrWhiteSpace(desc)) return;
-            try { _catalogoService.ActualizarTipoAnalisis(new TipoAnalisis { IdTipoAnalisis = id.Value, Descripcion = desc.Trim() }); CargarCatalogos(); _view.MostrarMensaje("Tipo de análisis actualizado."); }
-            catch (System.Exception ex) { _view.MostrarMensaje("Error: " + ex.Message, true: true); }
+            try { _catalogoService.ActualizarTipoAnalisis(new TipoAnalisis { IdTipoAnalisis = id.Value, Descripcion = desc.Trim() }); CargarCatalogos(); _view.MostrarMensaje("Tipo de análisis actualizado.", "Catálogos"); }
+            catch (System.Exception ex) { _view.MostrarMensaje("Error: " + ex.Message, "Catálogos", true); }
         }
         private void OnTiposAnalisisEliminar()
         {
             var id = _view.ObtenerTipoAnalisisSeleccionadoId(); if (id == null) { _view.MostrarMensaje("Seleccione un tipo de análisis."); return; }
             if (MessageBox.Show("¿Eliminar tipo de análisis?", "Confirmar", MessageBoxButtons.YesNo) != DialogResult.Yes) return;
-            try { _catalogoService.EliminarTipoAnalisis(id.Value); CargarCatalogos(); _view.MostrarMensaje("Tipo de análisis eliminado."); }
-            catch (System.Exception ex) { _view.MostrarMensaje("Error: " + ex.Message, true: true); }
+            try { _catalogoService.EliminarTipoAnalisis(id.Value); CargarCatalogos(); _view.MostrarMensaje("Tipo de análisis eliminado.", "Catálogos"); }
+            catch (System.Exception ex) { _view.MostrarMensaje("Error: " + ex.Message, "Catálogos", true); }
         }
 
         // Catálogos — Métricas
@@ -171,9 +173,9 @@ namespace SALC.Presenters
             var unidad = PromptInput("Unidad de medida:"); if (string.IsNullOrWhiteSpace(unidad)) return;
             var minStr = PromptInput("Valor mínimo (opcional):"); decimal? min = string.IsNullOrWhiteSpace(minStr) ? (decimal?)null : decimal.Parse(minStr);
             var maxStr = PromptInput("Valor máximo (opcional):"); decimal? max = string.IsNullOrWhiteSpace(maxStr) ? (decimal?)null : decimal.Parse(maxStr);
-            if (min.HasValue && max.HasValue && min > max) { _view.MostrarMensaje("Min no puede ser mayor que Max.", esError: true); return; }
-            try { _catalogoService.CrearMetrica(new Metrica { Nombre = nombre.Trim(), UnidadMedida = unidad.Trim(), ValorMinimo = min, ValorMaximo = max }); CargarCatalogos(); _view.MostrarMensaje("Métrica creada."); }
-            catch (System.Exception ex) { _view.MostrarMensaje("Error: " + ex.Message, true: true); }
+            if (min.HasValue && max.HasValue && min > max) { _view.MostrarMensaje("Min no puede ser mayor que Max.", "Métricas", true); return; }
+            try { _catalogoService.CrearMetrica(new Metrica { Nombre = nombre.Trim(), UnidadMedida = unidad.Trim(), ValorMinimo = min, ValorMaximo = max }); CargarCatalogos(); _view.MostrarMensaje("Métrica creada.", "Métricas"); }
+            catch (System.Exception ex) { _view.MostrarMensaje("Error: " + ex.Message, "Métricas", true); }
         }
         private void OnMetricasEditar()
         {
@@ -182,16 +184,16 @@ namespace SALC.Presenters
             var unidad = PromptInput("Nueva unidad:"); if (string.IsNullOrWhiteSpace(unidad)) return;
             var minStr = PromptInput("Nuevo mínimo (opcional):"); decimal? min = string.IsNullOrWhiteSpace(minStr) ? (decimal?)null : decimal.Parse(minStr);
             var maxStr = PromptInput("Nuevo máximo (opcional):"); decimal? max = string.IsNullOrWhiteSpace(maxStr) ? (decimal?)null : decimal.Parse(maxStr);
-            if (min.HasValue && max.HasValue && min > max) { _view.MostrarMensaje("Min no puede ser mayor que Max.", esError: true); return; }
-            try { _catalogoService.ActualizarMetrica(new Metrica { IdMetrica = id.Value, Nombre = nombre.Trim(), UnidadMedida = unidad.Trim(), ValorMinimo = min, ValorMaximo = max }); CargarCatalogos(); _view.MostrarMensaje("Métrica actualizada."); }
-            catch (System.Exception ex) { _view.MostrarMensaje("Error: " + ex.Message, true: true); }
+            if (min.HasValue && max.HasValue && min > max) { _view.MostrarMensaje("Min no puede ser mayor que Max.", "Métricas", true); return; }
+            try { _catalogoService.ActualizarMetrica(new Metrica { IdMetrica = id.Value, Nombre = nombre.Trim(), UnidadMedida = unidad.Trim(), ValorMinimo = min, ValorMaximo = max }); CargarCatalogos(); _view.MostrarMensaje("Métrica actualizada.", "Métricas"); }
+            catch (System.Exception ex) { _view.MostrarMensaje("Error: " + ex.Message, "Métricas", true); }
         }
         private void OnMetricasEliminar()
         {
             var id = _view.ObtenerMetricaSeleccionadaId(); if (id == null) { _view.MostrarMensaje("Seleccione una métrica."); return; }
             if (MessageBox.Show("¿Eliminar métrica?", "Confirmar", MessageBoxButtons.YesNo) != DialogResult.Yes) return;
-            try { _catalogoService.EliminarMetrica(id.Value); CargarCatalogos(); _view.MostrarMensaje("Métrica eliminada."); }
-            catch (System.Exception ex) { _view.MostrarMensaje("Error: " + ex.Message, true: true); }
+            try { _catalogoService.EliminarMetrica(id.Value); CargarCatalogos(); _view.MostrarMensaje("Métrica eliminada.", "Métricas"); }
+            catch (System.Exception ex) { _view.MostrarMensaje("Error: " + ex.Message, "Métricas", true); }
         }
 
         private string PromptInput(string mensaje)
