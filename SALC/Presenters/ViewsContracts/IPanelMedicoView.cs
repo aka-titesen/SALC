@@ -7,28 +7,44 @@ namespace SALC.Presenters.ViewsContracts
 {
     public interface IPanelMedicoView
     {
-        // Crear análisis
+        // Crear análisis (RF-05)
         event EventHandler CrearAnalisisClick;
-        // Datos crear análisis
+        event EventHandler BuscarPacienteCrearClick;
         string CrearAnalisisDniPacienteTexto { get; }
         int? TipoAnalisisSeleccionadoId { get; }
         string CrearAnalisisObservaciones { get; }
         void CargarTiposAnalisis(IEnumerable<TipoAnalisis> tipos);
+        void MostrarPacienteSeleccionado(Paciente paciente);
+        void LimpiarPacienteSeleccionado();
 
-        // Cargar resultados
+        // Cargar resultados (RF-06)
         event EventHandler CargarResultadosGuardarClick;
+        event EventHandler BuscarAnalisisResultadosClick;
+        event EventHandler CargarMetricasAnalisisClick;
         string AnalisisIdParaResultadosTexto { get; }
         void CargarResultadosParaEdicion(IList<ResultadoEdicionDto> filas);
         IList<ResultadoEdicionDto> LeerResultadosEditados();
+        void MostrarAnalisisParaResultados(Analisis analisis, Paciente paciente, TipoAnalisis tipo);
+        void LimpiarAnalisisParaResultados();
 
-        // Validar/Firmar
+        // Validar/Firmar (RF-07)
         event EventHandler FirmarAnalisisClick;
+        event EventHandler BuscarAnalisisFirmarClick;
         string AnalisisIdParaFirmaTexto { get; }
+        void MostrarAnalisisParaFirmar(Analisis analisis, Paciente paciente, TipoAnalisis tipo);
+        void LimpiarAnalisisParaFirmar();
+        void MostrarResultadosParaValidacion(IList<AnalisisMetrica> resultados);
 
-        // Generar informe (stub)
+        // Generar informe (RF-08) - Solo análisis verificados
         event EventHandler GenerarInformeClick;
+        event EventHandler BuscarAnalisisInformeClick;
+        string AnalisisIdParaInformeTexto { get; }
+        void MostrarAnalisisParaInforme(Analisis analisis, Paciente paciente, TipoAnalisis tipo);
+        void LimpiarAnalisisParaInforme();
 
-        // Mensajes
+        // Mensajes y navegación
         void MostrarMensaje(string texto, bool esError = false);
+        void ActivarTabResultados();
+        void ActivarTabValidacion();
     }
 }
