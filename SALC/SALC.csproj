@@ -55,6 +55,7 @@
   <Compile Include="Views\PanelAdministrador\FrmPacienteDetalle.cs" />
   <Compile Include="Views\PanelAdministrador\FrmObraSocialEdit.cs" />
   <Compile Include="Views\PanelAdministrador\FrmTipoAnalisisEdit.cs" />
+  <Compile Include="Views\PanelAdministrador\FrmMetricaEdit.cs" />
   <Compile Include="Views\PanelAdministrador\FrmUsuarioEdit.cs" />
   <Compile Include="Views\PanelAdministrador\FrmUsuarioDetalle.cs" />
   <Compile Include="Views\Compartidos\SeleccionAnalisisControl.cs" />

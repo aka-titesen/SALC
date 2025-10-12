@@ -14,11 +14,12 @@ namespace SALC.Views.PanelAdministrador
         private DataGridView gridTiposAnalisis;
         private DataGridView gridMetricas;
 
-        // Controles adicionales para usuarios, pacientes, obras sociales y tipos de análisis
+        // Controles adicionales para usuarios, pacientes, obras sociales, tipos de análisis y métricas
         private ComboBox cboFiltroEstadoUsuarios;
         private ComboBox cboFiltroEstadoPacientes;
         private ComboBox cboFiltroEstadoObrasSociales;
         private ComboBox cboFiltroEstadoTiposAnalisis;
+        private ComboBox cboFiltroEstadoMetricas;
 
         public FrmPanelAdministrador()
         {
@@ -152,12 +153,8 @@ namespace SALC.Views.PanelAdministrador
             // Tipos de Análisis - con filtro de estado personalizado
             tabsCat.TabPages.Add(CrearTabTiposAnalisis());
 
-            // Métricas
-            tabsCat.TabPages.Add(CrearTabCatalogo("Métricas",
-                (s, e) => MetricasNuevoClick?.Invoke(this, EventArgs.Empty),
-                (s, e) => MetricasEditarClick?.Invoke(this, EventArgs.Empty),
-                (s, e) => MetricasEliminarClick?.Invoke(this, EventArgs.Empty),
-                t => MetricasBuscarTextoChanged?.Invoke(this, t)));
+            // Métricas - con filtro de estado personalizado
+            tabsCat.TabPages.Add(CrearTabMetricas());
 
             tab.Controls.Add(tabsCat);
             tabs.TabPages.Add(tab);
@@ -265,17 +262,35 @@ namespace SALC.Views.PanelAdministrador
             return tab;
         }
 
-        private TabPage CrearTabCatalogo(string titulo,
-            EventHandler onNuevo, EventHandler onEditar, EventHandler onEliminar, Action<string> onBuscar)
+        private TabPage CrearTabMetricas()
         {
-            var tab = new TabPage(titulo);
+            var tab = new TabPage("Métricas");
             var tool = new ToolStrip();
             var btnNuevo = new ToolStripButton("Nuevo");
             var btnEditar = new ToolStripButton("Editar");
             var btnEliminar = new ToolStripButton("Eliminar");
-            var txtBuscar = new ToolStripTextBox { Width = 200, ToolTipText = "Buscar" };
-            tool.Items.AddRange(new ToolStripItem[] { btnNuevo, btnEditar, btnEliminar, new ToolStripSeparator(), new ToolStripLabel("Buscar:"), txtBuscar });
-            var grid = new DataGridView { 
+            var txtBuscar = new ToolStripTextBox { Width = 200, ToolTipText = "Buscar por nombre/unidad" };
+            
+            // Filtro de estado para métricas
+            var lblFiltroEstado = new ToolStripLabel("Estado:");
+            var cboFiltroEstadoHost = new ToolStripControlHost(cboFiltroEstadoMetricas = new ComboBox
+            {
+                DropDownStyle = ComboBoxStyle.DropDownList,
+                Width = 100
+            });
+            cboFiltroEstadoMetricas.Items.AddRange(new object[] { "Todos", "Activo", "Inactivo" });
+            cboFiltroEstadoMetricas.SelectedIndex = 0;
+            cboFiltroEstadoMetricas.SelectedIndexChanged += (s, e) => MetricasFiltroEstadoChanged?.Invoke(this, cboFiltroEstadoMetricas.SelectedItem.ToString());
+
+            tool.Items.AddRange(new ToolStripItem[] { 
+                btnNuevo, btnEditar, btnEliminar, 
+                new ToolStripSeparator(), 
+                new ToolStripLabel("Buscar:"), txtBuscar,
+                new ToolStripSeparator(),
+                lblFiltroEstado, cboFiltroEstadoHost
+            });
+            
+            gridMetricas = new DataGridView { 
                 Dock = DockStyle.Fill, 
                 ReadOnly = true, 
                 AllowUserToAddRows = false, 
@@ -285,17 +300,14 @@ namespace SALC.Views.PanelAdministrador
                 AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
             };
 
-            // Guardar referencia según el título
-            if (titulo.StartsWith("Métricas")) gridMetricas = grid;
-
-            btnNuevo.Click += onNuevo;
-            btnEditar.Click += onEditar;
-            btnEliminar.Click += onEliminar;
-            txtBuscar.TextChanged += (s, e) => onBuscar?.Invoke(txtBuscar.Text);
+            btnNuevo.Click += (s, e) => MetricasNuevoClick?.Invoke(this, EventArgs.Empty);
+            btnEditar.Click += (s, e) => MetricasEditarClick?.Invoke(this, EventArgs.Empty);
+            btnEliminar.Click += (s, e) => MetricasEliminarClick?.Invoke(this, EventArgs.Empty);
+            txtBuscar.TextChanged += (s, e) => MetricasBuscarTextoChanged?.Invoke(this, txtBuscar.Text);
 
             var panel = new Panel { Dock = DockStyle.Fill };
             tool.Dock = DockStyle.Top;
-            panel.Controls.Add(grid);
+            panel.Controls.Add(gridMetricas);
             panel.Controls.Add(tool);
             tab.Controls.Add(panel);
             return tab;
@@ -351,6 +363,8 @@ namespace SALC.Views.PanelAdministrador
         public event EventHandler MetricasEditarClick;
         public event EventHandler MetricasEliminarClick;
         public event EventHandler<string> MetricasBuscarTextoChanged;
+        public event EventHandler<string> MetricasFiltroEstadoChanged;
+        
         public event EventHandler EjecutarBackupClick;
         public event EventHandler ProgramarBackupClick;
         public event EventHandler ProbarConexionClick;

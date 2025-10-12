@@ -55,6 +55,7 @@ namespace SALC.Presenters.ViewsContracts
         event EventHandler MetricasEditarClick;
         event EventHandler MetricasEliminarClick;
         event EventHandler<string> MetricasBuscarTextoChanged;
+        event EventHandler<string> MetricasFiltroEstadoChanged;
 
         // Datos/selección Métricas
         void CargarMetricas(System.Collections.IEnumerable metricas);

@@ -107,8 +107,10 @@ namespace SALC.Presenters
         private string _filtroEstadoPacientesActual = "Todos";
         private string _filtroEstadoObrasSocialesActual = "Todos";
         private string _filtroEstadoTiposAnalisisActual = "Todos";
+        private string _filtroEstadoMetricasActual = "Todos";
         private List<ObraSocial> _obrasSociales = new List<ObraSocial>();
         private List<TipoAnalisis> _tiposAnalisis = new List<TipoAnalisis>();
+        private List<Metrica> _metricas = new List<Metrica>();
 
         public PanelAdministradorPresenter(IPanelAdministradorView view)
         {
@@ -153,10 +155,12 @@ namespace SALC.Presenters
             _view.TiposAnalisisBuscarTextoChanged += (s, txt) => OnTiposAnalisisBuscar(txt);
             _view.TiposAnalisisFiltroEstadoChanged += (s, filtro) => OnTiposAnalisisFiltroEstado(filtro);
             
-            // Otros catálogos
+            // Catálogos - Métricas
             _view.MetricasNuevoClick += (s, e) => OnMetricasNuevo();
             _view.MetricasEditarClick += (s, e) => OnMetricasEditar();
             _view.MetricasEliminarClick += (s, e) => OnMetricasEliminar();
+            _view.MetricasBuscarTextoChanged += (s, txt) => OnMetricasBuscar(txt);
+            _view.MetricasFiltroEstadoChanged += (s, filtro) => OnMetricasFiltroEstado(filtro);
         }
 
         private void OnProbarConexion()
@@ -327,7 +331,9 @@ namespace SALC.Presenters
                 _tiposAnalisis = _catalogoService.ObtenerTiposAnalisis().OrderBy(ta => ta.Descripcion).ToList();
                 AplicarFiltrosTiposAnalisis();
                 
-                _view.CargarMetricas(_catalogoService.ObtenerMetricas().ToList());
+                // Cargar métricas
+                _metricas = _catalogoService.ObtenerMetricas().OrderBy(m => m.Nombre).ToList();
+                AplicarFiltrosMetricas();
             }
             catch (System.Exception ex)
             {
@@ -412,6 +418,46 @@ namespace SALC.Presenters
             }
             
             _view.CargarTiposAnalisis(src.ToList());
+        }
+
+        private void AplicarFiltrosMetricas()
+        {
+            IEnumerable<Metrica> metricasFiltradas = _metricas;
+
+            // Filtro por estado
+            if (_filtroEstadoMetricasActual != "Todos")
+            {
+                metricasFiltradas = metricasFiltradas.Where(m => m.Estado == _filtroEstadoMetricasActual);
+            }
+
+            _view.CargarMetricas(metricasFiltradas.ToList());
+        }
+
+        private void OnMetricasFiltroEstado(string filtro)
+        {
+            _filtroEstadoMetricasActual = filtro ?? "Todos";
+            AplicarFiltrosMetricas();
+        }
+
+        private void OnMetricasBuscar(string txt)
+        {
+            var q = txt?.Trim().ToLowerInvariant();
+            IEnumerable<Metrica> src = _metricas;
+
+            // Aplicar filtro de estado
+            if (_filtroEstadoMetricasActual != "Todos")
+            {
+                src = src.Where(m => m.Estado == _filtroEstadoMetricasActual);
+            }
+
+            // Aplicar filtro de búsqueda
+            if (!string.IsNullOrEmpty(q))
+            {
+                src = src.Where(m => m.Nombre.ToLowerInvariant().Contains(q)
+                    || m.UnidadMedida.ToLowerInvariant().Contains(q));
+            }
+            
+            _view.CargarMetricas(src.ToList());
         }
 
         // Catálogos — Obras Sociales con formulario profesional
@@ -594,41 +640,94 @@ namespace SALC.Presenters
             }
         }
 
-        // Catálogos — Métricas
+        // Catálogos — Métricas con formulario profesional
         private void OnMetricasNuevo()
         {
-            var nombre = PromptInput("Nombre de la métrica:"); if (string.IsNullOrWhiteSpace(nombre)) return;
-            var unidad = PromptInput("Unidad de medida:"); if (string.IsNullOrWhiteSpace(unidad)) return;
-            var minStr = PromptInput("Valor mínimo (opcional):"); decimal? min = string.IsNullOrWhiteSpace(minStr) ? (decimal?)null : decimal.Parse(minStr);
-            var maxStr = PromptInput("Valor máximo (opcional):"); decimal? max = string.IsNullOrWhiteSpace(maxStr) ? (decimal?)null : decimal.Parse(maxStr);
-            if (min.HasValue && max.HasValue && min > max) { _view.MostrarMensaje("Min no puede ser mayor que Max.", "Métricas", true); return; }
-            try { _catalogoService.CrearMetrica(new Metrica { Nombre = nombre.Trim(), UnidadMedida = unidad.Trim(), ValorMinimo = min, ValorMaximo = max }); CargarCatalogos(); _view.MostrarMensaje("Métrica creada.", "Métricas"); }
-            catch (System.Exception ex) { _view.MostrarMensaje("Error: " + ex.Message, "Métricas", true); }
-        }
-        private void OnMetricasEditar()
-        {
-            var id = _view.ObtenerMetricaSeleccionadaId(); if (id == null) { _view.MostrarMensaje("Seleccione una métrica."); return; }
-            var nombre = PromptInput("Nuevo nombre:"); if (string.IsNullOrWhiteSpace(nombre)) return;
-            var unidad = PromptInput("Nueva unidad:"); if (string.IsNullOrWhiteSpace(unidad)) return;
-            var minStr = PromptInput("Nuevo mínimo (opcional):"); decimal? min = string.IsNullOrWhiteSpace(minStr) ? (decimal?)null : decimal.Parse(minStr);
-            var maxStr = PromptInput("Nuevo máximo (opcional):"); decimal? max = string.IsNullOrWhiteSpace(maxStr) ? (decimal?)null : decimal.Parse(maxStr);
-            if (min.HasValue && max.HasValue && min > max) { _view.MostrarMensaje("Min no puede ser mayor que Max.", "Métricas", true); return; }
-            try { _catalogoService.ActualizarMetrica(new Metrica { IdMetrica = id.Value, Nombre = nombre.Trim(), UnidadMedida = unidad.Trim(), ValorMinimo = min, ValorMaximo = max }); CargarCatalogos(); _view.MostrarMensaje("Métrica actualizada.", "Métricas"); }
-            catch (System.Exception ex) { _view.MostrarMensaje("Error: " + ex.Message, "Métricas", true); }
-        }
-        private void OnMetricasEliminar()
-        {
-            var id = _view.ObtenerMetricaSeleccionadaId(); if (id == null) { _view.MostrarMensaje("Seleccione una métrica."); return; }
-            if (MessageBox.Show("¿Desactivar métrica? (Se marcará como inactiva)", "Confirmar Baja Lógica", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) return;
-            try { _catalogoService.EliminarMetrica(id.Value); CargarCatalogos(); _view.MostrarMensaje("Métrica desactivada.", "Métricas"); }
-            catch (System.Exception ex) { _view.MostrarMensaje("Error: " + ex.Message, "Métricas", true); }
+            using (var dlg = new FrmMetricaEdit())
+            {
+                if (dlg.ShowDialog() == DialogResult.OK)
+                {
+                    try
+                    {
+                        var metrica = dlg.ObtenerMetrica();
+                        _catalogoService.CrearMetrica(metrica);
+                        CargarCatalogos();
+                        _view.MostrarMensaje("Métrica creada correctamente.", "Métricas");
+                    }
+                    catch (System.Exception ex)
+                    {
+                        _view.MostrarMensaje("Error al crear métrica: " + ex.Message, "Métricas", true);
+                    }
+                }
+            }
         }
 
-        private string PromptInput(string mensaje)
+        private void OnMetricasEditar()
         {
-            // Mini input prompt sin nuevas formas: usar InputBox improvisado
-            string input = Microsoft.VisualBasic.Interaction.InputBox(mensaje, "SALC");
-            return input;
+            var id = _view.ObtenerMetricaSeleccionadaId();
+            if (id == null)
+            {
+                _view.MostrarMensaje("Seleccione una métrica para editar.", "Métricas");
+                return;
+            }
+
+            var existente = _metricas.FirstOrDefault(m => m.IdMetrica == id.Value);
+            if (existente == null)
+            {
+                _view.MostrarMensaje("No se encontró la métrica seleccionada.", "Métricas", true);
+                return;
+            }
+
+            using (var dlg = new FrmMetricaEdit(existente))
+            {
+                if (dlg.ShowDialog() == DialogResult.OK)
+                {
+                    try
+                    {
+                        var metrica = dlg.ObtenerMetrica();
+                        _catalogoService.ActualizarMetrica(metrica);
+                        CargarCatalogos();
+                        _view.MostrarMensaje("Métrica actualizada correctamente.", "Métricas");
+                    }
+                    catch (System.Exception ex)
+                    {
+                        _view.MostrarMensaje("Error al actualizar métrica: " + ex.Message, "Métricas", true);
+                    }
+                }
+            }
+        }
+
+        private void OnMetricasEliminar()
+        {
+            var id = _view.ObtenerMetricaSeleccionadaId();
+            if (id == null)
+            {
+                _view.MostrarMensaje("Seleccione una métrica para desactivar.", "Métricas");
+                return;
+            }
+
+            var metrica = _metricas.FirstOrDefault(m => m.IdMetrica == id.Value);
+            if (metrica == null) return;
+
+            var confirm = MessageBox.Show(
+                $"¿Desactivar métrica '{metrica.Nombre}'?\n\n" +
+                "La métrica se marcará como inactiva pero se conservarán todos los datos asociados.",
+                "Confirmar Baja Lógica", 
+                MessageBoxButtons.YesNo, 
+                MessageBoxIcon.Question);
+                
+            if (confirm != DialogResult.Yes) return;
+
+            try
+            {
+                _catalogoService.EliminarMetrica(id.Value);
+                CargarCatalogos();
+                _view.MostrarMensaje("Métrica desactivada correctamente.", "Métricas");
+            }
+            catch (System.Exception ex)
+            {
+                _view.MostrarMensaje("Error al desactivar métrica: " + ex.Message, "Métricas", true);
+            }
         }
 
         private void OnUsuariosBuscar(string txt)
