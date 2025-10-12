@@ -149,7 +149,20 @@ namespace SALC.Views.PanelAdministrador
             txtApellido.Text = existente.Apellido; 
             txtEmail.Text = existente.Email;
             cboRol.SelectedIndex = existente.IdRol - 1;
+            cboRol.Enabled = false; // Deshabilitar cambio de rol en edición
             cboEstado.SelectedItem = existente.Estado;
+            
+            // Agregar información visual sobre por qué el rol está deshabilitado
+            var lblRolInfo = new Label 
+            { 
+                Text = "(No se puede modificar el rol de un usuario existente)", 
+                Left = cboRol.Left + cboRol.Width + 10, 
+                Top = cboRol.Top + 2, 
+                Width = 250, 
+                ForeColor = System.Drawing.Color.Gray,
+                Font = new System.Drawing.Font("Microsoft Sans Serif", 7.5F, System.Drawing.FontStyle.Italic)
+            };
+            Controls.Add(lblRolInfo);
             
             // Para .NET Framework 4.7.2, usamos un enfoque alternativo al PlaceholderText
             if (baseUsuario != null)

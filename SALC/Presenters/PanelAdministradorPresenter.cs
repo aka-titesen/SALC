@@ -386,39 +386,27 @@ namespace SALC.Presenters
             var usuario = _usuarios.FirstOrDefault(u => u.Dni == dni.Value);
             if (usuario == null) return;
 
-            // Preguntar si quiere eliminar físicamente o desactivar
+            // Confirmación simple para baja lógica
             var resultado = MessageBox.Show(
-                $"¿Cómo desea proceder con el usuario {usuario.Nombre} {usuario.Apellido}?\n\n" +
-                "• SÍ: Desactivar usuario (recomendado)\n" +
-                "• NO: Eliminar físicamente\n" +
-                "• CANCELAR: No hacer nada",
-                "Eliminar Usuario",
-                MessageBoxButtons.YesNoCancel,
+                $"¿Está seguro que desea desactivar al usuario {usuario.Nombre} {usuario.Apellido}?\n\n" +
+                "El usuario quedará inactivo pero sus datos se conservarán en el sistema.",
+                "Desactivar Usuario",
+                MessageBoxButtons.YesNo,
                 MessageBoxIcon.Question);
 
-            if (resultado == DialogResult.Cancel) return;
+            if (resultado != DialogResult.Yes) return;
 
             try
             {
-                if (resultado == DialogResult.Yes)
-                {
-                    // Eliminación lógica (desactivar)
-                    usuario.Estado = "Inactivo";
-                    _usuarioService.ActualizarUsuario(usuario);
-                    CargarListadoUsuarios();
-                    _view.MostrarMensaje("Usuario desactivado correctamente.", "Usuarios");
-                }
-                else
-                {
-                    // Eliminación física
-                    _usuarioService.EliminarUsuario(dni.Value);
-                    CargarListadoUsuarios();
-                    _view.MostrarMensaje("Usuario eliminado físicamente.", "Usuarios");
-                }
+                // Siempre realizar baja lógica (desactivar usuario)
+                usuario.Estado = "Inactivo";
+                _usuarioService.ActualizarUsuario(usuario);
+                CargarListadoUsuarios();
+                _view.MostrarMensaje("Usuario desactivado correctamente.", "Usuarios");
             }
             catch (System.Exception ex)
             {
-                _view.MostrarMensaje("Error al procesar usuario: " + ex.Message, "Usuarios", true);
+                _view.MostrarMensaje("Error al desactivar usuario: " + ex.Message, "Usuarios", true);
             }
         }
 
