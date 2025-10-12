@@ -14,32 +14,28 @@ namespace SALC.Views.PanelMedico
         private TabControl tabs;
         
         // RF-05: Crear análisis
-        private TextBox txtDniPaciente;
-        private Button btnBuscarPaciente;
-        private Label lblPacienteInfo;
+        private Button btnSeleccionarPaciente;
+        private Label lblPacienteSeleccionado;
         private ComboBox cboTipoAnalisis;
         private TextBox txtObservacionesCrear;
         private Button btnCrearAnalisis;
 
         // RF-06: Cargar resultados
-        private TextBox txtIdAnalisisResultados;
-        private Button btnBuscarAnalisisResultados;
-        private Label lblAnalisisResultadosInfo;
+        private Button btnSeleccionarAnalisisResultados;
+        private Label lblAnalisisResultadosSeleccionado;
         private Button btnCargarMetricas;
         private DataGridView gridResultados;
         private Button btnGuardarResultados;
 
         // RF-07: Validar/Firmar
-        private TextBox txtIdAnalisisFirmar;
-        private Button btnBuscarAnalisisFirmar;
-        private Label lblAnalisisFirmarInfo;
+        private Button btnSeleccionarAnalisisFirmar;
+        private Label lblAnalisisFirmarSeleccionado;
         private DataGridView gridValidacion;
         private Button btnFirmarAnalisis;
 
         // RF-08: Generar informe
-        private TextBox txtIdAnalisisInforme;
-        private Button btnBuscarAnalisisInforme;
-        private Label lblAnalisisInformeInfo;
+        private Button btnSeleccionarAnalisisInforme;
+        private Label lblAnalisisInformeSeleccionado;
         private Button btnGenerarInforme;
 
         public FrmPanelMedico()
@@ -72,7 +68,7 @@ namespace SALC.Views.PanelMedico
             };
             
             var lblDescripcion = new Label {
-                Text = "Selecciona un paciente y tipo de análisis para crear un nuevo análisis en estado 'Sin verificar'",
+                Text = "Seleccione un paciente y tipo de análisis para crear un nuevo análisis en estado 'Sin verificar'",
                 Left = 20, Top = 50, Width = 800, Height = 40,
                 ForeColor = System.Drawing.Color.Blue
             };
@@ -80,29 +76,33 @@ namespace SALC.Views.PanelMedico
             // Selección de paciente
             var gbPaciente = new GroupBox { 
                 Text = "Seleccionar Paciente", 
-                Left = 20, Top = 100, Width = 400, Height = 120 
+                Left = 20, Top = 100, Width = 500, Height = 120 
             };
             
-            var lblDni = new Label { Text = "DNI Paciente:", Left = 20, Top = 30, Width = 100 };
-            txtDniPaciente = new TextBox { Left = 120, Top = 28, Width = 120 };
-            btnBuscarPaciente = new Button { Text = "Buscar", Left = 250, Top = 26, Width = 80 };
-            lblPacienteInfo = new Label { 
-                Text = "Busque un paciente por DNI", 
-                Left = 20, Top = 60, Width = 350, Height = 40,
-                ForeColor = System.Drawing.Color.Gray
+            btnSeleccionarPaciente = new Button { 
+                Text = "Seleccionar Paciente...", 
+                Left = 20, Top = 30, Width = 160, Height = 35,
+                BackColor = System.Drawing.Color.LightBlue
+            };
+            
+            lblPacienteSeleccionado = new Label { 
+                Text = "Ningún paciente seleccionado", 
+                Left = 20, Top = 75, Width = 450, Height = 35,
+                ForeColor = System.Drawing.Color.Gray,
+                BorderStyle = BorderStyle.FixedSingle
             };
 
-            gbPaciente.Controls.AddRange(new Control[] { lblDni, txtDniPaciente, btnBuscarPaciente, lblPacienteInfo });
+            gbPaciente.Controls.AddRange(new Control[] { btnSeleccionarPaciente, lblPacienteSeleccionado });
 
             // Selección de tipo de análisis
             var gbTipo = new GroupBox { 
                 Text = "Tipo de Análisis", 
-                Left = 440, Top = 100, Width = 400, Height = 120 
+                Left = 540, Top = 100, Width = 400, Height = 120 
             };
             
-            var lblTipo = new Label { Text = "Tipo:", Left = 20, Top = 30, Width = 80 };
+            var lblTipo = new Label { Text = "Tipo:", Left = 20, Top = 40, Width = 80 };
             cboTipoAnalisis = new ComboBox { 
-                Left = 100, Top = 28, Width = 280, 
+                Left = 100, Top = 38, Width = 280, 
                 DropDownStyle = ComboBoxStyle.DropDownList,
                 DisplayMember = "Descripcion", 
                 ValueMember = "IdTipoAnalisis" 
@@ -113,11 +113,11 @@ namespace SALC.Views.PanelMedico
             // Observaciones
             var gbObservaciones = new GroupBox { 
                 Text = "Observaciones Generales", 
-                Left = 20, Top = 240, Width = 820, Height = 100 
+                Left = 20, Top = 240, Width = 920, Height = 100 
             };
             
             txtObservacionesCrear = new TextBox { 
-                Left = 20, Top = 30, Width = 780, Height = 50, 
+                Left = 20, Top = 30, Width = 880, Height = 50, 
                 Multiline = true, ScrollBars = ScrollBars.Vertical 
             };
 
@@ -126,13 +126,14 @@ namespace SALC.Views.PanelMedico
             // Botón crear
             btnCrearAnalisis = new Button { 
                 Text = "Crear Análisis", 
-                Left = 740, Top = 360, Width = 120, Height = 35,
+                Left = 820, Top = 360, Width = 120, Height = 40,
                 BackColor = System.Drawing.Color.LightGreen,
-                Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold)
+                Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold),
+                Enabled = false
             };
 
             // Eventos
-            btnBuscarPaciente.Click += (s, e) => BuscarPacienteCrearClick?.Invoke(this, EventArgs.Empty);
+            btnSeleccionarPaciente.Click += (s, e) => BuscarPacienteCrearClick?.Invoke(this, EventArgs.Empty);
             btnCrearAnalisis.Click += (s, e) => CrearAnalisisClick?.Invoke(this, EventArgs.Empty);
 
             tab.Controls.AddRange(new Control[] { 
@@ -157,32 +158,36 @@ namespace SALC.Views.PanelMedico
             };
             
             var lblDescripcion = new Label {
-                Text = "Busque un análisis 'Sin verificar' de su autoría y cargue los valores de las métricas",
+                Text = "Seleccione un análisis 'Sin verificar' de su autoría y cargue los valores de las métricas",
                 Left = 20, Top = 50, Width = 800, Height = 40,
                 ForeColor = System.Drawing.Color.Blue
             };
 
             // Selección de análisis
             var gbAnalisis = new GroupBox { 
-                Text = "Buscar Análisis", 
-                Left = 20, Top = 100, Width = 500, Height = 120 
+                Text = "Seleccionar Análisis", 
+                Left = 20, Top = 100, Width = 600, Height = 120 
             };
             
-            var lblId = new Label { Text = "ID Análisis:", Left = 20, Top = 30, Width = 100 };
-            txtIdAnalisisResultados = new TextBox { Left = 120, Top = 28, Width = 120 };
-            btnBuscarAnalisisResultados = new Button { Text = "Buscar", Left = 250, Top = 26, Width = 80 };
-            lblAnalisisResultadosInfo = new Label { 
-                Text = "Ingrese el ID del análisis a cargar", 
-                Left = 20, Top = 60, Width = 450, Height = 40,
-                ForeColor = System.Drawing.Color.Gray
+            btnSeleccionarAnalisisResultados = new Button { 
+                Text = "Seleccionar Análisis...", 
+                Left = 20, Top = 30, Width = 180, Height = 35,
+                BackColor = System.Drawing.Color.LightBlue
+            };
+            
+            lblAnalisisResultadosSeleccionado = new Label { 
+                Text = "Ningún análisis seleccionado", 
+                Left = 20, Top = 75, Width = 550, Height = 35,
+                ForeColor = System.Drawing.Color.Gray,
+                BorderStyle = BorderStyle.FixedSingle
             };
 
-            gbAnalisis.Controls.AddRange(new Control[] { lblId, txtIdAnalisisResultados, btnBuscarAnalisisResultados, lblAnalisisResultadosInfo });
+            gbAnalisis.Controls.AddRange(new Control[] { btnSeleccionarAnalisisResultados, lblAnalisisResultadosSeleccionado });
 
             // Botón cargar métricas
             btnCargarMetricas = new Button { 
                 Text = "Cargar Métricas", 
-                Left = 540, Top = 130, Width = 120, Height = 35,
+                Left = 640, Top = 130, Width = 120, Height = 35,
                 BackColor = System.Drawing.Color.LightBlue,
                 Enabled = false
             };
@@ -213,7 +218,7 @@ namespace SALC.Views.PanelMedico
             };
 
             // Eventos
-            btnBuscarAnalisisResultados.Click += (s, e) => BuscarAnalisisResultadosClick?.Invoke(this, EventArgs.Empty);
+            btnSeleccionarAnalisisResultados.Click += (s, e) => BuscarAnalisisResultadosClick?.Invoke(this, EventArgs.Empty);
             btnCargarMetricas.Click += (s, e) => CargarMetricasAnalisisClick?.Invoke(this, EventArgs.Empty);
             btnGuardarResultados.Click += (s, e) => CargarResultadosGuardarClick?.Invoke(this, EventArgs.Empty);
 
@@ -239,7 +244,7 @@ namespace SALC.Views.PanelMedico
             };
             
             var lblDescripcion = new Label {
-                Text = "Busque un análisis con resultados cargados y proceda a firmarlo para darle validez clínica",
+                Text = "Seleccione un análisis con resultados cargados y proceda a firmarlo para darle validez clínica",
                 Left = 20, Top = 50, Width = 800, Height = 40,
                 ForeColor = System.Drawing.Color.Blue
             };
@@ -253,20 +258,24 @@ namespace SALC.Views.PanelMedico
 
             // Selección de análisis
             var gbAnalisis = new GroupBox { 
-                Text = "Buscar Análisis para Firmar", 
-                Left = 20, Top = 130, Width = 500, Height = 120 
+                Text = "Seleccionar Análisis para Firmar", 
+                Left = 20, Top = 130, Width = 600, Height = 120 
             };
             
-            var lblId = new Label { Text = "ID Análisis:", Left = 20, Top = 30, Width = 100 };
-            txtIdAnalisisFirmar = new TextBox { Left = 120, Top = 28, Width = 120 };
-            btnBuscarAnalisisFirmar = new Button { Text = "Buscar", Left = 250, Top = 26, Width = 80 };
-            lblAnalisisFirmarInfo = new Label { 
-                Text = "Ingrese el ID del análisis a firmar", 
-                Left = 20, Top = 60, Width = 450, Height = 40,
-                ForeColor = System.Drawing.Color.Gray
+            btnSeleccionarAnalisisFirmar = new Button { 
+                Text = "Seleccionar Análisis...", 
+                Left = 20, Top = 30, Width = 180, Height = 35,
+                BackColor = System.Drawing.Color.Orange
+            };
+            
+            lblAnalisisFirmarSeleccionado = new Label { 
+                Text = "Ningún análisis seleccionado", 
+                Left = 20, Top = 75, Width = 550, Height = 35,
+                ForeColor = System.Drawing.Color.Gray,
+                BorderStyle = BorderStyle.FixedSingle
             };
 
-            gbAnalisis.Controls.AddRange(new Control[] { lblId, txtIdAnalisisFirmar, btnBuscarAnalisisFirmar, lblAnalisisFirmarInfo });
+            gbAnalisis.Controls.AddRange(new Control[] { btnSeleccionarAnalisisFirmar, lblAnalisisFirmarSeleccionado });
 
             // Grid de validación (solo lectura)
             var lblValidacion = new Label { 
@@ -295,7 +304,7 @@ namespace SALC.Views.PanelMedico
             };
 
             // Eventos
-            btnBuscarAnalisisFirmar.Click += (s, e) => BuscarAnalisisFirmarClick?.Invoke(this, EventArgs.Empty);
+            btnSeleccionarAnalisisFirmar.Click += (s, e) => BuscarAnalisisFirmarClick?.Invoke(this, EventArgs.Empty);
             btnFirmarAnalisis.Click += (s, e) => FirmarAnalisisClick?.Invoke(this, EventArgs.Empty);
 
             tab.Controls.AddRange(new Control[] { 
@@ -320,27 +329,31 @@ namespace SALC.Views.PanelMedico
             };
             
             var lblDescripcion = new Label {
-                Text = "Solo análisis verificados (firmados) pueden generar informe PDF",
+                Text = "Seleccione un análisis verificado (firmado) para generar informe PDF",
                 Left = 20, Top = 50, Width = 800, Height = 40,
                 ForeColor = System.Drawing.Color.Blue
             };
 
             // Selección de análisis
             var gbAnalisis = new GroupBox { 
-                Text = "Buscar Análisis Verificado", 
-                Left = 20, Top = 120, Width = 500, Height = 120 
+                Text = "Seleccionar Análisis Verificado", 
+                Left = 20, Top = 120, Width = 600, Height = 120 
             };
             
-            var lblId = new Label { Text = "ID Análisis:", Left = 20, Top = 30, Width = 100 };
-            txtIdAnalisisInforme = new TextBox { Left = 120, Top = 28, Width = 120 };
-            btnBuscarAnalisisInforme = new Button { Text = "Buscar", Left = 250, Top = 26, Width = 80 };
-            lblAnalisisInformeInfo = new Label { 
-                Text = "Ingrese el ID del análisis verificado", 
-                Left = 20, Top = 60, Width = 450, Height = 40,
-                ForeColor = System.Drawing.Color.Gray
+            btnSeleccionarAnalisisInforme = new Button { 
+                Text = "Seleccionar Análisis...", 
+                Left = 20, Top = 30, Width = 180, Height = 35,
+                BackColor = System.Drawing.Color.LightCoral
+            };
+            
+            lblAnalisisInformeSeleccionado = new Label { 
+                Text = "Ningún análisis seleccionado", 
+                Left = 20, Top = 75, Width = 550, Height = 35,
+                ForeColor = System.Drawing.Color.Gray,
+                BorderStyle = BorderStyle.FixedSingle
             };
 
-            gbAnalisis.Controls.AddRange(new Control[] { lblId, txtIdAnalisisInforme, btnBuscarAnalisisInforme, lblAnalisisInformeInfo });
+            gbAnalisis.Controls.AddRange(new Control[] { btnSeleccionarAnalisisInforme, lblAnalisisInformeSeleccionado });
 
             // Información del estado
             var lblEstado = new Label {
@@ -352,14 +365,14 @@ namespace SALC.Views.PanelMedico
             // Botón generar informe
             btnGenerarInforme = new Button { 
                 Text = "Generar Informe PDF", 
-                Left = 540, Top = 150, Width = 140, Height = 40,
+                Left = 640, Top = 150, Width = 140, Height = 40,
                 BackColor = System.Drawing.Color.LightCoral,
                 Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold),
                 Enabled = false
             };
 
             // Eventos
-            btnBuscarAnalisisInforme.Click += (s, e) => BuscarAnalisisInformeClick?.Invoke(this, EventArgs.Empty);
+            btnSeleccionarAnalisisInforme.Click += (s, e) => BuscarAnalisisInformeClick?.Invoke(this, EventArgs.Empty);
             btnGenerarInforme.Click += (s, e) => GenerarInformeClick?.Invoke(this, EventArgs.Empty);
 
             tab.Controls.AddRange(new Control[] { 
@@ -384,7 +397,7 @@ namespace SALC.Views.PanelMedico
         public event EventHandler BuscarAnalisisInformeClick;
 
         // RF-05: Crear análisis
-        public string CrearAnalisisDniPacienteTexto => txtDniPaciente?.Text?.Trim();
+        public string CrearAnalisisDniPacienteTexto => "";  // Ya no se usa
         public int? TipoAnalisisSeleccionadoId => cboTipoAnalisis?.SelectedValue as int? ?? (cboTipoAnalisis?.SelectedValue != null ? (int?)Convert.ToInt32(cboTipoAnalisis.SelectedValue) : null);
         public string CrearAnalisisObservaciones => txtObservacionesCrear?.Text?.Trim();
 
@@ -398,23 +411,22 @@ namespace SALC.Views.PanelMedico
         {
             if (paciente != null)
             {
-                lblPacienteInfo.Text = $"✓ {paciente.Nombre} {paciente.Apellido}\nDNI: {paciente.Dni}";
-                lblPacienteInfo.ForeColor = System.Drawing.Color.Green;
+                lblPacienteSeleccionado.Text = $"✓ {paciente.Nombre} {paciente.Apellido} (DNI: {paciente.Dni})";
+                lblPacienteSeleccionado.ForeColor = System.Drawing.Color.Green;
                 btnCrearAnalisis.Enabled = true;
             }
         }
 
         public void LimpiarPacienteSeleccionado()
         {
-            lblPacienteInfo.Text = "Busque un paciente por DNI";
-            lblPacienteInfo.ForeColor = System.Drawing.Color.Gray;
+            lblPacienteSeleccionado.Text = "Ningún paciente seleccionado";
+            lblPacienteSeleccionado.ForeColor = System.Drawing.Color.Gray;
             btnCrearAnalisis.Enabled = false;
-            txtDniPaciente.Text = "";
             txtObservacionesCrear.Text = "";
         }
 
         // RF-06: Cargar resultados
-        public string AnalisisIdParaResultadosTexto => txtIdAnalisisResultados?.Text?.Trim();
+        public string AnalisisIdParaResultadosTexto => "";  // Ya no se usa
 
         public void CargarResultadosParaEdicion(IList<ResultadoEdicionDto> filas)
         {
@@ -454,54 +466,47 @@ namespace SALC.Views.PanelMedico
         {
             if (analisis != null && paciente != null && tipo != null)
             {
-                lblAnalisisResultadosInfo.Text = $"✓ Análisis ID: {analisis.IdAnalisis}\n" +
-                                               $"Paciente: {paciente.Nombre} {paciente.Apellido}\n" +
-                                               $"Tipo: {tipo.Descripcion}";
-                lblAnalisisResultadosInfo.ForeColor = System.Drawing.Color.Green;
+                lblAnalisisResultadosSeleccionado.Text = $"✓ ID: {analisis.IdAnalisis} | Paciente: {paciente.Nombre} {paciente.Apellido} | Tipo: {tipo.Descripcion}";
+                lblAnalisisResultadosSeleccionado.ForeColor = System.Drawing.Color.Green;
                 btnCargarMetricas.Enabled = true;
             }
         }
 
         public void LimpiarAnalisisParaResultados()
         {
-            lblAnalisisResultadosInfo.Text = "Ingrese el ID del análisis a cargar";
-            lblAnalisisResultadosInfo.ForeColor = System.Drawing.Color.Gray;
+            lblAnalisisResultadosSeleccionado.Text = "Ningún análisis seleccionado";
+            lblAnalisisResultadosSeleccionado.ForeColor = System.Drawing.Color.Gray;
             btnCargarMetricas.Enabled = false;
             btnGuardarResultados.Enabled = false;
             gridResultados.DataSource = null;
-            txtIdAnalisisResultados.Text = "";
         }
 
         // RF-07: Validar/Firmar
-        public string AnalisisIdParaFirmaTexto => txtIdAnalisisFirmar?.Text?.Trim();
+        public string AnalisisIdParaFirmaTexto => "";  // Ya no se usa
 
         public void MostrarAnalisisParaFirmar(Analisis analisis, Paciente paciente, TipoAnalisis tipo)
         {
             if (analisis != null && paciente != null && tipo != null)
             {
-                lblAnalisisFirmarInfo.Text = $"✓ Análisis ID: {analisis.IdAnalisis}\n" +
-                                           $"Paciente: {paciente.Nombre} {paciente.Apellido}\n" +
-                                           $"Tipo: {tipo.Descripcion}\n" +
-                                           $"Creado: {analisis.FechaCreacion:dd/MM/yyyy HH:mm}";
-                lblAnalisisFirmarInfo.ForeColor = System.Drawing.Color.Green;
+                lblAnalisisFirmarSeleccionado.Text = $"✓ ID: {analisis.IdAnalisis} | Paciente: {paciente.Nombre} {paciente.Apellido} | Tipo: {tipo.Descripcion}";
+                lblAnalisisFirmarSeleccionado.ForeColor = System.Drawing.Color.Green;
                 btnFirmarAnalisis.Enabled = true;
             }
         }
 
         public void LimpiarAnalisisParaFirmar()
         {
-            lblAnalisisFirmarInfo.Text = "Ingrese el ID del análisis a firmar";
-            lblAnalisisFirmarInfo.ForeColor = System.Drawing.Color.Gray;
+            lblAnalisisFirmarSeleccionado.Text = "Ningún análisis seleccionado";
+            lblAnalisisFirmarSeleccionado.ForeColor = System.Drawing.Color.Gray;
             btnFirmarAnalisis.Enabled = false;
             gridValidacion.DataSource = null;
-            txtIdAnalisisFirmar.Text = "";
         }
 
         public void MostrarResultadosParaValidacion(IList<AnalisisMetrica> resultados)
         {
             // Preparar datos para mostrar en grid de validación
             var datosValidacion = resultados.Select(r => new {
-                Métrica = r.IdMetrica, // TODO: obtener nombre de métrica
+                IdMetrica = r.IdMetrica,
                 Resultado = r.Resultado,
                 Observaciones = r.Observaciones ?? "-"
             }).ToList();
@@ -510,27 +515,23 @@ namespace SALC.Views.PanelMedico
         }
 
         // RF-08: Generar informe
-        public string AnalisisIdParaInformeTexto => txtIdAnalisisInforme?.Text?.Trim();
+        public string AnalisisIdParaInformeTexto => "";  // Ya no se usa
 
         public void MostrarAnalisisParaInforme(Analisis analisis, Paciente paciente, TipoAnalisis tipo)
         {
             if (analisis != null && paciente != null && tipo != null)
             {
-                lblAnalisisInformeInfo.Text = $"✓ Análisis ID: {analisis.IdAnalisis} - VERIFICADO\n" +
-                                            $"Paciente: {paciente.Nombre} {paciente.Apellido}\n" +
-                                            $"Tipo: {tipo.Descripcion}\n" +
-                                            $"Firmado: {analisis.FechaFirma:dd/MM/yyyy HH:mm}";
-                lblAnalisisInformeInfo.ForeColor = System.Drawing.Color.Green;
+                lblAnalisisInformeSeleccionado.Text = $"✓ ID: {analisis.IdAnalisis} | Paciente: {paciente.Nombre} {paciente.Apellido} | Tipo: {tipo.Descripcion} | VERIFICADO";
+                lblAnalisisInformeSeleccionado.ForeColor = System.Drawing.Color.Green;
                 btnGenerarInforme.Enabled = true;
             }
         }
 
         public void LimpiarAnalisisParaInforme()
         {
-            lblAnalisisInformeInfo.Text = "Ingrese el ID del análisis verificado";
-            lblAnalisisInformeInfo.ForeColor = System.Drawing.Color.Gray;
+            lblAnalisisInformeSeleccionado.Text = "Ningún análisis seleccionado";
+            lblAnalisisInformeSeleccionado.ForeColor = System.Drawing.Color.Gray;
             btnGenerarInforme.Enabled = false;
-            txtIdAnalisisInforme.Text = "";
         }
 
         // Navegación

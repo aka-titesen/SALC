@@ -5,6 +5,7 @@ using SALC.Presenters.ViewsContracts;
 using SALC.BLL;
 using SALC.Domain;
 using SALC.DAL;
+using SALC.Views.PanelMedico;
 
 namespace SALC.Presenters
 {
@@ -67,45 +68,21 @@ namespace SALC.Presenters
 
         private void OnBuscarPacienteCrear(object sender, EventArgs e)
         {
-            var dniTexto = _view.CrearAnalisisDniPacienteTexto;
-            if (string.IsNullOrWhiteSpace(dniTexto))
-            {
-                _view.MostrarMensaje("Ingrese un DNI de paciente", true);
-                return;
-            }
-
-            if (!int.TryParse(dniTexto, out var dni))
-            {
-                _view.MostrarMensaje("DNI inválido", true);
-                return;
-            }
-
             try
             {
-                var paciente = _pacienteRepo.ObtenerPorId(dni);
-                if (paciente == null)
+                using (var frmSeleccion = new FrmSeleccionPaciente())
                 {
-                    _view.MostrarMensaje("Paciente no encontrado", true);
-                    _view.LimpiarPacienteSeleccionado();
-                    _pacienteSeleccionado = null;
-                    return;
+                    if (frmSeleccion.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                    {
+                        _pacienteSeleccionado = frmSeleccion.PacienteSeleccionado;
+                        _view.MostrarPacienteSeleccionado(_pacienteSeleccionado);
+                        _view.MostrarMensaje($"Paciente seleccionado: {_pacienteSeleccionado.Nombre} {_pacienteSeleccionado.Apellido}");
+                    }
                 }
-
-                if (paciente.Estado != "Activo")
-                {
-                    _view.MostrarMensaje("El paciente está inactivo", true);
-                    _view.LimpiarPacienteSeleccionado();
-                    _pacienteSeleccionado = null;
-                    return;
-                }
-
-                _pacienteSeleccionado = paciente;
-                _view.MostrarPacienteSeleccionado(paciente);
-                _view.MostrarMensaje($"Paciente: {paciente.Nombre} {paciente.Apellido}");
             }
             catch (Exception ex)
             {
-                _view.MostrarMensaje("Error al buscar paciente: " + ex.Message, true);
+                _view.MostrarMensaje("Error al seleccionar paciente: " + ex.Message, true);
                 _view.LimpiarPacienteSeleccionado();
                 _pacienteSeleccionado = null;
             }
@@ -115,7 +92,7 @@ namespace SALC.Presenters
         {
             if (_pacienteSeleccionado == null)
             {
-                _view.MostrarMensaje("Primero debe buscar y seleccionar un paciente", true);
+                _view.MostrarMensaje("Primero debe seleccionar un paciente", true);
                 return;
             }
 
@@ -157,63 +134,27 @@ namespace SALC.Presenters
 
         private void OnBuscarAnalisisResultados(object sender, EventArgs e)
         {
-            var idTexto = _view.AnalisisIdParaResultadosTexto;
-            if (string.IsNullOrWhiteSpace(idTexto))
-            {
-                _view.MostrarMensaje("Ingrese un ID de análisis", true);
-                return;
-            }
-
-            if (!int.TryParse(idTexto, out var idAnalisis))
-            {
-                _view.MostrarMensaje("ID de análisis inválido", true);
-                return;
-            }
-
             try
             {
-                var analisis = _analisisService.ObtenerAnalisisPorId(idAnalisis);
-                if (analisis == null)
+                using (var frmSeleccion = new FrmSeleccionAnalisisResultados(_dniMedico))
                 {
-                    _view.MostrarMensaje("Análisis no encontrado", true);
-                    _view.LimpiarAnalisisParaResultados();
-                    _analisisParaResultados = null;
-                    return;
+                    if (frmSeleccion.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                    {
+                        _analisisParaResultados = frmSeleccion.AnalisisSeleccionado;
+                        
+                        // Obtener datos completos para mostrar
+                        var paciente = _pacienteRepo.ObtenerPorId(_analisisParaResultados.DniPaciente);
+                        var tipoAnalisis = _catalogoService.ObtenerTiposAnalisis()
+                            .FirstOrDefault(t => t.IdTipoAnalisis == _analisisParaResultados.IdTipoAnalisis);
+
+                        _view.MostrarAnalisisParaResultados(_analisisParaResultados, paciente, tipoAnalisis);
+                        _view.MostrarMensaje($"Análisis seleccionado. Use 'Cargar Métricas' para comenzar a ingresar resultados.");
+                    }
                 }
-
-                // Verificar que sea del médico actual
-                if (analisis.DniCarga != _dniMedico)
-                {
-                    _view.MostrarMensaje("Solo puede editar resultados de análisis que usted creó", true);
-                    _view.LimpiarAnalisisParaResultados();
-                    _analisisParaResultados = null;
-                    return;
-                }
-
-                // Verificar que esté en estado "Sin verificar"
-                if (analisis.IdEstado != 1) // 1 = Sin verificar
-                {
-                    var estado = analisis.IdEstado == 2 ? "Verificado" : 
-                                analisis.IdEstado == 3 ? "Anulado" : "Desconocido";
-                    _view.MostrarMensaje($"El análisis está en estado '{estado}'. Solo se pueden editar análisis 'Sin verificar'", true);
-                    _view.LimpiarAnalisisParaResultados();
-                    _analisisParaResultados = null;
-                    return;
-                }
-
-                // Obtener datos completos para mostrar
-                var paciente = _pacienteRepo.ObtenerPorId(analisis.DniPaciente);
-                var tipoAnalisis = _catalogoService.ObtenerTiposAnalisis()
-                    .FirstOrDefault(t => t.IdTipoAnalisis == analisis.IdTipoAnalisis);
-
-                _analisisParaResultados = analisis;
-                _view.MostrarAnalisisParaResultados(analisis, paciente, tipoAnalisis);
-                _view.MostrarMensaje($"Análisis listo para carga de resultados. Use 'Cargar Métricas' para comenzar.");
-
             }
             catch (Exception ex)
             {
-                _view.MostrarMensaje("Error al buscar análisis: " + ex.Message, true);
+                _view.MostrarMensaje("Error al seleccionar análisis: " + ex.Message, true);
                 _view.LimpiarAnalisisParaResultados();
                 _analisisParaResultados = null;
             }
@@ -223,7 +164,7 @@ namespace SALC.Presenters
         {
             if (_analisisParaResultados == null)
             {
-                _view.MostrarMensaje("Primero debe buscar un análisis válido", true);
+                _view.MostrarMensaje("Primero debe seleccionar un análisis válido", true);
                 return;
             }
 
@@ -234,7 +175,7 @@ namespace SALC.Presenters
         {
             if (_analisisParaResultados == null)
             {
-                _view.MostrarMensaje("Primero debe buscar un análisis válido", true);
+                _view.MostrarMensaje("Primero debe seleccionar un análisis válido", true);
                 return;
             }
 
@@ -285,80 +226,30 @@ namespace SALC.Presenters
 
         private void OnBuscarAnalisisFirmar(object sender, EventArgs e)
         {
-            var idTexto = _view.AnalisisIdParaFirmaTexto;
-            if (string.IsNullOrWhiteSpace(idTexto))
-            {
-                _view.MostrarMensaje("Ingrese un ID de análisis", true);
-                return;
-            }
-
-            if (!int.TryParse(idTexto, out var idAnalisis))
-            {
-                _view.MostrarMensaje("ID de análisis inválido", true);
-                return;
-            }
-
             try
             {
-                var analisis = _analisisService.ObtenerAnalisisPorId(idAnalisis);
-                if (analisis == null)
+                using (var frmSeleccion = new FrmSeleccionAnalisisFirma(_dniMedico))
                 {
-                    _view.MostrarMensaje("Análisis no encontrado", true);
-                    _view.LimpiarAnalisisParaFirmar();
-                    _analisisParaFirmar = null;
-                    return;
+                    if (frmSeleccion.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                    {
+                        _analisisParaFirmar = frmSeleccion.AnalisisSeleccionado;
+                        
+                        // Obtener datos completos para mostrar
+                        var paciente = _pacienteRepo.ObtenerPorId(_analisisParaFirmar.DniPaciente);
+                        var tipoAnalisis = _catalogoService.ObtenerTiposAnalisis()
+                            .FirstOrDefault(t => t.IdTipoAnalisis == _analisisParaFirmar.IdTipoAnalisis);
+
+                        var resultados = _analisisService.ObtenerResultados(_analisisParaFirmar.IdAnalisis).ToList();
+
+                        _view.MostrarAnalisisParaFirmar(_analisisParaFirmar, paciente, tipoAnalisis);
+                        _view.MostrarResultadosParaValidacion(resultados);
+                        _view.MostrarMensaje($"Análisis seleccionado. Revise los resultados y presione 'Firmar Análisis'.");
+                    }
                 }
-
-                // Verificar que sea del médico actual
-                if (analisis.DniCarga != _dniMedico)
-                {
-                    _view.MostrarMensaje("Solo puede firmar análisis que usted creó", true);
-                    _view.LimpiarAnalisisParaFirmar();
-                    _analisisParaFirmar = null;
-                    return;
-                }
-
-                // Verificar el estado
-                if (analisis.IdEstado == 2) // Ya verificado
-                {
-                    _view.MostrarMensaje("Este análisis ya está firmado y verificado", true);
-                    _view.LimpiarAnalisisParaFirmar();
-                    _analisisParaFirmar = null;
-                    return;
-                }
-
-                if (analisis.IdEstado == 3) // Anulado
-                {
-                    _view.MostrarMensaje("Este análisis está anulado", true);
-                    _view.LimpiarAnalisisParaFirmar();
-                    _analisisParaFirmar = null;
-                    return;
-                }
-
-                // Verificar que tenga resultados cargados
-                var resultados = _analisisService.ObtenerResultados(idAnalisis).ToList();
-                if (!resultados.Any())
-                {
-                    _view.MostrarMensaje("No se puede firmar un análisis sin resultados. Primero cargue los resultados.", true);
-                    _view.LimpiarAnalisisParaFirmar();
-                    _analisisParaFirmar = null;
-                    return;
-                }
-
-                // Obtener datos completos para mostrar
-                var paciente = _pacienteRepo.ObtenerPorId(analisis.DniPaciente);
-                var tipoAnalisis = _catalogoService.ObtenerTiposAnalisis()
-                    .FirstOrDefault(t => t.IdTipoAnalisis == analisis.IdTipoAnalisis);
-
-                _analisisParaFirmar = analisis;
-                _view.MostrarAnalisisParaFirmar(analisis, paciente, tipoAnalisis);
-                _view.MostrarResultadosParaValidacion(resultados);
-                _view.MostrarMensaje($"Análisis listo para firma. Revise los resultados y presione 'Firmar Análisis'.");
-
             }
             catch (Exception ex)
             {
-                _view.MostrarMensaje("Error al buscar análisis: " + ex.Message, true);
+                _view.MostrarMensaje("Error al seleccionar análisis: " + ex.Message, true);
                 _view.LimpiarAnalisisParaFirmar();
                 _analisisParaFirmar = null;
             }
@@ -368,7 +259,7 @@ namespace SALC.Presenters
         {
             if (_analisisParaFirmar == null)
             {
-                _view.MostrarMensaje("Primero debe buscar un análisis válido para firmar", true);
+                _view.MostrarMensaje("Primero debe seleccionar un análisis válido para firmar", true);
                 return;
             }
 
@@ -408,63 +299,27 @@ namespace SALC.Presenters
 
         private void OnBuscarAnalisisInforme(object sender, EventArgs e)
         {
-            var idTexto = _view.AnalisisIdParaInformeTexto;
-            if (string.IsNullOrWhiteSpace(idTexto))
-            {
-                _view.MostrarMensaje("Ingrese un ID de análisis", true);
-                return;
-            }
-
-            if (!int.TryParse(idTexto, out var idAnalisis))
-            {
-                _view.MostrarMensaje("ID de análisis inválido", true);
-                return;
-            }
-
             try
             {
-                var analisis = _analisisService.ObtenerAnalisisPorId(idAnalisis);
-                if (analisis == null)
+                using (var frmSeleccion = new FrmSeleccionAnalisisInforme(_dniMedico))
                 {
-                    _view.MostrarMensaje("Análisis no encontrado", true);
-                    _view.LimpiarAnalisisParaInforme();
-                    _analisisParaInforme = null;
-                    return;
+                    if (frmSeleccion.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                    {
+                        _analisisParaInforme = frmSeleccion.AnalisisSeleccionado;
+                        
+                        // Obtener datos completos para mostrar
+                        var paciente = _pacienteRepo.ObtenerPorId(_analisisParaInforme.DniPaciente);
+                        var tipoAnalisis = _catalogoService.ObtenerTiposAnalisis()
+                            .FirstOrDefault(t => t.IdTipoAnalisis == _analisisParaInforme.IdTipoAnalisis);
+
+                        _view.MostrarAnalisisParaInforme(_analisisParaInforme, paciente, tipoAnalisis);
+                        _view.MostrarMensaje($"Análisis verificado seleccionado. Listo para generar informe PDF.");
+                    }
                 }
-
-                // Verificar que sea del médico actual
-                if (analisis.DniCarga != _dniMedico)
-                {
-                    _view.MostrarMensaje("Solo puede generar informes de análisis que usted creó", true);
-                    _view.LimpiarAnalisisParaInforme();
-                    _analisisParaInforme = null;
-                    return;
-                }
-
-                // Verificar que esté verificado
-                if (analisis.IdEstado != 2) // 2 = Verificado
-                {
-                    var estado = analisis.IdEstado == 1 ? "Sin verificar" : 
-                                analisis.IdEstado == 3 ? "Anulado" : "Desconocido";
-                    _view.MostrarMensaje($"Solo se pueden generar informes de análisis verificados. Estado actual: '{estado}'", true);
-                    _view.LimpiarAnalisisParaInforme();
-                    _analisisParaInforme = null;
-                    return;
-                }
-
-                // Obtener datos completos para mostrar
-                var paciente = _pacienteRepo.ObtenerPorId(analisis.DniPaciente);
-                var tipoAnalisis = _catalogoService.ObtenerTiposAnalisis()
-                    .FirstOrDefault(t => t.IdTipoAnalisis == analisis.IdTipoAnalisis);
-
-                _analisisParaInforme = analisis;
-                _view.MostrarAnalisisParaInforme(analisis, paciente, tipoAnalisis);
-                _view.MostrarMensaje($"Análisis verificado listo para generar informe.");
-
             }
             catch (Exception ex)
             {
-                _view.MostrarMensaje("Error al buscar análisis: " + ex.Message, true);
+                _view.MostrarMensaje("Error al seleccionar análisis: " + ex.Message, true);
                 _view.LimpiarAnalisisParaInforme();
                 _analisisParaInforme = null;
             }
@@ -474,7 +329,7 @@ namespace SALC.Presenters
         {
             if (_analisisParaInforme == null)
             {
-                _view.MostrarMensaje("Primero debe buscar un análisis verificado", true);
+                _view.MostrarMensaje("Primero debe seleccionar un análisis verificado", true);
                 return;
             }
 

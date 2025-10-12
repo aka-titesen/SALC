@@ -50,6 +50,10 @@
   <ItemGroup>
     <Compile Include="Views\PanelAsistente\FrmPanelAsistente.cs" />
     <Compile Include="Views\PanelMedico\FrmPanelMedico.cs" />
+    <Compile Include="Views\PanelMedico\FrmSeleccionPaciente.cs" />
+    <Compile Include="Views\PanelMedico\FrmSeleccionAnalisisResultados.cs" />
+    <Compile Include="Views\PanelMedico\FrmSeleccionAnalisisFirma.cs" />
+    <Compile Include="Views\PanelMedico\FrmSeleccionAnalisisInforme.cs" />
     <Compile Include="Views\PanelAdministrador\FrmPanelAdministrador.cs" />
   <Compile Include="Views\PanelAdministrador\FrmPacienteEdit.cs" />
   <Compile Include="Views\PanelAdministrador\FrmPacienteDetalle.cs" />
