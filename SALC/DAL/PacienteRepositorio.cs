@@ -13,8 +13,8 @@ namespace SALC.DAL
         {
             using (var cn = DbConexion.CrearConexion())
             using (var cmd = new SqlCommand(@"INSERT INTO pacientes
-                (dni, nombre, apellido, fecha_nac, sexo, email, telefono, id_obra_social)
-                VALUES (@dni, @nombre, @apellido, @fecha_nac, @sexo, @email, @telefono, @id_obra_social)", cn))
+                (dni, nombre, apellido, fecha_nac, sexo, email, telefono, id_obra_social, estado)
+                VALUES (@dni, @nombre, @apellido, @fecha_nac, @sexo, @email, @telefono, @id_obra_social, @estado)", cn))
             {
                 cmd.Parameters.AddWithValue("@dni", p.Dni);
                 cmd.Parameters.AddWithValue("@nombre", p.Nombre);
@@ -24,6 +24,7 @@ namespace SALC.DAL
                 cmd.Parameters.AddWithValue("@email", (object)p.Email ?? DBNull.Value);
                 cmd.Parameters.AddWithValue("@telefono", (object)p.Telefono ?? DBNull.Value);
                 cmd.Parameters.AddWithValue("@id_obra_social", (object)p.IdObraSocial ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@estado", p.Estado ?? "Activo");
                 cn.Open();
                 cmd.ExecuteNonQuery();
             }
@@ -33,7 +34,7 @@ namespace SALC.DAL
         {
             using (var cn = DbConexion.CrearConexion())
             using (var cmd = new SqlCommand(@"UPDATE pacientes SET
-                nombre=@nombre, apellido=@apellido, fecha_nac=@fecha_nac, sexo=@sexo, email=@email, telefono=@telefono, id_obra_social=@id_obra_social
+                nombre=@nombre, apellido=@apellido, fecha_nac=@fecha_nac, sexo=@sexo, email=@email, telefono=@telefono, id_obra_social=@id_obra_social, estado=@estado
                 WHERE dni=@dni", cn))
             {
                 cmd.Parameters.AddWithValue("@dni", p.Dni);
@@ -44,6 +45,7 @@ namespace SALC.DAL
                 cmd.Parameters.AddWithValue("@email", (object)p.Email ?? DBNull.Value);
                 cmd.Parameters.AddWithValue("@telefono", (object)p.Telefono ?? DBNull.Value);
                 cmd.Parameters.AddWithValue("@id_obra_social", (object)p.IdObraSocial ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@estado", p.Estado ?? "Activo");
                 cn.Open();
                 cmd.ExecuteNonQuery();
             }
@@ -51,8 +53,9 @@ namespace SALC.DAL
 
         public void Eliminar(object id)
         {
+            // Baja lógica - cambiar estado a "Inactivo"
             using (var cn = DbConexion.CrearConexion())
-            using (var cmd = new SqlCommand("DELETE FROM pacientes WHERE dni=@dni", cn))
+            using (var cmd = new SqlCommand("UPDATE pacientes SET estado='Inactivo' WHERE dni=@dni", cn))
             {
                 cmd.Parameters.AddWithValue("@dni", (int)id);
                 cn.Open();
@@ -63,7 +66,7 @@ namespace SALC.DAL
         public Paciente ObtenerPorId(object id)
         {
             using (var cn = DbConexion.CrearConexion())
-            using (var cmd = new SqlCommand(@"SELECT dni, nombre, apellido, fecha_nac, sexo, email, telefono, id_obra_social
+            using (var cmd = new SqlCommand(@"SELECT dni, nombre, apellido, fecha_nac, sexo, email, telefono, id_obra_social, estado
                 FROM pacientes WHERE dni=@dni", cn))
             {
                 cmd.Parameters.AddWithValue("@dni", (int)id);
@@ -80,7 +83,22 @@ namespace SALC.DAL
         public IEnumerable<Paciente> ObtenerTodos()
         {
             using (var cn = DbConexion.CrearConexion())
-            using (var cmd = new SqlCommand(@"SELECT dni, nombre, apellido, fecha_nac, sexo, email, telefono, id_obra_social FROM pacientes", cn))
+            using (var cmd = new SqlCommand(@"SELECT dni, nombre, apellido, fecha_nac, sexo, email, telefono, id_obra_social, estado FROM pacientes", cn))
+            {
+                cn.Open();
+                using (var rd = cmd.ExecuteReader())
+                {
+                    while (rd.Read())
+                        yield return Map(rd);
+                }
+            }
+        }
+
+        // Método para obtener solo pacientes activos
+        public IEnumerable<Paciente> ObtenerActivos()
+        {
+            using (var cn = DbConexion.CrearConexion())
+            using (var cmd = new SqlCommand(@"SELECT dni, nombre, apellido, fecha_nac, sexo, email, telefono, id_obra_social, estado FROM pacientes WHERE estado = 'Activo'", cn))
             {
                 cn.Open();
                 using (var rd = cmd.ExecuteReader())
@@ -102,7 +120,8 @@ namespace SALC.DAL
                 Sexo = rd.GetString(4)[0],
                 Email = rd.IsDBNull(5) ? null : rd.GetString(5),
                 Telefono = rd.IsDBNull(6) ? null : rd.GetString(6),
-                IdObraSocial = rd.IsDBNull(7) ? (int?)null : rd.GetInt32(7)
+                IdObraSocial = rd.IsDBNull(7) ? (int?)null : rd.GetInt32(7),
+                Estado = rd.GetString(8)
             };
         }
     }

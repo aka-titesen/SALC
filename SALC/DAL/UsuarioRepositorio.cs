@@ -20,7 +20,7 @@ namespace SALC.DAL
                 cmd.Parameters.AddWithValue("@email", entidad.Email);
                 cmd.Parameters.AddWithValue("@pass", entidad.PasswordHash);
                 cmd.Parameters.AddWithValue("@rol", entidad.IdRol);
-                cmd.Parameters.AddWithValue("@estado", entidad.Estado);
+                cmd.Parameters.AddWithValue("@estado", entidad.Estado ?? "Activo");
                 cn.Open();
                 cmd.ExecuteNonQuery();
             }
@@ -37,7 +37,7 @@ namespace SALC.DAL
                 cmd.Parameters.AddWithValue("@email", entidad.Email);
                 cmd.Parameters.AddWithValue("@pass", entidad.PasswordHash);
                 cmd.Parameters.AddWithValue("@rol", entidad.IdRol);
-                cmd.Parameters.AddWithValue("@estado", entidad.Estado);
+                cmd.Parameters.AddWithValue("@estado", entidad.Estado ?? "Activo");
                 cn.Open();
                 cmd.ExecuteNonQuery();
             }
@@ -45,8 +45,9 @@ namespace SALC.DAL
 
         public void Eliminar(object id)
         {
+            // Baja lógica - cambiar estado a "Inactivo"
             using (var cn = DbConexion.CrearConexion())
-            using (var cmd = new SqlCommand("DELETE FROM usuarios WHERE dni=@dni", cn))
+            using (var cmd = new SqlCommand("UPDATE usuarios SET estado='Inactivo' WHERE dni=@dni", cn))
             {
                 cmd.Parameters.AddWithValue("@dni", (int)id);
                 cn.Open();
@@ -86,10 +87,26 @@ namespace SALC.DAL
             }
         }
 
-        public Usuario ObtenerPorEmail(string email)
+        // Método para obtener solo usuarios activos
+        public IEnumerable<Usuario> ObtenerActivos()
         {
             using (var cn = DbConexion.CrearConexion())
-            using (var cmd = new SqlCommand("SELECT dni, nombre, apellido, email, password_hash, id_rol, estado FROM usuarios WHERE email=@em", cn))
+            using (var cmd = new SqlCommand("SELECT dni, nombre, apellido, email, password_hash, id_rol, estado FROM usuarios WHERE estado = 'Activo'", cn))
+            {
+                cn.Open();
+                using (var rd = cmd.ExecuteReader())
+                {
+                    while (rd.Read())
+                        yield return MapUsuario(rd);
+                }
+            }
+        }
+
+        public Usuario ObtenerPorEmail(string email)
+        {
+            // Solo buscar entre usuarios activos para el login
+            using (var cn = DbConexion.CrearConexion())
+            using (var cmd = new SqlCommand("SELECT dni, nombre, apellido, email, password_hash, id_rol, estado FROM usuarios WHERE email=@em AND estado='Activo'", cn))
             {
                 cmd.Parameters.AddWithValue("@em", email);
                 cn.Open();
@@ -134,7 +151,7 @@ namespace SALC.DAL
                             cmd.Parameters.AddWithValue("@email", usuario.Email);
                             cmd.Parameters.AddWithValue("@pass", usuario.PasswordHash);
                             cmd.Parameters.AddWithValue("@rol", usuario.IdRol);
-                            cmd.Parameters.AddWithValue("@estado", usuario.Estado);
+                            cmd.Parameters.AddWithValue("@estado", usuario.Estado ?? "Activo");
                             cmd.ExecuteNonQuery();
                         }
 
@@ -174,7 +191,7 @@ namespace SALC.DAL
                             cmd.Parameters.AddWithValue("@email", usuario.Email);
                             cmd.Parameters.AddWithValue("@pass", usuario.PasswordHash);
                             cmd.Parameters.AddWithValue("@rol", usuario.IdRol);
-                            cmd.Parameters.AddWithValue("@estado", usuario.Estado);
+                            cmd.Parameters.AddWithValue("@estado", usuario.Estado ?? "Activo");
                             cmd.ExecuteNonQuery();
                         }
 
@@ -197,64 +214,17 @@ namespace SALC.DAL
             }
         }
 
+        // Métodos de eliminación que usan baja lógica
         public void EliminarUsuarioMedico(int dni)
         {
-            using (var cn = DbConexion.CrearConexion())
-            {
-                cn.Open();
-                using (var tx = cn.BeginTransaction())
-                {
-                    try
-                    {
-                        using (var cmd = new SqlCommand("DELETE FROM medicos WHERE dni=@dni", cn, tx))
-                        {
-                            cmd.Parameters.AddWithValue("@dni", dni);
-                            cmd.ExecuteNonQuery();
-                        }
-                        using (var cmd = new SqlCommand("DELETE FROM usuarios WHERE dni=@dni", cn, tx))
-                        {
-                            cmd.Parameters.AddWithValue("@dni", dni);
-                            cmd.ExecuteNonQuery();
-                        }
-                        tx.Commit();
-                    }
-                    catch
-                    {
-                        tx.Rollback();
-                        throw;
-                    }
-                }
-            }
+            // Usar baja lógica
+            Eliminar(dni);
         }
 
         public void EliminarUsuarioAsistente(int dni)
         {
-            using (var cn = DbConexion.CrearConexion())
-            {
-                cn.Open();
-                using (var tx = cn.BeginTransaction())
-                {
-                    try
-                    {
-                        using (var cmd = new SqlCommand("DELETE FROM asistentes WHERE dni=@dni", cn, tx))
-                        {
-                            cmd.Parameters.AddWithValue("@dni", dni);
-                            cmd.ExecuteNonQuery();
-                        }
-                        using (var cmd = new SqlCommand("DELETE FROM usuarios WHERE dni=@dni", cn, tx))
-                        {
-                            cmd.Parameters.AddWithValue("@dni", dni);
-                            cmd.ExecuteNonQuery();
-                        }
-                        tx.Commit();
-                    }
-                    catch
-                    {
-                        tx.Rollback();
-                        throw;
-                    }
-                }
-            }
+            // Usar baja lógica
+            Eliminar(dni);
         }
     }
 }

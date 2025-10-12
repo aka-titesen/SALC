@@ -15,7 +15,7 @@ namespace SALC.BLL
             if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
 
             // Detectar base de datos del connection string
-            var cs = System.Configuration.ConfigurationManager.ConnectionStrings["SALC_Db"].ConnectionString;
+            var cs = System.Configuration.ConfigurationManager.ConnectionStrings["SALC"].ConnectionString;
             var builder = new SqlConnectionStringBuilder(cs);
             var database = builder.InitialCatalog;
 

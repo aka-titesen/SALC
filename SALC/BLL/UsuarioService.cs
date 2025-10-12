@@ -44,6 +44,10 @@ namespace SALC.BLL
         {
             // Hash de contraseña
             usuario.PasswordHash = _hasher.Hash(usuario.PasswordHash);
+            // Asegurar que el estado por defecto sea "Activo"
+            if (string.IsNullOrEmpty(usuario.Estado))
+                usuario.Estado = "Activo";
+                
             if (usuario.IdRol == 2 && medico != null)
             {
                 _usuarios.CrearUsuarioMedico(usuario, medico);
@@ -60,9 +64,7 @@ namespace SALC.BLL
 
         public void EliminarUsuario(int dni)
         {
-            // Intentar eliminar extensión y luego usuario
-            try { _usuarios.EliminarUsuarioMedico(dni); return; } catch { }
-            try { _usuarios.EliminarUsuarioAsistente(dni); return; } catch { }
+            // Usar baja lógica
             _usuarios.Eliminar(dni);
         }
 
@@ -74,6 +76,35 @@ namespace SALC.BLL
         public IEnumerable<Usuario> ObtenerTodos()
         {
             return _usuarios.ObtenerTodos();
+        }
+
+        // Método para obtener solo usuarios activos
+        public IEnumerable<Usuario> ObtenerActivos()
+        {
+            return _usuarios.ObtenerActivos();
+        }
+
+        // Método para activar/desactivar usuario
+        public void CambiarEstadoUsuario(int dni, string nuevoEstado)
+        {
+            var usuario = _usuarios.ObtenerPorId(dni);
+            if (usuario != null)
+            {
+                usuario.Estado = nuevoEstado;
+                _usuarios.Actualizar(usuario);
+            }
+        }
+
+        // Método para activar usuario
+        public void ActivarUsuario(int dni)
+        {
+            CambiarEstadoUsuario(dni, "Activo");
+        }
+
+        // Método para desactivar usuario
+        public void DesactivarUsuario(int dni)
+        {
+            CambiarEstadoUsuario(dni, "Inactivo");
         }
     }
 }

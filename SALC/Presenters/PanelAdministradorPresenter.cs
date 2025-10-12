@@ -238,8 +238,8 @@ namespace SALC.Presenters
         private void OnObrasSocialesEliminar()
         {
             var id = _view.ObtenerObraSocialSeleccionadaId(); if (id == null) { _view.MostrarMensaje("Seleccione una Obra Social."); return; }
-            if (MessageBox.Show("¿Eliminar Obra Social?", "Confirmar", MessageBoxButtons.YesNo) != DialogResult.Yes) return;
-            try { _catalogoService.EliminarObraSocial(id.Value); CargarCatalogos(); _view.MostrarMensaje("Obra Social eliminada.", "Catálogos"); }
+            if (MessageBox.Show("¿Desactivar Obra Social? (Se marcará como inactiva)", "Confirmar Baja Lógica", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) return;
+            try { _catalogoService.EliminarObraSocial(id.Value); CargarCatalogos(); _view.MostrarMensaje("Obra Social desactivada.", "Catálogos"); }
             catch (System.Exception ex) { _view.MostrarMensaje("Error: " + ex.Message, "Catálogos", true); }
         }
 
@@ -260,8 +260,8 @@ namespace SALC.Presenters
         private void OnTiposAnalisisEliminar()
         {
             var id = _view.ObtenerTipoAnalisisSeleccionadoId(); if (id == null) { _view.MostrarMensaje("Seleccione un tipo de análisis."); return; }
-            if (MessageBox.Show("¿Eliminar tipo de análisis?", "Confirmar", MessageBoxButtons.YesNo) != DialogResult.Yes) return;
-            try { _catalogoService.EliminarTipoAnalisis(id.Value); CargarCatalogos(); _view.MostrarMensaje("Tipo de análisis eliminado.", "Catálogos"); }
+            if (MessageBox.Show("¿Desactivar tipo de análisis? (Se marcará como inactivo)", "Confirmar Baja Lógica", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) return;
+            try { _catalogoService.EliminarTipoAnalisis(id.Value); CargarCatalogos(); _view.MostrarMensaje("Tipo de análisis desactivado.", "Catálogos"); }
             catch (System.Exception ex) { _view.MostrarMensaje("Error: " + ex.Message, "Catálogos", true); }
         }
 
@@ -290,8 +290,8 @@ namespace SALC.Presenters
         private void OnMetricasEliminar()
         {
             var id = _view.ObtenerMetricaSeleccionadaId(); if (id == null) { _view.MostrarMensaje("Seleccione una métrica."); return; }
-            if (MessageBox.Show("¿Eliminar métrica?", "Confirmar", MessageBoxButtons.YesNo) != DialogResult.Yes) return;
-            try { _catalogoService.EliminarMetrica(id.Value); CargarCatalogos(); _view.MostrarMensaje("Métrica eliminada.", "Métricas"); }
+            if (MessageBox.Show("¿Desactivar métrica? (Se marcará como inactiva)", "Confirmar Baja Lógica", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) return;
+            try { _catalogoService.EliminarMetrica(id.Value); CargarCatalogos(); _view.MostrarMensaje("Métrica desactivada.", "Métricas"); }
             catch (System.Exception ex) { _view.MostrarMensaje("Error: " + ex.Message, "Métricas", true); }
         }
 
@@ -520,20 +520,31 @@ namespace SALC.Presenters
             var dni = _view.ObtenerPacienteSeleccionadoDni();
             if (dni == null)
             {
-                _view.MostrarMensaje("Seleccione un paciente para eliminar.", "Pacientes");
+                _view.MostrarMensaje("Seleccione un paciente para desactivar.", "Pacientes");
                 return;
             }
-            var confirm = MessageBox.Show($"¿Eliminar paciente DNI {dni}?", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+            
+            var paciente = _pacientes.FirstOrDefault(p => p.Dni == dni.Value);
+            if (paciente == null) return;
+            
+            var confirm = MessageBox.Show(
+                $"¿Desactivar paciente {paciente.Nombre} {paciente.Apellido} (DNI: {dni})?\n\n" +
+                "El paciente se marcará como inactivo pero se conservarán todos sus datos y análisis.",
+                "Confirmar Baja Lógica", 
+                MessageBoxButtons.YesNo, 
+                MessageBoxIcon.Question);
+                
             if (confirm != DialogResult.Yes) return;
+            
             try
             {
                 _pacienteService.EliminarPaciente(dni.Value);
                 CargarListadoPacientes();
-                _view.MostrarMensaje("Paciente eliminado.", "Pacientes");
+                _view.MostrarMensaje("Paciente desactivado correctamente.", "Pacientes");
             }
             catch (System.Exception ex)
             {
-                _view.MostrarMensaje("Error al eliminar paciente: " + ex.Message, "Pacientes", true);
+                _view.MostrarMensaje("Error al desactivar paciente: " + ex.Message, "Pacientes", true);
             }
         }
     }

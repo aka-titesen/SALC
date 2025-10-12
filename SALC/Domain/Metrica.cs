@@ -7,5 +7,6 @@ namespace SALC.Domain
         public string UnidadMedida { get; set; }
         public decimal? ValorMaximo { get; set; }
         public decimal? ValorMinimo { get; set; }
+        public string Estado { get; set; } = "Activo"; // Baja lógica: "Activo" | "Inactivo"
     }
 }

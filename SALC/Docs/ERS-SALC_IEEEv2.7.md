@@ -165,12 +165,14 @@ Esta sección describe la estructura detallada de la base de datos.
 | id\_obra\_social | INT | PK, IDENTITY. ID único. |
 | cuit | NVARCHAR(13) | NOT NULL, UNIQUE. CUIT de la entidad. |
 | nombre | NVARCHAR(50) | NOT NULL. Nombre de la obra social. |
+| estado | NVARCHAR(20) | NOT NULL. CHECK ('Activo', 'Inactivo'). |
 
 | Tabla: tipos\_analisis |  |  |
 | :---- | :---- | :---- |
 | **Columna** | **Tipo de Dato SQL** | **Restricciones y Descripción** |
 | id\_tipo\_analisis | INT | PK, IDENTITY. ID único. |
 | descripcion | NVARCHAR(100) | NOT NULL. Nombre del análisis. |
+| estado | NVARCHAR(20) | NOT NULL. CHECK ('Activo', 'Inactivo'). |
 
 | Tabla: metricas |  |  |
 | :---- | :---- | :---- |
@@ -180,6 +182,8 @@ Esta sección describe la estructura detallada de la base de datos.
 | unidad\_medida | NVARCHAR(20) | NOT NULL. Unidad (ej. 'mg/dL'). |
 | valor\_maximo | DECIMAL(10,2) | NULL. Valor de referencia máximo. |
 | valor\_minimo | DECIMAL(10,2) | NULL. Valor de referencia mínimo. |
+| estado | NVARCHAR(20) | NOT NULL. CHECK ('Activo', 'Inactivo'). |
+|  |  |  |
 
 **Tablas de Entidades Principales**
 
@@ -219,6 +223,7 @@ Esta sección describe la estructura detallada de la base de datos.
 | email | NVARCHAR(100) | NULL. |
 | telefono | NVARCHAR(20) | NULL. |
 | id\_obra\_social | INT | NULL, FK a obras\_sociales.id\_obra\_social. |
+| estado | NVARCHAR(20) | NOT NULL. CHECK ('Activo', 'Inactivo'). |
 
 **Tablas Transaccionales**
 

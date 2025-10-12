@@ -9,6 +9,11 @@ namespace SALC.DAL
 {
     public class AnalisisRepositorio : IRepositorioBase<Analisis>
     {
+        // Constantes para los estados de análisis basados en la base de datos
+        private const int EstadoSinVerificar = 1;
+        private const int EstadoVerificado = 2;
+        private const int EstadoAnulado = 3; // Baja lógica
+
         public Analisis CrearYDevolver(Analisis a)
         {
             using (var cn = DbConexion.CrearConexion())
@@ -57,10 +62,12 @@ namespace SALC.DAL
 
         public void Eliminar(object id)
         {
+            // Baja lógica - cambiar estado a "Anulado"
             using (var cn = DbConexion.CrearConexion())
-            using (var cmd = new SqlCommand("DELETE FROM analisis WHERE id_analisis=@id", cn))
+            using (var cmd = new SqlCommand("UPDATE analisis SET id_estado=@estado WHERE id_analisis=@id", cn))
             {
                 cmd.Parameters.AddWithValue("@id", (int)id);
+                cmd.Parameters.AddWithValue("@estado", EstadoAnulado);
                 cn.Open();
                 cmd.ExecuteNonQuery();
             }
@@ -95,6 +102,22 @@ namespace SALC.DAL
             }
         }
 
+        // Método para obtener solo análisis no anulados (activos)
+        public IEnumerable<Analisis> ObtenerActivos()
+        {
+            using (var cn = DbConexion.CrearConexion())
+            using (var cmd = new SqlCommand(@"SELECT id_analisis, id_tipo_analisis, id_estado, dni_paciente, dni_carga, dni_firma, fecha_creacion, fecha_firma, observaciones 
+                FROM analisis WHERE id_estado != @estadoAnulado", cn))
+            {
+                cmd.Parameters.AddWithValue("@estadoAnulado", EstadoAnulado);
+                cn.Open();
+                using (var rd = cmd.ExecuteReader())
+                {
+                    while (rd.Read()) yield return Map(rd);
+                }
+            }
+        }
+
         public IEnumerable<Analisis> ObtenerPorMedicoCarga(int dni)
         {
             using (var cn = DbConexion.CrearConexion())
@@ -110,6 +133,23 @@ namespace SALC.DAL
             }
         }
 
+        // Método para obtener análisis no anulados por médico
+        public IEnumerable<Analisis> ObtenerActivosPorMedicoCarga(int dni)
+        {
+            using (var cn = DbConexion.CrearConexion())
+            using (var cmd = new SqlCommand(@"SELECT id_analisis, id_tipo_analisis, id_estado, dni_paciente, dni_carga, dni_firma, fecha_creacion, fecha_firma, observaciones
+                FROM analisis WHERE dni_carga=@dni AND id_estado != @estadoAnulado", cn))
+            {
+                cmd.Parameters.AddWithValue("@dni", dni);
+                cmd.Parameters.AddWithValue("@estadoAnulado", EstadoAnulado);
+                cn.Open();
+                using (var rd = cmd.ExecuteReader())
+                {
+                    while (rd.Read()) yield return Map(rd);
+                }
+            }
+        }
+
         public IEnumerable<Analisis> ObtenerPorPaciente(int dniPaciente)
         {
             using (var cn = DbConexion.CrearConexion())
@@ -117,6 +157,23 @@ namespace SALC.DAL
                 FROM analisis WHERE dni_paciente=@dni", cn))
             {
                 cmd.Parameters.AddWithValue("@dni", dniPaciente);
+                cn.Open();
+                using (var rd = cmd.ExecuteReader())
+                {
+                    while (rd.Read()) yield return Map(rd);
+                }
+            }
+        }
+
+        // Método para obtener análisis no anulados por paciente
+        public IEnumerable<Analisis> ObtenerActivosPorPaciente(int dniPaciente)
+        {
+            using (var cn = DbConexion.CrearConexion())
+            using (var cmd = new SqlCommand(@"SELECT id_analisis, id_tipo_analisis, id_estado, dni_paciente, dni_carga, dni_firma, fecha_creacion, fecha_firma, observaciones
+                FROM analisis WHERE dni_paciente=@dni AND id_estado != @estadoAnulado", cn))
+            {
+                cmd.Parameters.AddWithValue("@dni", dniPaciente);
+                cmd.Parameters.AddWithValue("@estadoAnulado", EstadoAnulado);
                 cn.Open();
                 using (var rd = cmd.ExecuteReader())
                 {

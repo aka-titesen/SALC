@@ -5,5 +5,6 @@ namespace SALC.Domain
         public int IdObraSocial { get; set; }
         public string Cuit { get; set; }
         public string Nombre { get; set; }
+        public string Estado { get; set; } = "Activo"; // Baja lógica: "Activo" | "Inactivo"
     }
 }

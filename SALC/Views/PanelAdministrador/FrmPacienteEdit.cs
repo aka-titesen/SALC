@@ -8,13 +8,14 @@ namespace SALC.Views.PanelAdministrador
     {
         private TextBox txtDni, txtNombre, txtApellido, txtEmail, txtTelefono, txtSexo;
         private DateTimePicker dtpFechaNac;
+        private ComboBox cboEstado;
         private Button btnOk, btnCancel;
         private int? dniOriginal;
 
         public FrmPacienteEdit(Paciente existente = null)
         {
             Text = existente == null ? "Nuevo Paciente" : "Editar Paciente";
-            Width = 420; Height = 360; FormBorderStyle = FormBorderStyle.FixedDialog; MaximizeBox = false; MinimizeBox = false;
+            Width = 420; Height = 400; FormBorderStyle = FormBorderStyle.FixedDialog; MaximizeBox = false; MinimizeBox = false;
             StartPosition = FormStartPosition.CenterParent;
 
             var lblDni = new Label { Text = "DNI:", Left = 20, Top = 20, Width = 120 };
@@ -31,13 +32,18 @@ namespace SALC.Views.PanelAdministrador
             txtEmail = new TextBox { Left = 150, Top = 193, Width = 200 };
             var lblTel = new Label { Text = "Teléfono:", Left = 20, Top = 230, Width = 120 };
             txtTelefono = new TextBox { Left = 150, Top = 228, Width = 200 };
+            
+            // Agregar combo de estado
+            var lblEstado = new Label { Text = "Estado:", Left = 20, Top = 265, Width = 120 };
+            cboEstado = new ComboBox { Left = 150, Top = 263, Width = 120, DropDownStyle = ComboBoxStyle.DropDownList };
+            cboEstado.Items.AddRange(new object[] { "Activo", "Inactivo" });
 
-            btnOk = new Button { Text = "Aceptar", Left = 170, Top = 270, Width = 80, DialogResult = DialogResult.OK };
-            btnCancel = new Button { Text = "Cancelar", Left = 260, Top = 270, Width = 90, DialogResult = DialogResult.Cancel };
+            btnOk = new Button { Text = "Aceptar", Left = 170, Top = 310, Width = 80, DialogResult = DialogResult.OK };
+            btnCancel = new Button { Text = "Cancelar", Left = 260, Top = 310, Width = 90, DialogResult = DialogResult.Cancel };
             AcceptButton = btnOk; CancelButton = btnCancel;
             btnOk.Click += (s, e) => { if (!Validar()) this.DialogResult = DialogResult.None; };
 
-            Controls.AddRange(new Control[] { lblDni, txtDni, lblNombre, txtNombre, lblApellido, txtApellido, lblFecha, dtpFechaNac, lblSexo, txtSexo, lblEmail, txtEmail, lblTel, txtTelefono, btnOk, btnCancel });
+            Controls.AddRange(new Control[] { lblDni, txtDni, lblNombre, txtNombre, lblApellido, txtApellido, lblFecha, dtpFechaNac, lblSexo, txtSexo, lblEmail, txtEmail, lblTel, txtTelefono, lblEstado, cboEstado, btnOk, btnCancel });
 
             if (existente != null)
             {
@@ -50,6 +56,12 @@ namespace SALC.Views.PanelAdministrador
                 txtSexo.Text = existente.Sexo.ToString();
                 txtEmail.Text = existente.Email;
                 txtTelefono.Text = existente.Telefono;
+                cboEstado.SelectedItem = existente.Estado ?? "Activo";
+            }
+            else
+            {
+                // Valores por defecto para nuevo paciente
+                cboEstado.SelectedItem = "Activo";
             }
         }
 
@@ -69,6 +81,7 @@ namespace SALC.Views.PanelAdministrador
             var sx = (txtSexo.Text ?? string.Empty).Trim().ToUpperInvariant();
             if (sx != "M" && sx != "F" && sx != "X") { MessageBox.Show("Sexo debe ser M, F o X."); txtSexo.Focus(); return false; }
             if (dtpFechaNac.Value.Date > DateTime.Today) { MessageBox.Show("Fecha de nacimiento no puede ser futura."); dtpFechaNac.Focus(); return false; }
+            if (cboEstado.SelectedItem == null) { MessageBox.Show("Seleccione un estado."); cboEstado.Focus(); return false; }
             return true;
         }
 
@@ -83,7 +96,8 @@ namespace SALC.Views.PanelAdministrador
                 Sexo = (txtSexo.Text ?? "").Trim().ToUpperInvariant()[0],
                 Email = string.IsNullOrWhiteSpace(txtEmail.Text) ? null : txtEmail.Text.Trim(),
                 Telefono = string.IsNullOrWhiteSpace(txtTelefono.Text) ? null : txtTelefono.Text.Trim(),
-                IdObraSocial = null // editable en próxima iteración desde catálogo/combobox
+                IdObraSocial = null, // editable en próxima iteración desde catálogo/combobox
+                Estado = cboEstado.SelectedItem?.ToString() ?? "Activo"
             };
         }
     }
