@@ -14,9 +14,10 @@ namespace SALC.Views.PanelAdministrador
         private DataGridView gridTiposAnalisis;
         private DataGridView gridMetricas;
 
-        // Controles adicionales para usuarios y pacientes
+        // Controles adicionales para usuarios, pacientes y obras sociales
         private ComboBox cboFiltroEstadoUsuarios;
         private ComboBox cboFiltroEstadoPacientes;
+        private ComboBox cboFiltroEstadoObrasSociales;
 
         public FrmPanelAdministrador()
         {
@@ -144,12 +145,8 @@ namespace SALC.Views.PanelAdministrador
             var tab = new TabPage("Catálogos");
             var tabsCat = new TabControl { Dock = DockStyle.Fill };
 
-            // Obras Sociales
-            tabsCat.TabPages.Add(CrearTabCatalogo("Obras Sociales",
-                (s, e) => ObrasSocialesNuevoClick?.Invoke(this, EventArgs.Empty),
-                (s, e) => ObrasSocialesEditarClick?.Invoke(this, EventArgs.Empty),
-                (s, e) => ObrasSocialesEliminarClick?.Invoke(this, EventArgs.Empty),
-                t => ObrasSocialesBuscarTextoChanged?.Invoke(this, t)));
+            // Obras Sociales - con filtro de estado personalizado
+            tabsCat.TabPages.Add(CrearTabObrasSociales());
 
             // Tipos de Análisis
             tabsCat.TabPages.Add(CrearTabCatalogo("Tipos de Análisis",
@@ -167,6 +164,57 @@ namespace SALC.Views.PanelAdministrador
 
             tab.Controls.Add(tabsCat);
             tabs.TabPages.Add(tab);
+        }
+
+        private TabPage CrearTabObrasSociales()
+        {
+            var tab = new TabPage("Obras Sociales");
+            var tool = new ToolStrip();
+            var btnNuevo = new ToolStripButton("Nuevo");
+            var btnEditar = new ToolStripButton("Editar");
+            var btnEliminar = new ToolStripButton("Eliminar");
+            var txtBuscar = new ToolStripTextBox { Width = 200, ToolTipText = "Buscar por CUIT/Nombre" };
+            
+            // Filtro de estado para obras sociales
+            var lblFiltroEstado = new ToolStripLabel("Estado:");
+            var cboFiltroEstadoHost = new ToolStripControlHost(cboFiltroEstadoObrasSociales = new ComboBox
+            {
+                DropDownStyle = ComboBoxStyle.DropDownList,
+                Width = 100
+            });
+            cboFiltroEstadoObrasSociales.Items.AddRange(new object[] { "Todos", "Activo", "Inactivo" });
+            cboFiltroEstadoObrasSociales.SelectedIndex = 0;
+            cboFiltroEstadoObrasSociales.SelectedIndexChanged += (s, e) => ObrasSocialesFiltroEstadoChanged?.Invoke(this, cboFiltroEstadoObrasSociales.SelectedItem.ToString());
+
+            tool.Items.AddRange(new ToolStripItem[] { 
+                btnNuevo, btnEditar, btnEliminar, 
+                new ToolStripSeparator(), 
+                new ToolStripLabel("Buscar:"), txtBuscar,
+                new ToolStripSeparator(),
+                lblFiltroEstado, cboFiltroEstadoHost
+            });
+            
+            gridObrasSociales = new DataGridView { 
+                Dock = DockStyle.Fill, 
+                ReadOnly = true, 
+                AllowUserToAddRows = false, 
+                SelectionMode = DataGridViewSelectionMode.FullRowSelect, 
+                MultiSelect = false, 
+                AutoGenerateColumns = true,
+                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
+            };
+
+            btnNuevo.Click += (s, e) => ObrasSocialesNuevoClick?.Invoke(this, EventArgs.Empty);
+            btnEditar.Click += (s, e) => ObrasSocialesEditarClick?.Invoke(this, EventArgs.Empty);
+            btnEliminar.Click += (s, e) => ObrasSocialesEliminarClick?.Invoke(this, EventArgs.Empty);
+            txtBuscar.TextChanged += (s, e) => ObrasSocialesBuscarTextoChanged?.Invoke(this, txtBuscar.Text);
+
+            var panel = new Panel { Dock = DockStyle.Fill };
+            tool.Dock = DockStyle.Top;
+            panel.Controls.Add(gridObrasSociales);
+            panel.Controls.Add(tool);
+            tab.Controls.Add(panel);
+            return tab;
         }
 
         private TabPage CrearTabCatalogo(string titulo,
@@ -190,8 +238,7 @@ namespace SALC.Views.PanelAdministrador
             };
 
             // Guardar referencia según el título
-            if (titulo.StartsWith("Obras")) gridObrasSociales = grid;
-            else if (titulo.StartsWith("Tipos")) gridTiposAnalisis = grid;
+            if (titulo.StartsWith("Tipos")) gridTiposAnalisis = grid;
             else if (titulo.StartsWith("Métricas")) gridMetricas = grid;
 
             btnNuevo.Click += onNuevo;
@@ -245,6 +292,8 @@ namespace SALC.Views.PanelAdministrador
         public event EventHandler ObrasSocialesEditarClick;
         public event EventHandler ObrasSocialesEliminarClick;
         public event EventHandler<string> ObrasSocialesBuscarTextoChanged;
+        public event EventHandler<string> ObrasSocialesFiltroEstadoChanged;
+        
         public event EventHandler TiposAnalisisNuevoClick;
         public event EventHandler TiposAnalisisEditarClick;
         public event EventHandler TiposAnalisisEliminarClick;

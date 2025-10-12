@@ -33,6 +33,7 @@ namespace SALC.Presenters.ViewsContracts
         event EventHandler ObrasSocialesEditarClick;
         event EventHandler ObrasSocialesEliminarClick;
         event EventHandler<string> ObrasSocialesBuscarTextoChanged;
+        event EventHandler<string> ObrasSocialesFiltroEstadoChanged;
 
         // Datos/selección Obras Sociales
         void CargarObrasSociales(System.Collections.IEnumerable obrasSociales);

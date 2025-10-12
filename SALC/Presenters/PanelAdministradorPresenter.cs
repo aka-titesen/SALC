@@ -105,6 +105,8 @@ namespace SALC.Presenters
         private readonly ObraSocialRepositorio _obraSocialRepo = new ObraSocialRepositorio();
         private string _filtroEstadoUsuariosActual = "Todos";
         private string _filtroEstadoPacientesActual = "Todos";
+        private string _filtroEstadoObrasSocialesActual = "Todos";
+        private List<ObraSocial> _obrasSociales = new List<ObraSocial>();
 
         public PanelAdministradorPresenter(IPanelAdministradorView view)
         {
@@ -135,10 +137,14 @@ namespace SALC.Presenters
             _view.UsuariosDetalleClick += (s, e) => OnUsuariosDetalle();
             _view.UsuariosFiltroEstadoChanged += (s, filtro) => OnUsuariosFiltroEstado(filtro);
 
-            // Catálogos
+            // Catálogos - Obras Sociales
             _view.ObrasSocialesNuevoClick += (s, e) => OnObrasSocialesNuevo();
             _view.ObrasSocialesEditarClick += (s, e) => OnObrasSocialesEditar();
             _view.ObrasSocialesEliminarClick += (s, e) => OnObrasSocialesEliminar();
+            _view.ObrasSocialesBuscarTextoChanged += (s, txt) => OnObrasSocialesBuscar(txt);
+            _view.ObrasSocialesFiltroEstadoChanged += (s, filtro) => OnObrasSocialesFiltroEstado(filtro);
+            
+            // Otros catálogos
             _view.TiposAnalisisNuevoClick += (s, e) => OnTiposAnalisisNuevo();
             _view.TiposAnalisisEditarClick += (s, e) => OnTiposAnalisisEditar();
             _view.TiposAnalisisEliminarClick += (s, e) => OnTiposAnalisisEliminar();
@@ -307,7 +313,10 @@ namespace SALC.Presenters
         {
             try
             {
-                _view.CargarObrasSociales(_catalogoService.ObtenerObrasSociales().ToList());
+                // Cargar obras sociales
+                _obrasSociales = _catalogoService.ObtenerObrasSociales().OrderBy(os => os.Nombre).ToList();
+                AplicarFiltrosObrasSociales();
+                
                 _view.CargarTiposAnalisis(_catalogoService.ObtenerTiposAnalisis().ToList());
                 _view.CargarMetricas(_catalogoService.ObtenerMetricas().ToList());
             }
@@ -317,32 +326,134 @@ namespace SALC.Presenters
             }
         }
 
-        // Catálogos — Obras Sociales
+        private void AplicarFiltrosObrasSociales()
+        {
+            IEnumerable<ObraSocial> obrasSocialesFiltradas = _obrasSociales;
+
+            // Filtro por estado
+            if (_filtroEstadoObrasSocialesActual != "Todos")
+            {
+                obrasSocialesFiltradas = obrasSocialesFiltradas.Where(os => os.Estado == _filtroEstadoObrasSocialesActual);
+            }
+
+            _view.CargarObrasSociales(obrasSocialesFiltradas.ToList());
+        }
+
+        private void OnObrasSocialesFiltroEstado(string filtro)
+        {
+            _filtroEstadoObrasSocialesActual = filtro ?? "Todos";
+            AplicarFiltrosObrasSociales();
+        }
+
+        private void OnObrasSocialesBuscar(string txt)
+        {
+            var q = txt?.Trim().ToLowerInvariant();
+            IEnumerable<ObraSocial> src = _obrasSociales;
+
+            // Aplicar filtro de estado
+            if (_filtroEstadoObrasSocialesActual != "Todos")
+            {
+                src = src.Where(os => os.Estado == _filtroEstadoObrasSocialesActual);
+            }
+
+            // Aplicar filtro de búsqueda
+            if (!string.IsNullOrEmpty(q))
+            {
+                src = src.Where(os => os.Nombre.ToLowerInvariant().Contains(q)
+                    || os.Cuit.ToLowerInvariant().Contains(q));
+            }
+            
+            _view.CargarObrasSociales(src.ToList());
+        }
+
+        // Catálogos — Obras Sociales con formulario profesional
         private void OnObrasSocialesNuevo()
         {
-            var nombre = PromptInput("Nombre de la Obra Social:");
-            if (string.IsNullOrWhiteSpace(nombre)) return;
-            var cuit = PromptInput("CUIT (10-13 caracteres):");
-            if (string.IsNullOrWhiteSpace(cuit)) return;
-            try { _catalogoService.CrearObraSocial(new ObraSocial { Nombre = nombre.Trim(), Cuit = cuit.Trim() }); CargarCatalogos(); _view.MostrarMensaje("Obra Social creada.", "Catálogos"); }
-            catch (System.Exception ex) { _view.MostrarMensaje("Error: " + ex.Message, "Catálogos", true); }
+            using (var dlg = new FrmObraSocialEdit())
+            {
+                if (dlg.ShowDialog() == DialogResult.OK)
+                {
+                    try
+                    {
+                        var obraSocial = dlg.ObtenerObraSocial();
+                        _catalogoService.CrearObraSocial(obraSocial);
+                        CargarCatalogos();
+                        _view.MostrarMensaje("Obra Social creada correctamente.", "Obras Sociales");
+                    }
+                    catch (System.Exception ex)
+                    {
+                        _view.MostrarMensaje("Error al crear obra social: " + ex.Message, "Obras Sociales", true);
+                    }
+                }
+            }
         }
 
         private void OnObrasSocialesEditar()
         {
-            var id = _view.ObtenerObraSocialSeleccionadaId(); if (id == null) { _view.MostrarMensaje("Seleccione una Obra Social."); return; }
-            var nombre = PromptInput("Nuevo nombre:"); if (string.IsNullOrWhiteSpace(nombre)) return;
-            var cuit = PromptInput("Nuevo CUIT:"); if (string.IsNullOrWhiteSpace(cuit)) return;
-            try { _catalogoService.ActualizarObraSocial(new ObraSocial { IdObraSocial = id.Value, Nombre = nombre.Trim(), Cuit = cuit.Trim() }); CargarCatalogos(); _view.MostrarMensaje("Obra Social actualizada.", "Catálogos"); }
-            catch (System.Exception ex) { _view.MostrarMensaje("Error: " + ex.Message, "Catálogos", true); }
+            var id = _view.ObtenerObraSocialSeleccionadaId();
+            if (id == null)
+            {
+                _view.MostrarMensaje("Seleccione una obra social para editar.", "Obras Sociales");
+                return;
+            }
+
+            var existente = _obrasSociales.FirstOrDefault(os => os.IdObraSocial == id.Value);
+            if (existente == null)
+            {
+                _view.MostrarMensaje("No se encontró la obra social seleccionada.", "Obras Sociales", true);
+                return;
+            }
+
+            using (var dlg = new FrmObraSocialEdit(existente))
+            {
+                if (dlg.ShowDialog() == DialogResult.OK)
+                {
+                    try
+                    {
+                        var obraSocial = dlg.ObtenerObraSocial();
+                        _catalogoService.ActualizarObraSocial(obraSocial);
+                        CargarCatalogos();
+                        _view.MostrarMensaje("Obra Social actualizada correctamente.", "Obras Sociales");
+                    }
+                    catch (System.Exception ex)
+                    {
+                        _view.MostrarMensaje("Error al actualizar obra social: " + ex.Message, "Obras Sociales", true);
+                    }
+                }
+            }
         }
 
         private void OnObrasSocialesEliminar()
         {
-            var id = _view.ObtenerObraSocialSeleccionadaId(); if (id == null) { _view.MostrarMensaje("Seleccione una Obra Social."); return; }
-            if (MessageBox.Show("¿Desactivar Obra Social? (Se marcará como inactiva)", "Confirmar Baja Lógica", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) return;
-            try { _catalogoService.EliminarObraSocial(id.Value); CargarCatalogos(); _view.MostrarMensaje("Obra Social desactivada.", "Catálogos"); }
-            catch (System.Exception ex) { _view.MostrarMensaje("Error: " + ex.Message, "Catálogos", true); }
+            var id = _view.ObtenerObraSocialSeleccionadaId();
+            if (id == null)
+            {
+                _view.MostrarMensaje("Seleccione una obra social para desactivar.", "Obras Sociales");
+                return;
+            }
+
+            var obraSocial = _obrasSociales.FirstOrDefault(os => os.IdObraSocial == id.Value);
+            if (obraSocial == null) return;
+
+            var confirm = MessageBox.Show(
+                $"¿Desactivar obra social '{obraSocial.Nombre}'?\n\n" +
+                "La obra social se marcará como inactiva pero se conservarán todos los datos asociados.",
+                "Confirmar Baja Lógica", 
+                MessageBoxButtons.YesNo, 
+                MessageBoxIcon.Question);
+                
+            if (confirm != DialogResult.Yes) return;
+
+            try
+            {
+                _catalogoService.EliminarObraSocial(id.Value);
+                CargarCatalogos();
+                _view.MostrarMensaje("Obra Social desactivada correctamente.", "Obras Sociales");
+            }
+            catch (System.Exception ex)
+            {
+                _view.MostrarMensaje("Error al desactivar obra social: " + ex.Message, "Obras Sociales", true);
+            }
         }
 
         // Catálogos — Tipos de Análisis
