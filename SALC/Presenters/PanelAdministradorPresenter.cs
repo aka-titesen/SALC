@@ -48,19 +48,63 @@ namespace SALC.Presenters
         }
     }
 
+    // ViewModel para mostrar información enriquecida de pacientes en la grilla
+    public class PacienteViewModel
+    {
+        public int Dni { get; set; }
+        public string Nombre { get; set; }
+        public string Apellido { get; set; }
+        public DateTime FechaNac { get; set; }
+        public string Sexo { get; set; }
+        public string Email { get; set; }
+        public string Telefono { get; set; }
+        public string ObraSocial { get; set; }
+        public string Estado { get; set; }
+
+        public static PacienteViewModel FromPaciente(Paciente paciente, string nombreObraSocial = null)
+        {
+            return new PacienteViewModel
+            {
+                Dni = paciente.Dni,
+                Nombre = paciente.Nombre,
+                Apellido = paciente.Apellido,
+                FechaNac = paciente.FechaNac,
+                Sexo = ObtenerDescripcionSexo(paciente.Sexo),
+                Email = string.IsNullOrWhiteSpace(paciente.Email) ? "-" : paciente.Email,
+                Telefono = string.IsNullOrWhiteSpace(paciente.Telefono) ? "-" : paciente.Telefono,
+                ObraSocial = nombreObraSocial ?? "Sin obra social",
+                Estado = paciente.Estado
+            };
+        }
+
+        private static string ObtenerDescripcionSexo(char sexo)
+        {
+            switch (sexo)
+            {
+                case 'M': return "Masculino";
+                case 'F': return "Femenino";
+                case 'X': return "Otro";
+                default: return "No especificado";
+            }
+        }
+    }
+
     public class PanelAdministradorPresenter
     {
         private readonly IPanelAdministradorView _view;
         private readonly IBackupService _backupService;
         private readonly IPacienteService _pacienteService;
         private List<Paciente> _pacientes = new List<Paciente>();
+        private List<PacienteViewModel> _pacientesViewModel = new List<PacienteViewModel>();
         private readonly IUsuarioService _usuarioService = new UsuarioService();
         private List<Usuario> _usuarios = new List<Usuario>();
         private List<UsuarioViewModel> _usuariosViewModel = new List<UsuarioViewModel>();
         private readonly ICatalogoService _catalogoService = new CatalogoService();
         private readonly MedicoRepositorio _medicoRepo = new MedicoRepositorio();
         private readonly AsistenteRepositorio _asistenteRepo = new AsistenteRepositorio();
-        private string _filtroEstadoActual = "Todos";
+        private readonly ObraSocialRepositorio _obraSocialRepo = new ObraSocialRepositorio();
+        private string _filtroEstadoUsuariosActual = "Todos";
+        private string _filtroEstadoPacientesActual = "Todos";
 
         public PanelAdministradorPresenter(IPanelAdministradorView view)
         {
@@ -76,6 +120,8 @@ namespace SALC.Presenters
             _view.PacientesEditarClick += (s, e) => OnPacientesEditar();
             _view.PacientesEliminarClick += (s, e) => OnPacientesEliminar();
             _view.PacientesBuscarTextoChanged += (s, txt) => OnPacientesBuscar(txt);
+            _view.PacientesDetalleClick += (s, e) => OnPacientesDetalle();
+            _view.PacientesFiltroEstadoChanged += (s, filtro) => OnPacientesFiltroEstado(filtro);
 
             CargarListadoPacientes();
             CargarListadoUsuarios();
@@ -187,9 +233,9 @@ namespace SALC.Presenters
             IEnumerable<UsuarioViewModel> usuariosFiltrados = _usuariosViewModel;
 
             // Filtro por estado
-            if (_filtroEstadoActual != "Todos")
+            if (_filtroEstadoUsuariosActual != "Todos")
             {
-                usuariosFiltrados = usuariosFiltrados.Where(u => u.Estado == _filtroEstadoActual);
+                usuariosFiltrados = usuariosFiltrados.Where(u => u.Estado == _filtroEstadoUsuariosActual);
             }
 
             _view.CargarUsuarios(usuariosFiltrados.ToList());
@@ -197,8 +243,64 @@ namespace SALC.Presenters
 
         private void OnUsuariosFiltroEstado(string filtro)
         {
-            _filtroEstadoActual = filtro ?? "Todos";
+            _filtroEstadoUsuariosActual = filtro ?? "Todos";
             AplicarFiltrosUsuarios();
+        }
+
+        private void CargarListadoPacientes()
+        {
+            try
+            {
+                _pacientes = _pacienteService.ObtenerTodos().OrderBy(p => p.Apellido).ThenBy(p => p.Nombre).ToList();
+                GenerarViewModelsPacientes();
+                AplicarFiltrosPacientes();
+            }
+            catch (System.Exception ex)
+            {
+                _view.MostrarMensaje("Error cargando pacientes: " + ex.Message, "Pacientes", true);
+            }
+        }
+
+        private void GenerarViewModelsPacientes()
+        {
+            _pacientesViewModel = new List<PacienteViewModel>();
+            foreach (var paciente in _pacientes)
+            {
+                string nombreObraSocial = null;
+                try
+                {
+                    if (paciente.IdObraSocial.HasValue)
+                    {
+                        var obraSocial = _obraSocialRepo.ObtenerPorId(paciente.IdObraSocial.Value);
+                        nombreObraSocial = obraSocial?.Nombre;
+                    }
+                }
+                catch (Exception)
+                {
+                    nombreObraSocial = "Error al cargar obra social";
+                }
+
+                _pacientesViewModel.Add(PacienteViewModel.FromPaciente(paciente, nombreObraSocial));
+            }
+        }
+
+        private void AplicarFiltrosPacientes()
+        {
+            IEnumerable<PacienteViewModel> pacientesFiltrados = _pacientesViewModel;
+
+            // Filtro por estado
+            if (_filtroEstadoPacientesActual != "Todos")
+            {
+                pacientesFiltrados = pacientesFiltrados.Where(p => p.Estado == _filtroEstadoPacientesActual);
+            }
+
+            _view.CargarPacientes(pacientesFiltrados.ToList());
+        }
+
+        private void OnPacientesFiltroEstado(string filtro)
+        {
+            _filtroEstadoPacientesActual = filtro ?? "Todos";
+            AplicarFiltrosPacientes();
         }
 
         private void CargarCatalogos()
@@ -308,9 +410,9 @@ namespace SALC.Presenters
             IEnumerable<UsuarioViewModel> src = _usuariosViewModel;
 
             // Aplicar filtro de estado
-            if (_filtroEstadoActual != "Todos")
+            if (_filtroEstadoUsuariosActual != "Todos")
             {
-                src = src.Where(u => u.Estado == _filtroEstadoActual);
+                src = src.Where(u => u.Estado == _filtroEstadoUsuariosActual);
             }
 
             // Aplicar filtro de búsqueda
@@ -323,6 +425,28 @@ namespace SALC.Presenters
             }
             
             _view.CargarUsuarios(src.ToList());
+        }
+
+        private void OnPacientesBuscar(string txt)
+        {
+            var q = txt?.Trim().ToLowerInvariant();
+            IEnumerable<PacienteViewModel> src = _pacientesViewModel;
+
+            // Aplicar filtro de estado
+            if (_filtroEstadoPacientesActual != "Todos")
+            {
+                src = src.Where(p => p.Estado == _filtroEstadoPacientesActual);
+            }
+
+            // Aplicar filtro de búsqueda
+            if (!string.IsNullOrEmpty(q))
+            {
+                src = src.Where(p => p.Apellido.ToLowerInvariant().Contains(q)
+                    || p.Nombre.ToLowerInvariant().Contains(q)
+                    || p.Dni.ToString().Contains(q));
+            }
+            
+            _view.CargarPacientes(src.ToList());
         }
 
         private void OnUsuariosNuevo()
@@ -439,32 +563,6 @@ namespace SALC.Presenters
             }
         }
 
-        private void CargarListadoPacientes()
-        {
-            try
-            {
-                _pacientes = _pacienteService.ObtenerTodos().OrderBy(p => p.Apellido).ThenBy(p => p.Nombre).ToList();
-                _view.CargarPacientes(_pacientes);
-            }
-            catch (System.Exception ex)
-            {
-                _view.MostrarMensaje("Error cargando pacientes: " + ex.Message, "Pacientes", true);
-            }
-        }
-
-        private void OnPacientesBuscar(string txt)
-        {
-            var q = txt?.Trim().ToLowerInvariant();
-            IEnumerable<Paciente> src = _pacientes;
-            if (!string.IsNullOrEmpty(q))
-            {
-                src = _pacientes.Where(p => p.Apellido.ToLowerInvariant().Contains(q)
-                    || p.Nombre.ToLowerInvariant().Contains(q)
-                    || p.Dni.ToString().Contains(q));
-            }
-            _view.CargarPacientes(src.ToList());
-        }
-
         private void OnPacientesNuevo()
         {
             using (var dlg = new SALC.Views.PanelAdministrador.FrmPacienteEdit())
@@ -545,6 +643,35 @@ namespace SALC.Presenters
             catch (System.Exception ex)
             {
                 _view.MostrarMensaje("Error al desactivar paciente: " + ex.Message, "Pacientes", true);
+            }
+        }
+
+        private void OnPacientesDetalle()
+        {
+            var dni = _view.ObtenerPacienteSeleccionadoDni();
+            if (dni == null)
+            {
+                _view.MostrarMensaje("Seleccione un paciente para ver los detalles.", "Pacientes");
+                return;
+            }
+
+            var paciente = _pacientes.FirstOrDefault(p => p.Dni == dni.Value);
+            if (paciente == null)
+            {
+                _view.MostrarMensaje("No se encontró el paciente seleccionado.", "Pacientes", true);
+                return;
+            }
+
+            try
+            {
+                using (var dlg = new SALC.Views.PanelAdministrador.FrmPacienteDetalle(paciente))
+                {
+                    dlg.ShowDialog();
+                }
+            }
+            catch (System.Exception ex)
+            {
+                _view.MostrarMensaje("Error al mostrar detalles del paciente: " + ex.Message, "Pacientes", true);
             }
         }
     }

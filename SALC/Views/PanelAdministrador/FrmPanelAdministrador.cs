@@ -14,8 +14,9 @@ namespace SALC.Views.PanelAdministrador
         private DataGridView gridTiposAnalisis;
         private DataGridView gridMetricas;
 
-        // Controles adicionales para usuarios
+        // Controles adicionales para usuarios y pacientes
         private ComboBox cboFiltroEstadoUsuarios;
+        private ComboBox cboFiltroEstadoPacientes;
 
         public FrmPanelAdministrador()
         {
@@ -92,8 +93,28 @@ namespace SALC.Views.PanelAdministrador
             var btnNuevo = new ToolStripButton("Nuevo");
             var btnEditar = new ToolStripButton("Editar");
             var btnEliminar = new ToolStripButton("Eliminar");
+            var btnDetalle = new ToolStripButton("Ver Detalle");
             var txtBuscar = new ToolStripTextBox { Width = 200, ToolTipText = "Buscar por DNI/Apellido" };
-            tool.Items.AddRange(new ToolStripItem[] { btnNuevo, btnEditar, btnEliminar, new ToolStripSeparator(), new ToolStripLabel("Buscar:"), txtBuscar });
+            
+            // Filtro de estado para pacientes
+            var lblFiltroEstado = new ToolStripLabel("Estado:");
+            var cboFiltroEstadoHost = new ToolStripControlHost(cboFiltroEstadoPacientes = new ComboBox
+            {
+                DropDownStyle = ComboBoxStyle.DropDownList,
+                Width = 100
+            });
+            cboFiltroEstadoPacientes.Items.AddRange(new object[] { "Todos", "Activo", "Inactivo" });
+            cboFiltroEstadoPacientes.SelectedIndex = 0;
+            cboFiltroEstadoPacientes.SelectedIndexChanged += (s, e) => PacientesFiltroEstadoChanged?.Invoke(this, cboFiltroEstadoPacientes.SelectedItem.ToString());
+
+            tool.Items.AddRange(new ToolStripItem[] { 
+                btnNuevo, btnEditar, btnEliminar, btnDetalle,
+                new ToolStripSeparator(), 
+                new ToolStripLabel("Buscar:"), txtBuscar,
+                new ToolStripSeparator(),
+                lblFiltroEstado, cboFiltroEstadoHost
+            });
+            
             gridPacientes = new DataGridView { 
                 Dock = DockStyle.Fill, 
                 ReadOnly = true, 
@@ -107,6 +128,7 @@ namespace SALC.Views.PanelAdministrador
             btnNuevo.Click += (s, e) => PacientesNuevoClick?.Invoke(this, EventArgs.Empty);
             btnEditar.Click += (s, e) => PacientesEditarClick?.Invoke(this, EventArgs.Empty);
             btnEliminar.Click += (s, e) => PacientesEliminarClick?.Invoke(this, EventArgs.Empty);
+            btnDetalle.Click += (s, e) => PacientesDetalleClick?.Invoke(this, EventArgs.Empty);
             txtBuscar.TextChanged += (s, e) => PacientesBuscarTextoChanged?.Invoke(this, txtBuscar.Text);
 
             var panel = new Panel { Dock = DockStyle.Fill };
@@ -214,6 +236,11 @@ namespace SALC.Views.PanelAdministrador
         public event EventHandler PacientesEditarClick;
         public event EventHandler PacientesEliminarClick;
         public event EventHandler<string> PacientesBuscarTextoChanged;
+        
+        // Nuevos eventos para pacientes
+        public event EventHandler PacientesDetalleClick;
+        public event EventHandler<string> PacientesFiltroEstadoChanged;
+        
         public event EventHandler ObrasSocialesNuevoClick;
         public event EventHandler ObrasSocialesEditarClick;
         public event EventHandler ObrasSocialesEliminarClick;

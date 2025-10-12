@@ -21,6 +21,8 @@ namespace SALC.Presenters.ViewsContracts
         event EventHandler PacientesEditarClick;
         event EventHandler PacientesEliminarClick;
         event EventHandler<string> PacientesBuscarTextoChanged;
+        event EventHandler PacientesDetalleClick;
+        event EventHandler<string> PacientesFiltroEstadoChanged;
 
         // Datos/selección Pacientes
         void CargarPacientes(System.Collections.IEnumerable pacientes);

@@ -52,6 +52,7 @@
     <Compile Include="Views\PanelMedico\FrmPanelMedico.cs" />
     <Compile Include="Views\PanelAdministrador\FrmPanelAdministrador.cs" />
   <Compile Include="Views\PanelAdministrador\FrmPacienteEdit.cs" />
+  <Compile Include="Views\PanelAdministrador\FrmPacienteDetalle.cs" />
   <Compile Include="Views\PanelAdministrador\FrmUsuarioEdit.cs" />
   <Compile Include="Views\PanelAdministrador\FrmUsuarioDetalle.cs" />
   <Compile Include="Views\Compartidos\SeleccionAnalisisControl.cs" />
@@ -88,6 +89,7 @@
     <Compile Include="DAL\AnalisisMetricaRepositorio.cs" />
     <Compile Include="DAL\MedicoRepositorio.cs" />
     <Compile Include="DAL\AsistenteRepositorio.cs" />
+    <Compile Include="DAL\ObraSocialRepositorio.cs" />
     <Compile Include="DAL\IRepositorioBase.cs" />
     <Compile Include="Infraestructura\DbConexion.cs" />
   <Compile Include="Infraestructura\DbHealth.cs" />
