@@ -106,7 +106,9 @@ namespace SALC.Presenters
         private string _filtroEstadoUsuariosActual = "Todos";
         private string _filtroEstadoPacientesActual = "Todos";
         private string _filtroEstadoObrasSocialesActual = "Todos";
+        private string _filtroEstadoTiposAnalisisActual = "Todos";
         private List<ObraSocial> _obrasSociales = new List<ObraSocial>();
+        private List<TipoAnalisis> _tiposAnalisis = new List<TipoAnalisis>();
 
         public PanelAdministradorPresenter(IPanelAdministradorView view)
         {
@@ -144,10 +146,14 @@ namespace SALC.Presenters
             _view.ObrasSocialesBuscarTextoChanged += (s, txt) => OnObrasSocialesBuscar(txt);
             _view.ObrasSocialesFiltroEstadoChanged += (s, filtro) => OnObrasSocialesFiltroEstado(filtro);
             
-            // Otros catálogos
+            // Catálogos - Tipos de Análisis
             _view.TiposAnalisisNuevoClick += (s, e) => OnTiposAnalisisNuevo();
             _view.TiposAnalisisEditarClick += (s, e) => OnTiposAnalisisEditar();
             _view.TiposAnalisisEliminarClick += (s, e) => OnTiposAnalisisEliminar();
+            _view.TiposAnalisisBuscarTextoChanged += (s, txt) => OnTiposAnalisisBuscar(txt);
+            _view.TiposAnalisisFiltroEstadoChanged += (s, filtro) => OnTiposAnalisisFiltroEstado(filtro);
+            
+            // Otros catálogos
             _view.MetricasNuevoClick += (s, e) => OnMetricasNuevo();
             _view.MetricasEditarClick += (s, e) => OnMetricasEditar();
             _view.MetricasEliminarClick += (s, e) => OnMetricasEliminar();
@@ -317,7 +323,10 @@ namespace SALC.Presenters
                 _obrasSociales = _catalogoService.ObtenerObrasSociales().OrderBy(os => os.Nombre).ToList();
                 AplicarFiltrosObrasSociales();
                 
-                _view.CargarTiposAnalisis(_catalogoService.ObtenerTiposAnalisis().ToList());
+                // Cargar tipos de análisis
+                _tiposAnalisis = _catalogoService.ObtenerTiposAnalisis().OrderBy(ta => ta.Descripcion).ToList();
+                AplicarFiltrosTiposAnalisis();
+                
                 _view.CargarMetricas(_catalogoService.ObtenerMetricas().ToList());
             }
             catch (System.Exception ex)
@@ -364,6 +373,45 @@ namespace SALC.Presenters
             }
             
             _view.CargarObrasSociales(src.ToList());
+        }
+
+        private void AplicarFiltrosTiposAnalisis()
+        {
+            IEnumerable<TipoAnalisis> tiposAnalisisFiltrados = _tiposAnalisis;
+
+            // Filtro por estado
+            if (_filtroEstadoTiposAnalisisActual != "Todos")
+            {
+                tiposAnalisisFiltrados = tiposAnalisisFiltrados.Where(ta => ta.Estado == _filtroEstadoTiposAnalisisActual);
+            }
+
+            _view.CargarTiposAnalisis(tiposAnalisisFiltrados.ToList());
+        }
+
+        private void OnTiposAnalisisFiltroEstado(string filtro)
+        {
+            _filtroEstadoTiposAnalisisActual = filtro ?? "Todos";
+            AplicarFiltrosTiposAnalisis();
+        }
+
+        private void OnTiposAnalisisBuscar(string txt)
+        {
+            var q = txt?.Trim().ToLowerInvariant();
+            IEnumerable<TipoAnalisis> src = _tiposAnalisis;
+
+            // Aplicar filtro de estado
+            if (_filtroEstadoTiposAnalisisActual != "Todos")
+            {
+                src = src.Where(ta => ta.Estado == _filtroEstadoTiposAnalisisActual);
+            }
+
+            // Aplicar filtro de búsqueda
+            if (!string.IsNullOrEmpty(q))
+            {
+                src = src.Where(ta => ta.Descripcion.ToLowerInvariant().Contains(q));
+            }
+            
+            _view.CargarTiposAnalisis(src.ToList());
         }
 
         // Catálogos — Obras Sociales con formulario profesional
@@ -456,26 +504,94 @@ namespace SALC.Presenters
             }
         }
 
-        // Catálogos — Tipos de Análisis
+        // Catálogos — Tipos de Análisis con formulario profesional
         private void OnTiposAnalisisNuevo()
         {
-            var desc = PromptInput("Descripción del tipo de análisis:"); if (string.IsNullOrWhiteSpace(desc)) return;
-            try { _catalogoService.CrearTipoAnalisis(new TipoAnalisis { Descripcion = desc.Trim() }); CargarCatalogos(); _view.MostrarMensaje("Tipo de análisis creado.", "Catálogos"); }
-            catch (System.Exception ex) { _view.MostrarMensaje("Error: " + ex.Message, "Catálogos", true); }
+            using (var dlg = new FrmTipoAnalisisEdit())
+            {
+                if (dlg.ShowDialog() == DialogResult.OK)
+                {
+                    try
+                    {
+                        var tipoAnalisis = dlg.ObtenerTipoAnalisis();
+                        _catalogoService.CrearTipoAnalisis(tipoAnalisis);
+                        CargarCatalogos();
+                        _view.MostrarMensaje("Tipo de análisis creado correctamente.", "Tipos de Análisis");
+                    }
+                    catch (System.Exception ex)
+                    {
+                        _view.MostrarMensaje("Error al crear tipo de análisis: " + ex.Message, "Tipos de Análisis", true);
+                    }
+                }
+            }
         }
+
         private void OnTiposAnalisisEditar()
         {
-            var id = _view.ObtenerTipoAnalisisSeleccionadoId(); if (id == null) { _view.MostrarMensaje("Seleccione un tipo de análisis."); return; }
-            var desc = PromptInput("Nueva descripción:"); if (string.IsNullOrWhiteSpace(desc)) return;
-            try { _catalogoService.ActualizarTipoAnalisis(new TipoAnalisis { IdTipoAnalisis = id.Value, Descripcion = desc.Trim() }); CargarCatalogos(); _view.MostrarMensaje("Tipo de análisis actualizado.", "Catálogos"); }
-            catch (System.Exception ex) { _view.MostrarMensaje("Error: " + ex.Message, "Catálogos", true); }
+            var id = _view.ObtenerTipoAnalisisSeleccionadoId();
+            if (id == null)
+            {
+                _view.MostrarMensaje("Seleccione un tipo de análisis para editar.", "Tipos de Análisis");
+                return;
+            }
+
+            var existente = _tiposAnalisis.FirstOrDefault(ta => ta.IdTipoAnalisis == id.Value);
+            if (existente == null)
+            {
+                _view.MostrarMensaje("No se encontró el tipo de análisis seleccionado.", "Tipos de Análisis", true);
+                return;
+            }
+
+            using (var dlg = new FrmTipoAnalisisEdit(existente))
+            {
+                if (dlg.ShowDialog() == DialogResult.OK)
+                {
+                    try
+                    {
+                        var tipoAnalisis = dlg.ObtenerTipoAnalisis();
+                        _catalogoService.ActualizarTipoAnalisis(tipoAnalisis);
+                        CargarCatalogos();
+                        _view.MostrarMensaje("Tipo de análisis actualizado correctamente.", "Tipos de Análisis");
+                    }
+                    catch (System.Exception ex)
+                    {
+                        _view.MostrarMensaje("Error al actualizar tipo de análisis: " + ex.Message, "Tipos de Análisis", true);
+                    }
+                }
+            }
         }
+
         private void OnTiposAnalisisEliminar()
         {
-            var id = _view.ObtenerTipoAnalisisSeleccionadoId(); if (id == null) { _view.MostrarMensaje("Seleccione un tipo de análisis."); return; }
-            if (MessageBox.Show("¿Desactivar tipo de análisis? (Se marcará como inactivo)", "Confirmar Baja Lógica", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) return;
-            try { _catalogoService.EliminarTipoAnalisis(id.Value); CargarCatalogos(); _view.MostrarMensaje("Tipo de análisis desactivado.", "Catálogos"); }
-            catch (System.Exception ex) { _view.MostrarMensaje("Error: " + ex.Message, "Catálogos", true); }
+            var id = _view.ObtenerTipoAnalisisSeleccionadoId();
+            if (id == null)
+            {
+                _view.MostrarMensaje("Seleccione un tipo de análisis para desactivar.", "Tipos de Análisis");
+                return;
+            }
+
+            var tipoAnalisis = _tiposAnalisis.FirstOrDefault(ta => ta.IdTipoAnalisis == id.Value);
+            if (tipoAnalisis == null) return;
+
+            var confirm = MessageBox.Show(
+                $"¿Desactivar tipo de análisis '{tipoAnalisis.Descripcion}'?\n\n" +
+                "El tipo de análisis se marcará como inactivo pero se conservarán todos los datos asociados.",
+                "Confirmar Baja Lógica", 
+                MessageBoxButtons.YesNo, 
+                MessageBoxIcon.Question);
+                
+            if (confirm != DialogResult.Yes) return;
+
+            try
+            {
+                _catalogoService.EliminarTipoAnalisis(id.Value);
+                CargarCatalogos();
+                _view.MostrarMensaje("Tipo de análisis desactivado correctamente.", "Tipos de Análisis");
+            }
+            catch (System.Exception ex)
+            {
+                _view.MostrarMensaje("Error al desactivar tipo de análisis: " + ex.Message, "Tipos de Análisis", true);
+            }
         }
 
         // Catálogos — Métricas

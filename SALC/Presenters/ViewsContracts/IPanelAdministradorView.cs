@@ -28,7 +28,7 @@ namespace SALC.Presenters.ViewsContracts
         void CargarPacientes(System.Collections.IEnumerable pacientes);
         int? ObtenerPacienteSeleccionadoDni();
 
-        // Catálogos
+        // Catálogos - Obras Sociales
         event EventHandler ObrasSocialesNuevoClick;
         event EventHandler ObrasSocialesEditarClick;
         event EventHandler ObrasSocialesEliminarClick;
@@ -39,15 +39,18 @@ namespace SALC.Presenters.ViewsContracts
         void CargarObrasSociales(System.Collections.IEnumerable obrasSociales);
         int? ObtenerObraSocialSeleccionadaId();
 
+        // Catálogos - Tipos de Análisis
         event EventHandler TiposAnalisisNuevoClick;
         event EventHandler TiposAnalisisEditarClick;
         event EventHandler TiposAnalisisEliminarClick;
         event EventHandler<string> TiposAnalisisBuscarTextoChanged;
+        event EventHandler<string> TiposAnalisisFiltroEstadoChanged;
 
         // Datos/selección Tipos de Análisis
         void CargarTiposAnalisis(System.Collections.IEnumerable tiposAnalisis);
         int? ObtenerTipoAnalisisSeleccionadoId();
 
+        // Catálogos - Métricas
         event EventHandler MetricasNuevoClick;
         event EventHandler MetricasEditarClick;
         event EventHandler MetricasEliminarClick;
