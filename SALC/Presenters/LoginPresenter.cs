@@ -45,7 +45,7 @@ namespace SALC.Presenters
                 }
 
                 // Routing por rol: 1=Admin, 2=Médico, 3=Asistente (según lote/ERS)
-                System.Windows.Forms.Form next;
+                System.Windows.Forms.Form next = null;
                 switch (usuario.IdRol)
                 {
                     case 1: // Administrador
@@ -62,6 +62,8 @@ namespace SALC.Presenters
                         next = new Views.PanelAsistente.FrmPanelAsistente();
                         var pav3 = (Views.PanelAsistente.FrmPanelAsistente)next;
                         var asistentePresenter = new PanelAsistentePresenter(pav3);
+                        // Conectar el presenter con la vista para que pueda ser llamado desde eventos
+                        pav3.Tag = asistentePresenter;
                         break;
                     default:
                         _view.MostrarError("Rol de usuario no reconocido.");

@@ -6,14 +6,21 @@ namespace SALC.Presenters.ViewsContracts
 {
     public interface IPanelAsistenteView
     {
-        // Historial pacientes
-        event EventHandler BuscarHistorialClick;
-        string HistorialDniPacienteTexto { get; }
-        void CargarHistorialAnalisis(IEnumerable<Analisis> analisis);
+        // Lista de pacientes con búsqueda
+        event EventHandler BuscarPacientesClick;
+        string BusquedaPacienteTexto { get; }
+        void CargarListaPacientes(IEnumerable<Paciente> pacientes);
+        Paciente PacienteSeleccionado { get; }
 
-        // Generar informe verificado
-        event EventHandler GenerarInformeClick;
-        string AnalisisIdParaInformeTexto { get; }
+        // Historial de análisis
+        event EventHandler VerHistorialClick;
+        void CargarHistorialAnalisis(IEnumerable<object> analisisConEstados);
+        object AnalisisSeleccionado { get; }
+
+        // Acciones para análisis verificados
+        event EventHandler GenerarPdfClick;
+        event EventHandler EnviarInformeClick;
+        void HabilitarAccionesAnalisis(bool habilitar);
 
         // Mensajes
         void MostrarMensaje(string texto, bool esError = false);

@@ -1,6 +1,8 @@
 using System;
+using System.Linq;
 using SALC.Presenters.ViewsContracts;
 using SALC.BLL;
+using SALC.Domain;
 
 namespace SALC.Presenters
 {
@@ -8,45 +10,231 @@ namespace SALC.Presenters
     {
         private readonly IPanelAsistenteView _view;
         private readonly IAnalisisService _analisisService = new AnalisisService();
+        private readonly IPacienteService _pacienteService = new PacienteService();
 
         public PanelAsistentePresenter(IPanelAsistenteView view)
         {
             _view = view;
-            _view.BuscarHistorialClick += (s, e) => OnBuscarHistorial();
-            _view.GenerarInformeClick += (s, e) => OnGenerarInforme();
+            _view.BuscarPacientesClick += (s, e) => OnBuscarPacientes();
+            _view.VerHistorialClick += (s, e) => OnVerHistorial();
+            _view.GenerarPdfClick += (s, e) => OnGenerarPdf();
+            _view.EnviarInformeClick += (s, e) => OnEnviarInforme();
         }
 
-        private void OnBuscarHistorial()
+        public void InicializarVista()
         {
-            if (!int.TryParse(_view.HistorialDniPacienteTexto, out var dniPaciente))
-            {
-                _view.MostrarMensaje("DNI de paciente inválido", true);
-                return;
-            }
-            var lista = _analisisService.ObtenerAnalisisPorPaciente(dniPaciente);
-            _view.CargarHistorialAnalisis(lista);
+            // Cargar todos los pacientes activos al inicializar
+            CargarTodosLosPacientes();
         }
 
-        private void OnGenerarInforme()
+        private void CargarTodosLosPacientes()
         {
-            if (!int.TryParse(_view.AnalisisIdParaInformeTexto, out var idAnalisis))
+            try
             {
-                _view.MostrarMensaje("ID de análisis inválido", true);
-                return;
+                var pacientes = _pacienteService.ObtenerActivos();
+                _view.CargarListaPacientes(pacientes);
             }
-            var a = _analisisService.ObtenerAnalisisPorId(idAnalisis);
-            if (a == null)
+            catch (Exception ex)
             {
-                _view.MostrarMensaje("Análisis no encontrado", true);
-                return;
+                _view.MostrarMensaje($"Error al cargar pacientes: {ex.Message}", true);
             }
-            if (a.IdEstado != 2) // 2 = Verificado
+        }
+
+        private void OnBuscarPacientes()
+        {
+            try
             {
-                _view.MostrarMensaje("Solo se puede generar informe para análisis Verificado", true);
-                return;
+                var textoBusqueda = _view.BusquedaPacienteTexto?.Trim();
+                
+                if (string.IsNullOrEmpty(textoBusqueda))
+                {
+                    // Si no hay texto, mostrar todos los pacientes
+                    CargarTodosLosPacientes();
+                    return;
+                }
+
+                var pacientes = _pacienteService.ObtenerActivos();
+                
+                // Buscar por DNI o apellido
+                if (int.TryParse(textoBusqueda, out int dni))
+                {
+                    // Búsqueda por DNI
+                    pacientes = pacientes.Where(p => p.Dni.ToString().Contains(textoBusqueda));
+                }
+                else
+                {
+                    // Búsqueda por apellido (case-insensitive)
+                    pacientes = pacientes.Where(p => p.Apellido.ToLower().Contains(textoBusqueda.ToLower()));
+                }
+
+                _view.CargarListaPacientes(pacientes);
             }
-            // Stub de informe: se implementará en Sprint 9
-            _view.MostrarMensaje("Generación de informe (PDF) pendiente para Sprint 9");
+            catch (Exception ex)
+            {
+                _view.MostrarMensaje($"Error en la búsqueda: {ex.Message}", true);
+            }
+        }
+
+        private void OnVerHistorial()
+        {
+            try
+            {
+                var pacienteSeleccionado = _view.PacienteSeleccionado;
+                if (pacienteSeleccionado == null)
+                {
+                    _view.MostrarMensaje("Seleccione un paciente para ver su historial.", true);
+                    return;
+                }
+
+                // Obtener TODOS los análisis del paciente (incluyendo anulados)
+                var analisis = _analisisService.ObtenerAnalisisPorPaciente(pacienteSeleccionado.Dni);
+                
+                // Crear objetos con información completa para mostrar en el grid
+                var analisisCompletos = analisis.Select(a => new
+                {
+                    IdAnalisis = a.IdAnalisis,
+                    TipoAnalisis = ObtenerDescripcionTipoAnalisis(a.IdTipoAnalisis),
+                    Estado = ObtenerDescripcionEstado(a.IdEstado),
+                    FechaCreacion = a.FechaCreacion.ToString("dd/MM/yyyy HH:mm"),
+                    FechaFirma = a.FechaFirma?.ToString("dd/MM/yyyy HH:mm") ?? "No firmado",
+                    MedicoCarga = ObtenerNombreMedico(a.DniCarga),
+                    MedicoFirma = a.DniFirma.HasValue ? ObtenerNombreMedico(a.DniFirma.Value) : "Sin firmar",
+                    Observaciones = a.Observaciones ?? ""
+                }).ToList();
+
+                _view.CargarHistorialAnalisis(analisisCompletos);
+                _view.HabilitarAccionesAnalisis(false); // Inicialmente deshabilitado
+            }
+            catch (Exception ex)
+            {
+                _view.MostrarMensaje($"Error al obtener historial: {ex.Message}", true);
+            }
+        }
+
+        private void OnGenerarPdf()
+        {
+            try
+            {
+                var analisisSeleccionado = _view.AnalisisSeleccionado;
+                if (analisisSeleccionado == null)
+                {
+                    _view.MostrarMensaje("Seleccione un análisis para generar el PDF.", true);
+                    return;
+                }
+
+                // Obtener el ID del análisis desde el objeto seleccionado
+                var idAnalisis = (int)analisisSeleccionado.GetType().GetProperty("IdAnalisis").GetValue(analisisSeleccionado);
+                
+                var analisis = _analisisService.ObtenerAnalisisPorId(idAnalisis);
+                if (analisis == null)
+                {
+                    _view.MostrarMensaje("Análisis no encontrado.", true);
+                    return;
+                }
+
+                if (analisis.IdEstado != 2) // 2 = Verificado
+                {
+                    _view.MostrarMensaje("Solo se puede generar PDF para análisis verificados.", true);
+                    return;
+                }
+
+                // TODO: Implementar generación real de PDF
+                _view.MostrarMensaje($"PDF generado exitosamente para el análisis {idAnalisis}.\n(Funcionalidad completa pendiente de implementación)");
+            }
+            catch (Exception ex)
+            {
+                _view.MostrarMensaje($"Error al generar PDF: {ex.Message}", true);
+            }
+        }
+
+        private void OnEnviarInforme()
+        {
+            try
+            {
+                var analisisSeleccionado = _view.AnalisisSeleccionado;
+                if (analisisSeleccionado == null)
+                {
+                    _view.MostrarMensaje("Seleccione un análisis para enviar.", true);
+                    return;
+                }
+
+                var idAnalisis = (int)analisisSeleccionado.GetType().GetProperty("IdAnalisis").GetValue(analisisSeleccionado);
+                
+                var analisis = _analisisService.ObtenerAnalisisPorId(idAnalisis);
+                if (analisis == null)
+                {
+                    _view.MostrarMensaje("Análisis no encontrado.", true);
+                    return;
+                }
+
+                if (analisis.IdEstado != 2) // 2 = Verificado
+                {
+                    _view.MostrarMensaje("Solo se puede enviar informes de análisis verificados.", true);
+                    return;
+                }
+
+                // TODO: Implementar envío real por email/teléfono
+                var paciente = _pacienteService.ObtenerPorDni(analisis.DniPaciente);
+                _view.MostrarMensaje($"Informe enviado exitosamente a {paciente.Nombre} {paciente.Apellido}.\nEmail: {paciente.Email}\nTeléfono: {paciente.Telefono}\n(Funcionalidad completa pendiente de implementación)");
+            }
+            catch (Exception ex)
+            {
+                _view.MostrarMensaje($"Error al enviar informe: {ex.Message}", true);
+            }
+        }
+
+        // Métodos auxiliares para obtener descripciones
+        private string ObtenerDescripcionTipoAnalisis(int idTipo)
+        {
+            // TODO: Implementar consulta real a tipos de análisis
+            switch (idTipo)
+            {
+                case 1: return "Hemograma Completo";
+                case 2: return "Glucosa en Ayunas";
+                case 3: return "Perfil Lipídico Completo";
+                case 4: return "Análisis de Orina Completo";
+                default: return $"Tipo {idTipo}";
+            }
+        }
+
+        private string ObtenerDescripcionEstado(int idEstado)
+        {
+            switch (idEstado)
+            {
+                case 1: return "Sin verificar";
+                case 2: return "Verificado";
+                case 3: return "Anulado";
+                default: return $"Estado {idEstado}";
+            }
+        }
+
+        private string ObtenerNombreMedico(int dniMedico)
+        {
+            // TODO: Implementar consulta real a usuarios/médicos
+            return $"Dr. {dniMedico}";
+        }
+
+        public void SeleccionAnalisisCambiada()
+        {
+            try
+            {
+                var analisisSeleccionado = _view.AnalisisSeleccionado;
+                if (analisisSeleccionado == null)
+                {
+                    _view.HabilitarAccionesAnalisis(false);
+                    return;
+                }
+
+                var estado = analisisSeleccionado.GetType().GetProperty("Estado").GetValue(analisisSeleccionado).ToString();
+                
+                // Solo habilitar acciones para análisis verificados
+                bool esVerificado = estado == "Verificado";
+                _view.HabilitarAccionesAnalisis(esVerificado);
+            }
+            catch
+            {
+                _view.HabilitarAccionesAnalisis(false);
+            }
         }
     }
 }
