@@ -16,18 +16,6 @@ namespace SALC.Presenters.ViewsContracts
         void CargarUsuarios(System.Collections.IEnumerable usuarios);
         int? ObtenerUsuarioSeleccionadoDni();
 
-        // Pacientes
-        event EventHandler PacientesNuevoClick;
-        event EventHandler PacientesEditarClick;
-        event EventHandler PacientesEliminarClick;
-        event EventHandler<string> PacientesBuscarTextoChanged;
-        event EventHandler PacientesDetalleClick;
-        event EventHandler<string> PacientesFiltroEstadoChanged;
-
-        // Datos/selección Pacientes
-        void CargarPacientes(System.Collections.IEnumerable pacientes);
-        int? ObtenerPacienteSeleccionadoDni();
-
         // Catálogos - Obras Sociales
         event EventHandler ObrasSocialesNuevoClick;
         event EventHandler ObrasSocialesEditarClick;
@@ -61,6 +49,9 @@ namespace SALC.Presenters.ViewsContracts
         void CargarMetricas(System.Collections.IEnumerable metricas);
         int? ObtenerMetricaSeleccionadaId();
 
+        // Relaciones Tipo Análisis - Métricas
+        event EventHandler RelacionesTipoAnalisisMetricaGestionarClick;
+        
         // Backups
         event EventHandler EjecutarBackupClick;
         event EventHandler ProgramarBackupClick;

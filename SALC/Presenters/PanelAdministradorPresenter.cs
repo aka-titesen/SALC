@@ -48,63 +48,17 @@ namespace SALC.Presenters
         }
     }
 
-    // ViewModel para mostrar información enriquecida de pacientes en la grilla
-    public class PacienteViewModel
-    {
-        public int Dni { get; set; }
-        public string Nombre { get; set; }
-        public string Apellido { get; set; }
-        public DateTime FechaNac { get; set; }
-        public string Sexo { get; set; }
-        public string Email { get; set; }
-        public string Telefono { get; set; }
-        public string ObraSocial { get; set; }
-        public string Estado { get; set; }
-
-        public static PacienteViewModel FromPaciente(Paciente paciente, string nombreObraSocial = null)
-        {
-            return new PacienteViewModel
-            {
-                Dni = paciente.Dni,
-                Nombre = paciente.Nombre,
-                Apellido = paciente.Apellido,
-                FechaNac = paciente.FechaNac,
-                Sexo = ObtenerDescripcionSexo(paciente.Sexo),
-                Email = string.IsNullOrWhiteSpace(paciente.Email) ? "-" : paciente.Email,
-                Telefono = string.IsNullOrWhiteSpace(paciente.Telefono) ? "-" : paciente.Telefono,
-                ObraSocial = nombreObraSocial ?? "Sin obra social",
-                Estado = paciente.Estado
-            };
-        }
-
-        private static string ObtenerDescripcionSexo(char sexo)
-        {
-            switch (sexo)
-            {
-                case 'M': return "Masculino";
-                case 'F': return "Femenino";
-                case 'X': return "Otro";
-                default: return "No especificado";
-            }
-        }
-    }
-
     public class PanelAdministradorPresenter
     {
         private readonly IPanelAdministradorView _view;
         private readonly IBackupService _backupService;
-        private readonly IPacienteService _pacienteService;
-        private List<Paciente> _pacientes = new List<Paciente>();
-        private List<PacienteViewModel> _pacientesViewModel = new List<PacienteViewModel>();
         private readonly IUsuarioService _usuarioService = new UsuarioService();
         private List<Usuario> _usuarios = new List<Usuario>();
         private List<UsuarioViewModel> _usuariosViewModel = new List<UsuarioViewModel>();
         private readonly ICatalogoService _catalogoService = new CatalogoService();
         private readonly MedicoRepositorio _medicoRepo = new MedicoRepositorio();
         private readonly AsistenteRepositorio _asistenteRepo = new AsistenteRepositorio();
-        private readonly ObraSocialRepositorio _obraSocialRepo = new ObraSocialRepositorio();
         private string _filtroEstadoUsuariosActual = "Todos";
-        private string _filtroEstadoPacientesActual = "Todos";
         private string _filtroEstadoObrasSocialesActual = "Todos";
         private string _filtroEstadoTiposAnalisisActual = "Todos";
         private string _filtroEstadoMetricasActual = "Todos";
@@ -120,16 +74,6 @@ namespace SALC.Presenters
             _view.EjecutarBackupClick += (s, e) => OnEjecutarBackup();
             _view.ProgramarBackupClick += (s, e) => OnProgramarBackup();
 
-            // Pacientes
-            _pacienteService = new PacienteService();
-            _view.PacientesNuevoClick += (s, e) => OnPacientesNuevo();
-            _view.PacientesEditarClick += (s, e) => OnPacientesEditar();
-            _view.PacientesEliminarClick += (s, e) => OnPacientesEliminar();
-            _view.PacientesBuscarTextoChanged += (s, txt) => OnPacientesBuscar(txt);
-            _view.PacientesDetalleClick += (s, e) => OnPacientesDetalle();
-            _view.PacientesFiltroEstadoChanged += (s, filtro) => OnPacientesFiltroEstado(filtro);
-
-            CargarListadoPacientes();
             CargarListadoUsuarios();
             CargarCatalogos();
 
@@ -161,6 +105,9 @@ namespace SALC.Presenters
             _view.MetricasEliminarClick += (s, e) => OnMetricasEliminar();
             _view.MetricasBuscarTextoChanged += (s, txt) => OnMetricasBuscar(txt);
             _view.MetricasFiltroEstadoChanged += (s, filtro) => OnMetricasFiltroEstado(filtro);
+
+            // Relaciones Tipo Análisis - Métricas
+            _view.RelacionesTipoAnalisisMetricaGestionarClick += (s, e) => OnGestionarRelacionesTipoAnalisisMetricas();
         }
 
         private void OnProbarConexion()
@@ -194,6 +141,21 @@ namespace SALC.Presenters
         private void OnProgramarBackup()
         {
             MessageBox.Show("Programación de backups: pendiente de implementación.", "Backup", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void OnGestionarRelacionesTipoAnalisisMetricas()
+        {
+            try
+            {
+                using (var dlg = new FrmGestionRelacionesTipoAnalisisMetricas())
+                {
+                    dlg.ShowDialog();
+                }
+            }
+            catch (Exception ex)
+            {
+                _view.MostrarMensaje("Error al abrir gestión de relaciones: " + ex.Message, "Relaciones Tipo Análisis-Métricas", true);
+            }
         }
 
         private void CargarListadoUsuarios()
@@ -261,62 +223,6 @@ namespace SALC.Presenters
         {
             _filtroEstadoUsuariosActual = filtro ?? "Todos";
             AplicarFiltrosUsuarios();
-        }
-
-        private void CargarListadoPacientes()
-        {
-            try
-            {
-                _pacientes = _pacienteService.ObtenerTodos().OrderBy(p => p.Apellido).ThenBy(p => p.Nombre).ToList();
-                GenerarViewModelsPacientes();
-                AplicarFiltrosPacientes();
-            }
-            catch (System.Exception ex)
-            {
-                _view.MostrarMensaje("Error cargando pacientes: " + ex.Message, "Pacientes", true);
-            }
-        }
-
-        private void GenerarViewModelsPacientes()
-        {
-            _pacientesViewModel = new List<PacienteViewModel>();
-            foreach (var paciente in _pacientes)
-            {
-                string nombreObraSocial = null;
-                try
-                {
-                    if (paciente.IdObraSocial.HasValue)
-                    {
-                        var obraSocial = _obraSocialRepo.ObtenerPorId(paciente.IdObraSocial.Value);
-                        nombreObraSocial = obraSocial?.Nombre;
-                    }
-                }
-                catch (Exception)
-                {
-                    nombreObraSocial = "Error al cargar obra social";
-                }
-
-                _pacientesViewModel.Add(PacienteViewModel.FromPaciente(paciente, nombreObraSocial));
-            }
-        }
-
-        private void AplicarFiltrosPacientes()
-        {
-            IEnumerable<PacienteViewModel> pacientesFiltrados = _pacientesViewModel;
-
-            // Filtro por estado
-            if (_filtroEstadoPacientesActual != "Todos")
-            {
-                pacientesFiltrados = pacientesFiltrados.Where(p => p.Estado == _filtroEstadoPacientesActual);
-            }
-
-            _view.CargarPacientes(pacientesFiltrados.ToList());
-        }
-
-        private void OnPacientesFiltroEstado(string filtro)
-        {
-            _filtroEstadoPacientesActual = filtro ?? "Todos";
-            AplicarFiltrosPacientes();
         }
 
         private void CargarCatalogos()
@@ -753,28 +659,6 @@ namespace SALC.Presenters
             _view.CargarUsuarios(src.ToList());
         }
 
-        private void OnPacientesBuscar(string txt)
-        {
-            var q = txt?.Trim().ToLowerInvariant();
-            IEnumerable<PacienteViewModel> src = _pacientesViewModel;
-
-            // Aplicar filtro de estado
-            if (_filtroEstadoPacientesActual != "Todos")
-            {
-                src = src.Where(p => p.Estado == _filtroEstadoPacientesActual);
-            }
-
-            // Aplicar filtro de búsqueda
-            if (!string.IsNullOrEmpty(q))
-            {
-                src = src.Where(p => p.Apellido.ToLowerInvariant().Contains(q)
-                    || p.Nombre.ToLowerInvariant().Contains(q)
-                    || p.Dni.ToString().Contains(q));
-            }
-            
-            _view.CargarPacientes(src.ToList());
-        }
-
         private void OnUsuariosNuevo()
         {
             using (var dlg = new SALC.Views.PanelAdministrador.FrmUsuarioEdit())
@@ -886,118 +770,6 @@ namespace SALC.Presenters
             catch (System.Exception ex)
             {
                 _view.MostrarMensaje("Error al mostrar detalles del usuario: " + ex.Message, "Usuarios", true);
-            }
-        }
-
-        private void OnPacientesNuevo()
-        {
-            using (var dlg = new SALC.Views.PanelAdministrador.FrmPacienteEdit())
-            {
-                if (dlg.ShowDialog() == DialogResult.OK)
-                {
-                    try
-                    {
-                        var p = dlg.ObtenerPaciente();
-                        _pacienteService.CrearPaciente(p);
-                        CargarListadoPacientes();
-                        _view.MostrarMensaje("Paciente creado correctamente.", "Pacientes");
-                    }
-                    catch (System.Exception ex)
-                    {
-                        _view.MostrarMensaje("Error al crear paciente: " + ex.Message, "Pacientes", true);
-                    }
-                }
-            }
-        }
-
-        private void OnPacientesEditar()
-        {
-            var dni = _view.ObtenerPacienteSeleccionadoDni();
-            if (dni == null)
-            {
-                _view.MostrarMensaje("Seleccione un paciente para editar.", "Pacientes");
-                return;
-            }
-            var existente = _pacientes.FirstOrDefault(p => p.Dni == dni.Value);
-            if (existente == null) return;
-            using (var dlg = new SALC.Views.PanelAdministrador.FrmPacienteEdit(existente))
-            {
-                if (dlg.ShowDialog() == DialogResult.OK)
-                {
-                    try
-                    {
-                        var p = dlg.ObtenerPaciente();
-                        _pacienteService.ActualizarPaciente(p);
-                        CargarListadoPacientes();
-                        _view.MostrarMensaje("Paciente actualizado.", "Pacientes");
-                    }
-                    catch (System.Exception ex)
-                    {
-                        _view.MostrarMensaje("Error al actualizar paciente: " + ex.Message, "Pacientes", true);
-                    }
-                }
-            }
-        }
-
-        private void OnPacientesEliminar()
-        {
-            var dni = _view.ObtenerPacienteSeleccionadoDni();
-            if (dni == null)
-            {
-                _view.MostrarMensaje("Seleccione un paciente para desactivar.", "Pacientes");
-                return;
-            }
-            
-            var paciente = _pacientes.FirstOrDefault(p => p.Dni == dni.Value);
-            if (paciente == null) return;
-            
-            var confirm = MessageBox.Show(
-                $"¿Desactivar paciente {paciente.Nombre} {paciente.Apellido} (DNI: {dni})?\n\n" +
-                "El paciente se marcará como inactivo pero se conservarán todos sus datos y análisis.",
-                "Confirmar Baja Lógica", 
-                MessageBoxButtons.YesNo, 
-                MessageBoxIcon.Question);
-                
-            if (confirm != DialogResult.Yes) return;
-            
-            try
-            {
-                _pacienteService.EliminarPaciente(dni.Value);
-                CargarListadoPacientes();
-                _view.MostrarMensaje("Paciente desactivado correctamente.", "Pacientes");
-            }
-            catch (System.Exception ex)
-            {
-                _view.MostrarMensaje("Error al desactivar paciente: " + ex.Message, "Pacientes", true);
-            }
-        }
-
-        private void OnPacientesDetalle()
-        {
-            var dni = _view.ObtenerPacienteSeleccionadoDni();
-            if (dni == null)
-            {
-                _view.MostrarMensaje("Seleccione un paciente para ver los detalles.", "Pacientes");
-                return;
-            }
-
-            var paciente = _pacientes.FirstOrDefault(p => p.Dni == dni.Value);
-            if (paciente == null)
-            {
-                _view.MostrarMensaje("No se encontró el paciente seleccionado.", "Pacientes", true);
-                return;
-            }
-
-            try
-            {
-                using (var dlg = new SALC.Views.PanelAdministrador.FrmPacienteDetalle(paciente))
-                {
-                    dlg.ShowDialog();
-                }
-            }
-            catch (System.Exception ex)
-            {
-                _view.MostrarMensaje("Error al mostrar detalles del paciente: " + ex.Message, "Pacientes", true);
             }
         }
     }

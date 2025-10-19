@@ -63,6 +63,7 @@
   <Compile Include="Views\PanelAdministrador\FrmMetricaEdit.cs" />
   <Compile Include="Views\PanelAdministrador\FrmUsuarioEdit.cs" />
   <Compile Include="Views\PanelAdministrador\FrmUsuarioDetalle.cs" />
+  <Compile Include="Views\PanelAdministrador\FrmGestionRelacionesTipoAnalisisMetricas.cs" />
   <Compile Include="Views\Compartidos\SeleccionAnalisisControl.cs" />
   <Compile Include="Views\Compartidos\SeleccionPacienteControl.cs" />
     <Compile Include="Views\Compartidos\FrmInicio.cs" />
@@ -102,6 +103,7 @@
     <Compile Include="DAL\MedicoRepositorio.cs" />
     <Compile Include="DAL\AsistenteRepositorio.cs" />
     <Compile Include="DAL\ObraSocialRepositorio.cs" />
+    <Compile Include="DAL\TipoAnalisisMetricaRepositorio.cs" />
     <Compile Include="DAL\IRepositorioBase.cs" />
     <Compile Include="Infraestructura\DbConexion.cs" />
   <Compile Include="Infraestructura\DbHealth.cs" />
@@ -111,6 +113,7 @@
     <Compile Include="Domain\Analisis.cs" />
     <Compile Include="Domain\Metrica.cs" />
     <Compile Include="Domain\TipoAnalisis.cs" />
+    <Compile Include="Domain\TipoAnalisisMetrica.cs" />
     <Compile Include="Domain\ObraSocial.cs" />
     <Compile Include="Domain\Paciente.cs" />
     <Compile Include="Domain\Asistente.cs" />

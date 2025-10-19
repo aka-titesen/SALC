@@ -1,12 +1,14 @@
 using System.Collections.Generic;
 using SALC.Domain;
 using SALC.DAL;
+using System.Linq;
 
 namespace SALC.BLL
 {
     public class CatalogoService : ICatalogoService
     {
         private readonly CatalogoRepositorio _repo = new CatalogoRepositorio();
+        private readonly TipoAnalisisMetricaRepositorio _tipoAnalisisMetricaRepo = new TipoAnalisisMetricaRepositorio();
         
         // Métodos que devuelven todos los registros (incluyendo inactivos)
         public IEnumerable<Metrica> ObtenerMetricas()
@@ -52,5 +54,46 @@ namespace SALC.BLL
         public void CrearMetrica(Metrica m) => _repo.CrearMetrica(m);
         public void ActualizarMetrica(Metrica m) => _repo.ActualizarMetrica(m);
         public void EliminarMetrica(int id) => _repo.EliminarMetrica(id); // Baja lógica
+
+        // Gestión de relaciones Tipo Análisis - Métricas
+        public IEnumerable<TipoAnalisisMetrica> ObtenerRelacionesTipoAnalisisMetricas()
+        {
+            return _tipoAnalisisMetricaRepo.ObtenerRelaciones();
+        }
+
+        public IEnumerable<Metrica> ObtenerMetricasPorTipoAnalisis(int idTipoAnalisis)
+        {
+            return _tipoAnalisisMetricaRepo.ObtenerMetricasPorTipoAnalisis(idTipoAnalisis);
+        }
+
+        public void CrearRelacionTipoAnalisisMetrica(int idTipoAnalisis, int idMetrica)
+        {
+            if (!ExisteRelacionTipoAnalisisMetrica(idTipoAnalisis, idMetrica))
+            {
+                _tipoAnalisisMetricaRepo.CrearRelacion(idTipoAnalisis, idMetrica);
+            }
+        }
+
+        public void EliminarRelacionTipoAnalisisMetrica(int idTipoAnalisis, int idMetrica)
+        {
+            _tipoAnalisisMetricaRepo.EliminarRelacion(idTipoAnalisis, idMetrica);
+        }
+
+        public void ActualizarRelacionesTipoAnalisis(int idTipoAnalisis, IEnumerable<int> idsMetricas)
+        {
+            // Eliminar todas las relaciones existentes del tipo de análisis
+            _tipoAnalisisMetricaRepo.EliminarTodasLasRelacionesDeTipoAnalisis(idTipoAnalisis);
+            
+            // Crear las nuevas relaciones
+            foreach (var idMetrica in idsMetricas)
+            {
+                _tipoAnalisisMetricaRepo.CrearRelacion(idTipoAnalisis, idMetrica);
+            }
+        }
+
+        public bool ExisteRelacionTipoAnalisisMetrica(int idTipoAnalisis, int idMetrica)
+        {
+            return _tipoAnalisisMetricaRepo.ExisteRelacion(idTipoAnalisis, idMetrica);
+        }
     }
 }

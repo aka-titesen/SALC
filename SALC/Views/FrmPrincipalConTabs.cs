@@ -272,54 +272,6 @@ namespace SALC.Views
 
             tabPrincipal.TabPages.Add(tabUsuarios);
 
-            // Pestaña Pacientes - Usar la misma lógica
-            var tabPacientes = new TabPage("Pacientes")
-            {
-                BackColor = Color.White
-            };
-            
-            try
-            {
-                var frmPanelPacientes = new Views.PanelAdministrador.FrmPanelAdministrador
-                {
-                    TopLevel = false,
-                    FormBorderStyle = FormBorderStyle.None,
-                    Dock = DockStyle.Fill
-                };
-
-                var presenterPacientes = new SALC.Presenters.PanelAdministradorPresenter(frmPanelPacientes);
-
-                var tabControlPacientes = frmPanelPacientes.Controls.OfType<TabControl>().FirstOrDefault();
-                if (tabControlPacientes != null && tabControlPacientes.TabPages.Count > 1)
-                {
-                    // Tomar la pestaña de pacientes (índice 1)
-                    var pacientesTabPage = tabControlPacientes.TabPages[1];
-                    tabControlPacientes.TabPages.Remove(pacientesTabPage);
-                    tabPacientes.Controls.Add(pacientesTabPage.Controls[0]);
-                }
-                else
-                {
-                    tabPacientes.Controls.Add(frmPanelPacientes);
-                    frmPanelPacientes.Show();
-                }
-
-                tabPacientes.Tag = presenterPacientes;
-            }
-            catch (Exception ex)
-            {
-                var lblError = new Label
-                {
-                    Text = $"Error al cargar panel de pacientes:\n{ex.Message}",
-                    Font = new Font("Segoe UI", 12),
-                    ForeColor = Color.Red,
-                    TextAlign = ContentAlignment.MiddleCenter,
-                    Dock = DockStyle.Fill
-                };
-                tabPacientes.Controls.Add(lblError);
-            }
-
-            tabPrincipal.TabPages.Add(tabPacientes);
-
             // Pestaña Catálogos - Usar la misma lógica
             var tabCatalogos = new TabPage("Catálogos")
             {
@@ -338,10 +290,10 @@ namespace SALC.Views
                 var presenterCatalogos = new SALC.Presenters.PanelAdministradorPresenter(frmPanelCatalogos);
 
                 var tabControlCatalogos = frmPanelCatalogos.Controls.OfType<TabControl>().FirstOrDefault();
-                if (tabControlCatalogos != null && tabControlCatalogos.TabPages.Count > 2)
+                if (tabControlCatalogos != null && tabControlCatalogos.TabPages.Count > 1)
                 {
-                    // Tomar la pestaña de catálogos (índice 2)
-                    var catalogosTabPage = tabControlCatalogos.TabPages[2];
+                    // Tomar la pestaña de catálogos (ahora índice 1, ya que se eliminó la de pacientes)
+                    var catalogosTabPage = tabControlCatalogos.TabPages[1];
                     tabControlCatalogos.TabPages.Remove(catalogosTabPage);
                     tabCatalogos.Controls.Add(catalogosTabPage.Controls[0]);
                 }
@@ -386,10 +338,10 @@ namespace SALC.Views
                 var presenterBackups = new SALC.Presenters.PanelAdministradorPresenter(frmPanelBackups);
 
                 var tabControlBackups = frmPanelBackups.Controls.OfType<TabControl>().FirstOrDefault();
-                if (tabControlBackups != null && tabControlBackups.TabPages.Count > 3)
+                if (tabControlBackups != null && tabControlBackups.TabPages.Count > 2)
                 {
-                    // Tomar la pestaña de backups (índice 3)
-                    var backupsTabPage = tabControlBackups.TabPages[3];
+                    // Tomar la pestaña de backups (ahora índice 2, ya que se eliminó la de pacientes)
+                    var backupsTabPage = tabControlBackups.TabPages[2];
                     tabControlBackups.TabPages.Remove(backupsTabPage);
                     tabBackups.Controls.Add(backupsTabPage.Controls[0]);
                 }

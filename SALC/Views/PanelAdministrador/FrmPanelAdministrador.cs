@@ -9,14 +9,12 @@ namespace SALC.Views.PanelAdministrador
         private TabControl tabs;
         // Grillas por sección
         private DataGridView gridUsuarios;
-        private DataGridView gridPacientes;
         private DataGridView gridObrasSociales;
         private DataGridView gridTiposAnalisis;
         private DataGridView gridMetricas;
 
-        // Controles adicionales para usuarios, pacientes, obras sociales, tipos de análisis y métricas
+        // Controles adicionales para usuarios, obras sociales, tipos de análisis y métricas
         private ComboBox cboFiltroEstadoUsuarios;
-        private ComboBox cboFiltroEstadoPacientes;
         private ComboBox cboFiltroEstadoObrasSociales;
         private ComboBox cboFiltroEstadoTiposAnalisis;
         private ComboBox cboFiltroEstadoMetricas;
@@ -31,7 +29,6 @@ namespace SALC.Views.PanelAdministrador
             Controls.Add(tabs);
 
             AgregarTabUsuarios();
-            AgregarTabPacientes();
             AgregarTabCatalogos();
             AgregarTabBackups();
         }
@@ -89,59 +86,6 @@ namespace SALC.Views.PanelAdministrador
             tabs.TabPages.Add(tab);
         }
 
-        private void AgregarTabPacientes()
-        {
-            var tab = new TabPage("Pacientes");
-            var tool = new ToolStrip();
-            var btnNuevo = new ToolStripButton("Nuevo") { DisplayStyle = ToolStripItemDisplayStyle.Text };
-            var btnEditar = new ToolStripButton("Editar") { DisplayStyle = ToolStripItemDisplayStyle.Text };
-            var btnEliminar = new ToolStripButton("Eliminar") { DisplayStyle = ToolStripItemDisplayStyle.Text };
-            var btnDetalle = new ToolStripButton("Ver Detalle") { DisplayStyle = ToolStripItemDisplayStyle.Text };
-            var txtBuscar = new ToolStripTextBox { Width = 200, ToolTipText = "Buscar por DNI/Apellido" };
-            
-            // Filtro de estado para pacientes
-            var lblFiltroEstado = new ToolStripLabel("Estado:");
-            var cboFiltroEstadoHost = new ToolStripControlHost(cboFiltroEstadoPacientes = new ComboBox
-            {
-                DropDownStyle = ComboBoxStyle.DropDownList,
-                Width = 100
-            });
-            cboFiltroEstadoPacientes.Items.AddRange(new object[] { "Todos", "Activo", "Inactivo" });
-            cboFiltroEstadoPacientes.SelectedIndex = 0;
-            cboFiltroEstadoPacientes.SelectedIndexChanged += (s, e) => PacientesFiltroEstadoChanged?.Invoke(this, cboFiltroEstadoPacientes.SelectedItem.ToString());
-
-            tool.Items.AddRange(new ToolStripItem[] { 
-                btnNuevo, btnEditar, btnEliminar, btnDetalle,
-                new ToolStripSeparator(), 
-                new ToolStripLabel("Buscar:"), txtBuscar,
-                new ToolStripSeparator(),
-                lblFiltroEstado, cboFiltroEstadoHost
-            });
-            
-            gridPacientes = new DataGridView { 
-                Dock = DockStyle.Fill, 
-                ReadOnly = true, 
-                AllowUserToAddRows = false, 
-                SelectionMode = DataGridViewSelectionMode.FullRowSelect, 
-                MultiSelect = false, 
-                AutoGenerateColumns = true,
-                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
-            };
-
-            btnNuevo.Click += (s, e) => PacientesNuevoClick?.Invoke(this, EventArgs.Empty);
-            btnEditar.Click += (s, e) => PacientesEditarClick?.Invoke(this, EventArgs.Empty);
-            btnEliminar.Click += (s, e) => PacientesEliminarClick?.Invoke(this, EventArgs.Empty);
-            btnDetalle.Click += (s, e) => PacientesDetalleClick?.Invoke(this, EventArgs.Empty);
-            txtBuscar.TextChanged += (s, e) => PacientesBuscarTextoChanged?.Invoke(this, txtBuscar.Text);
-
-            var panel = new Panel { Dock = DockStyle.Fill };
-            tool.Dock = DockStyle.Top;
-            panel.Controls.Add(gridPacientes);
-            panel.Controls.Add(tool);
-            tab.Controls.Add(panel);
-            tabs.TabPages.Add(tab);
-        }
-
         private void AgregarTabCatalogos()
         {
             var tab = new TabPage("Catálogos");
@@ -155,6 +99,9 @@ namespace SALC.Views.PanelAdministrador
 
             // Métricas - con filtro de estado personalizado
             tabsCat.TabPages.Add(CrearTabMetricas());
+
+            // Relaciones Tipo Análisis - Métricas
+            tabsCat.TabPages.Add(CrearTabRelacionesTipoAnalisisMetricas());
 
             tab.Controls.Add(tabsCat);
             tabs.TabPages.Add(tab);
@@ -313,6 +260,37 @@ namespace SALC.Views.PanelAdministrador
             return tab;
         }
 
+        private TabPage CrearTabRelacionesTipoAnalisisMetricas()
+        {
+            var tab = new TabPage("Relaciones Análisis-Métricas");
+            
+            var lblDescripcion = new Label
+            {
+                Text = "Gestione qué métricas componen cada tipo de análisis.\nLas relaciones definen los valores que se pueden cargar para cada tipo de análisis.",
+                Left = 20,
+                Top = 20,
+                Width = 600,
+                Height = 50,
+                AutoSize = false
+            };
+
+            var btnGestionarRelaciones = new Button
+            {
+                Text = "Gestionar Relaciones Tipo Análisis - Métricas",
+                Left = 20,
+                Top = 80,
+                Width = 350,
+                Height = 30
+            };
+
+            btnGestionarRelaciones.Click += (s, e) => RelacionesTipoAnalisisMetricaGestionarClick?.Invoke(this, EventArgs.Empty);
+
+            tab.Controls.Add(lblDescripcion);
+            tab.Controls.Add(btnGestionarRelaciones);
+            
+            return tab;
+        }
+
         private void AgregarTabBackups()
         {
             var tab = new TabPage("Backups");
@@ -338,15 +316,6 @@ namespace SALC.Views.PanelAdministrador
         public event EventHandler UsuariosDetalleClick;
         public event EventHandler<string> UsuariosFiltroEstadoChanged;
         
-        public event EventHandler PacientesNuevoClick;
-        public event EventHandler PacientesEditarClick;
-        public event EventHandler PacientesEliminarClick;
-        public event EventHandler<string> PacientesBuscarTextoChanged;
-        
-        // Nuevos eventos para pacientes
-        public event EventHandler PacientesDetalleClick;
-        public event EventHandler<string> PacientesFiltroEstadoChanged;
-        
         public event EventHandler ObrasSocialesNuevoClick;
         public event EventHandler ObrasSocialesEditarClick;
         public event EventHandler ObrasSocialesEliminarClick;
@@ -365,6 +334,9 @@ namespace SALC.Views.PanelAdministrador
         public event EventHandler<string> MetricasBuscarTextoChanged;
         public event EventHandler<string> MetricasFiltroEstadoChanged;
         
+        // Evento para relaciones Tipo Análisis - Métricas
+        public event EventHandler RelacionesTipoAnalisisMetricaGestionarClick;
+        
         public event EventHandler EjecutarBackupClick;
         public event EventHandler ProgramarBackupClick;
         public event EventHandler ProbarConexionClick;
@@ -379,21 +351,6 @@ namespace SALC.Views.PanelAdministrador
         {
             if (gridUsuarios?.CurrentRow?.DataBoundItem == null) return null;
             var row = gridUsuarios.CurrentRow.DataBoundItem;
-            var dniProp = row.GetType().GetProperty("Dni");
-            if (dniProp == null) return null;
-            var val = dniProp.GetValue(row);
-            return val as int? ?? (val != null ? (int?)System.Convert.ToInt32(val) : null);
-        }
-
-        public void CargarPacientes(System.Collections.IEnumerable pacientes)
-        {
-            if (gridPacientes != null) gridPacientes.DataSource = pacientes;
-        }
-
-        public int? ObtenerPacienteSeleccionadoDni()
-        {
-            if (gridPacientes?.CurrentRow?.DataBoundItem == null) return null;
-            var row = gridPacientes.CurrentRow.DataBoundItem;
             var dniProp = row.GetType().GetProperty("Dni");
             if (dniProp == null) return null;
             var val = dniProp.GetValue(row);

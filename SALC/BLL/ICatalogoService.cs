@@ -25,5 +25,13 @@ namespace SALC.BLL
         void CrearMetrica(Metrica m);
         void ActualizarMetrica(Metrica m);
         void EliminarMetrica(int id); // Baja lógica
+
+        // Gestión de relaciones Tipo Análisis - Métricas
+        IEnumerable<TipoAnalisisMetrica> ObtenerRelacionesTipoAnalisisMetricas();
+        IEnumerable<Metrica> ObtenerMetricasPorTipoAnalisis(int idTipoAnalisis);
+        void CrearRelacionTipoAnalisisMetrica(int idTipoAnalisis, int idMetrica);
+        void EliminarRelacionTipoAnalisisMetrica(int idTipoAnalisis, int idMetrica);
+        void ActualizarRelacionesTipoAnalisis(int idTipoAnalisis, IEnumerable<int> idsMetricas);
+        bool ExisteRelacionTipoAnalisisMetrica(int idTipoAnalisis, int idMetrica);
     }
 }
