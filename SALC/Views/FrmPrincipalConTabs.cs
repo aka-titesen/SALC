@@ -213,7 +213,7 @@ namespace SALC.Views
 
         private void AgregarPestanasAdministrador()
         {
-            // Pestaña Usuarios - Solo gestión de usuarios
+            // Pestaña Usuarios - Crear directamente los controles sin el panel completo
             var tabUsuarios = new TabPage("Usuarios")
             {
                 BackColor = Color.White
@@ -221,7 +221,7 @@ namespace SALC.Views
 
             try
             {
-                // Crear una instancia del panel completo para obtener solo la funcionalidad de usuarios
+                // Crear el panel de administrador para obtener la funcionalidad
                 var frmPanelAdmin = new Views.PanelAdministrador.FrmPanelAdministrador
                 {
                     TopLevel = false,
@@ -229,24 +229,31 @@ namespace SALC.Views
                     Dock = DockStyle.Fill
                 };
 
-                // Crear el presenter para el panel de administrador
+                // Crear el presenter
                 var presenter = new SALC.Presenters.PanelAdministradorPresenter(frmPanelAdmin);
-                frmPanelAdmin.Tag = presenter;
 
-                // Seleccionar la pestaña de usuarios en el panel
+                // Obtener el TabControl interno y extraer solo la pestaña de usuarios
                 var tabControl = frmPanelAdmin.Controls.OfType<TabControl>().FirstOrDefault();
                 if (tabControl != null && tabControl.TabPages.Count > 0)
                 {
-                    tabControl.SelectedIndex = 0; // Pestaña usuarios
-                    // Ocultar las otras pestañas para mostrar solo usuarios
-                    for (int i = tabControl.TabPages.Count - 1; i > 0; i--)
-                    {
-                        tabControl.TabPages.RemoveAt(i);
-                    }
+                    // Tomar la pestaña de usuarios (índice 0)
+                    var usuariosTabPage = tabControl.TabPages[0];
+                    
+                    // Remover la pestaña del control original
+                    tabControl.TabPages.Remove(usuariosTabPage);
+                    
+                    // Agregar directamente el contenido de la pestaña
+                    tabUsuarios.Controls.Add(usuariosTabPage.Controls[0]); // El panel con el contenido
+                }
+                else
+                {
+                    // Fallback: agregar todo el formulario
+                    tabUsuarios.Controls.Add(frmPanelAdmin);
+                    frmPanelAdmin.Show();
                 }
 
-                tabUsuarios.Controls.Add(frmPanelAdmin);
-                frmPanelAdmin.Show();
+                // Guardar referencia del presenter
+                tabUsuarios.Tag = presenter;
             }
             catch (Exception ex)
             {
@@ -263,7 +270,7 @@ namespace SALC.Views
 
             tabPrincipal.TabPages.Add(tabUsuarios);
 
-            // Pestaña Pacientes - Solo gestión de pacientes
+            // Pestaña Pacientes - Usar la misma lógica
             var tabPacientes = new TabPage("Pacientes")
             {
                 BackColor = Color.White
@@ -279,21 +286,22 @@ namespace SALC.Views
                 };
 
                 var presenterPacientes = new SALC.Presenters.PanelAdministradorPresenter(frmPanelPacientes);
-                frmPanelPacientes.Tag = presenterPacientes;
 
-                // Seleccionar la pestaña de pacientes en el panel
                 var tabControlPacientes = frmPanelPacientes.Controls.OfType<TabControl>().FirstOrDefault();
                 if (tabControlPacientes != null && tabControlPacientes.TabPages.Count > 1)
                 {
-                    tabControlPacientes.SelectedIndex = 1; // Pestaña pacientes
-                    // Remover todas las pestañas excepto pacientes
-                    var pacientesTab = tabControlPacientes.TabPages[1];
-                    tabControlPacientes.TabPages.Clear();
-                    tabControlPacientes.TabPages.Add(pacientesTab);
+                    // Tomar la pestaña de pacientes (índice 1)
+                    var pacientesTabPage = tabControlPacientes.TabPages[1];
+                    tabControlPacientes.TabPages.Remove(pacientesTabPage);
+                    tabPacientes.Controls.Add(pacientesTabPage.Controls[0]);
+                }
+                else
+                {
+                    tabPacientes.Controls.Add(frmPanelPacientes);
+                    frmPanelPacientes.Show();
                 }
 
-                tabPacientes.Controls.Add(frmPanelPacientes);
-                frmPanelPacientes.Show();
+                tabPacientes.Tag = presenterPacientes;
             }
             catch (Exception ex)
             {
@@ -310,7 +318,7 @@ namespace SALC.Views
 
             tabPrincipal.TabPages.Add(tabPacientes);
 
-            // Pestaña Catálogos - Solo gestión de catálogos
+            // Pestaña Catálogos - Usar la misma lógica
             var tabCatalogos = new TabPage("Catálogos")
             {
                 BackColor = Color.White
@@ -326,21 +334,22 @@ namespace SALC.Views
                 };
 
                 var presenterCatalogos = new SALC.Presenters.PanelAdministradorPresenter(frmPanelCatalogos);
-                frmPanelCatalogos.Tag = presenterCatalogos;
 
-                // Seleccionar la pestaña de catálogos en el panel
                 var tabControlCatalogos = frmPanelCatalogos.Controls.OfType<TabControl>().FirstOrDefault();
                 if (tabControlCatalogos != null && tabControlCatalogos.TabPages.Count > 2)
                 {
-                    tabControlCatalogos.SelectedIndex = 2; // Pestaña catálogos
-                    // Remover todas las pestañas excepto catálogos
-                    var catalogosTab = tabControlCatalogos.TabPages[2];
-                    tabControlCatalogos.TabPages.Clear();
-                    tabControlCatalogos.TabPages.Add(catalogosTab);
+                    // Tomar la pestaña de catálogos (índice 2)
+                    var catalogosTabPage = tabControlCatalogos.TabPages[2];
+                    tabControlCatalogos.TabPages.Remove(catalogosTabPage);
+                    tabCatalogos.Controls.Add(catalogosTabPage.Controls[0]);
+                }
+                else
+                {
+                    tabCatalogos.Controls.Add(frmPanelCatalogos);
+                    frmPanelCatalogos.Show();
                 }
 
-                tabCatalogos.Controls.Add(frmPanelCatalogos);
-                frmPanelCatalogos.Show();
+                tabCatalogos.Tag = presenterCatalogos;
             }
             catch (Exception ex)
             {
@@ -357,7 +366,7 @@ namespace SALC.Views
 
             tabPrincipal.TabPages.Add(tabCatalogos);
 
-            // Pestaña Backups - Solo gestión de backups
+            // Pestaña Backups - Usar la misma lógica
             var tabBackups = new TabPage("Backups")
             {
                 BackColor = Color.White
@@ -373,21 +382,22 @@ namespace SALC.Views
                 };
 
                 var presenterBackups = new SALC.Presenters.PanelAdministradorPresenter(frmPanelBackups);
-                frmPanelBackups.Tag = presenterBackups;
 
-                // Seleccionar la pestaña de backups en el panel
                 var tabControlBackups = frmPanelBackups.Controls.OfType<TabControl>().FirstOrDefault();
                 if (tabControlBackups != null && tabControlBackups.TabPages.Count > 3)
                 {
-                    tabControlBackups.SelectedIndex = 3; // Pestaña backups
-                    // Remover todas las pestañas excepto backups
-                    var backupsTab = tabControlBackups.TabPages[3];
-                    tabControlBackups.TabPages.Clear();
-                    tabControlBackups.TabPages.Add(backupsTab);
+                    // Tomar la pestaña de backups (índice 3)
+                    var backupsTabPage = tabControlBackups.TabPages[3];
+                    tabControlBackups.TabPages.Remove(backupsTabPage);
+                    tabBackups.Controls.Add(backupsTabPage.Controls[0]);
+                }
+                else
+                {
+                    tabBackups.Controls.Add(frmPanelBackups);
+                    frmPanelBackups.Show();
                 }
 
-                tabBackups.Controls.Add(frmPanelBackups);
-                frmPanelBackups.Show();
+                tabBackups.Tag = presenterBackups;
             }
             catch (Exception ex)
             {

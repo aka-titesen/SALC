@@ -40,10 +40,10 @@ namespace SALC.Views.PanelAdministrador
         {
             var tab = new TabPage("Usuarios");
             var tool = new ToolStrip();
-            var btnNuevo = new ToolStripButton("Nuevo");
-            var btnEditar = new ToolStripButton("Editar");
-            var btnEliminar = new ToolStripButton("Eliminar");
-            var btnDetalle = new ToolStripButton("Ver Detalle");
+            var btnNuevo = new ToolStripButton("Nuevo") { DisplayStyle = ToolStripItemDisplayStyle.Text };
+            var btnEditar = new ToolStripButton("Editar") { DisplayStyle = ToolStripItemDisplayStyle.Text };
+            var btnEliminar = new ToolStripButton("Eliminar") { DisplayStyle = ToolStripItemDisplayStyle.Text };
+            var btnDetalle = new ToolStripButton("Ver Detalle") { DisplayStyle = ToolStripItemDisplayStyle.Text };
             var txtBuscar = new ToolStripTextBox { Width = 200, ToolTipText = "Buscar por DNI/Apellido/Email" };
             
             // Filtro de estado
@@ -93,10 +93,10 @@ namespace SALC.Views.PanelAdministrador
         {
             var tab = new TabPage("Pacientes");
             var tool = new ToolStrip();
-            var btnNuevo = new ToolStripButton("Nuevo");
-            var btnEditar = new ToolStripButton("Editar");
-            var btnEliminar = new ToolStripButton("Eliminar");
-            var btnDetalle = new ToolStripButton("Ver Detalle");
+            var btnNuevo = new ToolStripButton("Nuevo") { DisplayStyle = ToolStripItemDisplayStyle.Text };
+            var btnEditar = new ToolStripButton("Editar") { DisplayStyle = ToolStripItemDisplayStyle.Text };
+            var btnEliminar = new ToolStripButton("Eliminar") { DisplayStyle = ToolStripItemDisplayStyle.Text };
+            var btnDetalle = new ToolStripButton("Ver Detalle") { DisplayStyle = ToolStripItemDisplayStyle.Text };
             var txtBuscar = new ToolStripTextBox { Width = 200, ToolTipText = "Buscar por DNI/Apellido" };
             
             // Filtro de estado para pacientes
@@ -164,9 +164,9 @@ namespace SALC.Views.PanelAdministrador
         {
             var tab = new TabPage("Obras Sociales");
             var tool = new ToolStrip();
-            var btnNuevo = new ToolStripButton("Nuevo");
-            var btnEditar = new ToolStripButton("Editar");
-            var btnEliminar = new ToolStripButton("Eliminar");
+            var btnNuevo = new ToolStripButton("Nuevo") { DisplayStyle = ToolStripItemDisplayStyle.Text };
+            var btnEditar = new ToolStripButton("Editar") { DisplayStyle = ToolStripItemDisplayStyle.Text };
+            var btnEliminar = new ToolStripButton("Eliminar") { DisplayStyle = ToolStripItemDisplayStyle.Text };
             var txtBuscar = new ToolStripTextBox { Width = 200, ToolTipText = "Buscar por CUIT/Nombre" };
             
             // Filtro de estado para obras sociales
@@ -215,9 +215,9 @@ namespace SALC.Views.PanelAdministrador
         {
             var tab = new TabPage("Tipos de Análisis");
             var tool = new ToolStrip();
-            var btnNuevo = new ToolStripButton("Nuevo");
-            var btnEditar = new ToolStripButton("Editar");
-            var btnEliminar = new ToolStripButton("Eliminar");
+            var btnNuevo = new ToolStripButton("Nuevo") { DisplayStyle = ToolStripItemDisplayStyle.Text };
+            var btnEditar = new ToolStripButton("Editar") { DisplayStyle = ToolStripItemDisplayStyle.Text };
+            var btnEliminar = new ToolStripButton("Eliminar") { DisplayStyle = ToolStripItemDisplayStyle.Text };
             var txtBuscar = new ToolStripTextBox { Width = 200, ToolTipText = "Buscar por descripción" };
             
             // Filtro de estado para tipos de análisis
@@ -266,9 +266,9 @@ namespace SALC.Views.PanelAdministrador
         {
             var tab = new TabPage("Métricas");
             var tool = new ToolStrip();
-            var btnNuevo = new ToolStripButton("Nuevo");
-            var btnEditar = new ToolStripButton("Editar");
-            var btnEliminar = new ToolStripButton("Eliminar");
+            var btnNuevo = new ToolStripButton("Nuevo") { DisplayStyle = ToolStripItemDisplayStyle.Text };
+            var btnEditar = new ToolStripButton("Editar") { DisplayStyle = ToolStripItemDisplayStyle.Text };
+            var btnEliminar = new ToolStripButton("Eliminar") { DisplayStyle = ToolStripItemDisplayStyle.Text };
             var txtBuscar = new ToolStripTextBox { Width = 200, ToolTipText = "Buscar por nombre/unidad" };
             
             // Filtro de estado para métricas
