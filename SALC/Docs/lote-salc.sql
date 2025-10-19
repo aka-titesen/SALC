@@ -12,7 +12,8 @@ GO
 INSERT INTO roles (nombre_rol) VALUES
 ('Administrador'),
 ('Médico'),
-('Asistente');
+('Asistente'),
+('Sin rol')
 GO
 
 -- 2. ESTADOS DE ANÁLISIS ---------------------------------
