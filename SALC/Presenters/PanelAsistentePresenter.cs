@@ -11,6 +11,7 @@ namespace SALC.Presenters
         private readonly IPanelAsistenteView _view;
         private readonly IAnalisisService _analisisService = new AnalisisService();
         private readonly IPacienteService _pacienteService = new PacienteService();
+        private readonly ICatalogoService _catalogoService = new CatalogoService();
 
         public PanelAsistentePresenter(IPanelAsistenteView view)
         {
@@ -186,14 +187,15 @@ namespace SALC.Presenters
         // Métodos auxiliares para obtener descripciones
         private string ObtenerDescripcionTipoAnalisis(int idTipo)
         {
-            // TODO: Implementar consulta real a tipos de análisis
-            switch (idTipo)
+            try
             {
-                case 1: return "Hemograma Completo";
-                case 2: return "Glucosa en Ayunas";
-                case 3: return "Perfil Lipídico Completo";
-                case 4: return "Análisis de Orina Completo";
-                default: return $"Tipo {idTipo}";
+                var tipo = _catalogoService.ObtenerTiposAnalisis()
+                    .FirstOrDefault(t => t.IdTipoAnalisis == idTipo);
+                return tipo?.Descripcion ?? $"Tipo {idTipo}";
+            }
+            catch
+            {
+                return $"Tipo {idTipo}";
             }
         }
 
@@ -210,8 +212,16 @@ namespace SALC.Presenters
 
         private string ObtenerNombreMedico(int dniMedico)
         {
-            // TODO: Implementar consulta real a usuarios/médicos
-            return $"Dr. {dniMedico}";
+            try
+            {
+                var usuarioRepo = new SALC.DAL.UsuarioRepositorio();
+                var medico = usuarioRepo.ObtenerPorId(dniMedico);
+                return medico != null ? $"Dr. {medico.Nombre} {medico.Apellido}" : $"Dr. {dniMedico}";
+            }
+            catch
+            {
+                return $"Dr. {dniMedico}";
+            }
         }
 
         public void SeleccionAnalisisCambiada()

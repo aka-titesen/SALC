@@ -226,5 +226,40 @@ namespace SALC.DAL
             // Usar baja lógica
             Eliminar(dni);
         }
+
+        // Método para obtener médicos que han firmado al menos un análisis
+        public IEnumerable<Usuario> ObtenerMedicosConAnalisisFirmados()
+        {
+            using (var cn = DbConexion.CrearConexion())
+            using (var cmd = new SqlCommand(
+                @"SELECT DISTINCT u.dni, u.nombre, u.apellido, u.email, u.password_hash, u.id_rol, u.estado 
+                  FROM usuarios u 
+                  INNER JOIN analisis a ON u.dni = a.dni_firma 
+                  WHERE u.id_rol = 2 AND u.estado = 'Activo' AND a.dni_firma IS NOT NULL
+                  ORDER BY u.apellido, u.nombre", cn))
+            {
+                cn.Open();
+                using (var rd = cmd.ExecuteReader())
+                {
+                    while (rd.Read())
+                        yield return MapUsuario(rd);
+                }
+            }
+        }
+
+        // Método para obtener médicos activos (todos)
+        public IEnumerable<Usuario> ObtenerMedicosActivos()
+        {
+            using (var cn = DbConexion.CrearConexion())
+            using (var cmd = new SqlCommand("SELECT dni, nombre, apellido, email, password_hash, id_rol, estado FROM usuarios WHERE id_rol = 2 AND estado = 'Activo' ORDER BY apellido, nombre", cn))
+            {
+                cn.Open();
+                using (var rd = cmd.ExecuteReader())
+                {
+                    while (rd.Read())
+                        yield return MapUsuario(rd);
+                }
+            }
+        }
     }
 }

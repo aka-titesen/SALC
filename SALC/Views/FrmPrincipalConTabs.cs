@@ -4,6 +4,8 @@ using System.Drawing;
 using SALC.Views.Compartidos;
 using SALC.Domain;
 using System.Linq;
+using SALC.Views.PanelAsistente;
+using SALC.Presenters;
 
 namespace SALC.Views
 {
@@ -523,63 +525,133 @@ namespace SALC.Views
 
         private void AgregarPestanasAsistente()
         {
-            // Pestaña Panel del Asistente (reemplaza la ventana actual)
-            var tabAsistente = new TabPage("Consultar Pacientes")
-            {
-                BackColor = Color.White
-            };
-
             try
             {
-                var frmAsistente = new PanelAsistente.FrmPanelAsistente
+                // Crear una sola instancia del panel asistente
+                var frmPanelAsistente = new PanelAsistente.FrmPanelAsistente
                 {
                     TopLevel = false,
                     FormBorderStyle = FormBorderStyle.None,
                     Dock = DockStyle.Fill
                 };
 
-                // Crear el presenter para el asistente
-                var presenter = new SALC.Presenters.PanelAsistentePresenter(frmAsistente);
-                frmAsistente.Tag = presenter;
+                // Crear el presenter una sola vez
+                var presenterAsistente = new SALC.Presenters.PanelAsistentePresenter(frmPanelAsistente);
+                frmPanelAsistente.Tag = presenterAsistente;
 
-                tabAsistente.Controls.Add(frmAsistente);
-                frmAsistente.Show();
+                // Mostrar el formulario para inicializarlo completamente
+                frmPanelAsistente.Show();
+
+                // Pestaña 1: Consultar Pacientes (RF-09)
+                var tabConsultarPacientes = new TabPage("Consultar Pacientes")
+                {
+                    BackColor = Color.White,
+                    UseVisualStyleBackColor = false
+                };
+
+                tabConsultarPacientes.Controls.Add(frmPanelAsistente);
+                tabPrincipal.TabPages.Add(tabConsultarPacientes);
 
                 // Inicializar la vista del asistente
-                presenter.InicializarVista();
+                presenterAsistente.InicializarVista();
+
+                // Pestaña 2: Informes Verificados (RF-08)
+                AgregarPestanaInformesVerificados();
+
+                // Guardar referencia del presenter para que no se pierda
+                tabPrincipal.Tag = presenterAsistente;
             }
             catch (Exception ex)
             {
-                // Si hay error con el panel del asistente, mostrar mensaje
+                var tabError = new TabPage("Error - Funcionalidades Asistente")
+                {
+                    BackColor = Color.White
+                };
+
                 var lblError = new Label
                 {
-                    Text = $"Error al cargar panel del asistente:\n{ex.Message}\n\nFuncionalidad en desarrollo.",
-                    Font = new Font("Segoe UI", 12),
+                    Text = $"Error al cargar funcionalidades del asistente:\n{ex.Message}",
+                    Font = new Font("Segoe UI", 11),
                     ForeColor = Color.Red,
                     TextAlign = ContentAlignment.MiddleCenter,
                     Dock = DockStyle.Fill
                 };
-                tabAsistente.Controls.Add(lblError);
+
+                tabError.Controls.Add(lblError);
+                tabPrincipal.TabPages.Add(tabError);
             }
+        }
 
-            tabPrincipal.TabPages.Add(tabAsistente);
-
-            // Pestaña Informes Verificados
+        private void AgregarPestanaInformesVerificados()
+        {
             var tabInformesVerificados = new TabPage("Informes")
             {
-                BackColor = Color.White
+                BackColor = Color.White,
+                UseVisualStyleBackColor = false
             };
-            
-            var lblInformesVerificados = new Label
+
+            try
             {
-                Text = "Panel de Informes Verificados\n\nFuncionalidades:\n• Consultar análisis verificados\n• Generar PDFs de resultados\n• Enviar informes a pacientes\n• Gestionar comunicaciones",
-                Font = new Font("Segoe UI", 12),
-                ForeColor = Color.FromArgb(70, 130, 180),
-                TextAlign = ContentAlignment.MiddleCenter,
-                Dock = DockStyle.Fill
-            };
-            
-            tabInformesVerificados.Controls.Add(lblInformesVerificados);
+                // Crear formulario de informes verificados para asistente
+                var frmInformesAsistente = new SALC.Views.PanelAsistente.FrmInformesVerificados
+                {
+                    TopLevel = false,
+                    FormBorderStyle = FormBorderStyle.None,
+                    Dock = DockStyle.Fill
+                };
+
+                // Crear presenter para informes verificados
+                var presenterInformes = new SALC.Presenters.InformesVerificadosPresenter(frmInformesAsistente);
+                frmInformesAsistente.Tag = presenterInformes;
+
+                tabInformesVerificados.Controls.Add(frmInformesAsistente);
+                frmInformesAsistente.Show();
+
+                // Inicializar la vista
+                presenterInformes.InicializarVista();
+            }
+            catch (Exception ex)
+            {
+                // Si hay error, mostrar placeholder mejorado
+                var panel = new Panel { Dock = DockStyle.Fill, BackColor = Color.White };
+
+                var lblTitulo = new Label
+                {
+                    Text = "📋 Informes Verificados",
+                    Font = new Font("Segoe UI", 16, FontStyle.Bold),
+                    ForeColor = Color.FromArgb(70, 130, 180),
+                    Location = new Point(50, 50),
+                    Size = new Size(400, 35)
+                };
+
+                var lblDescripcion = new Label
+                {
+                    Text = "RF-08: Generar y Enviar Informes de Análisis Verificados\n\n" +
+                           "Funcionalidades para Asistente:\n" +
+                           "• Consultar análisis en estado 'Verificado'\n" +
+                           "• Generar informes PDF de resultados\n" +
+                           "• Enviar informes a pacientes por email\n" +
+                           "• Gestionar comunicaciones con pacientes\n\n" +
+                           "Restricción: Solo análisis previamente verificados por un Médico",
+                    Font = new Font("Segoe UI", 11),
+                    ForeColor = Color.FromArgb(70, 130, 180),
+                    Location = new Point(50, 100),
+                    Size = new Size(600, 200)
+                };
+
+                var lblEstado = new Label
+                {
+                    Text = $"⚠️ Error al cargar componente: {ex.Message}",
+                    Font = new Font("Segoe UI", 9, FontStyle.Italic),
+                    ForeColor = Color.Orange,
+                    Location = new Point(50, 320),
+                    Size = new Size(600, 30)
+                };
+
+                panel.Controls.AddRange(new Control[] { lblTitulo, lblDescripcion, lblEstado });
+                tabInformesVerificados.Controls.Add(panel);
+            }
+
             tabPrincipal.TabPages.Add(tabInformesVerificados);
         }
 
