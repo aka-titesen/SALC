@@ -1,7 +1,7 @@
 ### **Especificación de Requisitos de Software (ERS)**
 
 Proyecto: Sistema de Administración de Laboratorio Clínico (SALC)  
-Versión: 2.7  
+Versión: 2.9  
 Estado: Final
 
 ### **1\. Introducción**
@@ -32,9 +32,9 @@ Los roles de usuario definen el alcance funcional dentro del sistema.
 
 | Rol | Alcance Funcional Detallado (Acciones habilitadas) |
 | :---- | :---- |
-| **Administrador** | Ejecuta operaciones de Alta, Baja y Modificación (ABM) sobre todas las entidades del sistema (Usuarios, Pacientes, Análisis, Obras Sociales, etc.). Configura y gestiona las copias de seguridad de la base de datos. |
-| **Médico** | Crea un nuevo Análisis para un Paciente, asociándose a él. Carga los resultados numéricos del análisis. Valida los resultados, firmando digitalmente el análisis. Genera el informe del análisis en formato PDF y lo envía al paciente por email o teléfono. Visualiza la lista completa de pacientes, pero solo puede acceder al historial detallado de análisis de los pacientes a los que él mismo está asociado. |
-| **Asistente** | Visualiza la lista completa de pacientes y puede acceder al historial detallado de análisis de cualquier paciente. Genera el informe en PDF de un Análisis que ya ha sido previamente validado por un Médico. Envía dicho informe al paciente por email o teléfono. |
+| **Administrador** | Ejecuta operaciones de Alta, Baja y Modificación (ABM) sobre todas las entidades del sistema (Usuarios, Análisis, Obras Sociales, etc.), **excepto Pacientes**. Configura y gestiona las copias de seguridad de la base de datos. **Podrá crear, modificar y eliminar las asociaciones entre los tipos de análisis y las métricas que los componen.** |
+| **Médico** | Crea un nuevo Análisis para un Paciente, asociándose a él. Carga los resultados numéricos del análisis. Valida los resultados, firmando digitalmente el análisis. Genera el informe del análisis en formato PDF y lo envía al paciente por email o teléfono. Visualiza la lista completa de pacientes, pero solo puede acceder al historial detallado de análisis de los pacientes a los que él mismo está asociado. **Podrá realizar la modificación de datos de Pacientes y la baja lógica (cambio de estado a "Inactivo") de los mismos.** |
+| **Asistente** | **Podrá realizar el Alta y Modificación de Pacientes.** Visualiza la lista completa de pacientes y puede acceder al historial detallado de análisis de cualquier paciente. Genera el informe en PDF de un Análisis que ya ha sido previamente validado por un Médico. Envía dicho informe al paciente por email o teléfono. |
 
 **Relación Jerárquica:** Cada Asistente está supervisado por un único Médico.
 
@@ -64,11 +64,13 @@ El SALC es una **aplicación de escritorio monolítica** desarrollada en **Windo
 
 #### **3.2 Requisitos Funcionales (RF)**
 
+## 
+
 | Código | Nombre | Actor(es) | Descripción Detallada |
 | :---- | :---- | :---- | :---- |
 | **RF-01** | Autenticar Usuario | Todos | El sistema debe validar el DNI y la contraseña del usuario contra el hash almacenado en usuarios.password\_hash. Si la validación es exitosa, se concederá acceso según el id\_rol asociado. |
 | **RF-02** | ABM de Usuarios | Administrador | El sistema permitirá crear, leer, modificar y eliminar registros en las tablas usuarios, medicos y asistentes, manteniendo la integridad referencial. |
-| **RF-03** | ABM de Pacientes | Administrador | El sistema permitirá el ABM completo de la entidad pacientes. |
+| **RF-03** | ABM de Pacientes | Médico, Asistente | **El sistema permitirá al Asistente el alta y modificación de la entidad pacientes. El Médico podrá modificar los datos del paciente y realizar una baja lógica (cambio de estado a "Inactivo").** |
 | **RF-04** | ABM de Catálogos | Administrador | El sistema permitirá el ABM de obras\_sociales, tipos\_analisis y metricas. |
 | **RF-05** | Crear Análisis | Médico | Un usuario Médico podrá crear un nuevo registro en la tabla analisis, asociando un dni\_paciente y un id\_tipo\_analisis. Su DNI se registrará en dni\_carga. |
 | **RF-06** | Cargar Resultados | Médico | Sobre un análisis existente en estado "Sin verificar", el Médico podrá insertar o modificar registros en analisis\_metrica, registrando el valor numérico de cada métrica. |
@@ -76,6 +78,7 @@ El SALC es una **aplicación de escritorio monolítica** desarrollada en **Windo
 | **RF-08** | Generar y Enviar Informe | Médico, Asistente | El sistema debe generar un informe en formato PDF. Un Médico puede hacerlo para cualquier análisis que él haya cargado. Un Asistente solo puede hacerlo para análisis con estado "Verificado". |
 | **RF-09** | Visualizar Historial | Médico, Asistente | El sistema mostrará una lista de todos los pacientes. Un Asistente podrá ver el historial detallado de cualquier paciente. Un Médico solo podrá ver el historial detallado de los pacientes asociados a los análisis que él cargó (analisis.dni\_carga). |
 | **RF-10** | Gestionar Backups | Administrador | El sistema proveerá una interfaz para ejecutar y programar copias de seguridad de la base de datos SQL Server. |
+| **RF-11** | Gestionar Relación Tipo de Análisis \- Métrica | Administrador | El sistema permitirá al Administrador crear, modificar y eliminar las asociaciones entre los diferentes tipos de análisis y las métricas que los componen, utilizando la tabla tipo\_analisis\_metrica. Esto incluye la capacidad de asignar una o varias métricas a un tipo de análisis y viceversa. |
 
 #### **3.3 Requisitos No Funcionales (RNF)**
 
@@ -184,6 +187,15 @@ Esta sección describe la estructura detallada de la base de datos.
 | valor\_minimo | DECIMAL(10,2) | NULL. Valor de referencia mínimo. |
 | estado | NVARCHAR(20) | NOT NULL. CHECK ('Activo', 'Inactivo'). |
 |  |  |  |
+
+| Tabla: tipo\_analisis\_metrica |  |  |
+| :---- | :---- | :---- |
+| **Columna** | **Tipo de dato SQL** | **Restricciones y Descripción** |
+| **id\_tipo\_analisis**	 | **INT** | **PK, FK a tipos\_analisis.** |
+| **id\_metrica**	 | **INT** | **PK, FK a metricas.** |
+|  |  | Define qué métricas componen cada tipo de análisis. Relación N:N. Clave primaria compuesta por (id\_tipo\_analisis, id\_metrica). |
+|  |  | Clave foránea a tipos\_analisis(id\_tipo\_analisis) con ON DELETE CASCADE. |
+|  |  | Clave foránea a metricas(id\_metrica) con ON DELETE CASCADE. |
 
 **Tablas de Entidades Principales**
 
