@@ -417,77 +417,108 @@ namespace SALC.Views
 
         private void AgregarPestanasMedico()
         {
-            // Pestaña Crear Análisis
-            var tabCrear = new TabPage("Crear Análisis")
+            try
             {
-                BackColor = Color.White
-            };
-            
-            var lblCrear = new Label
-            {
-                Text = "Panel de Creación de Análisis\n\nFuncionalidades:\n• Crear nuevos análisis para pacientes\n• Seleccionar tipos de estudios\n• Asignar análisis a pacientes\n• Configurar parámetros iniciales",
-                Font = new Font("Segoe UI", 12),
-                ForeColor = Color.FromArgb(70, 130, 180),
-                TextAlign = ContentAlignment.MiddleCenter,
-                Dock = DockStyle.Fill
-            };
-            
-            tabCrear.Controls.Add(lblCrear);
-            tabPrincipal.TabPages.Add(tabCrear);
+                // Crear una sola instancia del panel médico
+                var frmPanelMedico = new Views.PanelMedico.FrmPanelMedico
+                {
+                    TopLevel = false,
+                    FormBorderStyle = FormBorderStyle.None,
+                    Dock = DockStyle.Fill
+                };
 
-            // Pestaña Cargar Resultados
-            var tabResultados = new TabPage("Resultados")
-            {
-                BackColor = Color.White
-            };
-            
-            var lblResultados = new Label
-            {
-                Text = "Panel de Carga de Resultados\n\nFuncionalidades:\n• Cargar valores de métricas\n• Ingresar resultados numéricos\n• Añadir observaciones\n• Modificar análisis pendientes",
-                Font = new Font("Segoe UI", 12),
-                ForeColor = Color.FromArgb(70, 130, 180),
-                TextAlign = ContentAlignment.MiddleCenter,
-                Dock = DockStyle.Fill
-            };
-            
-            tabResultados.Controls.Add(lblResultados);
-            tabPrincipal.TabPages.Add(tabResultados);
+                // Crear el presenter una sola vez
+                var presenterMedico = new SALC.Presenters.PanelMedicoPresenter(frmPanelMedico, usuarioActual.Dni);
 
-            // Pestaña Firmar
-            var tabFirmar = new TabPage("Validar")
-            {
-                BackColor = Color.White
-            };
-            
-            var lblFirmar = new Label
-            {
-                Text = "Panel de Validación de Análisis\n\nFuncionalidades:\n• Revisar análisis completados\n• Validar resultados cargados\n• Firmar digitalmente\n• Cambiar estado a 'Verificado'",
-                Font = new Font("Segoe UI", 12),
-                ForeColor = Color.FromArgb(70, 130, 180),
-                TextAlign = ContentAlignment.MiddleCenter,
-                Dock = DockStyle.Fill
-            };
-            
-            tabFirmar.Controls.Add(lblFirmar);
-            tabPrincipal.TabPages.Add(tabFirmar);
+                // Mostrar el formulario para inicializarlo completamente
+                frmPanelMedico.Show();
 
-            // Pestaña Informes
-            var tabInformes = new TabPage("Informes")
+                // Obtener el TabControl interno del panel médico
+                var tabControlMedico = frmPanelMedico.Controls.OfType<TabControl>().FirstOrDefault();
+                
+                if (tabControlMedico != null && tabControlMedico.TabPages.Count >= 4)
+                {
+                    // Extraer y configurar cada pestaña manteniendo la funcionalidad
+                    ExtraerPestanaMedico(tabControlMedico, 0, "Crear Análisis");
+                    ExtraerPestanaMedico(tabControlMedico, 0, "Resultados"); // Índice 0 porque se van removiendo
+                    ExtraerPestanaMedico(tabControlMedico, 0, "Validar");
+                    ExtraerPestanaMedico(tabControlMedico, 0, "Informes");
+                    
+                    // Guardar referencia del presenter para que no se pierda
+                    tabPrincipal.Tag = presenterMedico;
+                }
+                else
+                {
+                    // Fallback: mostrar mensaje de error
+                    var tabError = new TabPage("Error")
+                    {
+                        BackColor = Color.White
+                    };
+                    
+                    var lblError = new Label
+                    {
+                        Text = "No se pudieron cargar las funcionalidades del médico.\nContacte al administrador del sistema.",
+                        Font = new Font("Segoe UI", 12),
+                        ForeColor = Color.Red,
+                        TextAlign = ContentAlignment.MiddleCenter,
+                        Dock = DockStyle.Fill
+                    };
+                    
+                    tabError.Controls.Add(lblError);
+                    tabPrincipal.TabPages.Add(tabError);
+                }
+            }
+            catch (Exception ex)
             {
-                BackColor = Color.White
-            };
-            
-            var lblInformes = new Label
+                var tabError = new TabPage("Error - Funcionalidades Médico")
+                {
+                    BackColor = Color.White
+                };
+                
+                var lblError = new Label
+                {
+                    Text = $"Error al cargar funcionalidades del médico:\n{ex.Message}",
+                    Font = new Font("Segoe UI", 11),
+                    ForeColor = Color.Red,
+                    TextAlign = ContentAlignment.MiddleCenter,
+                    Dock = DockStyle.Fill
+                };
+                
+                tabError.Controls.Add(lblError);
+                tabPrincipal.TabPages.Add(tabError);
+            }
+        }
+
+        private void ExtraerPestanaMedico(TabControl tabControlOriginal, int indice, string nuevoNombre)
+        {
+            if (indice >= 0 && indice < tabControlOriginal.TabPages.Count)
             {
-                Text = "Panel de Generación de Informes\n\nFuncionalidades:\n• Generar informes PDF\n• Enviar resultados a pacientes\n• Consultar análisis propios\n• Gestionar reportes médicos",
-                Font = new Font("Segoe UI", 12),
-                ForeColor = Color.FromArgb(70, 130, 180),
-                TextAlign = ContentAlignment.MiddleCenter,
-                Dock = DockStyle.Fill
-            };
-            
-            tabInformes.Controls.Add(lblInformes);
-            tabPrincipal.TabPages.Add(tabInformes);
+                // Tomar la pestaña del control original
+                var pestanaOriginal = tabControlOriginal.TabPages[indice];
+                
+                // Remover del control original
+                tabControlOriginal.TabPages.RemoveAt(indice);
+                
+                // Crear nueva pestaña con el nombre apropiado
+                var nuevaPestana = new TabPage(nuevoNombre)
+                {
+                    BackColor = Color.White,
+                    UseVisualStyleBackColor = false
+                };
+                
+                // Transferir todos los controles
+                var controles = new Control[pestanaOriginal.Controls.Count];
+                pestanaOriginal.Controls.CopyTo(controles, 0);
+                
+                foreach (var control in controles)
+                {
+                    pestanaOriginal.Controls.Remove(control);
+                    nuevaPestana.Controls.Add(control);
+                }
+                
+                // Agregar la nueva pestaña al TabControl principal
+                tabPrincipal.TabPages.Add(nuevaPestana);
+            }
         }
 
         private void AgregarPestanasAsistente()
