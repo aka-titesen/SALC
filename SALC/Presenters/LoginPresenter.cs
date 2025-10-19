@@ -44,39 +44,26 @@ namespace SALC.Presenters
                     return;
                 }
 
-                // Routing por rol: 1=Admin, 2=Médico, 3=Asistente (según lote/ERS)
-                System.Windows.Forms.Form next = null;
-                switch (usuario.IdRol)
+                // Crear el nuevo formulario principal con pestañas
+                var frmPrincipalTabs = new FrmPrincipalConTabs(usuario);
+                
+                // Obtener referencia al login
+                var loginForm = _view as System.Windows.Forms.Form;
+                
+                // Mostrar la ventana principal
+                frmPrincipalTabs.Show();
+                
+                // Ocultar el login
+                if (loginForm != null)
                 {
-                    case 1: // Administrador
-                        next = new Views.PanelAdministrador.FrmPanelAdministrador();
-                        var pav = (Views.PanelAdministrador.FrmPanelAdministrador)next;
-                        var adminPresenter = new PanelAdministradorPresenter(pav);
-                        break;
-                    case 2: // Médico
-                        next = new Views.PanelMedico.FrmPanelMedico();
-                        var pmv = (Views.PanelMedico.FrmPanelMedico)next;
-                        var medicoPresenter = new PanelMedicoPresenter(pmv, usuario.Dni);
-                        break;
-                    case 3: // Asistente
-                        next = new Views.PanelAsistente.FrmPanelAsistente();
-                        var pav3 = (Views.PanelAsistente.FrmPanelAsistente)next;
-                        var asistentePresenter = new PanelAsistentePresenter(pav3);
-                        // Conectar el presenter con la vista para que pueda ser llamado desde eventos
-                        pav3.Tag = asistentePresenter;
-                        break;
-                    default:
-                        _view.MostrarError("Rol de usuario no reconocido.");
-                        return;
+                    loginForm.WindowState = System.Windows.Forms.FormWindowState.Minimized;
+                    loginForm.Hide();
                 }
-
-                // Abrir como hijo MDI
-                if (next != null && _view is System.Windows.Forms.Form loginForm && loginForm.MdiParent != null)
-                {
-                    next.MdiParent = loginForm.MdiParent;
-                    next.Show();
-                    loginForm.Close();
-                }
+                
+                // Configurar que cuando se cierre la ventana principal, se cierre la aplicación
+                frmPrincipalTabs.FormClosed += (s, e) => {
+                    System.Windows.Forms.Application.Exit();
+                };
             }
             catch (System.Data.SqlClient.SqlException ex)
             {

@@ -64,8 +64,10 @@
   <Compile Include="Views\PanelAdministrador\FrmUsuarioDetalle.cs" />
   <Compile Include="Views\Compartidos\SeleccionAnalisisControl.cs" />
   <Compile Include="Views\Compartidos\SeleccionPacienteControl.cs" />
+    <Compile Include="Views\Compartidos\FrmInicio.cs" />
     <Compile Include="Views\FrmLogin.cs" />
     <Compile Include="Views\FrmPrincipal.cs" />
+    <Compile Include="Views\FrmPrincipalConTabs.cs" />
     <Compile Include="Presenters\PanelAsistentePresenter.cs" />
     <Compile Include="Presenters\PanelMedicoPresenter.cs" />
   <Compile Include="Presenters\ResultadoEdicionDto.cs" />
