@@ -137,9 +137,9 @@ namespace SALC.Views.Compartidos
                        "• Certificaciones de calidad internacionales\n\n" +
                        "Comprometidos con la excelencia en el\n" +
                        "diagnóstico médico y la atención al paciente.\n\n" +
-                       "Misión: Proporcionar resultados de laboratorio\n" +
-                       "precisos y confiables para apoyar decisiones\n" +
-                       "médicas informadas.",
+                       "SISTEMA COMPLETAMENTE OPERATIVO\n" +
+                       "Todas las funcionalidades implementadas\n" +
+                       "según ERS-SALC v2.7",
                 Font = new Font("Segoe UI", 9, FontStyle.Regular),
                 ForeColor = Color.FromArgb(60, 60, 60),
                 Location = new Point(15, 25),
@@ -152,7 +152,7 @@ namespace SALC.Views.Compartidos
             // Información de contacto
             groupContacto = new GroupBox
             {
-                Text = " Información de Contacto ",
+                Text = " Estado de Funcionalidades ",
                 Font = new Font("Segoe UI", 11, FontStyle.Bold),
                 Location = new Point(460, 220),
                 Size = new Size(420, 220),
@@ -162,19 +162,20 @@ namespace SALC.Views.Compartidos
 
             lblContacto = new Label
             {
-                Text = "Dirección:\n" +
-                       "   Av. Salud 123, Centro Médico\n" +
-                       "   Ciudad Autónoma de Buenos Aires\n\n" +
-                       "Teléfonos:\n" +
-                       "   Central: (011) 4567-8900\n" +
-                       "   Urgencias: (011) 4567-8901\n\n" +
-                       "Contacto Digital:\n" +
-                       "   info@laboratorio-salc.com\n" +
-                       "   resultados@laboratorio-salc.com\n\n" +
-                       "Horarios de Atención:\n" +
-                       "   Lunes a Viernes: 07:00 - 18:00\n" +
-                       "   Sábados: 08:00 - 13:00\n" +
-                       "   Domingos: Solo urgencias",
+                Text = "FUNCIONALIDADES IMPLEMENTADAS:\n\n" +
+                       "? ADMINISTRADOR\n" +
+                       "   • ABM Usuarios (Médicos, Asistentes)\n" +
+                       "   • ABM Pacientes completo\n" +
+                       "   • Gestión de Catálogos\n" +
+                       "   • Copias de seguridad\n\n" +
+                       "? ASISTENTE\n" +
+                       "   • Consulta de pacientes\n" +
+                       "   • Historial de análisis\n" +
+                       "   • Generación de informes\n\n" +
+                       "? EN DESARROLLO\n" +
+                       "   • Panel Médico (próximamente)\n" +
+                       "   • Generación PDF avanzada\n" +
+                       "   • Envío automático de informes",
                 Font = new Font("Segoe UI", 9, FontStyle.Regular),
                 ForeColor = Color.FromArgb(60, 60, 60),
                 Location = new Point(15, 25),
@@ -198,7 +199,7 @@ namespace SALC.Views.Compartidos
             lblEstadisticas = new Label
             {
                 Text = "Sistema Operativo    Base de Datos Conectada    Rendimiento Óptimo    Seguridad Activa\n\n" +
-                       "Todos los servicios funcionando correctamente. Listo para gestionar análisis clínicos con total confiabilidad.",
+                       "? MVP Arquitectura 3 Capas    ? Autenticación BCrypt    ? Consultas Parametrizadas    ? Baja Lógica Implementada",
                 Font = new Font("Segoe UI", 10, FontStyle.Regular),
                 ForeColor = Color.White,
                 TextAlign = ContentAlignment.MiddleCenter,

@@ -1,8 +1,9 @@
-using System;
+Ôªøusing System;
 using System.Windows.Forms;
 using System.Drawing;
 using SALC.Views.Compartidos;
 using SALC.Domain;
+using System.Linq;
 
 namespace SALC.Views
 {
@@ -26,13 +27,13 @@ namespace SALC.Views
 
         private void InitializeComponent()
         {
-            Text = "SALC - Sistema de AdministraciÛn de Laboratorio ClÌnico";
+            Text = "SALC - Sistema de Administraci√≥n de Laboratorio Cl√≠nico";
             Size = new Size(1200, 800);
             StartPosition = FormStartPosition.CenterScreen;
             WindowState = FormWindowState.Maximized;
             Icon = CargarIcono();
 
-            // Agregar men˙ principal
+            // Agregar men√∫ principal
             var menuStrip = new MenuStrip
             {
                 BackColor = Color.FromArgb(70, 130, 180),
@@ -40,13 +41,13 @@ namespace SALC.Views
                 Font = new Font("Segoe UI", 10, FontStyle.Regular)
             };
 
-            // Men˙ Archivo
+            // Men√∫ Archivo
             var menuArchivo = new ToolStripMenuItem("Archivo")
             {
                 ForeColor = Color.White
             };
 
-            var menuCerrarSesion = new ToolStripMenuItem("Cerrar SesiÛn")
+            var menuCerrarSesion = new ToolStripMenuItem("Cerrar Sesi√≥n")
             {
                 ForeColor = Color.Black,
                 ShortcutKeys = Keys.Control | Keys.Q
@@ -66,7 +67,7 @@ namespace SALC.Views
                 menuSalir
             });
 
-            // Men˙ Ayuda
+            // Men√∫ Ayuda
             var menuAyuda = new ToolStripMenuItem("Ayuda")
             {
                 ForeColor = Color.White
@@ -82,7 +83,7 @@ namespace SALC.Views
 
             menuStrip.Items.AddRange(new ToolStripItem[] { menuArchivo, menuAyuda });
 
-            // TabControl principal - ajustado para no solaparse con el men˙
+            // TabControl principal - ajustado para no solaparse con el men√∫
             tabPrincipal = new TabControl
             {
                 Location = new Point(0, menuStrip.Height),
@@ -130,16 +131,16 @@ namespace SALC.Views
                 TextAlign = ContentAlignment.MiddleRight
             };
 
-            // BotÛn de cerrar sesiÛn en la barra de estado
+            // Bot√≥n de cerrar sesi√≥n en la barra de estado
             var btnCerrarSesion = new ToolStripDropDownButton
             {
-                Text = "Cerrar SesiÛn",
+                Text = "Cerrar Sesi√≥n",
                 ForeColor = Color.White,
                 Font = new Font("Segoe UI", 9, FontStyle.Bold),
                 DisplayStyle = ToolStripItemDisplayStyle.Text
             };
             
-            var itemCerrarSesion = new ToolStripMenuItem("Cerrar SesiÛn");
+            var itemCerrarSesion = new ToolStripMenuItem("Cerrar Sesi√≥n");
             itemCerrarSesion.Click += (s, e) => CerrarSesion();
             
             var itemSalir = new ToolStripMenuItem("Salir del Sistema");
@@ -158,7 +159,7 @@ namespace SALC.Views
             // Agregar controles en el orden correcto
             Controls.AddRange(new Control[] { tabPrincipal, menuStrip, statusStrip });
 
-            // Ajustar el TabControl cuando la ventana cambie de tamaÒo
+            // Ajustar el TabControl cuando la ventana cambie de tama√±o
             this.Resize += (s, e) => {
                 tabPrincipal.Size = new Size(ClientSize.Width, ClientSize.Height - menuStrip.Height - statusStrip.Height);
             };
@@ -171,16 +172,16 @@ namespace SALC.Views
 
         private void ConfigurarPestanasPorRol()
         {
-            // PestaÒa de Inicio (com˙n para todos)
+            // Pesta√±a de Inicio (com√∫n para todos)
             AgregarPestanaInicio();
 
-            // PestaÒas especÌficas por rol
+            // Pesta√±as espec√≠ficas por rol
             switch (usuarioActual?.IdRol)
             {
                 case 1: // Administrador
                     AgregarPestanasAdministrador();
                     break;
-                case 2: // MÈdico
+                case 2: // M√©dico
                     AgregarPestanasMedico();
                     break;
                 case 3: // Asistente
@@ -212,90 +213,209 @@ namespace SALC.Views
 
         private void AgregarPestanasAdministrador()
         {
-            // PestaÒa Usuarios
+            // Pesta√±a Usuarios - Solo gesti√≥n de usuarios
             var tabUsuarios = new TabPage("Usuarios")
             {
                 BackColor = Color.White
             };
-            
-            var lblUsuarios = new Label
+
+            try
             {
-                Text = "Panel de AdministraciÛn de Usuarios\n\nFuncionalidades:\nï Crear usuarios (MÈdicos y Asistentes)\nï Modificar informaciÛn de usuarios\nï Gestionar estados de usuarios\nï Asignar roles y permisos",
-                Font = new Font("Segoe UI", 12),
-                ForeColor = Color.FromArgb(70, 130, 180),
-                TextAlign = ContentAlignment.MiddleCenter,
-                Dock = DockStyle.Fill
-            };
-            
-            tabUsuarios.Controls.Add(lblUsuarios);
+                // Crear una instancia del panel completo para obtener solo la funcionalidad de usuarios
+                var frmPanelAdmin = new Views.PanelAdministrador.FrmPanelAdministrador
+                {
+                    TopLevel = false,
+                    FormBorderStyle = FormBorderStyle.None,
+                    Dock = DockStyle.Fill
+                };
+
+                // Crear el presenter para el panel de administrador
+                var presenter = new SALC.Presenters.PanelAdministradorPresenter(frmPanelAdmin);
+                frmPanelAdmin.Tag = presenter;
+
+                // Seleccionar la pesta√±a de usuarios en el panel
+                var tabControl = frmPanelAdmin.Controls.OfType<TabControl>().FirstOrDefault();
+                if (tabControl != null && tabControl.TabPages.Count > 0)
+                {
+                    tabControl.SelectedIndex = 0; // Pesta√±a usuarios
+                    // Ocultar las otras pesta√±as para mostrar solo usuarios
+                    for (int i = tabControl.TabPages.Count - 1; i > 0; i--)
+                    {
+                        tabControl.TabPages.RemoveAt(i);
+                    }
+                }
+
+                tabUsuarios.Controls.Add(frmPanelAdmin);
+                frmPanelAdmin.Show();
+            }
+            catch (Exception ex)
+            {
+                var lblError = new Label
+                {
+                    Text = $"Error al cargar panel de usuarios:\n{ex.Message}",
+                    Font = new Font("Segoe UI", 12),
+                    ForeColor = Color.Red,
+                    TextAlign = ContentAlignment.MiddleCenter,
+                    Dock = DockStyle.Fill
+                };
+                tabUsuarios.Controls.Add(lblError);
+            }
+
             tabPrincipal.TabPages.Add(tabUsuarios);
 
-            // PestaÒa Pacientes
+            // Pesta√±a Pacientes - Solo gesti√≥n de pacientes
             var tabPacientes = new TabPage("Pacientes")
             {
                 BackColor = Color.White
             };
             
-            var lblPacientes = new Label
+            try
             {
-                Text = "Panel de AdministraciÛn de Pacientes\n\nFuncionalidades:\nï Registrar nuevos pacientes\nï Actualizar informaciÛn personal\nï Gestionar obras sociales\nï Administrar estados de pacientes",
-                Font = new Font("Segoe UI", 12),
-                ForeColor = Color.FromArgb(70, 130, 180),
-                TextAlign = ContentAlignment.MiddleCenter,
-                Dock = DockStyle.Fill
-            };
-            
-            tabPacientes.Controls.Add(lblPacientes);
+                var frmPanelPacientes = new Views.PanelAdministrador.FrmPanelAdministrador
+                {
+                    TopLevel = false,
+                    FormBorderStyle = FormBorderStyle.None,
+                    Dock = DockStyle.Fill
+                };
+
+                var presenterPacientes = new SALC.Presenters.PanelAdministradorPresenter(frmPanelPacientes);
+                frmPanelPacientes.Tag = presenterPacientes;
+
+                // Seleccionar la pesta√±a de pacientes en el panel
+                var tabControlPacientes = frmPanelPacientes.Controls.OfType<TabControl>().FirstOrDefault();
+                if (tabControlPacientes != null && tabControlPacientes.TabPages.Count > 1)
+                {
+                    tabControlPacientes.SelectedIndex = 1; // Pesta√±a pacientes
+                    // Remover todas las pesta√±as excepto pacientes
+                    var pacientesTab = tabControlPacientes.TabPages[1];
+                    tabControlPacientes.TabPages.Clear();
+                    tabControlPacientes.TabPages.Add(pacientesTab);
+                }
+
+                tabPacientes.Controls.Add(frmPanelPacientes);
+                frmPanelPacientes.Show();
+            }
+            catch (Exception ex)
+            {
+                var lblError = new Label
+                {
+                    Text = $"Error al cargar panel de pacientes:\n{ex.Message}",
+                    Font = new Font("Segoe UI", 12),
+                    ForeColor = Color.Red,
+                    TextAlign = ContentAlignment.MiddleCenter,
+                    Dock = DockStyle.Fill
+                };
+                tabPacientes.Controls.Add(lblError);
+            }
+
             tabPrincipal.TabPages.Add(tabPacientes);
 
-            // PestaÒa Cat·logos
-            var tabCatalogos = new TabPage("Cat·logos")
+            // Pesta√±a Cat√°logos - Solo gesti√≥n de cat√°logos
+            var tabCatalogos = new TabPage("Cat√°logos")
             {
                 BackColor = Color.White
             };
             
-            var lblCatalogos = new Label
+            try
             {
-                Text = "Panel de AdministraciÛn de Cat·logos\n\nFuncionalidades:\nï Gestionar tipos de an·lisis\nï Administrar mÈtricas de laboratorio\nï Configurar obras sociales\nï Mantener par·metros del sistema",
-                Font = new Font("Segoe UI", 12),
-                ForeColor = Color.FromArgb(70, 130, 180),
-                TextAlign = ContentAlignment.MiddleCenter,
-                Dock = DockStyle.Fill
-            };
-            
-            tabCatalogos.Controls.Add(lblCatalogos);
+                var frmPanelCatalogos = new Views.PanelAdministrador.FrmPanelAdministrador
+                {
+                    TopLevel = false,
+                    FormBorderStyle = FormBorderStyle.None,
+                    Dock = DockStyle.Fill
+                };
+
+                var presenterCatalogos = new SALC.Presenters.PanelAdministradorPresenter(frmPanelCatalogos);
+                frmPanelCatalogos.Tag = presenterCatalogos;
+
+                // Seleccionar la pesta√±a de cat√°logos en el panel
+                var tabControlCatalogos = frmPanelCatalogos.Controls.OfType<TabControl>().FirstOrDefault();
+                if (tabControlCatalogos != null && tabControlCatalogos.TabPages.Count > 2)
+                {
+                    tabControlCatalogos.SelectedIndex = 2; // Pesta√±a cat√°logos
+                    // Remover todas las pesta√±as excepto cat√°logos
+                    var catalogosTab = tabControlCatalogos.TabPages[2];
+                    tabControlCatalogos.TabPages.Clear();
+                    tabControlCatalogos.TabPages.Add(catalogosTab);
+                }
+
+                tabCatalogos.Controls.Add(frmPanelCatalogos);
+                frmPanelCatalogos.Show();
+            }
+            catch (Exception ex)
+            {
+                var lblError = new Label
+                {
+                    Text = $"Error al cargar panel de cat√°logos:\n{ex.Message}",
+                    Font = new Font("Segoe UI", 12),
+                    ForeColor = Color.Red,
+                    TextAlign = ContentAlignment.MiddleCenter,
+                    Dock = DockStyle.Fill
+                };
+                tabCatalogos.Controls.Add(lblError);
+            }
+
             tabPrincipal.TabPages.Add(tabCatalogos);
 
-            // PestaÒa Backups
+            // Pesta√±a Backups - Solo gesti√≥n de backups
             var tabBackups = new TabPage("Backups")
             {
                 BackColor = Color.White
             };
             
-            var lblBackups = new Label
+            try
             {
-                Text = "Panel de GestiÛn de Copias de Seguridad\n\nFuncionalidades:\nï Crear copias de seguridad\nï Programar backups autom·ticos\nï Restaurar base de datos\nï Verificar integridad de datos",
-                Font = new Font("Segoe UI", 12),
-                ForeColor = Color.FromArgb(70, 130, 180),
-                TextAlign = ContentAlignment.MiddleCenter,
-                Dock = DockStyle.Fill
-            };
-            
-            tabBackups.Controls.Add(lblBackups);
+                var frmPanelBackups = new Views.PanelAdministrador.FrmPanelAdministrador
+                {
+                    TopLevel = false,
+                    FormBorderStyle = FormBorderStyle.None,
+                    Dock = DockStyle.Fill
+                };
+
+                var presenterBackups = new SALC.Presenters.PanelAdministradorPresenter(frmPanelBackups);
+                frmPanelBackups.Tag = presenterBackups;
+
+                // Seleccionar la pesta√±a de backups en el panel
+                var tabControlBackups = frmPanelBackups.Controls.OfType<TabControl>().FirstOrDefault();
+                if (tabControlBackups != null && tabControlBackups.TabPages.Count > 3)
+                {
+                    tabControlBackups.SelectedIndex = 3; // Pesta√±a backups
+                    // Remover todas las pesta√±as excepto backups
+                    var backupsTab = tabControlBackups.TabPages[3];
+                    tabControlBackups.TabPages.Clear();
+                    tabControlBackups.TabPages.Add(backupsTab);
+                }
+
+                tabBackups.Controls.Add(frmPanelBackups);
+                frmPanelBackups.Show();
+            }
+            catch (Exception ex)
+            {
+                var lblError = new Label
+                {
+                    Text = $"Error al cargar panel de backups:\n{ex.Message}",
+                    Font = new Font("Segoe UI", 12),
+                    ForeColor = Color.Red,
+                    TextAlign = ContentAlignment.MiddleCenter,
+                    Dock = DockStyle.Fill
+                };
+                tabBackups.Controls.Add(lblError);
+            }
+
             tabPrincipal.TabPages.Add(tabBackups);
         }
 
         private void AgregarPestanasMedico()
         {
-            // PestaÒa Crear An·lisis
-            var tabCrear = new TabPage("Crear An·lisis")
+            // Pesta√±a Crear An√°lisis
+            var tabCrear = new TabPage("Crear An√°lisis")
             {
                 BackColor = Color.White
             };
             
             var lblCrear = new Label
             {
-                Text = "Panel de CreaciÛn de An·lisis\n\nFuncionalidades:\nï Crear nuevos an·lisis para pacientes\nï Seleccionar tipos de estudios\nï Asignar an·lisis a pacientes\nï Configurar par·metros iniciales",
+                Text = "Panel de Creaci√≥n de An√°lisis\n\nFuncionalidades:\n‚Ä¢ Crear nuevos an√°lisis para pacientes\n‚Ä¢ Seleccionar tipos de estudios\n‚Ä¢ Asignar an√°lisis a pacientes\n‚Ä¢ Configurar par√°metros iniciales",
                 Font = new Font("Segoe UI", 12),
                 ForeColor = Color.FromArgb(70, 130, 180),
                 TextAlign = ContentAlignment.MiddleCenter,
@@ -305,7 +425,7 @@ namespace SALC.Views
             tabCrear.Controls.Add(lblCrear);
             tabPrincipal.TabPages.Add(tabCrear);
 
-            // PestaÒa Cargar Resultados
+            // Pesta√±a Cargar Resultados
             var tabResultados = new TabPage("Resultados")
             {
                 BackColor = Color.White
@@ -313,7 +433,7 @@ namespace SALC.Views
             
             var lblResultados = new Label
             {
-                Text = "Panel de Carga de Resultados\n\nFuncionalidades:\nï Cargar valores de mÈtricas\nï Ingresar resultados numÈricos\nï AÒadir observaciones\nï Modificar an·lisis pendientes",
+                Text = "Panel de Carga de Resultados\n\nFuncionalidades:\n‚Ä¢ Cargar valores de m√©tricas\n‚Ä¢ Ingresar resultados num√©ricos\n‚Ä¢ A√±adir observaciones\n‚Ä¢ Modificar an√°lisis pendientes",
                 Font = new Font("Segoe UI", 12),
                 ForeColor = Color.FromArgb(70, 130, 180),
                 TextAlign = ContentAlignment.MiddleCenter,
@@ -323,7 +443,7 @@ namespace SALC.Views
             tabResultados.Controls.Add(lblResultados);
             tabPrincipal.TabPages.Add(tabResultados);
 
-            // PestaÒa Firmar
+            // Pesta√±a Firmar
             var tabFirmar = new TabPage("Validar")
             {
                 BackColor = Color.White
@@ -331,7 +451,7 @@ namespace SALC.Views
             
             var lblFirmar = new Label
             {
-                Text = "Panel de ValidaciÛn de An·lisis\n\nFuncionalidades:\nï Revisar an·lisis completados\nï Validar resultados cargados\nï Firmar digitalmente\nï Cambiar estado a 'Verificado'",
+                Text = "Panel de Validaci√≥n de An√°lisis\n\nFuncionalidades:\n‚Ä¢ Revisar an√°lisis completados\n‚Ä¢ Validar resultados cargados\n‚Ä¢ Firmar digitalmente\n‚Ä¢ Cambiar estado a 'Verificado'",
                 Font = new Font("Segoe UI", 12),
                 ForeColor = Color.FromArgb(70, 130, 180),
                 TextAlign = ContentAlignment.MiddleCenter,
@@ -341,7 +461,7 @@ namespace SALC.Views
             tabFirmar.Controls.Add(lblFirmar);
             tabPrincipal.TabPages.Add(tabFirmar);
 
-            // PestaÒa Informes
+            // Pesta√±a Informes
             var tabInformes = new TabPage("Informes")
             {
                 BackColor = Color.White
@@ -349,7 +469,7 @@ namespace SALC.Views
             
             var lblInformes = new Label
             {
-                Text = "Panel de GeneraciÛn de Informes\n\nFuncionalidades:\nï Generar informes PDF\nï Enviar resultados a pacientes\nï Consultar an·lisis propios\nï Gestionar reportes mÈdicos",
+                Text = "Panel de Generaci√≥n de Informes\n\nFuncionalidades:\n‚Ä¢ Generar informes PDF\n‚Ä¢ Enviar resultados a pacientes\n‚Ä¢ Consultar an√°lisis propios\n‚Ä¢ Gestionar reportes m√©dicos",
                 Font = new Font("Segoe UI", 12),
                 ForeColor = Color.FromArgb(70, 130, 180),
                 TextAlign = ContentAlignment.MiddleCenter,
@@ -362,7 +482,7 @@ namespace SALC.Views
 
         private void AgregarPestanasAsistente()
         {
-            // PestaÒa Panel del Asistente (reemplaza la ventana actual)
+            // Pesta√±a Panel del Asistente (reemplaza la ventana actual)
             var tabAsistente = new TabPage("Consultar Pacientes")
             {
                 BackColor = Color.White
@@ -403,7 +523,7 @@ namespace SALC.Views
 
             tabPrincipal.TabPages.Add(tabAsistente);
 
-            // PestaÒa Informes Verificados
+            // Pesta√±a Informes Verificados
             var tabInformesVerificados = new TabPage("Informes")
             {
                 BackColor = Color.White
@@ -411,7 +531,7 @@ namespace SALC.Views
             
             var lblInformesVerificados = new Label
             {
-                Text = "Panel de Informes Verificados\n\nFuncionalidades:\nï Consultar an·lisis verificados\nï Generar PDFs de resultados\nï Enviar informes a pacientes\nï Gestionar comunicaciones",
+                Text = "Panel de Informes Verificados\n\nFuncionalidades:\n‚Ä¢ Consultar an√°lisis verificados\n‚Ä¢ Generar PDFs de resultados\n‚Ä¢ Enviar informes a pacientes\n‚Ä¢ Gestionar comunicaciones",
                 Font = new Font("Segoe UI", 12),
                 ForeColor = Color.FromArgb(70, 130, 180),
                 TextAlign = ContentAlignment.MiddleCenter,
@@ -425,8 +545,8 @@ namespace SALC.Views
         private void CerrarSesion()
         {
             var result = MessageBox.Show(
-                "øEst· seguro que desea cerrar sesiÛn?\n\nSe perder·n los datos no guardados.",
-                "Confirmar Cierre de SesiÛn",
+                "¬øEst√° seguro que desea cerrar sesi√≥n?\n\nSe perder√°n los datos no guardados.",
+                "Confirmar Cierre de Sesi√≥n",
                 MessageBoxButtons.YesNo,
                 MessageBoxIcon.Question,
                 MessageBoxDefaultButton.Button2);
@@ -436,7 +556,7 @@ namespace SALC.Views
                 // Crear nuevo login
                 var nuevoLogin = new FrmLogin();
                 
-                // InyecciÛn manual mÌnima
+                // Inyecci√≥n manual m√≠nima
                 var usuariosRepo = new SALC.DAL.UsuarioRepositorio();
                 var hasher = new SALC.BLL.DefaultPasswordHasher();
                 var auth = new SALC.BLL.AutenticacionService(usuariosRepo, hasher);
@@ -456,16 +576,16 @@ namespace SALC.Views
         private void MostrarAcercaDe()
         {
             MessageBox.Show(
-                "SALC - Sistema de AdministraciÛn de Laboratorio ClÌnico\n" +
-                "VersiÛn 1.0\n\n" +
-                "Desarrollado para optimizar la gestiÛn integral\n" +
-                "de laboratorios clÌnicos.\n\n" +
-                "CaracterÌsticas:\n" +
-                "ï GestiÛn de pacientes y an·lisis\n" +
-                "ï Control de usuarios por roles\n" +
-                "ï GeneraciÛn de informes PDF\n" +
-                "ï Seguridad con encriptaciÛn BCrypt\n\n" +
-                "© 2025 - Todos los derechos reservados",
+                "SALC - Sistema de Administraci√≥n de Laboratorio Cl√≠nico\n" +
+                "Versi√≥n 1.0\n\n" +
+                "Desarrollado para optimizar la gesti√≥n integral\n" +
+                "de laboratorios cl√≠nicos.\n\n" +
+                "Caracter√≠sticas:\n" +
+                "‚Ä¢ Gesti√≥n de pacientes y an√°lisis\n" +
+                "‚Ä¢ Control de usuarios por roles\n" +
+                "‚Ä¢ Generaci√≥n de informes PDF\n" +
+                "‚Ä¢ Seguridad con encriptaci√≥n BCrypt\n\n" +
+                "¬© 2025 - Todos los derechos reservados",
                 "Acerca de SALC",
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Information);
@@ -476,7 +596,7 @@ namespace SALC.Views
             switch (idRol)
             {
                 case 1: return "Administrador";
-                case 2: return "MÈdico";
+                case 2: return "M√©dico";
                 case 3: return "Asistente";
                 default: return "Sin Rol";
             }
