@@ -1,9 +1,9 @@
 /* ====================================================================
-   SALC – LOTE DE DATOS DE EJEMPLO – v2.8
-   - Adaptado a la estructura de BD v2.8 con baja lógica implementada.
+   SALC – LOTE DE DATOS DE EJEMPLO – v1.0
+   - Adaptado a la estructura de BD v1.0 con baja lógica implementada.
    - Incluye el estado 'Anulado' para análisis.
    - Incluye ejemplos de registros 'Inactivos' en tablas maestras.
-   - Contraseñas hasheadas (ejemplo BCrypt).
+   - Contraseñas NO hasheadas, aún en texto plano (Recomendable usar por ejemplo BCrypt).
    ==================================================================== */
 USE [SALC];
 GO
@@ -52,7 +52,7 @@ INSERT INTO metricas (nombre, unidad_medida, valor_minimo, valor_maximo, estado)
 GO
 
 -- 6. USUARIOS (Datos comunes) ---------------------------
--- Las contraseñas son un HASH generado por la aplicación (ej. BCrypt).
+-- Las contraseñas deberían ser un HASH generado por la aplicación (ej. BCrypt).
 INSERT INTO usuarios (dni, nombre, apellido, id_rol, email, password_hash, estado) VALUES
 (30000001,'Juan','Pérez',1,'jperez@lab.com','$2a$12$URP1nbn2iSYn5/cEFwcaMeN8N.8SR1TaL3FMwFvYthH6c7DAfxWWm', 'Activo'),
 (30000002,'María','González',2,'mgonzalez@lab.com','$2a$12$xR2X4M31NjPdlYXefWGhVO/mhEY4wEcHGtrIT09zPWFyjcH49k7.q', 'Activo'),
@@ -102,5 +102,5 @@ INSERT INTO analisis_metrica (id_analisis, id_metrica, resultado) VALUES
 -- NOTA: El análisis anulado (ID 4) no tiene resultados cargados.
 GO
 
-PRINT 'Lote de datos de ejemplo v2.8 (con baja lógica) cargado correctamente.';
+PRINT 'Lote de datos de ejemplo v1.0 (con baja lógica) cargado correctamente.';
 GO

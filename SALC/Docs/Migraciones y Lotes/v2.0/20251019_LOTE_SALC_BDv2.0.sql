@@ -1,6 +1,6 @@
 /* ====================================================================
-   SALC – LOTE DE DATOS DE EJEMPLO – v2.9
-   - Adaptado a la estructura de BD v2.9.
+   SALC – LOTE DE DATOS DE EJEMPLO – v2.0
+   - Adaptado a la estructura de BD v2.0.
    - Se añade la población de la tabla 'tipo_analisis_metrica'.
    - Se incluyen contraseñas en texto plano en comentarios para pruebas.
    ==================================================================== */
@@ -114,6 +114,6 @@ INSERT INTO analisis_metrica (id_analisis, id_metrica, resultado) VALUES
 -- NOTA: El análisis anulado (ID 4) no tiene resultados cargados.
 GO
 
-PRINT 'Lote de datos de ejemplo v2.9 (con passwords) cargado correctamente.';
+PRINT 'Lote de datos de ejemplo v2.0 (con passwords) cargado correctamente.';
 GO
 

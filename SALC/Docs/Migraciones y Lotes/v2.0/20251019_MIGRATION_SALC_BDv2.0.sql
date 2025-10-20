@@ -1,5 +1,5 @@
 ----------------------------------------------------------------------
--- SALC Database Script - v2.9
+-- SALC Database Script - v2.0
 -- Cambios:
 -- 1. Se añade la tabla 'tipo_analisis_metrica' para crear una
 --    relación N:N entre tipos de análisis y las métricas que los

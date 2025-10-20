@@ -1,5 +1,5 @@
 ----------------------------------------------------------------------
--- SALC Database Script - v2.8 (Con Baja Lógica Profesional)
+-- SALC Database Script - v2.8
 -- Cambios:
 -- 1. Agregada columna 'estado' a tablas maestras para soportar baja lógica.
 -- 2. La baja lógica de 'analisis' se maneja a través de un nuevo estado
