@@ -50,6 +50,7 @@
   <ItemGroup>
     <Compile Include="Views\PanelAsistente\FrmPanelAsistente.cs" />
     <Compile Include="Views\PanelAsistente\FrmInformesVerificados.cs" />
+    <Compile Include="Views\PanelAsistente\FrmGestionPacientes.cs" />
     <Compile Include="Views\PanelMedico\FrmPanelMedico.cs" />
     <Compile Include="Views\PanelMedico\FrmSeleccionPaciente.cs" />
     <Compile Include="Views\PanelMedico\FrmSeleccionAnalisisResultados.cs" />
@@ -72,12 +73,14 @@
     <Compile Include="Views\FrmPrincipalConTabs.cs" />
     <Compile Include="Presenters\PanelAsistentePresenter.cs" />
     <Compile Include="Presenters\InformesVerificadosPresenter.cs" />
+    <Compile Include="Presenters\GestionPacientesAsistentePresenter.cs" />
     <Compile Include="Presenters\PanelMedicoPresenter.cs" />
   <Compile Include="Presenters\ResultadoEdicionDto.cs" />
     <Compile Include="Presenters\PanelAdministradorPresenter.cs" />
     <Compile Include="Presenters\LoginPresenter.cs" />
     <Compile Include="Presenters\ViewsContracts\IPanelAsistenteView.cs" />
     <Compile Include="Presenters\ViewsContracts\IInformesVerificadosView.cs" />
+    <Compile Include="Presenters\ViewsContracts\IGestionPacientesAsistenteView.cs" />
     <Compile Include="Presenters\ViewsContracts\IPanelMedicoView.cs" />
     <Compile Include="Presenters\ViewsContracts\IPanelAdministradorView.cs" />
     <Compile Include="Presenters\ViewsContracts\ILoginView.cs" />

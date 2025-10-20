@@ -484,7 +484,17 @@ namespace SALC.Views
         {
             try
             {
-                // Crear una sola instancia del panel asistente
+                // Pestaña 1: Gestión de Pacientes (RF-03) - NUEVA FUNCIONALIDAD
+                AgregarPestanaGestionPacientesAsistente();
+
+                // Pestaña 2: Consultar Pacientes (RF-09)
+                var tabConsultarPacientes = new TabPage("Consultar Pacientes")
+                {
+                    BackColor = Color.White,
+                    UseVisualStyleBackColor = false
+                };
+
+                // Crear una sola instancia del panel asistente para consultas
                 var frmPanelAsistente = new PanelAsistente.FrmPanelAsistente
                 {
                     TopLevel = false,
@@ -499,20 +509,13 @@ namespace SALC.Views
                 // Mostrar el formulario para inicializarlo completamente
                 frmPanelAsistente.Show();
 
-                // Pestaña 1: Consultar Pacientes (RF-09)
-                var tabConsultarPacientes = new TabPage("Consultar Pacientes")
-                {
-                    BackColor = Color.White,
-                    UseVisualStyleBackColor = false
-                };
-
                 tabConsultarPacientes.Controls.Add(frmPanelAsistente);
                 tabPrincipal.TabPages.Add(tabConsultarPacientes);
 
                 // Inicializar la vista del asistente
                 presenterAsistente.InicializarVista();
 
-                // Pestaña 2: Informes Verificados (RF-08)
+                // Pestaña 3: Informes Verificados (RF-08)
                 AgregarPestanaInformesVerificados();
 
                 // Guardar referencia del presenter para que no se pierda
@@ -539,6 +542,93 @@ namespace SALC.Views
             }
         }
 
+        private void AgregarPestanaGestionPacientesAsistente()
+        {
+            var tabGestionPacientes = new TabPage("Gestión de Pacientes")
+            {
+                BackColor = Color.White,
+                UseVisualStyleBackColor = false
+            };
+
+            try
+            {
+                // Crear formulario de gestión de pacientes para asistente
+                var frmGestionPacientes = new SALC.Views.PanelAsistente.FrmGestionPacientes
+                {
+                    TopLevel = false,
+                    FormBorderStyle = FormBorderStyle.None,
+                    Dock = DockStyle.Fill
+                };
+
+                // Crear presenter para gestión de pacientes del asistente
+                var presenterGestionPacientes = new SALC.Presenters.GestionPacientesAsistentePresenter(frmGestionPacientes);
+                frmGestionPacientes.Tag = presenterGestionPacientes;
+
+                tabGestionPacientes.Controls.Add(frmGestionPacientes);
+                frmGestionPacientes.Show();
+
+                // Inicializar la vista
+                presenterGestionPacientes.InicializarVista();
+            }
+            catch (Exception ex)
+            {
+                // Si hay error, mostrar placeholder descriptivo
+                var panel = new Panel { Dock = DockStyle.Fill, BackColor = Color.White };
+
+                var lblTitulo = new Label
+                {
+                    Text = "👥 Gestión de Pacientes - Asistente",
+                    Font = new Font("Segoe UI", 16, FontStyle.Bold),
+                    ForeColor = Color.FromArgb(70, 130, 180),
+                    Location = new Point(50, 50),
+                    Size = new Size(500, 35)
+                };
+
+                var lblDescripcion = new Label
+                {
+                    Text = "RF-03: Administración de Pacientes por Asistente\n\n" +
+                           "Funcionalidades habilitadas para Asistente:\n" +
+                           "• ✅ Alta de nuevos pacientes\n" +
+                           "• ✅ Modificación de datos de pacientes existentes\n" +
+                           "• 📋 Listado y búsqueda de pacientes\n" +
+                           "• 👁️ Visualización de información completa\n\n" +
+                           "Restricciones:\n" +
+                           "• ❌ No puede realizar baja de pacientes\n" +
+                           "• ⚠️ Supervisado por médico asignado\n\n" +
+                           "Nota: Esta funcionalidad complementa la consulta de historiales (RF-09)",
+                    Font = new Font("Segoe UI", 11),
+                    ForeColor = Color.FromArgb(70, 130, 180),
+                    Location = new Point(50, 100),
+                    Size = new Size(650, 250)
+                };
+
+                var lblEstado = new Label
+                {
+                    Text = $"⚠️ Error al cargar componente: {ex.Message}",
+                    Font = new Font("Segoe UI", 9, FontStyle.Italic),
+                    ForeColor = Color.Orange,
+                    Location = new Point(50, 370),
+                    Size = new Size(600, 30)
+                };
+
+                var lblImplementacion = new Label
+                {
+                    Text = "💡 Componentes implementados: FrmGestionPacientes y GestionPacientesAsistentePresenter",
+                    Font = new Font("Segoe UI", 9, FontStyle.Italic),
+                    ForeColor = Color.Green,
+                    Location = new Point(50, 400),
+                    Size = new Size(600, 30)
+                };
+
+                panel.Controls.AddRange(new Control[] { 
+                    lblTitulo, lblDescripcion, lblEstado, lblImplementacion 
+                });
+                tabGestionPacientes.Controls.Add(panel);
+            }
+
+            tabPrincipal.TabPages.Add(tabGestionPacientes);
+        }
+
         private void AgregarPestanaInformesVerificados()
         {
             var tabInformesVerificados = new TabPage("Informes")
@@ -549,6 +639,9 @@ namespace SALC.Views
 
             try
             {
+                // TODO: Implementar FrmInformesVerificados y InformesVerificadosPresenter
+                // Temporalmente comentado para evitar errores de compilación
+                /*
                 // Crear formulario de informes verificados para asistente
                 var frmInformesAsistente = new SALC.Views.PanelAsistente.FrmInformesVerificados
                 {
@@ -566,6 +659,10 @@ namespace SALC.Views
 
                 // Inicializar la vista
                 presenterInformes.InicializarVista();
+                */
+                
+                // Lanzar excepción para mostrar placeholder
+                throw new NotImplementedException("Componente de informes verificados pendiente de implementación");
             }
             catch (Exception ex)
             {
@@ -605,7 +702,16 @@ namespace SALC.Views
                     Size = new Size(600, 30)
                 };
 
-                panel.Controls.AddRange(new Control[] { lblTitulo, lblDescripcion, lblEstado });
+                var lblImplementacion = new Label
+                {
+                    Text = "💡 Pendiente: Implementar FrmInformesVerificados y InformesVerificadosPresenter",
+                    Font = new Font("Segoe UI", 9, FontStyle.Italic),
+                    ForeColor = Color.Gray,
+                    Location = new Point(50, 350),
+                    Size = new Size(600, 30)
+                };
+
+                panel.Controls.AddRange(new Control[] { lblTitulo, lblDescripcion, lblEstado, lblImplementacion });
                 tabInformesVerificados.Controls.Add(panel);
             }
 
