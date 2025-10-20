@@ -98,6 +98,7 @@
     <Compile Include="BLL\IAutenticacionService.cs" />
   <Compile Include="BLL\IPasswordHasher.cs" />
   <Compile Include="BLL\DefaultPasswordHasher.cs" />
+    <Compile Include="DAL\BackupRepositorio.cs" />
     <Compile Include="DAL\UsuarioRepositorio.cs" />
     <Compile Include="DAL\PacienteRepositorio.cs" />
     <Compile Include="DAL\CatalogoRepositorio.cs" />
@@ -110,6 +111,7 @@
     <Compile Include="DAL\IRepositorioBase.cs" />
     <Compile Include="Infraestructura\DbConexion.cs" />
   <Compile Include="Infraestructura\DbHealth.cs" />
+    <Compile Include="Domain\Backup.cs" />
     <Compile Include="Domain\EstadoAnalisis.cs" />
     <Compile Include="Domain\Rol.cs" />
     <Compile Include="Domain\AnalisisMetrica.cs" />
@@ -122,6 +124,7 @@
     <Compile Include="Domain\Asistente.cs" />
     <Compile Include="Domain\Medico.cs" />
     <Compile Include="Domain\Usuario.cs" />
+    <Compile Include="Domain\EstadosConstantes.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">

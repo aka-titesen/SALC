@@ -15,10 +15,20 @@ namespace SALC
         /// Punto de entrada principal para la aplicación.
         /// </summary>
         [STAThread]
-        static void Main()
+        static void Main(string[] args)
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+            
+            // Verificar si se está ejecutando un backup automático
+            if (args != null && args.Length > 0)
+            {
+                if (args.Contains("/backup") && args.Contains("/auto"))
+                {
+                    EjecutarBackupAutomatico();
+                    return; // Salir sin mostrar interfaz gráfica
+                }
+            }
             
             // Iniciar directamente con el login
             var login = new FrmLogin();
@@ -31,6 +41,27 @@ namespace SALC
             
             // Ejecutar la aplicación con el login como formulario principal
             Application.Run(login);
+        }
+
+        private static void EjecutarBackupAutomatico()
+        {
+            try
+            {
+                var backupService = new BackupService();
+                backupService.EjecutarBackupAutomatico();
+                
+                // Log del resultado (opcional - podría escribir a Event Log de Windows)
+                System.Diagnostics.EventLog.WriteEntry("SALC", 
+                    "Backup automático ejecutado correctamente", 
+                    System.Diagnostics.EventLogEntryType.Information);
+            }
+            catch (Exception ex)
+            {
+                // Log del error
+                System.Diagnostics.EventLog.WriteEntry("SALC", 
+                    $"Error en backup automático: {ex.Message}", 
+                    System.Diagnostics.EventLogEntryType.Error);
+            }
         }
     }
 }

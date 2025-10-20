@@ -65,6 +65,7 @@ namespace SALC.Presenters
         private List<ObraSocial> _obrasSociales = new List<ObraSocial>();
         private List<TipoAnalisis> _tiposAnalisis = new List<TipoAnalisis>();
         private List<Metrica> _metricas = new List<Metrica>();
+        private int _dniUsuarioActual;
 
         public PanelAdministradorPresenter(IPanelAdministradorView view)
         {
@@ -121,20 +122,43 @@ namespace SALC.Presenters
 
         private void OnEjecutarBackup()
         {
-            using (var sfd = new SaveFileDialog { Filter = "Archivo de backup (*.bak)|*.bak", FileName = $"SALC_{DateTime.Now:yyyyMMdd_HHmm}.bak" })
+            // TODO: Implementar formulario completo de gestión de backups
+            try
             {
-                if (sfd.ShowDialog() == DialogResult.OK)
+                // Hasta que se implemente el formulario de gestión de backups,
+                // mostrar un diálogo simple para ejecutar backup manual
+                using (var dlg = new SaveFileDialog())
                 {
-                    try
+                    dlg.Filter = "Archivos de backup (*.bak)|*.bak";
+                    dlg.Title = "Seleccionar ubicación del backup";
+                    dlg.FileName = $"SALC_Manual_{DateTime.Now:yyyyMMdd_HHmmss}.bak";
+                    
+                    if (dlg.ShowDialog() == DialogResult.OK)
                     {
-                        _backupService.EjecutarBackup(sfd.FileName);
-                        MessageBox.Show("Backup realizado correctamente.", "Backup", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    }
-                    catch (System.Exception ex)
-                    {
-                        MessageBox.Show("Error al ejecutar backup: " + ex.Message, "Backup", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        var cursor = Cursor.Current;
+                        try
+                        {
+                            Cursor.Current = Cursors.WaitCursor;
+                            _backupService.EjecutarBackup(dlg.FileName, _dniUsuarioActual, "Manual");
+                            MessageBox.Show("Backup ejecutado correctamente en:\n" + dlg.FileName, 
+                                          "Backup", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        }
+                        finally
+                        {
+                            Cursor.Current = cursor;
+                        }
                     }
                 }
+                
+                // Cuando esté listo el formulario, descomentar:
+                // using (var dlg = new SALC.Views.PanelAdministrador.Backups.FrmGestionBackups(_dniUsuarioActual))
+                // {
+                //     dlg.ShowDialog();
+                // }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error al ejecutar backup: " + ex.Message, "Backups", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -771,6 +795,11 @@ namespace SALC.Presenters
             {
                 _view.MostrarMensaje("Error al mostrar detalles del usuario: " + ex.Message, "Usuarios", true);
             }
+        }
+
+        public void EstablecerUsuarioActual(int dni)
+        {
+            _dniUsuarioActual = dni;
         }
     }
 }

@@ -17,7 +17,7 @@ El sistema SALC se centrará exclusivamente en la operativa interna del laborato
 * **Funcionalidad IN-SCOPE:**  
   * Gestión de entidades maestras: Pacientes, Obras Sociales, Tipos de Análisis y Métricas.  
   * Control de acceso y permisos basado en tres roles definidos: Administrador, Médico y Asistente.  
-  * Ciclo de vida de los análisis: Creación, carga de resultados, validación por firma, y generación/envío de informes.  
+  * Ciclo de vida de los análisis: Creación, carga de resultados y validación por firma.  
   * Administración del sistema: Gestión de usuarios, catálogos y copias de seguridad.  
 * **Funcionalidad OUT-OF-SCOPE:**  
   * Gestión de turnos o agenda médica.  
@@ -33,7 +33,7 @@ Los roles de usuario definen el alcance funcional dentro del sistema.
 | Rol | Alcance Funcional Detallado (Acciones habilitadas) |
 | :---- | :---- |
 | **Administrador** | Ejecuta operaciones de Alta, Baja y Modificación (ABM) sobre todas las entidades del sistema (Usuarios, Análisis, Obras Sociales, etc.), **excepto Pacientes**. Configura y gestiona las copias de seguridad de la base de datos. **Podrá crear, modificar y eliminar las asociaciones entre los tipos de análisis y las métricas que los componen.** |
-| **Médico** | Crea un nuevo Análisis para un Paciente, asociándose a él. Carga los resultados numéricos del análisis. Valida los resultados, firmando digitalmente el análisis. Genera el informe del análisis en formato PDF y lo envía al paciente por email o teléfono. Visualiza la lista completa de pacientes, pero solo puede acceder al historial detallado de análisis de los pacientes a los que él mismo está asociado. **Podrá realizar la modificación de datos de Pacientes y la baja lógica (cambio de estado a "Inactivo") de los mismos.** |
+| **Médico** | Crea un nuevo Análisis para un Paciente, asociándose a él. Carga los resultados numéricos del análisis. Valida los resultados, firmando digitalmente el análisis. Visualiza la lista completa de pacientes, pero solo puede acceder al historial detallado de análisis de los pacientes a los que él mismo está asociado. Podrá realizar la modificación de datos de Pacientes y la baja lógica (cambio de estado a "Inactivo") de los mismos. |
 | **Asistente** | **Podrá realizar el Alta y Modificación de Pacientes.** Visualiza la lista completa de pacientes y puede acceder al historial detallado de análisis de cualquier paciente. Genera el informe en PDF de un Análisis que ya ha sido previamente validado por un Médico. Envía dicho informe al paciente por email o teléfono. |
 
 **Relación Jerárquica:** Cada Asistente está supervisado por un único Médico.
@@ -75,7 +75,7 @@ El SALC es una **aplicación de escritorio monolítica** desarrollada en **Windo
 | **RF-05** | Crear Análisis | Médico | Un usuario Médico podrá crear un nuevo registro en la tabla analisis, asociando un dni\_paciente y un id\_tipo\_analisis. Su DNI se registrará en dni\_carga. |
 | **RF-06** | Cargar Resultados | Médico | Sobre un análisis existente en estado "Sin verificar", el Médico podrá insertar o modificar registros en analisis\_metrica, registrando el valor numérico de cada métrica. |
 | **RF-07** | Validar Análisis | Médico | El Médico podrá cambiar el id\_estado de un análisis a "Verificado". Al hacerlo, su DNI se registrará en dni\_firma y se establecerá la fecha\_firma. Los resultados en analisis\_metrica se vuelven inmutables. |
-| **RF-08** | Generar y Enviar Informe | Médico, Asistente | El sistema debe generar un informe en formato PDF. Un Médico puede hacerlo para cualquier análisis que él haya cargado. Un Asistente solo puede hacerlo para análisis con estado "Verificado". |
+| **RF-08** | Generar y Enviar Informe | Asistente | El sistema debe generar un informe en formato PDF. Un Asistente solo puede hacerlo para análisis con estado "Verificado”. |
 | **RF-09** | Visualizar Historial | Médico, Asistente | El sistema mostrará una lista de todos los pacientes. Un Asistente podrá ver el historial detallado de cualquier paciente. Un Médico solo podrá ver el historial detallado de los pacientes asociados a los análisis que él cargó (analisis.dni\_carga). |
 | **RF-10** | Gestionar Backups | Administrador | El sistema proveerá una interfaz para ejecutar y programar copias de seguridad de la base de datos SQL Server. |
 | **RF-11** | Gestionar Relación Tipo de Análisis \- Métrica | Administrador | El sistema permitirá al Administrador crear, modificar y eliminar las asociaciones entre los diferentes tipos de análisis y las métricas que los componen, utilizando la tabla tipo\_analisis\_metrica. Esto incluye la capacidad de asignar una o varias métricas a un tipo de análisis y viceversa. |
