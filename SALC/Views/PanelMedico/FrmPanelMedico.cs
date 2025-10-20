@@ -38,6 +38,10 @@ namespace SALC.Views.PanelMedico
         private Label lblAnalisisInformeSeleccionado;
         private Button btnGenerarInforme;
 
+        // RF-03: Gestión de Pacientes (Médico)
+        private DataGridView gridPacientes;
+        private ComboBox cboFiltroEstadoPacientes;
+
         public FrmPanelMedico()
         {
             Text = "Panel de Médico - Sistema SALC";
@@ -48,39 +52,133 @@ namespace SALC.Views.PanelMedico
             tabs = new TabControl { Dock = DockStyle.Fill };
             Controls.Add(tabs);
 
-            CrearTabCrearAnalisis();
+            CrearTabGestionPacientes(); // SEPARADO: Solo gestión de pacientes
+            CrearTabCrearAnalisis();    // SEPARADO: Solo flujo de análisis
             CrearTabCargarResultados();
             CrearTabValidarFirmar();
             CrearTabGenerarInforme();
         }
 
+        #region RF-03: Gestión de Pacientes (Médico)
+
+        private void CrearTabGestionPacientes()
+        {
+            var tab = new TabPage("Gestión de Pacientes");
+            
+            // Título y descripción
+            var lblTitulo = new Label { 
+                Text = "Gestión de Pacientes (RF-03) - Rol: Médico", 
+                Left = 20, Top = 20, Width = 500, Height = 25,
+                Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold)
+            };
+            
+            var lblDescripcion = new Label {
+                Text = "Como médico, puede modificar datos de pacientes y realizar baja lógica. Para crear pacientes, consulte al asistente.",
+                Left = 20, Top = 50, Width = 800, Height = 40,
+                ForeColor = System.Drawing.Color.Blue
+            };
+
+            // Toolbar
+            var tool = new ToolStrip();
+            var btnEditar = new ToolStripButton("Modificar Paciente") { DisplayStyle = ToolStripItemDisplayStyle.Text };
+            var btnEliminar = new ToolStripButton("Dar de Baja") { DisplayStyle = ToolStripItemDisplayStyle.Text };
+            var txtBuscar = new ToolStripTextBox { Width = 200, ToolTipText = "Buscar por DNI/Apellido/Nombre" };
+            
+            // Filtro de estado para pacientes
+            var lblFiltroEstado = new ToolStripLabel("Estado:");
+            var cboFiltroEstadoHost = new ToolStripControlHost(cboFiltroEstadoPacientes = new ComboBox
+            {
+                DropDownStyle = ComboBoxStyle.DropDownList,
+                Width = 100
+            });
+            cboFiltroEstadoPacientes.Items.AddRange(new object[] { "Todos", "Activo", "Inactivo" });
+            cboFiltroEstadoPacientes.SelectedIndex = 0;
+            cboFiltroEstadoPacientes.SelectedIndexChanged += (s, e) => PacientesFiltroEstadoChanged?.Invoke(this, cboFiltroEstadoPacientes.SelectedItem.ToString());
+
+            tool.Items.AddRange(new ToolStripItem[] { 
+                btnEditar, btnEliminar,
+                new ToolStripSeparator(), 
+                new ToolStripLabel("Buscar:"), txtBuscar,
+                new ToolStripSeparator(),
+                lblFiltroEstado, cboFiltroEstadoHost
+            });
+            
+            // Grid de pacientes
+            gridPacientes = new DataGridView { 
+                Left = 20, Top = 120, Width = 1120, Height = 480,
+                ReadOnly = true, 
+                AllowUserToAddRows = false, 
+                SelectionMode = DataGridViewSelectionMode.FullRowSelect, 
+                MultiSelect = false, 
+                AutoGenerateColumns = true,
+                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
+            };
+
+            // Información adicional
+            var lblInfo = new Label {
+                Text = "ℹ️ Permisos de Médico:\n" +
+                       "• ✅ Modificar datos de pacientes existentes\n" +
+                       "• ✅ Dar de baja lógica (cambiar estado a 'Inactivo')\n" +
+                       "• ❌ No puede crear nuevos pacientes (solo el Asistente)",
+                Left = 20, Top = 620, Width = 500, Height = 80,
+                ForeColor = System.Drawing.Color.DarkGreen
+            };
+
+            // Eventos
+            btnEditar.Click += (s, e) => PacientesEditarClick?.Invoke(this, EventArgs.Empty);
+            btnEliminar.Click += (s, e) => PacientesEliminarClick?.Invoke(this, EventArgs.Empty);
+            txtBuscar.TextChanged += (s, e) => PacientesBuscarTextoChanged?.Invoke(this, txtBuscar.Text);
+
+            // Layout
+            var panel = new Panel { Dock = DockStyle.Fill };
+            tool.Dock = DockStyle.Top;
+            tool.Top = 100;
+            panel.Controls.Add(gridPacientes);
+            panel.Controls.Add(tool);
+            
+            tab.Controls.AddRange(new Control[] { 
+                lblTitulo, lblDescripcion, panel, lblInfo
+            });
+            tabs.TabPages.Add(tab);
+        }
+
+        #endregion
+
         #region RF-05: Crear Análisis
 
         private void CrearTabCrearAnalisis()
         {
-            var tab = new TabPage("1. Crear Análisis");
+            var tab = new TabPage("Crear Análisis");
             
             // Título y descripción
             var lblTitulo = new Label { 
-                Text = "Paso 1: Creación del Análisis (RF-05)", 
+                Text = "Crear Nuevo Análisis (RF-05)", 
                 Left = 20, Top = 20, Width = 400, Height = 25,
                 Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold)
             };
             
             var lblDescripcion = new Label {
-                Text = "Seleccione un paciente y tipo de análisis para crear un nuevo análisis en estado 'Sin verificar'",
+                Text = "Seleccione un paciente existente y tipo de análisis para crear un nuevo análisis en estado 'Sin verificar'",
                 Left = 20, Top = 50, Width = 800, Height = 40,
                 ForeColor = System.Drawing.Color.Blue
             };
 
+            // Información de flujo
+            var lblFlujo = new Label {
+                Text = "💡 Flujo de Análisis: 1️⃣ Crear → 2️⃣ Cargar Resultados → 3️⃣ Validar/Firmar → 4️⃣ Generar Informe",
+                Left = 20, Top = 90, Width = 900, Height = 20,
+                ForeColor = System.Drawing.Color.Green,
+                Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Italic)
+            };
+
             // Selección de paciente
             var gbPaciente = new GroupBox { 
-                Text = "Seleccionar Paciente", 
-                Left = 20, Top = 100, Width = 500, Height = 120 
+                Text = "Paso 1: Seleccionar Paciente", 
+                Left = 20, Top = 130, Width = 500, Height = 120 
             };
             
             btnSeleccionarPaciente = new Button { 
-                Text = "Seleccionar Paciente...", 
+                Text = "Buscar Paciente...", 
                 Left = 20, Top = 30, Width = 160, Height = 35,
                 BackColor = System.Drawing.Color.LightBlue
             };
@@ -96,8 +194,8 @@ namespace SALC.Views.PanelMedico
 
             // Selección de tipo de análisis
             var gbTipo = new GroupBox { 
-                Text = "Tipo de Análisis", 
-                Left = 540, Top = 100, Width = 400, Height = 120 
+                Text = "Paso 2: Tipo de Análisis", 
+                Left = 540, Top = 130, Width = 400, Height = 120 
             };
             
             var lblTipo = new Label { Text = "Tipo:", Left = 20, Top = 40, Width = 80 };
@@ -112,24 +210,35 @@ namespace SALC.Views.PanelMedico
 
             // Observaciones
             var gbObservaciones = new GroupBox { 
-                Text = "Observaciones Generales", 
-                Left = 20, Top = 240, Width = 920, Height = 100 
+                Text = "Paso 3: Observaciones Iniciales (Opcional)", 
+                Left = 20, Top = 270, Width = 920, Height = 100 
             };
             
             txtObservacionesCrear = new TextBox { 
                 Left = 20, Top = 30, Width = 880, Height = 50, 
-                Multiline = true, ScrollBars = ScrollBars.Vertical 
+                Multiline = true, ScrollBars = ScrollBars.Vertical
             };
 
             gbObservaciones.Controls.Add(txtObservacionesCrear);
 
             // Botón crear
             btnCrearAnalisis = new Button { 
-                Text = "Crear Análisis", 
-                Left = 820, Top = 360, Width = 120, Height = 40,
+                Text = "CREAR ANÁLISIS", 
+                Left = 800, Top = 390, Width = 140, Height = 40,
                 BackColor = System.Drawing.Color.LightGreen,
                 Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold),
                 Enabled = false
+            };
+
+            // Información adicional
+            var lblInfo = new Label {
+                Text = "ℹ️ Después de crear el análisis:\n" +
+                       "• Vaya a la pestaña 'Cargar Resultados' para ingresar las métricas\n" +
+                       "• Complete todos los valores y guarde los resultados\n" +
+                       "• Proceda a 'Validar/Firmar' cuando termine la carga\n" +
+                       "• Finalmente genere el informe PDF en la última pestaña",
+                Left = 20, Top = 450, Width = 700, Height = 100,
+                ForeColor = System.Drawing.Color.DarkBlue
             };
 
             // Eventos
@@ -137,7 +246,7 @@ namespace SALC.Views.PanelMedico
             btnCrearAnalisis.Click += (s, e) => CrearAnalisisClick?.Invoke(this, EventArgs.Empty);
 
             tab.Controls.AddRange(new Control[] { 
-                lblTitulo, lblDescripcion, gbPaciente, gbTipo, gbObservaciones, btnCrearAnalisis 
+                lblTitulo, lblDescripcion, lblFlujo, gbPaciente, gbTipo, gbObservaciones, btnCrearAnalisis, lblInfo
             });
             tabs.TabPages.Add(tab);
         }
@@ -385,7 +494,7 @@ namespace SALC.Views.PanelMedico
 
         #region Eventos e Implementación de IPanelMedicoView
 
-        // Eventos
+        // Eventos - Análisis
         public event EventHandler CrearAnalisisClick;
         public event EventHandler BuscarPacienteCrearClick;
         public event EventHandler CargarResultadosGuardarClick;
@@ -395,6 +504,12 @@ namespace SALC.Views.PanelMedico
         public event EventHandler BuscarAnalisisFirmarClick;
         public event EventHandler GenerarInformeClick;
         public event EventHandler BuscarAnalisisInformeClick;
+
+        // Eventos - Gestión de Pacientes
+        public event EventHandler PacientesEditarClick;
+        public event EventHandler PacientesEliminarClick;
+        public event EventHandler<string> PacientesBuscarTextoChanged;
+        public event EventHandler<string> PacientesFiltroEstadoChanged;
 
         // RF-05: Crear análisis
         public string CrearAnalisisDniPacienteTexto => "";  // Ya no se usa
@@ -534,15 +649,31 @@ namespace SALC.Views.PanelMedico
             btnGenerarInforme.Enabled = false;
         }
 
+        // RF-03: Gestión de Pacientes
+        public void CargarPacientes(System.Collections.IEnumerable pacientes)
+        {
+            if (gridPacientes != null) gridPacientes.DataSource = pacientes;
+        }
+
+        public int? ObtenerPacienteSeleccionadoDni()
+        {
+            if (gridPacientes?.CurrentRow?.DataBoundItem == null) return null;
+            var row = gridPacientes.CurrentRow.DataBoundItem;
+            var dniProp = row.GetType().GetProperty("Dni");
+            if (dniProp == null) return null;
+            var val = dniProp.GetValue(row);
+            return val as int? ?? (val != null ? (int?)System.Convert.ToInt32(val) : null);
+        }
+
         // Navegación
         public void ActivarTabResultados()
         {
-            tabs.SelectedIndex = 1; // Tab "Cargar Resultados"
+            tabs.SelectedIndex = 2; // Tab "Cargar Resultados" 
         }
 
         public void ActivarTabValidacion()
         {
-            tabs.SelectedIndex = 2; // Tab "Validar / Firmar"
+            tabs.SelectedIndex = 3; // Tab "Validar / Firmar"
         }
 
         // Mensajes

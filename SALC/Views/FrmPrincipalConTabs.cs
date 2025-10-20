@@ -390,20 +390,22 @@ namespace SALC.Views
                 // Obtener el TabControl interno del panel médico
                 var tabControlMedico = frmPanelMedico.Controls.OfType<TabControl>().FirstOrDefault();
                 
-                if (tabControlMedico != null && tabControlMedico.TabPages.Count >= 4)
+                if (tabControlMedico != null && tabControlMedico.TabPages.Count >= 5)
                 {
-                    // Extraer y configurar cada pestaña manteniendo la funcionalidad
-                    ExtraerPestanaMedico(tabControlMedico, 0, "Crear Análisis");
-                    ExtraerPestanaMedico(tabControlMedico, 0, "Resultados"); // Índice 0 porque se van removiendo
-                    ExtraerPestanaMedico(tabControlMedico, 0, "Validar");
-                    ExtraerPestanaMedico(tabControlMedico, 0, "Informes");
+                    // Extraer pestañas en el orden correcto:
+                    // 0 = Gestión de Pacientes, 1 = Crear Análisis, 2 = Cargar Resultados, 3 = Validar/Firmar, 4 = Generar Informe
+                    ExtraerPestanaMedico(tabControlMedico, 0, "Gestión de Pacientes"); // NUEVA: Primera pestaña
+                    ExtraerPestanaMedico(tabControlMedico, 0, "Crear Análisis");       // Ahora índice 0 porque se removió la anterior
+                    ExtraerPestanaMedico(tabControlMedico, 0, "Cargar Resultados");    // Ahora índice 0 porque se removió la anterior
+                    ExtraerPestanaMedico(tabControlMedico, 0, "Validar/Firmar");       // Ahora índice 0 porque se removió la anterior
+                    ExtraerPestanaMedico(tabControlMedico, 0, "Generar Informe");      // Ahora índice 0 porque se removió la anterior
                     
                     // Guardar referencia del presenter para que no se pierda
                     tabPrincipal.Tag = presenterMedico;
                 }
                 else
                 {
-                    // Fallback: mostrar mensaje de error
+                    // Fallback: mostrar mensaje de error con info de debug
                     var tabError = new TabPage("Error")
                     {
                         BackColor = Color.White
@@ -411,7 +413,9 @@ namespace SALC.Views
                     
                     var lblError = new Label
                     {
-                        Text = "No se pudieron cargar las funcionalidades del médico.\nContacte al administrador del sistema.",
+                        Text = $"Error: Panel médico tiene {tabControlMedico?.TabPages.Count ?? 0} pestañas.\n" +
+                               "Se esperaban 5 pestañas (Gestión Pacientes, Crear, Cargar, Validar, Generar).\n" +
+                               "Contacte al administrador del sistema.",
                         Font = new Font("Segoe UI", 12),
                         ForeColor = Color.Red,
                         TextAlign = ContentAlignment.MiddleCenter,
@@ -431,7 +435,8 @@ namespace SALC.Views
                 
                 var lblError = new Label
                 {
-                    Text = $"Error al cargar funcionalidades del médico:\n{ex.Message}",
+                    Text = $"Error al cargar funcionalidades del médico:\n{ex.Message}\n\n" +
+                           "Verifique que el Panel de Médico tenga las 5 pestañas correctas.",
                     Font = new Font("Segoe UI", 11),
                     ForeColor = Color.Red,
                     TextAlign = ContentAlignment.MiddleCenter,

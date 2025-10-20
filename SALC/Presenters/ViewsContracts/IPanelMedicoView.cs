@@ -42,6 +42,16 @@ namespace SALC.Presenters.ViewsContracts
         void MostrarAnalisisParaInforme(Analisis analisis, Paciente paciente, TipoAnalisis tipo);
         void LimpiarAnalisisParaInforme();
 
+        // Gestión de Pacientes (RF-03) - Médico puede modificar y dar de baja
+        event EventHandler PacientesEditarClick;
+        event EventHandler PacientesEliminarClick; // Baja lógica
+        event EventHandler<string> PacientesBuscarTextoChanged;
+        event EventHandler<string> PacientesFiltroEstadoChanged;
+        
+        // Datos/selección Pacientes
+        void CargarPacientes(System.Collections.IEnumerable pacientes);
+        int? ObtenerPacienteSeleccionadoDni();
+
         // Mensajes y navegación
         void MostrarMensaje(string texto, bool esError = false);
         void ActivarTabResultados();
