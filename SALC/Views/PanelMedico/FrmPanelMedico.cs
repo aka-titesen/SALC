@@ -33,11 +33,6 @@ namespace SALC.Views.PanelMedico
         private DataGridView gridValidacion;
         private Button btnFirmarAnalisis;
 
-        // RF-08: Generar informe
-        private Button btnSeleccionarAnalisisInforme;
-        private Label lblAnalisisInformeSeleccionado;
-        private Button btnGenerarInforme;
-
         // RF-03: Gestión de Pacientes (Médico)
         private DataGridView gridPacientes;
         private ComboBox cboFiltroEstadoPacientes;
@@ -56,7 +51,7 @@ namespace SALC.Views.PanelMedico
             CrearTabCrearAnalisis();    // SEPARADO: Solo flujo de análisis
             CrearTabCargarResultados();
             CrearTabValidarFirmar();
-            CrearTabGenerarInforme();
+            // ❌ ELIMINADO: CrearTabGenerarInforme() - Esta funcionalidad es exclusiva del Asistente según ERS
         }
 
         #region RF-03: Gestión de Pacientes (Médico)
@@ -148,11 +143,11 @@ namespace SALC.Views.PanelMedico
 
         private void CrearTabCrearAnalisis()
         {
-            var tab = new TabPage("Crear Análisis");
+            var tab = new TabPage("1. Crear Análisis");
             
             // Título y descripción
             var lblTitulo = new Label { 
-                Text = "Crear Nuevo Análisis (RF-05)", 
+                Text = "Paso 1: Crear Nuevo Análisis (RF-05)", 
                 Left = 20, Top = 20, Width = 400, Height = 25,
                 Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold)
             };
@@ -163,10 +158,10 @@ namespace SALC.Views.PanelMedico
                 ForeColor = System.Drawing.Color.Blue
             };
 
-            // Información de flujo
+            // Información de flujo actualizada según ERS
             var lblFlujo = new Label {
-                Text = "💡 Flujo de Análisis: 1️⃣ Crear → 2️⃣ Cargar Resultados → 3️⃣ Validar/Firmar → 4️⃣ Generar Informe",
-                Left = 20, Top = 90, Width = 900, Height = 20,
+                Text = "💡 Flujo de Análisis (Médico): 1️⃣ Crear → 2️⃣ Cargar Resultados → 3️⃣ Validar/Firmar ✅ | 4️⃣ Generar Informe (Solo Asistente)",
+                Left = 20, Top = 90, Width = 1000, Height = 20,
                 ForeColor = System.Drawing.Color.Green,
                 Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Italic)
             };
@@ -230,13 +225,13 @@ namespace SALC.Views.PanelMedico
                 Enabled = false
             };
 
-            // Información adicional
+            // Información adicional actualizada según ERS
             var lblInfo = new Label {
-                Text = "ℹ️ Después de crear el análisis:\n" +
-                       "• Vaya a la pestaña 'Cargar Resultados' para ingresar las métricas\n" +
+                Text = "ℹ️ Después de crear el análisis (según ERS):\n" +
+                       "• Vaya a la pestaña 'Cargar Resultados' para ingresar las métricas específicas\n" +
                        "• Complete todos los valores y guarde los resultados\n" +
                        "• Proceda a 'Validar/Firmar' cuando termine la carga\n" +
-                       "• Finalmente genere el informe PDF en la última pestaña",
+                       "• 📋 NOTA: El Asistente será responsable de generar el informe PDF",
                 Left = 20, Top = 450, Width = 700, Height = 100,
                 ForeColor = System.Drawing.Color.DarkBlue
             };
@@ -267,15 +262,23 @@ namespace SALC.Views.PanelMedico
             };
             
             var lblDescripcion = new Label {
-                Text = "Seleccione un análisis 'Sin verificar' de su autoría y cargue los valores de las métricas",
+                Text = "Seleccione un análisis 'Sin verificar' de su autoría y cargue los valores de las métricas específicas del tipo de análisis",
                 Left = 20, Top = 50, Width = 800, Height = 40,
                 ForeColor = System.Drawing.Color.Blue
+            };
+
+            // Nota importante sobre métricas específicas
+            var lblMetricasEspecificas = new Label {
+                Text = "⚠️ IMPORTANTE: Solo se mostrarán las métricas asociadas al tipo de análisis seleccionado (no todas las métricas del sistema)",
+                Left = 20, Top = 90, Width = 900, Height = 20,
+                ForeColor = System.Drawing.Color.Red,
+                Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold)
             };
 
             // Selección de análisis
             var gbAnalisis = new GroupBox { 
                 Text = "Seleccionar Análisis", 
-                Left = 20, Top = 100, Width = 600, Height = 120 
+                Left = 20, Top = 120, Width = 600, Height = 120 
             };
             
             btnSeleccionarAnalisisResultados = new Button { 
@@ -295,21 +298,21 @@ namespace SALC.Views.PanelMedico
 
             // Botón cargar métricas
             btnCargarMetricas = new Button { 
-                Text = "Cargar Métricas", 
-                Left = 640, Top = 130, Width = 120, Height = 35,
+                Text = "Cargar Métricas Específicas", 
+                Left = 640, Top = 150, Width = 180, Height = 35,
                 BackColor = System.Drawing.Color.LightBlue,
                 Enabled = false
             };
 
             // Grid de resultados
             var lblGrid = new Label { 
-                Text = "Resultados del Análisis:", 
-                Left = 20, Top = 240, Width = 200,
+                Text = "Métricas Específicas del Tipo de Análisis:", 
+                Left = 20, Top = 260, Width = 300,
                 Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold)
             };
 
             gridResultados = new DataGridView { 
-                Left = 20, Top = 270, Width = 1120, Height = 350,
+                Left = 20, Top = 290, Width = 1120, Height = 320,
                 AllowUserToAddRows = false,
                 AllowUserToDeleteRows = false,
                 AutoGenerateColumns = true,
@@ -320,7 +323,7 @@ namespace SALC.Views.PanelMedico
             // Botón guardar
             btnGuardarResultados = new Button { 
                 Text = "Guardar Resultados", 
-                Left = 1020, Top = 635, Width = 120, Height = 35,
+                Left = 1020, Top = 625, Width = 120, Height = 35,
                 BackColor = System.Drawing.Color.LightGreen,
                 Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold),
                 Enabled = false
@@ -332,7 +335,7 @@ namespace SALC.Views.PanelMedico
             btnGuardarResultados.Click += (s, e) => CargarResultadosGuardarClick?.Invoke(this, EventArgs.Empty);
 
             tab.Controls.AddRange(new Control[] { 
-                lblTitulo, lblDescripcion, gbAnalisis, btnCargarMetricas, lblGrid, gridResultados, btnGuardarResultados 
+                lblTitulo, lblDescripcion, lblMetricasEspecificas, gbAnalisis, btnCargarMetricas, lblGrid, gridResultados, btnGuardarResultados 
             });
             tabs.TabPages.Add(tab);
         }
@@ -347,8 +350,8 @@ namespace SALC.Views.PanelMedico
             
             // Título y descripción
             var lblTitulo = new Label { 
-                Text = "Paso 3: Validación y Firma (RF-07)", 
-                Left = 20, Top = 20, Width = 400, Height = 25,
+                Text = "Paso 3: Validación y Firma (RF-07) - FINAL del flujo Médico", 
+                Left = 20, Top = 20, Width = 500, Height = 25,
                 Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold)
             };
             
@@ -365,10 +368,18 @@ namespace SALC.Views.PanelMedico
                 Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold)
             };
 
+            // Información sobre continuación del flujo
+            var lblFlujoPost = new Label {
+                Text = "📋 Después de firmar: El Asistente podrá generar el informe PDF para el paciente",
+                Left = 20, Top = 115, Width = 700, Height = 20,
+                ForeColor = System.Drawing.Color.Green,
+                Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Italic)
+            };
+
             // Selección de análisis
             var gbAnalisis = new GroupBox { 
                 Text = "Seleccionar Análisis para Firmar", 
-                Left = 20, Top = 130, Width = 600, Height = 120 
+                Left = 20, Top = 150, Width = 600, Height = 120 
             };
             
             btnSeleccionarAnalisisFirmar = new Button { 
@@ -389,12 +400,12 @@ namespace SALC.Views.PanelMedico
             // Grid de validación (solo lectura)
             var lblValidacion = new Label { 
                 Text = "Revisión de Resultados:", 
-                Left = 20, Top = 270, Width = 200,
+                Left = 20, Top = 290, Width = 200,
                 Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold)
             };
 
             gridValidacion = new DataGridView { 
-                Left = 20, Top = 300, Width = 1120, Height = 300,
+                Left = 20, Top = 320, Width = 1120, Height = 280,
                 AllowUserToAddRows = false,
                 AllowUserToDeleteRows = false,
                 ReadOnly = true,
@@ -417,75 +428,7 @@ namespace SALC.Views.PanelMedico
             btnFirmarAnalisis.Click += (s, e) => FirmarAnalisisClick?.Invoke(this, EventArgs.Empty);
 
             tab.Controls.AddRange(new Control[] { 
-                lblTitulo, lblDescripcion, lblAdvertencia, gbAnalisis, lblValidacion, gridValidacion, btnFirmarAnalisis 
-            });
-            tabs.TabPages.Add(tab);
-        }
-
-        #endregion
-
-        #region RF-08: Generar Informe
-
-        private void CrearTabGenerarInforme()
-        {
-            var tab = new TabPage("4. Generar Informe");
-            
-            // Título y descripción
-            var lblTitulo = new Label { 
-                Text = "Paso 4: Generación de Informe (RF-08)", 
-                Left = 20, Top = 20, Width = 400, Height = 25,
-                Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold)
-            };
-            
-            var lblDescripcion = new Label {
-                Text = "Seleccione un análisis verificado (firmado) para generar informe PDF",
-                Left = 20, Top = 50, Width = 800, Height = 40,
-                ForeColor = System.Drawing.Color.Blue
-            };
-
-            // Selección de análisis
-            var gbAnalisis = new GroupBox { 
-                Text = "Seleccionar Análisis Verificado", 
-                Left = 20, Top = 120, Width = 600, Height = 120 
-            };
-            
-            btnSeleccionarAnalisisInforme = new Button { 
-                Text = "Seleccionar Análisis...", 
-                Left = 20, Top = 30, Width = 180, Height = 35,
-                BackColor = System.Drawing.Color.LightCoral
-            };
-            
-            lblAnalisisInformeSeleccionado = new Label { 
-                Text = "Ningún análisis seleccionado", 
-                Left = 20, Top = 75, Width = 550, Height = 35,
-                ForeColor = System.Drawing.Color.Gray,
-                BorderStyle = BorderStyle.FixedSingle
-            };
-
-            gbAnalisis.Controls.AddRange(new Control[] { btnSeleccionarAnalisisInforme, lblAnalisisInformeSeleccionado });
-
-            // Información del estado
-            var lblEstado = new Label {
-                Text = "ℹ️ Solo se mostrarán análisis en estado 'Verificado' que usted haya creado",
-                Left = 20, Top = 260, Width = 800, Height = 20,
-                ForeColor = System.Drawing.Color.Green
-            };
-
-            // Botón generar informe
-            btnGenerarInforme = new Button { 
-                Text = "Generar Informe PDF", 
-                Left = 640, Top = 150, Width = 140, Height = 40,
-                BackColor = System.Drawing.Color.LightCoral,
-                Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold),
-                Enabled = false
-            };
-
-            // Eventos
-            btnSeleccionarAnalisisInforme.Click += (s, e) => BuscarAnalisisInformeClick?.Invoke(this, EventArgs.Empty);
-            btnGenerarInforme.Click += (s, e) => GenerarInformeClick?.Invoke(this, EventArgs.Empty);
-
-            tab.Controls.AddRange(new Control[] { 
-                lblTitulo, lblDescripcion, gbAnalisis, lblEstado, btnGenerarInforme 
+                lblTitulo, lblDescripcion, lblAdvertencia, lblFlujoPost, gbAnalisis, lblValidacion, gridValidacion, btnFirmarAnalisis 
             });
             tabs.TabPages.Add(tab);
         }
@@ -502,8 +445,6 @@ namespace SALC.Views.PanelMedico
         public event EventHandler CargarMetricasAnalisisClick;
         public event EventHandler FirmarAnalisisClick;
         public event EventHandler BuscarAnalisisFirmarClick;
-        public event EventHandler GenerarInformeClick;
-        public event EventHandler BuscarAnalisisInformeClick;
 
         // Eventos - Gestión de Pacientes
         public event EventHandler PacientesEditarClick;
@@ -543,7 +484,7 @@ namespace SALC.Views.PanelMedico
         // RF-06: Cargar resultados
         public string AnalisisIdParaResultadosTexto => "";  // Ya no se usa
 
-        public void CargarResultadosParaEdicion(IList<ResultadoEdicionDto> filas)
+        public void CargarResultadosParaEdicion(IList<MetricaConResultado> filas)
         {
             gridResultados.DataSource = null;
             gridResultados.DataSource = filas;
@@ -564,14 +505,14 @@ namespace SALC.Views.PanelMedico
             btnGuardarResultados.Enabled = true;
         }
 
-        public IList<ResultadoEdicionDto> LeerResultadosEditados()
+        public IList<MetricaConResultado> LeerResultadosEditados()
         {
-            var lista = new List<ResultadoEdicionDto>();
+            var lista = new List<MetricaConResultado>();
             foreach (DataGridViewRow row in gridResultados.Rows)
             {
-                if (row.DataBoundItem is ResultadoEdicionDto dto)
+                if (row.DataBoundItem is MetricaConResultado metrica)
                 {
-                    lista.Add(dto);
+                    lista.Add(metrica);
                 }
             }
             return lista;
@@ -627,26 +568,6 @@ namespace SALC.Views.PanelMedico
             }).ToList();
 
             gridValidacion.DataSource = datosValidacion;
-        }
-
-        // RF-08: Generar informe
-        public string AnalisisIdParaInformeTexto => "";  // Ya no se usa
-
-        public void MostrarAnalisisParaInforme(Analisis analisis, Paciente paciente, TipoAnalisis tipo)
-        {
-            if (analisis != null && paciente != null && tipo != null)
-            {
-                lblAnalisisInformeSeleccionado.Text = $"✓ ID: {analisis.IdAnalisis} | Paciente: {paciente.Nombre} {paciente.Apellido} | Tipo: {tipo.Descripcion} | VERIFICADO";
-                lblAnalisisInformeSeleccionado.ForeColor = System.Drawing.Color.Green;
-                btnGenerarInforme.Enabled = true;
-            }
-        }
-
-        public void LimpiarAnalisisParaInforme()
-        {
-            lblAnalisisInformeSeleccionado.Text = "Ningún análisis seleccionado";
-            lblAnalisisInformeSeleccionado.ForeColor = System.Drawing.Color.Gray;
-            btnGenerarInforme.Enabled = false;
         }
 
         // RF-03: Gestión de Pacientes

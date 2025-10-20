@@ -55,7 +55,6 @@
     <Compile Include="Views\PanelMedico\FrmSeleccionPaciente.cs" />
     <Compile Include="Views\PanelMedico\FrmSeleccionAnalisisResultados.cs" />
     <Compile Include="Views\PanelMedico\FrmSeleccionAnalisisFirma.cs" />
-    <Compile Include="Views\PanelMedico\FrmSeleccionAnalisisInforme.cs" />
     <Compile Include="Views\PanelAdministrador\FrmPanelAdministrador.cs" />
   <Compile Include="Views\PanelAdministrador\FrmPacienteEdit.cs" />
   <Compile Include="Views\PanelAdministrador\FrmPacienteDetalle.cs" />
@@ -75,8 +74,7 @@
     <Compile Include="Presenters\InformesVerificadosPresenter.cs" />
     <Compile Include="Presenters\GestionPacientesAsistentePresenter.cs" />
     <Compile Include="Presenters\PanelMedicoPresenter.cs" />
-  <Compile Include="Presenters\ResultadoEdicionDto.cs" />
-    <Compile Include="Presenters\PanelAdministradorPresenter.cs" />
+  <Compile Include="Presenters\PanelAdministradorPresenter.cs" />
     <Compile Include="Presenters\LoginPresenter.cs" />
     <Compile Include="Presenters\ViewsContracts\IPanelAsistenteView.cs" />
     <Compile Include="Presenters\ViewsContracts\IInformesVerificadosView.cs" />
@@ -117,6 +115,7 @@
     <Compile Include="Domain\AnalisisMetrica.cs" />
     <Compile Include="Domain\Analisis.cs" />
     <Compile Include="Domain\Metrica.cs" />
+    <Compile Include="Domain\MetricaConResultado.cs" />
     <Compile Include="Domain\TipoAnalisis.cs" />
     <Compile Include="Domain\TipoAnalisisMetrica.cs" />
     <Compile Include="Domain\ObraSocial.cs" />

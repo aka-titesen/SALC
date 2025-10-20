@@ -390,15 +390,14 @@ namespace SALC.Views
                 // Obtener el TabControl interno del panel médico
                 var tabControlMedico = frmPanelMedico.Controls.OfType<TabControl>().FirstOrDefault();
                 
-                if (tabControlMedico != null && tabControlMedico.TabPages.Count >= 5)
+                if (tabControlMedico != null && tabControlMedico.TabPages.Count >= 4)
                 {
                     // Extraer pestañas en el orden correcto:
-                    // 0 = Gestión de Pacientes, 1 = Crear Análisis, 2 = Cargar Resultados, 3 = Validar/Firmar, 4 = Generar Informe
+                    // 0 = Gestión de Pacientes, 1 = Crear Análisis, 2 = Cargar Resultados, 3 = Validar/Firmar
                     ExtraerPestanaMedico(tabControlMedico, 0, "Gestión de Pacientes"); // NUEVA: Primera pestaña
                     ExtraerPestanaMedico(tabControlMedico, 0, "Crear Análisis");       // Ahora índice 0 porque se removió la anterior
                     ExtraerPestanaMedico(tabControlMedico, 0, "Cargar Resultados");    // Ahora índice 0 porque se removió la anterior
                     ExtraerPestanaMedico(tabControlMedico, 0, "Validar/Firmar");       // Ahora índice 0 porque se removió la anterior
-                    ExtraerPestanaMedico(tabControlMedico, 0, "Generar Informe");      // Ahora índice 0 porque se removió la anterior
                     
                     // Guardar referencia del presenter para que no se pierda
                     tabPrincipal.Tag = presenterMedico;
@@ -414,7 +413,7 @@ namespace SALC.Views
                     var lblError = new Label
                     {
                         Text = $"Error: Panel médico tiene {tabControlMedico?.TabPages.Count ?? 0} pestañas.\n" +
-                               "Se esperaban 5 pestañas (Gestión Pacientes, Crear, Cargar, Validar, Generar).\n" +
+                               "Se esperaban 4 pestañas (Gestión Pacientes, Crear, Cargar, Validar).\n" +
                                "Contacte al administrador del sistema.",
                         Font = new Font("Segoe UI", 12),
                         ForeColor = Color.Red,
@@ -436,7 +435,7 @@ namespace SALC.Views
                 var lblError = new Label
                 {
                     Text = $"Error al cargar funcionalidades del médico:\n{ex.Message}\n\n" +
-                           "Verifique que el Panel de Médico tenga las 5 pestañas correctas.",
+                           "Verifique que el Panel de Médico tenga las 4 pestañas correctas.",
                     Font = new Font("Segoe UI", 11),
                     ForeColor = Color.Red,
                     TextAlign = ContentAlignment.MiddleCenter,

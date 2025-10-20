@@ -22,8 +22,8 @@ namespace SALC.Presenters.ViewsContracts
         event EventHandler BuscarAnalisisResultadosClick;
         event EventHandler CargarMetricasAnalisisClick;
         string AnalisisIdParaResultadosTexto { get; }
-        void CargarResultadosParaEdicion(IList<ResultadoEdicionDto> filas);
-        IList<ResultadoEdicionDto> LeerResultadosEditados();
+        void CargarResultadosParaEdicion(IList<MetricaConResultado> filas);
+        IList<MetricaConResultado> LeerResultadosEditados();
         void MostrarAnalisisParaResultados(Analisis analisis, Paciente paciente, TipoAnalisis tipo);
         void LimpiarAnalisisParaResultados();
 
@@ -34,13 +34,6 @@ namespace SALC.Presenters.ViewsContracts
         void MostrarAnalisisParaFirmar(Analisis analisis, Paciente paciente, TipoAnalisis tipo);
         void LimpiarAnalisisParaFirmar();
         void MostrarResultadosParaValidacion(IList<AnalisisMetrica> resultados);
-
-        // Generar informe (RF-08) - Solo análisis verificados
-        event EventHandler GenerarInformeClick;
-        event EventHandler BuscarAnalisisInformeClick;
-        string AnalisisIdParaInformeTexto { get; }
-        void MostrarAnalisisParaInforme(Analisis analisis, Paciente paciente, TipoAnalisis tipo);
-        void LimpiarAnalisisParaInforme();
 
         // Gestión de Pacientes (RF-03) - Médico puede modificar y dar de baja
         event EventHandler PacientesEditarClick;

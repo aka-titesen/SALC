@@ -65,7 +65,6 @@ namespace SALC.Presenters
         private Paciente _pacienteParaCrearAnalisis; // Solo para flujo de análisis
         private Analisis _analisisParaResultados;
         private Analisis _analisisParaFirmar;
-        private Analisis _analisisParaInforme;
 
         // ===== ESTADO PARA GESTIÓN DE PACIENTES (SEPARADO) =====
         private List<Paciente> _pacientesGestion = new List<Paciente>();
@@ -89,10 +88,6 @@ namespace SALC.Presenters
             // RF-07: Validar/Firmar
             _view.FirmarAnalisisClick += OnFirmarAnalisis;
             _view.BuscarAnalisisFirmarClick += OnBuscarAnalisisFirmar;
-
-            // RF-08: Generar Informe
-            _view.GenerarInformeClick += OnGenerarInforme;
-            _view.BuscarAnalisisInformeClick += OnBuscarAnalisisInforme;
 
             // RF-03: Gestión de Pacientes (ABM INDEPENDIENTE)
             _view.PacientesEditarClick += OnPacientesGestionEditar;
@@ -501,8 +496,8 @@ namespace SALC.Presenters
 
                 _analisisService.ValidarAnalisis(_analisisParaFirmar.IdAnalisis, _dniMedico);
 
-                _view.MostrarMensaje($"Análisis ID {_analisisParaFirmar.IdAnalisis} firmado correctamente.\n" +
-                                   "El análisis está ahora verificado y puede generar el informe.");
+                _view.MostrarMensaje($"✅ Análisis ID {_analisisParaFirmar.IdAnalisis} firmado correctamente.\n\n" +
+                                   "El análisis está ahora verificado y disponible para que el Asistente genere el informe PDF.");
 
                 // Limpiar estado
                 _view.LimpiarAnalisisParaFirmar();
@@ -513,51 +508,6 @@ namespace SALC.Presenters
             {
                 _view.MostrarMensaje("Error al firmar análisis: " + ex.Message, true);
             }
-        }
-
-        #endregion
-
-        #region RF-08: Generar Informe
-
-        private void OnBuscarAnalisisInforme(object sender, EventArgs e)
-        {
-            try
-            {
-                using (var frmSeleccion = new FrmSeleccionAnalisisInforme(_dniMedico))
-                {
-                    if (frmSeleccion.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-                    {
-                        _analisisParaInforme = frmSeleccion.AnalisisSeleccionado;
-                        
-                        // Obtener datos completos para mostrar
-                        var paciente = _pacienteRepo.ObtenerPorId(_analisisParaInforme.DniPaciente);
-                        var tipoAnalisis = _catalogoService.ObtenerTiposAnalisis()
-                            .FirstOrDefault(t => t.IdTipoAnalisis == _analisisParaInforme.IdTipoAnalisis);
-
-                        _view.MostrarAnalisisParaInforme(_analisisParaInforme, paciente, tipoAnalisis);
-                        _view.MostrarMensaje($"Análisis verificado seleccionado. Listo para generar informe PDF.");
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                _view.MostrarMensaje("Error al seleccionar análisis: " + ex.Message, true);
-                _view.LimpiarAnalisisParaInforme();
-                _analisisParaInforme = null;
-            }
-        }
-
-        private void OnGenerarInforme(object sender, EventArgs e)
-        {
-            if (_analisisParaInforme == null)
-            {
-                _view.MostrarMensaje("Primero debe seleccionar un análisis verificado", true);
-                return;
-            }
-
-            // TODO: Implementar generación de PDF en sprint posterior
-            _view.MostrarMensaje($"Funcionalidad de generación de informe PDF pendiente de implementación.\n" +
-                               $"Análisis ID: {_analisisParaInforme.IdAnalisis} listo para generar.");
         }
 
         #endregion
@@ -576,7 +526,7 @@ namespace SALC.Presenters
                     return;
                 }
 
-                // Obtener solo las métricas asociadas a este tipo de análisis
+                // ✅ CORRECCIÓN: Obtener solo las métricas asociadas a este tipo de análisis (según ERS)
                 var metricas = _catalogoService.ObtenerMetricasPorTipoAnalisis(analisis.IdTipoAnalisis).ToList();
 
                 if (metricas.Count == 0)
@@ -589,25 +539,17 @@ namespace SALC.Presenters
                 // Obtener resultados existentes
                 var existentes = _analisisService.ObtenerResultados(idAnalisis).ToList();
 
-                // Crear filas para el grid usando solo las métricas del tipo de análisis
-                var filas = new List<ResultadoEdicionDto>();
+                // Crear filas para el grid usando SOLO las métricas específicas del tipo de análisis
+                var filas = new List<MetricaConResultado>();
                 foreach (var metrica in metricas)
                 {
                     var existente = existentes.FirstOrDefault(x => x.IdMetrica == metrica.IdMetrica);
-                    filas.Add(new ResultadoEdicionDto
-                    {
-                        IdMetrica = metrica.IdMetrica,
-                        Nombre = metrica.Nombre,
-                        Unidad = metrica.UnidadMedida,
-                        Min = metrica.ValorMinimo,
-                        Max = metrica.ValorMaximo,
-                        Resultado = existente?.Resultado,
-                        Observaciones = existente?.Observaciones
-                    });
+                    filas.Add(MetricaConResultado.Desde(metrica, existente));
                 }
 
                 _view.CargarResultadosParaEdicion(filas);
-                _view.MostrarMensaje($"Se cargaron {filas.Count} métricas específicas para este tipo de análisis. Complete los valores en la columna 'Resultado'.");
+                _view.MostrarMensaje($"✅ Se cargaron {filas.Count} métricas específicas para este tipo de análisis.\n\n" +
+                                   "Complete los valores en la columna 'Resultado' y presione 'Guardar Resultados'.");
 
             }
             catch (Exception ex)

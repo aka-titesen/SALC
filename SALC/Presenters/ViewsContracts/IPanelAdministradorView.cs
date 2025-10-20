@@ -27,7 +27,7 @@ namespace SALC.Presenters.ViewsContracts
         void CargarObrasSociales(System.Collections.IEnumerable obrasSociales);
         int? ObtenerObraSocialSeleccionadaId();
 
-        // Catálogos - Tipos de Análisis
+        // Catálogos - Tipos de Análisis 
         event EventHandler TiposAnalisisNuevoClick;
         event EventHandler TiposAnalisisEditarClick;
         event EventHandler TiposAnalisisEliminarClick;
