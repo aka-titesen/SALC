@@ -33,10 +33,130 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="ICSharpCode.SharpZipLib, Version=1.4.2.13, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpZipLib.1.4.2\lib\netstandard2.0\ICSharpCode.SharpZipLib.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=8.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Bcl.AsyncInterfaces.8.0.0\lib\net462\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.DependencyInjection, Version=8.0.0.1, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.DependencyInjection.8.0.1\lib\net462\Microsoft.Extensions.DependencyInjection.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions, Version=8.0.0.2, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.DependencyInjection.Abstractions.8.0.2\lib\net462\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Logging, Version=8.0.0.1, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.Logging.8.0.1\lib\net462\Microsoft.Extensions.Logging.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Logging.Abstractions, Version=8.0.0.2, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.Logging.Abstractions.8.0.2\lib\net462\Microsoft.Extensions.Logging.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Options, Version=8.0.0.2, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.Options.8.0.2\lib\net462\Microsoft.Extensions.Options.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Primitives, Version=8.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.Primitives.8.0.0\lib\net462\Microsoft.Extensions.Primitives.dll</HintPath>
+    </Reference>
+    <Reference Include="MigraDoc.DocumentObjectModel, Version=6.2.2.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
+      <HintPath>..\packages\PDFsharp-MigraDoc-GDI.6.2.2\lib\net462\MigraDoc.DocumentObjectModel.dll</HintPath>
+    </Reference>
+    <Reference Include="MigraDoc.Rendering-gdi, Version=6.2.2.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
+      <HintPath>..\packages\PDFsharp-MigraDoc-GDI.6.2.2\lib\net462\MigraDoc.Rendering-gdi.dll</HintPath>
+    </Reference>
+    <Reference Include="MigraDoc.RtfRendering-gdi, Version=6.2.2.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
+      <HintPath>..\packages\PDFsharp-MigraDoc-GDI.6.2.2\lib\net462\MigraDoc.RtfRendering-gdi.dll</HintPath>
+    </Reference>
+    <Reference Include="MigraDocCore.DocumentObjectModel, Version=1.3.67.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MigraDocCore.DocumentObjectModel.1.3.67\lib\netstandard2.0\MigraDocCore.DocumentObjectModel.dll</HintPath>
+    </Reference>
+    <Reference Include="MigraDocCore.Rendering, Version=1.3.67.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MigraDocCore.Rendering.1.3.67\lib\netstandard2.0\MigraDocCore.Rendering.dll</HintPath>
+    </Reference>
+    <Reference Include="PdfSharp, Version=6.2.2.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
+      <HintPath>..\packages\PDFsharp.6.2.2\lib\netstandard2.0\PdfSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="PdfSharp-gdi, Version=6.2.2.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
+      <HintPath>..\packages\PDFsharp-GDI.6.2.2\lib\net462\PdfSharp-gdi.dll</HintPath>
+    </Reference>
+    <Reference Include="PdfSharp.BarCodes, Version=6.2.2.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
+      <HintPath>..\packages\PDFsharp.6.2.2\lib\netstandard2.0\PdfSharp.BarCodes.dll</HintPath>
+    </Reference>
+    <Reference Include="PdfSharp.BarCodes-gdi, Version=6.2.2.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
+      <HintPath>..\packages\PDFsharp-GDI.6.2.2\lib\net462\PdfSharp.BarCodes-gdi.dll</HintPath>
+    </Reference>
+    <Reference Include="PdfSharp.Charting, Version=6.2.2.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
+      <HintPath>..\packages\PDFsharp.6.2.2\lib\netstandard2.0\PdfSharp.Charting.dll</HintPath>
+    </Reference>
+    <Reference Include="PdfSharp.Charting-gdi, Version=6.2.2.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
+      <HintPath>..\packages\PDFsharp-GDI.6.2.2\lib\net462\PdfSharp.Charting-gdi.dll</HintPath>
+    </Reference>
+    <Reference Include="PdfSharp.Cryptography, Version=6.2.2.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
+      <HintPath>..\packages\PDFsharp-GDI.6.2.2\lib\net462\PdfSharp.Cryptography.dll</HintPath>
+    </Reference>
+    <Reference Include="PdfSharp.Quality, Version=6.2.2.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
+      <HintPath>..\packages\PDFsharp.6.2.2\lib\netstandard2.0\PdfSharp.Quality.dll</HintPath>
+    </Reference>
+    <Reference Include="PdfSharp.Quality-gdi, Version=6.2.2.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
+      <HintPath>..\packages\PDFsharp-GDI.6.2.2\lib\net462\PdfSharp.Quality-gdi.dll</HintPath>
+    </Reference>
+    <Reference Include="PdfSharp.Shared, Version=6.2.2.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
+      <HintPath>..\packages\PDFsharp-GDI.6.2.2\lib\net462\PdfSharp.Shared.dll</HintPath>
+    </Reference>
+    <Reference Include="PdfSharp.Snippets, Version=6.2.2.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
+      <HintPath>..\packages\PDFsharp.6.2.2\lib\netstandard2.0\PdfSharp.Snippets.dll</HintPath>
+    </Reference>
+    <Reference Include="PdfSharp.Snippets-gdi, Version=6.2.2.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
+      <HintPath>..\packages\PDFsharp-GDI.6.2.2\lib\net462\PdfSharp.Snippets-gdi.dll</HintPath>
+    </Reference>
+    <Reference Include="PdfSharp.System, Version=6.2.2.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
+      <HintPath>..\packages\PDFsharp-GDI.6.2.2\lib\net462\PdfSharp.System.dll</HintPath>
+    </Reference>
+    <Reference Include="PdfSharp.WPFonts, Version=6.2.2.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
+      <HintPath>..\packages\PDFsharp-GDI.6.2.2\lib\net462\PdfSharp.WPFonts.dll</HintPath>
+    </Reference>
+    <Reference Include="PdfSharpCore, Version=1.3.67.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\PdfSharpCore.1.3.67\lib\netstandard2.0\PdfSharpCore.dll</HintPath>
+    </Reference>
+    <Reference Include="PdfSharpCore.Charting, Version=1.3.67.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\PdfSharpCore.Charting.1.3.67\lib\netstandard2.0\PdfSharpCore.Charting.dll</HintPath>
+    </Reference>
+    <Reference Include="SixLabors.Fonts, Version=1.0.0.0, Culture=neutral, PublicKeyToken=d998eea7b14cab13, processorArchitecture=MSIL">
+      <HintPath>..\packages\SixLabors.Fonts.1.0.0\lib\netstandard2.0\SixLabors.Fonts.dll</HintPath>
+    </Reference>
+    <Reference Include="SixLabors.ImageSharp, Version=1.0.0.0, Culture=neutral, PublicKeyToken=d998eea7b14cab13, processorArchitecture=MSIL">
+      <HintPath>..\packages\SixLabors.ImageSharp.1.0.4\lib\net472\SixLabors.ImageSharp.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="Microsoft.VisualBasic" />
+    <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Diagnostics.DiagnosticSource, Version=8.0.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Diagnostics.DiagnosticSource.8.0.1\lib\net462\System.Diagnostics.DiagnosticSource.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Memory, Version=4.0.1.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Memory.4.5.5\lib\net461\System.Memory.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.6.0.0\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security" />
+    <Reference Include="System.Security.Cryptography.Pkcs, Version=8.0.0.1, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Security.Cryptography.Pkcs.8.0.1\lib\net462\System.Security.Cryptography.Pkcs.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Threading.Tasks.Extensions.4.5.4\lib\net461\System.Threading.Tasks.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ValueTuple.4.5.0\lib\net47\System.ValueTuple.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -48,33 +168,77 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Views\PanelAsistente\FrmPanelAsistente.cs" />
-    <Compile Include="Views\PanelAsistente\FrmInformesVerificados.cs" />
-    <Compile Include="Views\PanelAsistente\FrmGestionPacientes.cs" />
-    <Compile Include="Views\PanelMedico\FrmPanelMedico.cs" />
-    <Compile Include="Views\PanelMedico\FrmSeleccionPaciente.cs" />
-    <Compile Include="Views\PanelMedico\FrmSeleccionAnalisisResultados.cs" />
-    <Compile Include="Views\PanelMedico\FrmSeleccionAnalisisFirma.cs" />
-    <Compile Include="Views\PanelAdministrador\FrmPanelAdministrador.cs" />
-  <Compile Include="Views\PanelAdministrador\FrmPacienteEdit.cs" />
-  <Compile Include="Views\PanelAdministrador\FrmPacienteDetalle.cs" />
-  <Compile Include="Views\PanelAdministrador\FrmObraSocialEdit.cs" />
-  <Compile Include="Views\PanelAdministrador\FrmTipoAnalisisEdit.cs" />
-  <Compile Include="Views\PanelAdministrador\FrmMetricaEdit.cs" />
-  <Compile Include="Views\PanelAdministrador\FrmUsuarioEdit.cs" />
-  <Compile Include="Views\PanelAdministrador\FrmUsuarioDetalle.cs" />
-  <Compile Include="Views\PanelAdministrador\FrmGestionRelacionesTipoAnalisisMetricas.cs" />
-  <Compile Include="Views\Compartidos\SeleccionAnalisisControl.cs" />
-  <Compile Include="Views\Compartidos\SeleccionPacienteControl.cs" />
-    <Compile Include="Views\Compartidos\FrmInicio.cs" />
-    <Compile Include="Views\FrmLogin.cs" />
-    <Compile Include="Views\FrmPrincipal.cs" />
-    <Compile Include="Views\FrmPrincipalConTabs.cs" />
+    <Compile Include="Views\PanelAsistente\FrmPanelAsistente.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Views\PanelAsistente\FrmInformesVerificados.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Views\PanelAsistente\FrmGestionPacientes.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Views\PanelMedico\FrmPanelMedico.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Views\PanelMedico\FrmSeleccionPaciente.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Views\PanelMedico\FrmSeleccionAnalisisResultados.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Views\PanelMedico\FrmSeleccionAnalisisFirma.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Views\PanelAdministrador\FrmPanelAdministrador.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Views\PanelAdministrador\FrmPacienteEdit.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Views\PanelAdministrador\FrmPacienteDetalle.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Views\PanelAdministrador\FrmObraSocialEdit.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Views\PanelAdministrador\FrmTipoAnalisisEdit.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Views\PanelAdministrador\FrmMetricaEdit.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Views\PanelAdministrador\FrmUsuarioEdit.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Views\PanelAdministrador\FrmUsuarioDetalle.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Views\PanelAdministrador\FrmGestionRelacionesTipoAnalisisMetricas.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Views\Compartidos\SeleccionAnalisisControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Views\Compartidos\SeleccionPacienteControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Views\Compartidos\FrmInicio.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Views\FrmLogin.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Views\FrmPrincipal.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Views\FrmPrincipalConTabs.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Presenters\PanelAsistentePresenter.cs" />
     <Compile Include="Presenters\InformesVerificadosPresenter.cs" />
     <Compile Include="Presenters\GestionPacientesAsistentePresenter.cs" />
     <Compile Include="Presenters\PanelMedicoPresenter.cs" />
-  <Compile Include="Presenters\PanelAdministradorPresenter.cs" />
+    <Compile Include="Presenters\PanelAdministradorPresenter.cs" />
     <Compile Include="Presenters\LoginPresenter.cs" />
     <Compile Include="Presenters\ViewsContracts\IPanelAsistenteView.cs" />
     <Compile Include="Presenters\ViewsContracts\IInformesVerificadosView.cs" />
@@ -94,8 +258,8 @@
     <Compile Include="BLL\IUsuarioService.cs" />
     <Compile Include="BLL\AutenticacionService.cs" />
     <Compile Include="BLL\IAutenticacionService.cs" />
-  <Compile Include="BLL\IPasswordHasher.cs" />
-  <Compile Include="BLL\DefaultPasswordHasher.cs" />
+    <Compile Include="BLL\IPasswordHasher.cs" />
+    <Compile Include="BLL\DefaultPasswordHasher.cs" />
     <Compile Include="DAL\BackupRepositorio.cs" />
     <Compile Include="DAL\UsuarioRepositorio.cs" />
     <Compile Include="DAL\PacienteRepositorio.cs" />
@@ -108,7 +272,7 @@
     <Compile Include="DAL\TipoAnalisisMetricaRepositorio.cs" />
     <Compile Include="DAL\IRepositorioBase.cs" />
     <Compile Include="Infraestructura\DbConexion.cs" />
-  <Compile Include="Infraestructura\DbHealth.cs" />
+    <Compile Include="Infraestructura\DbHealth.cs" />
     <Compile Include="Domain\Backup.cs" />
     <Compile Include="Domain\EstadoAnalisis.cs" />
     <Compile Include="Domain\Rol.cs" />
@@ -135,6 +299,7 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
