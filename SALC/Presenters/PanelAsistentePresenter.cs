@@ -12,6 +12,7 @@ namespace SALC.Presenters
         private readonly IAnalisisService _analisisService = new AnalisisService();
         private readonly IPacienteService _pacienteService = new PacienteService();
         private readonly ICatalogoService _catalogoService = new CatalogoService();
+        private readonly IInformeService _informeService = new InformeService();
 
         public PanelAsistentePresenter(IPanelAsistenteView view)
         {
@@ -139,8 +140,21 @@ namespace SALC.Presenters
                     return;
                 }
 
-                // TODO: Implementar generación real de PDF
-                _view.MostrarMensaje($"PDF generado exitosamente para el análisis {idAnalisis}.\n(Funcionalidad completa pendiente de implementación)");
+                // Generar el PDF usando el servicio
+                string rutaArchivo = _informeService.GenerarPdfDeAnalisis(idAnalisis);
+                
+                if (rutaArchivo != null)
+                {
+                    _view.MostrarMensaje($"✅ PDF generado exitosamente.\n\nUbicación:\n{rutaArchivo}\n\nEl informe ha sido guardado correctamente.");
+                }
+                else
+                {
+                    _view.MostrarMensaje("Generación de PDF cancelada por el usuario.");
+                }
+            }
+            catch (InvalidOperationException ex)
+            {
+                _view.MostrarMensaje($"Error: {ex.Message}", true);
             }
             catch (Exception ex)
             {
