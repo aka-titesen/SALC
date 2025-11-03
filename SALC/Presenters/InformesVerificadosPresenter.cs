@@ -3,7 +3,6 @@ using SALC.DAL;
 using SALC.Domain;
 using SALC.Presenters.ViewsContracts;
 using System;
-using SALC.EmailService;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
@@ -13,7 +12,7 @@ namespace SALC.Presenters
     public class InformesVerificadosPresenter
     {
         private readonly IInformesVerificadosView _view;
-        private readonly EmailServicio _emailService;
+        private readonly IEmailService _emailService = new EmailService();
         private readonly IAnalisisService _analisisService = new AnalisisService();
         private readonly IPacienteService _pacienteService = new PacienteService();
         private readonly ICatalogoService _catalogoService = new CatalogoService();
@@ -229,61 +228,78 @@ namespace SALC.Presenters
 
                 if (string.IsNullOrWhiteSpace(pacienteCompleto.Email))
                 {
-                    _view.MostrarMensaje("El paciente no tiene email registrado.", true);
+                    _view.MostrarMensaje($"El paciente {pacienteCompleto.Nombre} {pacienteCompleto.Apellido} no tiene email registrado.", true);
                     return;
                 }
 
-                using (OpenFileDialog openFileDialog = new OpenFileDialog())
+                // Obtener tipo de análisis para el mensaje
+                var tipoAnalisis = _catalogoService.ObtenerTiposAnalisis()
+                    .FirstOrDefault(t => t.IdTipoAnalisis == analisisCompleto.IdTipoAnalisis);
+                string descripcionTipo = tipoAnalisis?.Descripcion ?? "análisis clínico";
+
+                // Confirmar envío
+                var confirmacion = MessageBox.Show(
+                    $"¿Desea enviar el informe por correo electrónico?\n\n" +
+                    $"Destinatario: {pacienteCompleto.Nombre} {pacienteCompleto.Apellido}\n" +
+                    $"Email: {pacienteCompleto.Email}\n" +
+                    $"Análisis: {descripcionTipo}\n\n" +
+                    "El sistema generará el PDF y lo enviará automáticamente.",
+                    "Confirmar Envío por Email",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Question
+                );
+
+                if (confirmacion != DialogResult.Yes)
+                    return;
+
+                // Generar PDF en ubicación temporal
+                string rutaTemporal = System.IO.Path.Combine(
+                    System.IO.Path.GetTempPath(),
+                    $"Informe_{pacienteCompleto.Apellido}_{pacienteCompleto.Nombre}_DNI{pacienteCompleto.Dni}_{DateTime.Now:yyyyMMdd_HHmmss}.pdf"
+                );
+
+                string rutaPdf = _informeService.GenerarPdfDeAnalisis(analisisCompleto.IdAnalisis, rutaTemporal);
+
+                if (string.IsNullOrEmpty(rutaPdf))
                 {
-                    openFileDialog.Filter = "Archivos PDF (*.pdf)|*.pdf";
-                    openFileDialog.Title = "Seleccionar el informe PDF para enviar";
+                    _view.MostrarMensaje("Error al generar el archivo PDF.", true);
+                    return;
+                }
 
-                    if (openFileDialog.ShowDialog() == DialogResult.OK)
-                    {
-                        string rutaArchivoSeleccionado = openFileDialog.FileName;
+                // Enviar por email
+                string nombreCompleto = $"{pacienteCompleto.Nombre} {pacienteCompleto.Apellido}";
+                bool enviado = _emailService.EnviarInformePorCorreo(
+                    pacienteCompleto.Email,
+                    nombreCompleto,
+                    rutaPdf,
+                    descripcionTipo
+                );
 
-                        // 2. Extraer el Email del Paciente del análisis seleccionado
-                        var tipoAnalisis = analisisSeleccionado.GetType();
-                        string emailPaciente = tipoAnalisis.GetProperty("EmailPaciente")?.GetValue(analisisSeleccionado) as string;
-
-                        // Opcional: Obtener el ID para el mensaje de éxito
-                        var idAnalisis = tipoAnalisis.GetProperty("IdAnalisis")?.GetValue(analisisSeleccionado);
-
-                        if (string.IsNullOrWhiteSpace(emailPaciente))
-                        {
-                            _view.MostrarMensaje("El paciente seleccionado no tiene un correo electrónico válido.", true);
-                            return;
-                        }
-
-                        // 3. Llamar al servicio de envío de correo
-                        // Nota: La lógica del EmailService que proporcionaste ya maneja la adjunción.
-                        bool exito = _emailService.EnviarInformePorCorreo(emailPaciente, rutaArchivoSeleccionado);
-
-                        if (exito)
-                        {
-                            _view.MostrarMensaje($"Informe {idAnalisis} ({System.IO.Path.GetFileName(rutaArchivoSeleccionado)}) enviado con éxito a: {emailPaciente}", false);
-                        }
-                        // Si hay error, el EmailService debe mostrar el MessageBox.
-                    }
-                    else
-                    {
-                        // El usuario canceló la selección del archivo
-                        _view.MostrarMensaje("Envío de correo cancelado por el usuario.", false);
-                    }
-
-                    
-
-                    var observaciones = _view.ObservacionesEnvio;
-
+                if (enviado)
+                {
                     _view.MostrarMensaje(
-                        $"Informe enviado por email:\n\n" +
-                        $"Destinatario: {pacienteCompleto.Nombre} {pacienteCompleto.Apellido}\n" +
+                        $"? Informe enviado exitosamente por email\n\n" +
+                        $"Destinatario: {nombreCompleto}\n" +
                         $"Email: {pacienteCompleto.Email}\n" +
                         $"Análisis ID: {analisisCompleto.IdAnalisis}\n" +
-                        $"Mensaje: {(string.IsNullOrWhiteSpace(observaciones) ? "Sin mensaje adicional" : observaciones)}\n\n" +
-                        $"El email ha sido enviado exitosamente.\n" +
-                        $"(Funcionalidad completa pendiente de implementación)");
+                        $"Tipo: {descripcionTipo}"
+                    );
+
+                    // Eliminar archivo temporal
+                    try
+                    {
+                        if (System.IO.File.Exists(rutaPdf))
+                            System.IO.File.Delete(rutaPdf);
+                    }
+                    catch
+                    {
+                        // Ignorar errores al eliminar temporal
+                    }
                 }
+            }
+            catch (InvalidOperationException ex)
+            {
+                _view.MostrarMensaje($"Error de configuración: {ex.Message}", true);
             }
             catch (Exception ex)
             {

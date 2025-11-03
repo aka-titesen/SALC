@@ -17,6 +17,25 @@ namespace SALC.BLL
     {
         public string GenerarPdfDeAnalisis(int idAnalisis)
         {
+            return GenerarPdfDeAnalisis(idAnalisis, null, true);
+        }
+
+        /// <summary>
+        /// Genera un PDF del análisis en una ruta específica (para envío por email)
+        /// </summary>
+        /// <param name="idAnalisis">ID del análisis</param>
+        /// <param name="rutaDestino">Ruta donde guardar el PDF. Si es null, se pregunta al usuario</param>
+        /// <returns>Ruta del archivo generado o null si se canceló</returns>
+        public string GenerarPdfDeAnalisis(int idAnalisis, string rutaDestino)
+        {
+            return GenerarPdfDeAnalisis(idAnalisis, rutaDestino, false);
+        }
+
+        /// <summary>
+        /// Método interno que genera el PDF con o sin diálogo
+        /// </summary>
+        private string GenerarPdfDeAnalisis(int idAnalisis, string rutaDestino, bool mostrarDialogo)
+        {
             // Variables para almacenar los datos del análisis
             string nombrePaciente = "";
             string apellidoPaciente = "";
@@ -144,22 +163,26 @@ ORDER BY m.nombre;";
                     }
                 }
 
-                // ===== 4) SOLICITAR UBICACIÓN PARA GUARDAR EL PDF =====
-                string rutaArchivo = null;
-                using (var saveDialog = new SaveFileDialog())
+                // ===== 4) DETERMINAR RUTA DEL ARCHIVO =====
+                string rutaArchivo = rutaDestino;
+
+                if (mostrarDialogo || string.IsNullOrWhiteSpace(rutaArchivo))
                 {
-                    saveDialog.Filter = "Archivos PDF (*.pdf)|*.pdf";
-                    saveDialog.Title = "Guardar Informe de Análisis";
-                    saveDialog.FileName = $"Informe_{apellidoPaciente}_{nombrePaciente}_DNI{dniPaciente}_{DateTime.Now:yyyyMMdd_HHmmss}.pdf";
-                    saveDialog.DefaultExt = "pdf";
-                    saveDialog.AddExtension = true;
-
-                    if (saveDialog.ShowDialog() != DialogResult.OK)
+                    using (var saveDialog = new SaveFileDialog())
                     {
-                        return null; // Usuario canceló
-                    }
+                        saveDialog.Filter = "Archivos PDF (*.pdf)|*.pdf";
+                        saveDialog.Title = "Guardar Informe de Análisis";
+                        saveDialog.FileName = $"Informe_{apellidoPaciente}_{nombrePaciente}_DNI{dniPaciente}_{DateTime.Now:yyyyMMdd_HHmmss}.pdf";
+                        saveDialog.DefaultExt = "pdf";
+                        saveDialog.AddExtension = true;
 
-                    rutaArchivo = saveDialog.FileName;
+                        if (saveDialog.ShowDialog() != DialogResult.OK)
+                        {
+                            return null; // Usuario canceló
+                        }
+
+                        rutaArchivo = saveDialog.FileName;
+                    }
                 }
 
                 // ===== 5) GENERAR EL DOCUMENTO PDF =====

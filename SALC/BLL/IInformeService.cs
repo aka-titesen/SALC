@@ -16,5 +16,15 @@ namespace SALC.BLL
         /// <returns>Ruta completa del archivo PDF generado, o null si el usuario canceló</returns>
         /// <exception cref="InvalidOperationException">Si el análisis no está verificado o no existe</exception>
         string GenerarPdfDeAnalisis(int idAnalisis);
+
+        /// <summary>
+        /// Genera un informe PDF para un análisis verificado en una ruta específica
+        /// (sin mostrar diálogo SaveFileDialog). Usado para envío automático por email.
+        /// </summary>
+        /// <param name="idAnalisis">ID del análisis a informar</param>
+        /// <param name="rutaDestino">Ruta completa donde guardar el PDF</param>
+        /// <returns>Ruta completa del archivo PDF generado</returns>
+        /// <exception cref="InvalidOperationException">Si el análisis no está verificado o no existe</exception>
+        string GenerarPdfDeAnalisis(int idAnalisis, string rutaDestino);
     }
 }

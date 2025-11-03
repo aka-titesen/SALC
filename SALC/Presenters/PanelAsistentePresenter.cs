@@ -13,6 +13,7 @@ namespace SALC.Presenters
         private readonly IPacienteService _pacienteService = new PacienteService();
         private readonly ICatalogoService _catalogoService = new CatalogoService();
         private readonly IInformeService _informeService = new InformeService();
+        private readonly IEmailService _emailService = new EmailService();
 
         public PanelAsistentePresenter(IPanelAsistenteView view)
         {
@@ -188,13 +189,123 @@ namespace SALC.Presenters
                     return;
                 }
 
-                // TODO: Implementar envío real por email/teléfono
+                // Obtener datos del paciente
                 var paciente = _pacienteService.ObtenerPorDni(analisis.DniPaciente);
-                _view.MostrarMensaje($"Informe enviado exitosamente a {paciente.Nombre} {paciente.Apellido}.\nEmail: {paciente.Email}\nTeléfono: {paciente.Telefono}\n(Funcionalidad completa pendiente de implementación)");
+                if (paciente == null)
+                {
+                    _view.MostrarMensaje("No se encontró información del paciente.", true);
+                    return;
+                }
+
+                // Validar que el paciente tenga email
+                if (string.IsNullOrWhiteSpace(paciente.Email))
+                {
+                    _view.MostrarMensaje(
+                        $"El paciente {paciente.Nombre} {paciente.Apellido} no tiene un email registrado.\n\n" +
+                        "No es posible enviar el informe por correo electrónico.\n" +
+                        "Por favor, actualice los datos del paciente para incluir su email.", 
+                        true
+                    );
+                    return;
+                }
+
+                // Obtener tipo de análisis para el asunto del email
+                var tipoAnalisis = _catalogoService.ObtenerTiposAnalisis()
+                    .FirstOrDefault(t => t.IdTipoAnalisis == analisis.IdTipoAnalisis);
+                string descripcionTipo = tipoAnalisis?.Descripcion ?? "análisis clínico";
+
+                // Confirmar envío
+                var confirmacion = System.Windows.Forms.MessageBox.Show(
+                    $"¿Desea enviar el informe del análisis al paciente?\n\n" +
+                    $"Paciente: {paciente.Nombre} {paciente.Apellido}\n" +
+                    $"Email: {paciente.Email}\n" +
+                    $"Tipo de Análisis: {descripcionTipo}\n\n" +
+                    "Se generará el PDF y se enviará por correo electrónico.",
+                    "Confirmar Envío de Informe",
+                    System.Windows.Forms.MessageBoxButtons.YesNo,
+                    System.Windows.Forms.MessageBoxIcon.Question
+                );
+
+                if (confirmacion != System.Windows.Forms.DialogResult.Yes)
+                    return;
+
+                // 1. Generar el PDF (sin mostrar SaveDialog, guardar en temporal)
+                string rutaTemporal = System.IO.Path.Combine(
+                    System.IO.Path.GetTempPath(),
+                    $"Informe_{paciente.Apellido}_{paciente.Nombre}_DNI{paciente.Dni}_{DateTime.Now:yyyyMMdd_HHmmss}.pdf"
+                );
+
+                // Generar PDF usando el servicio existente (modificaremos InformeService para aceptar ruta)
+                string rutaPdf = GenerarPdfParaEnvio(idAnalisis, rutaTemporal);
+                
+                if (string.IsNullOrEmpty(rutaPdf))
+                {
+                    _view.MostrarMensaje("Error al generar el archivo PDF.", true);
+                    return;
+                }
+
+                // 2. Enviar por email
+                string nombreCompleto = $"{paciente.Nombre} {paciente.Apellido}";
+                bool enviado = _emailService.EnviarInformePorCorreo(
+                    paciente.Email, 
+                    nombreCompleto, 
+                    rutaPdf, 
+                    descripcionTipo
+                );
+
+                if (enviado)
+                {
+                    _view.MostrarMensaje(
+                        $"✅ Informe enviado exitosamente\n\n" +
+                        $"Destinatario: {nombreCompleto}\n" +
+                        $"Email: {paciente.Email}\n" +
+                        $"Análisis: {descripcionTipo}\n\n" +
+                        "El paciente recibirá el informe en su correo electrónico."
+                    );
+
+                    // Eliminar archivo temporal después de enviar
+                    try
+                    {
+                        if (System.IO.File.Exists(rutaPdf))
+                            System.IO.File.Delete(rutaPdf);
+                    }
+                    catch
+                    {
+                        // Ignorar errores al eliminar temporal
+                    }
+                }
+                else
+                {
+                    _view.MostrarMensaje(
+                        "No se pudo enviar el informe por correo electrónico.\n" +
+                        "Verifique la configuración del servidor SMTP.", 
+                        true
+                    );
+                }
+            }
+            catch (InvalidOperationException ex)
+            {
+                _view.MostrarMensaje($"Error de configuración: {ex.Message}", true);
             }
             catch (Exception ex)
             {
                 _view.MostrarMensaje($"Error al enviar informe: {ex.Message}", true);
+            }
+        }
+
+        /// <summary>
+        /// Genera un PDF para envío por email (sin mostrar diálogo SaveFileDialog)
+        /// </summary>
+        private string GenerarPdfParaEnvio(int idAnalisis, string rutaDestino)
+        {
+            try
+            {
+                // Usar el método sobrecargado que acepta ruta directa
+                return ((InformeService)_informeService).GenerarPdfDeAnalisis(idAnalisis, rutaDestino);
+            }
+            catch
+            {
+                return null;
             }
         }
 
