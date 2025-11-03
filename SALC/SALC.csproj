@@ -248,6 +248,8 @@
     <Compile Include="Presenters\ViewsContracts\ILoginView.cs" />
     <Compile Include="BLL\BackupService.cs" />
     <Compile Include="BLL\IBackupService.cs" />
+    <Compile Include="BLL\InformeService.cs" />
+    <Compile Include="BLL\IInformeService.cs" />
     <Compile Include="BLL\AnalisisService.cs" />
     <Compile Include="BLL\IAnalisisService.cs" />
     <Compile Include="BLL\CatalogoService.cs" />

@@ -15,12 +15,11 @@ namespace SALC.Presenters
         private readonly IPacienteService _pacienteService = new PacienteService();
         private readonly ICatalogoService _catalogoService = new CatalogoService();
         private readonly UsuarioRepositorio _usuarioRepo = new UsuarioRepositorio();
+        private readonly IInformeService _informeService = new InformeService();
 
         public InformesVerificadosPresenter(IInformesVerificadosView view)
         {
             _view = view;
-
-            // Conectar eventos
             _view.BuscarAnalisisClick += OnBuscarAnalisis;
             _view.LimpiarFiltrosClick += OnLimpiarFiltros;
             _view.GenerarPdfClick += OnGenerarPdf;
@@ -33,10 +32,7 @@ namespace SALC.Presenters
         {
             try
             {
-                // Cargar médicos que han firmado análisis
                 CargarMedicosConAnalisis();
-                
-                // Cargar análisis verificados del último mes por defecto
                 OnBuscarAnalisis(null, EventArgs.Empty);
             }
             catch (Exception ex)
@@ -49,7 +45,6 @@ namespace SALC.Presenters
         {
             try
             {
-                // Obtener todos los médicos que han firmado al menos un análisis
                 var medicosConAnalisis = _usuarioRepo.ObtenerMedicosConAnalisisFirmados()
                     .Select(m => new
                     {
@@ -57,7 +52,6 @@ namespace SALC.Presenters
                         NombreCompleto = $"Dr. {m.Nombre} {m.Apellido}"
                     })
                     .ToList();
-
                 _view.CargarMedicos(medicosConAnalisis);
             }
             catch (Exception ex)
@@ -70,26 +64,22 @@ namespace SALC.Presenters
         {
             try
             {
-                // Obtener filtros de la vista
                 var fechaDesde = _view.FechaDesde;
-                var fechaHasta = _view.FechaHasta.AddDays(1); // Incluir todo el día
+                var fechaHasta = _view.FechaHasta.AddDays(1);
                 var medicoId = _view.MedicoSeleccionadoId;
                 var textoBusqueda = _view.TextoBusquedaPaciente;
 
-                // Obtener todos los análisis verificados
                 var analisisVerificados = _analisisService.ObtenerAnalisisActivos()
-                    .Where(a => a.IdEstado == 2) // Solo verificados
-                    .Where(a => a.FechaFirma.HasValue) // Que tengan fecha de firma
+                    .Where(a => a.IdEstado == 2)
+                    .Where(a => a.FechaFirma.HasValue)
                     .Where(a => a.FechaFirma.Value >= fechaDesde && a.FechaFirma.Value < fechaHasta)
                     .ToList();
 
-                // Filtrar por médico si se seleccionó uno específico
                 if (medicoId.HasValue)
                 {
                     analisisVerificados = analisisVerificados.Where(a => a.DniFirma == medicoId.Value).ToList();
                 }
 
-                // Crear objetos completos para mostrar en el grid
                 var analisisCompletos = new List<object>();
 
                 foreach (var analisis in analisisVerificados)
@@ -101,7 +91,6 @@ namespace SALC.Presenters
                             .FirstOrDefault(t => t.IdTipoAnalisis == analisis.IdTipoAnalisis);
                         var medicoFirma = _usuarioRepo.ObtenerPorId(analisis.DniFirma ?? 0);
 
-                        // Filtrar por texto de búsqueda de paciente si se especificó
                         if (!string.IsNullOrEmpty(textoBusqueda))
                         {
                             bool coincide = false;
@@ -114,7 +103,6 @@ namespace SALC.Presenters
                                 coincide = paciente.Apellido.ToLower().Contains(textoBusqueda.ToLower()) ||
                                           paciente.Nombre.ToLower().Contains(textoBusqueda.ToLower());
                             }
-
                             if (!coincide) continue;
                         }
 
@@ -129,19 +117,16 @@ namespace SALC.Presenters
                             MedicoFirma = medicoFirma != null ? $"Dr. {medicoFirma.Nombre} {medicoFirma.Apellido}" : "Médico no encontrado",
                             EmailPaciente = paciente.Email ?? "Sin email",
                             TelefonoPaciente = paciente.Telefono ?? "Sin teléfono",
-                            // Objetos completos para uso posterior
                             AnalisisCompleto = analisis,
                             PacienteCompleto = paciente
                         });
                     }
                     catch (Exception ex)
                     {
-                        // Si hay error con un análisis específico, continuar con los demás
                         System.Diagnostics.Debug.WriteLine($"Error procesando análisis {analisis.IdAnalisis}: {ex.Message}");
                     }
                 }
 
-                // Ordenar por fecha de firma descendente (más recientes primero)
                 analisisCompletos = analisisCompletos
                     .OrderByDescending(a => ((dynamic)a).AnalisisCompleto.FechaFirma)
                     .ToList();
@@ -157,7 +142,7 @@ namespace SALC.Presenters
         private void OnLimpiarFiltros(object sender, EventArgs e)
         {
             _view.LimpiarFiltros();
-            OnBuscarAnalisis(sender, e); // Buscar nuevamente con filtros limpios
+            OnBuscarAnalisis(sender, e);
         }
 
         private void OnAnalisisSeleccionCambiada(object sender, EventArgs e)
@@ -185,35 +170,43 @@ namespace SALC.Presenters
                     return;
                 }
 
-                // Obtener datos del análisis
                 var analisisCompleto = ((dynamic)analisisSeleccionado).AnalisisCompleto as Analisis;
                 var pacienteCompleto = ((dynamic)analisisSeleccionado).PacienteCompleto as Paciente;
                 var idAnalisis = analisisCompleto.IdAnalisis;
 
-                // Validar que esté verificado
                 if (analisisCompleto.IdEstado != 2)
                 {
                     _view.MostrarMensaje("Solo se puede generar PDF para análisis verificados.", true);
                     return;
                 }
 
-                // TODO: Implementar generación real de PDF
-                // Por ahora simulamos la funcionalidad
-                var tipoAnalisis = _catalogoService.ObtenerTiposAnalisis()
-                    .FirstOrDefault(t => t.IdTipoAnalisis == analisisCompleto.IdTipoAnalisis);
+                string rutaArchivo = _informeService.GenerarPdfDeAnalisis(idAnalisis);
 
-                _view.MostrarMensaje(
-                    $"PDF generado exitosamente:\n\n" +
-                    $"Análisis ID: {idAnalisis}\n" +
-                    $"Paciente: {pacienteCompleto.Nombre} {pacienteCompleto.Apellido}\n" +
-                    $"Tipo: {tipoAnalisis?.Descripcion}\n" +
-                    $"Fecha verificación: {analisisCompleto.FechaFirma:dd/MM/yyyy HH:mm}\n\n" +
-                    $"El archivo PDF se ha guardado en la carpeta de informes.\n" +
-                    $"(Funcionalidad completa pendiente de implementación)");
+                if (rutaArchivo != null)
+                {
+                    var tipoAnalisis = _catalogoService.ObtenerTiposAnalisis()
+                        .FirstOrDefault(t => t.IdTipoAnalisis == analisisCompleto.IdTipoAnalisis);
+
+                    _view.MostrarMensaje(
+                        $"? Informe PDF generado exitosamente\n\n" +
+                        $"Análisis ID: {idAnalisis}\n" +
+                        $"Paciente: {pacienteCompleto.Nombre} {pacienteCompleto.Apellido}\n" +
+                        $"Tipo: {tipoAnalisis?.Descripcion}\n" +
+                        $"Fecha verificación: {analisisCompleto.FechaFirma:dd/MM/yyyy HH:mm}\n\n" +
+                        $"?? Archivo guardado en:\n{rutaArchivo}");
+                }
+                else
+                {
+                    _view.MostrarMensaje("Generación de informe cancelada por el usuario.");
+                }
+            }
+            catch (InvalidOperationException ex)
+            {
+                _view.MostrarMensaje($"? Error de validación: {ex.Message}", true);
             }
             catch (Exception ex)
             {
-                _view.MostrarMensaje($"Error al generar PDF: {ex.Message}", true);
+                _view.MostrarMensaje($"? Error al generar PDF: {ex.Message}", true);
             }
         }
 
@@ -239,7 +232,6 @@ namespace SALC.Presenters
 
                 var observaciones = _view.ObservacionesEnvio;
 
-                // TODO: Implementar envío real por email
                 _view.MostrarMensaje(
                     $"Informe enviado por email:\n\n" +
                     $"Destinatario: {pacienteCompleto.Nombre} {pacienteCompleto.Apellido}\n" +
@@ -277,7 +269,6 @@ namespace SALC.Presenters
 
                 var observaciones = _view.ObservacionesEnvio;
 
-                // TODO: Implementar envío real por WhatsApp
                 _view.MostrarMensaje(
                     $"Informe enviado por WhatsApp:\n\n" +
                     $"Destinatario: {pacienteCompleto.Nombre} {pacienteCompleto.Apellido}\n" +

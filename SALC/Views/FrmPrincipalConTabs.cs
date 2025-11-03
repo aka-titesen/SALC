@@ -638,9 +638,6 @@ namespace SALC.Views
 
             try
             {
-                // TODO: Implementar FrmInformesVerificados y InformesVerificadosPresenter
-                // Temporalmente comentado para evitar errores de compilación
-                /*
                 // Crear formulario de informes verificados para asistente
                 var frmInformesAsistente = new SALC.Views.PanelAsistente.FrmInformesVerificados
                 {
@@ -658,10 +655,6 @@ namespace SALC.Views
 
                 // Inicializar la vista
                 presenterInformes.InicializarVista();
-                */
-                
-                // Lanzar excepción para mostrar placeholder
-                throw new NotImplementedException("Componente de informes verificados pendiente de implementación");
             }
             catch (Exception ex)
             {
@@ -703,7 +696,7 @@ namespace SALC.Views
 
                 var lblImplementacion = new Label
                 {
-                    Text = "💡 Pendiente: Implementar FrmInformesVerificados y InformesVerificadosPresenter",
+                    Text = $"💡 Error técnico: {ex.StackTrace}",
                     Font = new Font("Segoe UI", 9, FontStyle.Italic),
                     ForeColor = Color.Gray,
                     Location = new Point(50, 350),
