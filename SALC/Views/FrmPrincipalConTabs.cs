@@ -233,6 +233,9 @@ namespace SALC.Views
 
                 // Crear el presenter
                 var presenter = new SALC.Presenters.PanelAdministradorPresenter(frmPanelAdmin);
+                
+                // IMPORTANTE: Establecer el DNI del usuario actual para backups
+                presenter.EstablecerUsuarioActual(usuarioActual.Dni);
 
                 // Obtener el TabControl interno y extraer solo la pestaña de usuarios
                 var tabControl = frmPanelAdmin.Controls.OfType<TabControl>().FirstOrDefault();
@@ -288,6 +291,9 @@ namespace SALC.Views
                 };
 
                 var presenterCatalogos = new SALC.Presenters.PanelAdministradorPresenter(frmPanelCatalogos);
+                
+                // IMPORTANTE: Establecer el DNI del usuario actual
+                presenterCatalogos.EstablecerUsuarioActual(usuarioActual.Dni);
 
                 var tabControlCatalogos = frmPanelCatalogos.Controls.OfType<TabControl>().FirstOrDefault();
                 if (tabControlCatalogos != null && tabControlCatalogos.TabPages.Count > 1)
@@ -336,6 +342,9 @@ namespace SALC.Views
                 };
 
                 var presenterBackups = new SALC.Presenters.PanelAdministradorPresenter(frmPanelBackups);
+                
+                // IMPORTANTE: Establecer el DNI del usuario actual para backups
+                presenterBackups.EstablecerUsuarioActual(usuarioActual.Dni);
 
                 var tabControlBackups = frmPanelBackups.Controls.OfType<TabControl>().FirstOrDefault();
                 if (tabControlBackups != null && tabControlBackups.TabPages.Count > 2)

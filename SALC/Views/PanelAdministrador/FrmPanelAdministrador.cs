@@ -294,15 +294,109 @@ namespace SALC.Views.PanelAdministrador
         private void AgregarTabBackups()
         {
             var tab = new TabPage("Backups");
-            var btnEjecutar = new Button { Text = "Ejecutar backup ahora", Left = 20, Top = 20, Width = 220 };
-            var btnProgramar = new Button { Text = "Programar backup...", Left = 20, Top = 60, Width = 220 };
-            var btnProbarConexion = new Button { Text = "Probar conexión a BD", Left = 20, Top = 100, Width = 220 };
+            
+            // Panel principal con scroll por si acaso
+            var panelPrincipal = new Panel
+            {
+                Dock = DockStyle.Fill,
+                AutoScroll = true,
+                Padding = new System.Windows.Forms.Padding(20)
+            };
+            
+            // Grupo de información
+            var grpInfo = new GroupBox
+            {
+                Text = "Información de Copias de Seguridad",
+                Left = 20,
+                Top = 20,
+                Width = 750,
+                Height = 130
+            };
+            
+            var lblDescripcion = new Label
+            {
+                Text = "Las copias de seguridad protegen los datos del sistema.\n" +
+                       "Se recomienda ejecutar backups regularmente según la política del laboratorio.\n\n" +
+                       "💡 El sistema usa la carpeta predeterminada de SQL Server que ya tiene los permisos configurados.\n" +
+                       "   Puede cambiar la ubicación, pero asegúrese de que SQL Server tenga permisos de escritura.",
+                Left = 15,
+                Top = 25,
+                Width = 710,
+                Height = 90,
+                AutoSize = false
+            };
+            
+            grpInfo.Controls.Add(lblDescripcion);
+            
+            // Grupo de acciones - CRÍTICO: Aquí están los botones
+            var grpAcciones = new GroupBox
+            {
+                Text = "Acciones Disponibles",
+                Left = 20,
+                Top = 170,
+                Width = 750,
+                Height = 150
+            };
+            
+            var btnEjecutar = new Button 
+            { 
+                Text = "🔄 Ejecutar Copia de Seguridad Ahora", 
+                Left = 20, 
+                Top = 35, 
+                Width = 320,
+                Height = 45,
+                Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold),
+                BackColor = System.Drawing.Color.FromArgb(0, 122, 204),
+                ForeColor = System.Drawing.Color.White,
+                FlatStyle = FlatStyle.Flat,
+                Cursor = Cursors.Hand
+            };
+            btnEjecutar.FlatAppearance.BorderSize = 0;
+            
+            var btnProbarConexion = new Button 
+            { 
+                Text = "🔌 Probar Conexión a Base de Datos", 
+                Left = 360, 
+                Top = 35, 
+                Width = 320,
+                Height = 45,
+                Font = new System.Drawing.Font("Microsoft Sans Serif", 9F),
+                BackColor = System.Drawing.Color.FromArgb(243, 243, 243),
+                ForeColor = System.Drawing.Color.Black,
+                FlatStyle = FlatStyle.Flat,
+                Cursor = Cursors.Hand
+            };
+            btnProbarConexion.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(204, 204, 204);
+            
+            var lblNota = new Label
+            {
+                Text = "✅ La ubicación predeterminada tiene los permisos necesarios para SQL Server.\n" +
+                       "📁 Se guardará en la carpeta de backups de SQL Server por defecto.",
+                Left = 20,
+                Top = 90,
+                Width = 660,
+                Height = 45,
+                AutoSize = false,
+                ForeColor = System.Drawing.Color.FromArgb(0, 100, 0),
+                Font = new System.Drawing.Font("Microsoft Sans Serif", 9F)
+            };
+            
+            // IMPORTANTE: Conectar eventos
             btnEjecutar.Click += (s, e) => EjecutarBackupClick?.Invoke(this, EventArgs.Empty);
-            btnProgramar.Click += (s, e) => ProgramarBackupClick?.Invoke(this, EventArgs.Empty);
             btnProbarConexion.Click += (s, e) => ProbarConexionClick?.Invoke(this, EventArgs.Empty);
-            tab.Controls.Add(btnEjecutar);
-            tab.Controls.Add(btnProgramar);
-            tab.Controls.Add(btnProbarConexion);
+            
+            // AGREGAR CONTROLES AL GRUPO DE ACCIONES
+            grpAcciones.Controls.Add(btnEjecutar);
+            grpAcciones.Controls.Add(btnProbarConexion);
+            grpAcciones.Controls.Add(lblNota);
+            
+            // AGREGAR GRUPOS AL PANEL PRINCIPAL
+            panelPrincipal.Controls.Add(grpInfo);
+            panelPrincipal.Controls.Add(grpAcciones);
+            
+            // AGREGAR PANEL PRINCIPAL AL TAB
+            tab.Controls.Add(panelPrincipal);
+            
             tabs.TabPages.Add(tab);
         }
 
@@ -338,7 +432,6 @@ namespace SALC.Views.PanelAdministrador
         public event EventHandler RelacionesTipoAnalisisMetricaGestionarClick;
         
         public event EventHandler EjecutarBackupClick;
-        public event EventHandler ProgramarBackupClick;
         public event EventHandler ProbarConexionClick;
 
         // Implementación de métodos de datos/selección
