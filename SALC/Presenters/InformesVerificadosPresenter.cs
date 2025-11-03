@@ -1,16 +1,19 @@
+using SALC.BLL;
+using SALC.DAL;
+using SALC.Domain;
+using SALC.Presenters.ViewsContracts;
 using System;
+using SALC.EmailService;
 using System.Collections.Generic;
 using System.Linq;
-using SALC.Presenters.ViewsContracts;
-using SALC.BLL;
-using SALC.Domain;
-using SALC.DAL;
+using System.Windows.Forms;
 
 namespace SALC.Presenters
 {
     public class InformesVerificadosPresenter
     {
         private readonly IInformesVerificadosView _view;
+        private readonly EmailServicio _emailService;
         private readonly IAnalisisService _analisisService = new AnalisisService();
         private readonly IPacienteService _pacienteService = new PacienteService();
         private readonly ICatalogoService _catalogoService = new CatalogoService();
@@ -230,16 +233,57 @@ namespace SALC.Presenters
                     return;
                 }
 
-                var observaciones = _view.ObservacionesEnvio;
+                using (OpenFileDialog openFileDialog = new OpenFileDialog())
+                {
+                    openFileDialog.Filter = "Archivos PDF (*.pdf)|*.pdf";
+                    openFileDialog.Title = "Seleccionar el informe PDF para enviar";
 
-                _view.MostrarMensaje(
-                    $"Informe enviado por email:\n\n" +
-                    $"Destinatario: {pacienteCompleto.Nombre} {pacienteCompleto.Apellido}\n" +
-                    $"Email: {pacienteCompleto.Email}\n" +
-                    $"Análisis ID: {analisisCompleto.IdAnalisis}\n" +
-                    $"Mensaje: {(string.IsNullOrWhiteSpace(observaciones) ? "Sin mensaje adicional" : observaciones)}\n\n" +
-                    $"El email ha sido enviado exitosamente.\n" +
-                    $"(Funcionalidad completa pendiente de implementación)");
+                    if (openFileDialog.ShowDialog() == DialogResult.OK)
+                    {
+                        string rutaArchivoSeleccionado = openFileDialog.FileName;
+
+                        // 2. Extraer el Email del Paciente del análisis seleccionado
+                        var tipoAnalisis = analisisSeleccionado.GetType();
+                        string emailPaciente = tipoAnalisis.GetProperty("EmailPaciente")?.GetValue(analisisSeleccionado) as string;
+
+                        // Opcional: Obtener el ID para el mensaje de éxito
+                        var idAnalisis = tipoAnalisis.GetProperty("IdAnalisis")?.GetValue(analisisSeleccionado);
+
+                        if (string.IsNullOrWhiteSpace(emailPaciente))
+                        {
+                            _view.MostrarMensaje("El paciente seleccionado no tiene un correo electrónico válido.", true);
+                            return;
+                        }
+
+                        // 3. Llamar al servicio de envío de correo
+                        // Nota: La lógica del EmailService que proporcionaste ya maneja la adjunción.
+                        bool exito = _emailService.EnviarInformePorCorreo(emailPaciente, rutaArchivoSeleccionado);
+
+                        if (exito)
+                        {
+                            _view.MostrarMensaje($"Informe {idAnalisis} ({System.IO.Path.GetFileName(rutaArchivoSeleccionado)}) enviado con éxito a: {emailPaciente}", false);
+                        }
+                        // Si hay error, el EmailService debe mostrar el MessageBox.
+                    }
+                    else
+                    {
+                        // El usuario canceló la selección del archivo
+                        _view.MostrarMensaje("Envío de correo cancelado por el usuario.", false);
+                    }
+
+                    
+
+                    var observaciones = _view.ObservacionesEnvio;
+
+                    _view.MostrarMensaje(
+                        $"Informe enviado por email:\n\n" +
+                        $"Destinatario: {pacienteCompleto.Nombre} {pacienteCompleto.Apellido}\n" +
+                        $"Email: {pacienteCompleto.Email}\n" +
+                        $"Análisis ID: {analisisCompleto.IdAnalisis}\n" +
+                        $"Mensaje: {(string.IsNullOrWhiteSpace(observaciones) ? "Sin mensaje adicional" : observaciones)}\n\n" +
+                        $"El email ha sido enviado exitosamente.\n" +
+                        $"(Funcionalidad completa pendiente de implementación)");
+                }
             }
             catch (Exception ex)
             {

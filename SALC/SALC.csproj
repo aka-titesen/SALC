@@ -168,6 +168,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DAL\EnviarMail.cs" />
     <Compile Include="Views\PanelAsistente\FrmPanelAsistente.cs">
       <SubType>Form</SubType>
     </Compile>
