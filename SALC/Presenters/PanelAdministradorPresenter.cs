@@ -73,7 +73,6 @@ namespace SALC.Presenters
             _view.ProbarConexionClick += (s, e) => OnProbarConexion();
             _backupService = new BackupService();
             _view.EjecutarBackupClick += (s, e) => OnEjecutarBackup();
-            _view.ProgramarBackupClick += (s, e) => OnProgramarBackup();
 
             CargarListadoUsuarios();
             CargarCatalogos();
@@ -122,49 +121,171 @@ namespace SALC.Presenters
 
         private void OnEjecutarBackup()
         {
-            // TODO: Implementar formulario completo de gestión de backups
             try
             {
-                // Hasta que se implemente el formulario de gestión de backups,
-                // mostrar un diálogo simple para ejecutar backup manual
+                // Obtener la ruta predeterminada de backups de SQL Server
+                string rutaSugerida = ObtenerRutaBackupSQLServer();
+                
+                // Mostrar diálogo para seleccionar la ubicación del backup
                 using (var dlg = new SaveFileDialog())
                 {
                     dlg.Filter = "Archivos de backup (*.bak)|*.bak";
-                    dlg.Title = "Seleccionar ubicación del backup";
+                    dlg.Title = "Guardar copia de seguridad de la base de datos";
                     dlg.FileName = $"SALC_Manual_{DateTime.Now:yyyyMMdd_HHmmss}.bak";
+                    dlg.InitialDirectory = rutaSugerida;
+                    dlg.RestoreDirectory = true;
                     
                     if (dlg.ShowDialog() == DialogResult.OK)
                     {
-                        var cursor = Cursor.Current;
+                        var cursorAnterior = Cursor.Current;
                         try
                         {
                             Cursor.Current = Cursors.WaitCursor;
-                            _backupService.EjecutarBackup(dlg.FileName, _dniUsuarioActual, "Manual");
-                            MessageBox.Show("Backup ejecutado correctamente en:\n" + dlg.FileName, 
-                                          "Backup", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            
+                            // Ejecutar backup manual
+                            _backupService.EjecutarBackupManual(dlg.FileName, _dniUsuarioActual);
+                            
+                            // Obtener información del backup ejecutado
+                            var ultimoBackup = _backupService.ObtenerUltimoBackup();
+                            var tamanoFormateado = _backupService.FormatearTamanoArchivo(ultimoBackup.TamanoArchivo);
+                            
+                            MessageBox.Show(
+                                $"Copia de seguridad ejecutada correctamente.\n\n" +
+                                $"Ubicación: {dlg.FileName}\n" +
+                                $"Tamaño: {tamanoFormateado}\n" +
+                                $"Fecha: {ultimoBackup.FechaHora:dd/MM/yyyy HH:mm:ss}", 
+                                "Backup Exitoso", 
+                                MessageBoxButtons.OK, 
+                                MessageBoxIcon.Information);
                         }
                         finally
                         {
-                            Cursor.Current = cursor;
+                            Cursor.Current = cursorAnterior;
                         }
                     }
                 }
+            }
+            catch (System.Data.SqlClient.SqlException sqlEx)
+            {
+                string mensajeError = "Error al ejecutar la copia de seguridad de la base de datos:\n\n";
                 
-                // Cuando esté listo el formulario, descomentar:
-                // using (var dlg = new SALC.Views.PanelAdministrador.Backups.FrmGestionBackups(_dniUsuarioActual))
-                // {
-                //     dlg.ShowDialog();
-                // }
+                // Analizar el error específico de SQL Server
+                if (sqlEx.Message.Contains("Operating system error 5") || 
+                    sqlEx.Message.Contains("Acceso denegado") ||
+                    sqlEx.Message.Contains("Access is denied"))
+                {
+                    mensajeError += "❌ SQL Server no tiene permisos para escribir en la ubicación seleccionada.\n\n";
+                    mensajeError += "💡 SOLUCIÓN: Seleccione la carpeta predeterminada de backups de SQL Server\n";
+                    mensajeError += "   que se muestra al abrir el diálogo de guardar.\n\n";
+                    mensajeError += "Esta carpeta ya tiene los permisos necesarios configurados.";
+                }
+                else if (sqlEx.Message.Contains("There is not enough space") || 
+                         sqlEx.Message.Contains("espacio"))
+                {
+                    mensajeError += "❌ No hay suficiente espacio en disco.\n\n";
+                    mensajeError += "Seleccione una unidad con más espacio disponible.";
+                }
+                else
+                {
+                    mensajeError += $"Error SQL: {sqlEx.Message}\n\n";
+                    mensajeError += "Contacte al administrador de base de datos.";
+                }
+                
+                MessageBox.Show(
+                    mensajeError,
+                    "Error en Backup", 
+                    MessageBoxButtons.OK, 
+                    MessageBoxIcon.Error);
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error al ejecutar backup: " + ex.Message, "Backups", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(
+                    $"Error inesperado al ejecutar la copia de seguridad:\n\n{ex.Message}\n\n" +
+                    "Intente guardar el backup en la ubicación predeterminada que se muestra al abrir el diálogo.",
+                    "Error en Backup", 
+                    MessageBoxButtons.OK, 
+                    MessageBoxIcon.Error);
             }
         }
-
-        private void OnProgramarBackup()
+        
+        /// <summary>
+        /// Obtiene la ruta predeterminada de backups de SQL Server consultando la instancia
+        /// </summary>
+        private string ObtenerRutaBackupSQLServer()
         {
-            MessageBox.Show("Programación de backups: pendiente de implementación.", "Backup", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            try
+            {
+                // Consultar a SQL Server por su carpeta predeterminada de backups
+                var connectionString = System.Configuration.ConfigurationManager.ConnectionStrings["SALC"].ConnectionString;
+                
+                using (var conexion = new System.Data.SqlClient.SqlConnection(connectionString))
+                {
+                    conexion.Open();
+                    
+                    // Esta consulta obtiene la ruta predeterminada de backups de SQL Server
+                    var sqlQuery = @"
+                        DECLARE @BackupDirectory NVARCHAR(500)
+                        EXEC master.dbo.xp_instance_regread 
+                            N'HKEY_LOCAL_MACHINE',
+                            N'Software\Microsoft\MSSQLServer\MSSQLServer',
+                            N'BackupDirectory',
+                            @BackupDirectory OUTPUT
+                        SELECT @BackupDirectory AS BackupDirectory";
+                    
+                    using (var comando = new System.Data.SqlClient.SqlCommand(sqlQuery, conexion))
+                    {
+                        var resultado = comando.ExecuteScalar();
+                        if (resultado != null && !string.IsNullOrEmpty(resultado.ToString()))
+                        {
+                            var rutaBackup = resultado.ToString();
+                            
+                            // Crear subdirectorio para SALC si no existe
+                            var rutaSALC = System.IO.Path.Combine(rutaBackup, "SALC");
+                            if (!System.IO.Directory.Exists(rutaSALC))
+                            {
+                                try
+                                {
+                                    System.IO.Directory.CreateDirectory(rutaSALC);
+                                    return rutaSALC;
+                                }
+                                catch
+                                {
+                                    // Si no se puede crear subdirectorio, usar la raíz
+                                    return rutaBackup;
+                                }
+                            }
+                            
+                            return rutaSALC;
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                // Si falla la consulta, usar rutas de respaldo conocidas
+            }
+            
+            // Rutas de respaldo en orden de prioridad
+            string[] rutasRespaldo = new[]
+            {
+                @"C:\Program Files\Microsoft SQL Server\MSSQL16.MSSQLSERVER\MSSQL\Backup",
+                @"C:\Program Files\Microsoft SQL Server\MSSQL15.MSSQLSERVER\MSSQL\Backup",
+                @"C:\Program Files\Microsoft SQL Server\MSSQL14.MSSQLSERVER\MSSQL\Backup",
+                @"C:\Program Files\Microsoft SQL Server\MSSQL13.MSSQLSERVER\MSSQL\Backup",
+                System.IO.Path.GetTempPath()
+            };
+            
+            // Retornar la primera ruta que exista
+            foreach (var ruta in rutasRespaldo)
+            {
+                if (System.IO.Directory.Exists(ruta))
+                {
+                    return ruta;
+                }
+            }
+            
+            // Última opción: carpeta temporal
+            return System.IO.Path.GetTempPath();
         }
 
         private void OnGestionarRelacionesTipoAnalisisMetricas()

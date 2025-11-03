@@ -2,259 +2,199 @@ using System;
 using System.Data.SqlClient;
 using System.IO;
 using System.Collections.Generic;
-using System.Diagnostics;
 using SALC.Infraestructura;
 using SALC.Domain;
 using SALC.DAL;
 
 namespace SALC.BLL
 {
+    /// <summary>
+    /// Servicio para gestionar copias de seguridad manuales de la base de datos
+    /// Implementa el patrón de 3 capas: esta capa contiene la lógica de negocio
+    /// </summary>
     public class BackupService : IBackupService
     {
         private readonly BackupRepositorio _backupRepo;
-        private const string TASK_NAME = "SALC_BackupAutomatico";
 
         public BackupService()
         {
             _backupRepo = new BackupRepositorio();
         }
 
-        #region Ejecución de Backups
+        #region Ejecución de Backup Manual
 
-        public void EjecutarBackup(string rutaArchivoBak, int? dniUsuario = null, string tipoBackup = "Manual")
+        /// <summary>
+        /// Ejecuta una copia de seguridad manual de la base de datos SQL Server
+        /// </summary>
+        /// <param name="rutaArchivoBak">Ruta completa donde se guardará el archivo .bak</param>
+        /// <param name="dniUsuario">DNI del administrador que ejecuta el backup</param>
+        /// <exception cref="ArgumentException">Si la ruta es inválida</exception>
+        /// <exception cref="SqlException">Si hay un error al ejecutar el backup en SQL Server</exception>
+        public void EjecutarBackupManual(string rutaArchivoBak, int dniUsuario)
         {
+            // Validaciones de negocio
+            if (string.IsNullOrWhiteSpace(rutaArchivoBak))
+                throw new ArgumentException("La ruta del archivo de backup no puede estar vacía.", nameof(rutaArchivoBak));
+
+            if (dniUsuario <= 0)
+                throw new ArgumentException("El DNI del usuario debe ser válido.", nameof(dniUsuario));
+
             var historial = new HistorialBackup
             {
                 FechaHora = DateTime.Now,
                 RutaArchivo = rutaArchivoBak,
-                TipoBackup = tipoBackup,
                 DniUsuario = dniUsuario
             };
 
             try
             {
-                if (string.IsNullOrWhiteSpace(rutaArchivoBak))
-                    throw new ArgumentException("Ruta de backup inválida.", nameof(rutaArchivoBak));
+                // Validar y crear directorio si no existe
+                var directorio = Path.GetDirectoryName(rutaArchivoBak);
+                if (string.IsNullOrEmpty(directorio))
+                    throw new ArgumentException("No se pudo determinar el directorio de la ruta especificada.", nameof(rutaArchivoBak));
 
-                var dir = Path.GetDirectoryName(rutaArchivoBak);
-                if (!Directory.Exists(dir)) 
-                    Directory.CreateDirectory(dir);
-
-                // Detectar base de datos del connection string
-                var cs = System.Configuration.ConfigurationManager.ConnectionStrings["SALC"].ConnectionString;
-                var builder = new SqlConnectionStringBuilder(cs);
-                var database = builder.InitialCatalog;
-
-                var tsql = $"BACKUP DATABASE [{database}] TO DISK = @ruta WITH INIT, STATS = 5";
-                using (var cn = DbConexion.CrearConexion())
-                using (var cmd = new SqlCommand(tsql, cn))
+                if (!Directory.Exists(directorio))
                 {
-                    cmd.Parameters.AddWithValue("@ruta", rutaArchivoBak);
-                    cn.Open();
-                    cmd.CommandTimeout = 0; // permitir backups largos
-                    cmd.ExecuteNonQuery();
+                    Directory.CreateDirectory(directorio);
                 }
 
-                // Obtener tamaño del archivo creado
+                // Obtener el nombre de la base de datos del connection string
+                var connectionString = System.Configuration.ConfigurationManager.ConnectionStrings["SALC"].ConnectionString;
+                var builder = new SqlConnectionStringBuilder(connectionString);
+                var nombreBaseDatos = builder.InitialCatalog;
+
+                if (string.IsNullOrEmpty(nombreBaseDatos))
+                    throw new InvalidOperationException("No se pudo determinar el nombre de la base de datos del connection string.");
+
+                // Ejecutar el comando BACKUP DATABASE en SQL Server
+                var sqlBackup = $"BACKUP DATABASE [{nombreBaseDatos}] TO DISK = @ruta WITH INIT, STATS = 5";
+                
+                using (var conexion = DbConexion.CrearConexion())
+                using (var comando = new SqlCommand(sqlBackup, conexion))
+                {
+                    comando.Parameters.AddWithValue("@ruta", rutaArchivoBak);
+                    comando.CommandTimeout = 0; // Sin timeout para permitir backups grandes
+                    
+                    conexion.Open();
+                    comando.ExecuteNonQuery();
+                }
+
+                // Obtener información del archivo creado
                 if (File.Exists(rutaArchivoBak))
                 {
-                    var fileInfo = new FileInfo(rutaArchivoBak);
-                    historial.TamanoArchivo = fileInfo.Length;
+                    var archivoInfo = new FileInfo(rutaArchivoBak);
+                    historial.TamanoArchivo = archivoInfo.Length;
+                }
+                else
+                {
+                    throw new FileNotFoundException("El archivo de backup no se creó correctamente.", rutaArchivoBak);
                 }
 
                 historial.Estado = "Exitoso";
-                historial.Observaciones = "Backup completado correctamente";
-
-                // Actualizar última ejecución si es automático
-                if (tipoBackup == "Automatico")
-                {
-                    _backupRepo.ActualizarUltimaEjecucion(DateTime.Now);
-                }
+                historial.Observaciones = $"Backup manual ejecutado correctamente. Base de datos: {nombreBaseDatos}";
             }
             catch (Exception ex)
             {
                 historial.Estado = "Error";
-                historial.Observaciones = ex.Message;
-                throw;
+                historial.Observaciones = $"Error al ejecutar backup: {ex.Message}";
+                
+                // Registrar en historial antes de relanzar la excepción
+                try
+                {
+                    _backupRepo.InsertarHistorial(historial);
+                }
+                catch
+                {
+                    // Ignorar errores al guardar historial si el backup falló
+                }
+                
+                throw; // Relanzar la excepción original
             }
             finally
             {
-                // Siempre registrar en el historial
-                _backupRepo.InsertarHistorial(historial);
+                // Siempre registrar en el historial si el backup fue exitoso
+                if (historial.Estado == "Exitoso")
+                {
+                    _backupRepo.InsertarHistorial(historial);
+                }
             }
-        }
-
-        public void EjecutarBackupAutomatico()
-        {
-            var config = ObtenerConfiguracion();
-            
-            if (!config.BackupAutomaticoHabilitado)
-                return;
-
-            // Generar nombre de archivo con timestamp
-            var nombreArchivo = $"SALC_AUTO_{DateTime.Now:yyyyMMdd_HHmmss}.bak";
-            var rutaCompleta = Path.Combine(config.RutaDestino ?? @"C:\Backups\SALC", nombreArchivo);
-
-            EjecutarBackup(rutaCompleta, null, "Automatico");
-            
-            // Limpiar backups antiguos según configuración
-            LimpiarBackupsAntiguos(config.DiasRetencion);
         }
 
         #endregion
 
         #region Gestión del Historial
 
+        /// <summary>
+        /// Obtiene el historial de backups ordenado por fecha descendente
+        /// </summary>
         public List<HistorialBackup> ObtenerHistorialBackups(int limite = 50)
         {
+            if (limite <= 0)
+                throw new ArgumentException("El límite debe ser mayor a cero.", nameof(limite));
+
             return _backupRepo.ObtenerHistorial(limite);
         }
 
+        /// <summary>
+        /// Obtiene información del último backup exitoso ejecutado
+        /// </summary>
         public HistorialBackup ObtenerUltimoBackup()
         {
             return _backupRepo.ObtenerUltimoBackup();
         }
 
+        /// <summary>
+        /// Elimina registros de historial y archivos físicos de backups más antiguos que el período especificado
+        /// </summary>
         public void LimpiarBackupsAntiguos(int diasRetencion)
         {
+            if (diasRetencion <= 0)
+                throw new ArgumentException("Los días de retención deben ser mayor a cero.", nameof(diasRetencion));
+
+            // Limpiar registros de historial en la base de datos
             _backupRepo.LimpiarHistorialAntiguo(diasRetencion);
             
-            // También eliminar archivos físicos antiguos si existen
-            var config = ObtenerConfiguracion();
-            var rutaBackups = config.RutaDestino ?? @"C:\Backups\SALC";
+            // Intentar eliminar archivos físicos antiguos
+            // Nota: Esto es una operación de mejor esfuerzo, no debe fallar si hay problemas con archivos
+            try
+            {
+                EliminarArchivosAntiguos(diasRetencion);
+            }
+            catch
+            {
+                // Ignorar errores al eliminar archivos físicos
+                // El historial ya fue limpiado en la BD
+            }
+        }
+
+        /// <summary>
+        /// Elimina archivos físicos de backup más antiguos que el período especificado
+        /// </summary>
+        private void EliminarArchivosAntiguos(int diasRetencion)
+        {
+            // Obtener todas las rutas únicas del historial
+            var rutas = _backupRepo.ObtenerRutasBackups();
             
-            if (Directory.Exists(rutaBackups))
+            var fechaLimite = DateTime.Now.AddDays(-diasRetencion);
+            
+            foreach (var ruta in rutas)
             {
-                var archivos = Directory.GetFiles(rutaBackups, "*.bak");
-                var fechaLimite = DateTime.Now.AddDays(-diasRetencion);
-                
-                foreach (var archivo in archivos)
+                try
                 {
-                    var fileInfo = new FileInfo(archivo);
-                    if (fileInfo.CreationTime < fechaLimite)
+                    if (File.Exists(ruta))
                     {
-                        try
+                        var archivoInfo = new FileInfo(ruta);
+                        if (archivoInfo.CreationTime < fechaLimite)
                         {
-                            File.Delete(archivo);
-                        }
-                        catch
-                        {
-                            // Ignorar errores al eliminar archivos (pueden estar en uso)
+                            File.Delete(ruta);
                         }
                     }
                 }
-            }
-        }
-
-        #endregion
-
-        #region Configuración
-
-        public ConfiguracionBackup ObtenerConfiguracion()
-        {
-            return _backupRepo.ObtenerConfiguracion();
-        }
-
-        public void ActualizarConfiguracion(ConfiguracionBackup config)
-        {
-            config.FechaModificacion = DateTime.Now;
-            _backupRepo.ActualizarConfiguracion(config);
-        }
-
-        #endregion
-
-        #region Programación Automática
-
-        public void ProgramarBackup(string expresionHorario, string rutaArchivoBak)
-        {
-            // Programar usando la configuración actual
-            var config = ObtenerConfiguracion();
-            ProgramarBackupAutomatico(config);
-        }
-
-        public void ProgramarBackupAutomatico(ConfiguracionBackup config)
-        {
-            if (!config.BackupAutomaticoHabilitado)
-            {
-                EliminarTareaProgramada();
-                return;
-            }
-
-            try
-            {
-                // Construir comando para ejecutar la aplicación con parámetros de backup
-                var rutaEjecutable = System.Reflection.Assembly.GetExecutingAssembly().Location;
-                var comandoBackup = $"\"{rutaEjecutable}\" /backup /auto";
-
-                // Crear comando schtasks para programar la tarea
-                var comando = BuildScheduleCommand(config, comandoBackup);
-                
-                // Eliminar tarea existente si existe
-                EliminarTareaProgramada();
-                
-                // Crear nueva tarea
-                var resultado = EjecutarComando(comando);
-                
-                if (resultado.ExitCode != 0)
+                catch
                 {
-                    throw new Exception($"Error al programar backup automático: {resultado.Output}");
+                    // Ignorar errores individuales (archivo en uso, sin permisos, etc.)
+                    continue;
                 }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"No se pudo programar el backup automático: {ex.Message}");
-            }
-        }
-
-        public void EliminarTareaProgramada()
-        {
-            try
-            {
-                var comando = $"schtasks /delete /tn \"{TASK_NAME}\" /f";
-                EjecutarComando(comando);
-            }
-            catch
-            {
-                // Ignorar errores al eliminar (la tarea podría no existir)
-            }
-        }
-
-        public bool ExisteTareaProgramada()
-        {
-            try
-            {
-                var comando = $"schtasks /query /tn \"{TASK_NAME}\"";
-                var resultado = EjecutarComando(comando);
-                return resultado.ExitCode == 0;
-            }
-            catch
-            {
-                return false;
-            }
-        }
-
-        public string ObtenerEstadoTarea()
-        {
-            try
-            {
-                var comando = $"schtasks /query /tn \"{TASK_NAME}\" /fo csv /nh";
-                var resultado = EjecutarComando(comando);
-                
-                if (resultado.ExitCode == 0 && !string.IsNullOrEmpty(resultado.Output))
-                {
-                    // Parsear CSV básico para obtener el estado
-                    var campos = resultado.Output.Split(',');
-                    if (campos.Length > 3)
-                    {
-                        return campos[3].Trim('"');
-                    }
-                }
-                
-                return "Desconocido";
-            }
-            catch
-            {
-                return "Error";
             }
         }
 
@@ -262,91 +202,21 @@ namespace SALC.BLL
 
         #region Utilidades
 
+        /// <summary>
+        /// Formatea un tamaño en bytes a una representación legible
+        /// </summary>
         public string FormatearTamanoArchivo(long bytes)
         {
-            if (bytes < 1024) return $"{bytes} B";
-            if (bytes < 1024 * 1024) return $"{bytes / 1024.0:F1} KB";
-            if (bytes < 1024 * 1024 * 1024) return $"{bytes / (1024.0 * 1024.0):F1} MB";
+            if (bytes < 1024) 
+                return $"{bytes} B";
+            
+            if (bytes < 1024 * 1024) 
+                return $"{bytes / 1024.0:F1} KB";
+            
+            if (bytes < 1024L * 1024L * 1024L) 
+                return $"{bytes / (1024.0 * 1024.0):F1} MB";
+            
             return $"{bytes / (1024.0 * 1024.0 * 1024.0):F1} GB";
-        }
-
-        #endregion
-
-        #region Métodos Privados de Programación
-
-        private string BuildScheduleCommand(ConfiguracionBackup config, string comandoBackup)
-        {
-            var diasSemana = ConvertirDiasSemana(config.DiasSemana);
-            
-            return $"schtasks /create /tn \"{TASK_NAME}\" " +
-                   $"/tr \"{comandoBackup}\" " +
-                   $"/sc weekly " +
-                   $"/d {diasSemana} " +
-                   $"/st {config.HoraProgramada} " +
-                   $"/ru SYSTEM " +
-                   $"/f " +
-                   $"/rl HIGHEST";
-        }
-
-        private string ConvertirDiasSemana(string diasConfig)
-        {
-            if (string.IsNullOrEmpty(diasConfig))
-                return "MON,TUE,WED,THU,FRI";
-
-            var dias = diasConfig.Split(',');
-            var diasWindows = new List<string>();
-
-            foreach (var dia in dias)
-            {
-                switch (dia.Trim())
-                {
-                    case "0": diasWindows.Add("SUN"); break;
-                    case "1": diasWindows.Add("MON"); break;
-                    case "2": diasWindows.Add("TUE"); break;
-                    case "3": diasWindows.Add("WED"); break;
-                    case "4": diasWindows.Add("THU"); break;
-                    case "5": diasWindows.Add("FRI"); break;
-                    case "6": diasWindows.Add("SAT"); break;
-                }
-            }
-
-            return diasWindows.Count > 0 ? string.Join(",", diasWindows) : "MON,TUE,WED,THU,FRI";
-        }
-
-        private CommandResult EjecutarComando(string comando)
-        {
-            var result = new CommandResult();
-            
-            using (var process = new Process())
-            {
-                process.StartInfo.FileName = "cmd.exe";
-                process.StartInfo.Arguments = $"/C {comando}";
-                process.StartInfo.UseShellExecute = false;
-                process.StartInfo.RedirectStandardOutput = true;
-                process.StartInfo.RedirectStandardError = true;
-                process.StartInfo.CreateNoWindow = true;
-
-                process.Start();
-                
-                result.Output = process.StandardOutput.ReadToEnd();
-                var error = process.StandardError.ReadToEnd();
-                
-                if (!string.IsNullOrEmpty(error))
-                {
-                    result.Output += Environment.NewLine + error;
-                }
-                
-                process.WaitForExit();
-                result.ExitCode = process.ExitCode;
-            }
-
-            return result;
-        }
-
-        private class CommandResult
-        {
-            public int ExitCode { get; set; }
-            public string Output { get; set; } = "";
         }
 
         #endregion
