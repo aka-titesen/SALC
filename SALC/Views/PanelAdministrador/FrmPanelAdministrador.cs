@@ -55,85 +55,85 @@ namespace SALC.Views.PanelAdministrador
             var panelPrincipal = new Panel
             {
                 Dock = DockStyle.Fill,
-                Padding = new Padding(20),
                 BackColor = Color.White,
-                AutoScroll = true
+                Padding = new Padding(25)
             };
 
-            // Título de la sección
+            // Título de la sección - MÁS ALTO
             var lblTitulo = new Label
             {
                 Text = "Administración de Personal Médico y Asistentes",
-                Font = new Font("Segoe UI", 14, FontStyle.Bold),
+                Font = new Font("Segoe UI", 16, FontStyle.Bold),
                 ForeColor = Color.FromArgb(41, 128, 185),
-                Location = new Point(20, 20),
-                Size = new Size(800, 30),
-                BackColor = Color.Transparent
+                Location = new Point(25, 25),
+                Size = new Size(1100, 40),
+                BackColor = Color.White,
+                AutoSize = false
             };
 
-            // Barra de herramientas rediseñada - POSICIÓN CORREGIDA
+            // Toolbar - MÁS ALTO Y MÁS ABAJO
             var tool = new ToolStrip
             {
                 BackColor = Color.FromArgb(236, 240, 241),
                 GripStyle = ToolStripGripStyle.Hidden,
-                Padding = new Padding(10, 5, 10, 5),
-                Font = new Font("Segoe UI", 9, FontStyle.Regular),
-                Location = new Point(20, 60),  // CORREGIDO: Más abajo del título
-                Width = 1140,
+                Padding = new Padding(12, 8, 12, 8),
+                Font = new Font("Segoe UI", 10, FontStyle.Regular),
+                Location = new Point(25, 80),
+                Width = 1100,
                 AutoSize = false,
-                Height = 35
+                Height = 45
             };
             
             var btnNuevo = new ToolStripButton("Nuevo Usuario") 
             { 
                 DisplayStyle = ToolStripItemDisplayStyle.Text,
-                Font = new Font("Segoe UI", 9, FontStyle.Bold),
+                Font = new Font("Segoe UI", 10, FontStyle.Bold),
                 ForeColor = Color.FromArgb(39, 174, 96)
             };
             
             var btnEditar = new ToolStripButton("Modificar") 
             { 
                 DisplayStyle = ToolStripItemDisplayStyle.Text,
-                Font = new Font("Segoe UI", 9, FontStyle.Regular)
+                Font = new Font("Segoe UI", 10, FontStyle.Regular)
             };
             
             var btnEliminar = new ToolStripButton("Dar de Baja") 
             { 
                 DisplayStyle = ToolStripItemDisplayStyle.Text,
-                Font = new Font("Segoe UI", 9, FontStyle.Regular),
+                Font = new Font("Segoe UI", 10, FontStyle.Regular),
                 ForeColor = Color.FromArgb(192, 57, 43)
             };
             
             var btnDetalle = new ToolStripButton("Ver Información Completa") 
             { 
                 DisplayStyle = ToolStripItemDisplayStyle.Text,
-                Font = new Font("Segoe UI", 9, FontStyle.Regular)
+                Font = new Font("Segoe UI", 10, FontStyle.Regular)
             };
             
             var lblBuscar = new ToolStripLabel("Buscar:") 
             { 
-                Font = new Font("Segoe UI", 9, FontStyle.Bold) 
+                Font = new Font("Segoe UI", 10, FontStyle.Bold) 
             };
             
             var txtBuscar = new ToolStripTextBox 
             { 
-                Width = 220, 
+                Width = 240, 
                 ToolTipText = "DNI, Apellido o Email",
-                Font = new Font("Segoe UI", 9)
+                Font = new Font("Segoe UI", 10)
             };
             
             // Filtro de estado
             var lblFiltroEstado = new ToolStripLabel("Filtrar por Estado:")
             {
-                Font = new Font("Segoe UI", 9, FontStyle.Bold),
-                Margin = new Padding(10, 0, 5, 0)
+                Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                Margin = new Padding(15, 0, 5, 0)
             };
             
             var cboFiltroEstadoHost = new ToolStripControlHost(cboFiltroEstadoUsuarios = new ComboBox
             {
                 DropDownStyle = ComboBoxStyle.DropDownList,
-                Width = 110,
-                Font = new Font("Segoe UI", 9)
+                Width = 120,
+                Font = new Font("Segoe UI", 10)
             });
             
             cboFiltroEstadoUsuarios.Items.AddRange(new object[] { "Todos", "Activo", "Inactivo" });
@@ -148,11 +148,11 @@ namespace SALC.Views.PanelAdministrador
                 lblFiltroEstado, cboFiltroEstadoHost
             });
             
-            // DataGridView rediseñado - POSICIÓN CORREGIDA
+            // DataGridView - MUCHO MÁS ABAJO CON ENCABEZADOS ALTOS
             gridUsuarios = new DataGridView 
             { 
-                Location = new Point(20, 105),  // CORREGIDO: Más abajo de la toolbar
-                Size = new Size(1140, 490),     // CORREGIDO: Altura ajustada
+                Location = new Point(25, 140),
+                Size = new Size(1100, 430),
                 ReadOnly = true, 
                 AllowUserToAddRows = false, 
                 SelectionMode = DataGridViewSelectionMode.FullRowSelect, 
@@ -161,25 +161,31 @@ namespace SALC.Views.PanelAdministrador
                 AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
                 BackgroundColor = Color.White,
                 BorderStyle = BorderStyle.FixedSingle,
+                ColumnHeadersHeight = 45,
+                ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing,
                 ColumnHeadersDefaultCellStyle = new DataGridViewCellStyle
                 {
                     BackColor = Color.FromArgb(52, 152, 219),
                     ForeColor = Color.White,
-                    Font = new Font("Segoe UI", 10, FontStyle.Bold),
-                    Padding = new Padding(5)
+                    Font = new Font("Segoe UI", 11, FontStyle.Bold),
+                    Padding = new Padding(10),
+                    Alignment = DataGridViewContentAlignment.MiddleCenter,
+                    WrapMode = DataGridViewTriState.False
                 },
                 DefaultCellStyle = new DataGridViewCellStyle
                 {
-                    Font = new Font("Segoe UI", 9),
+                    Font = new Font("Segoe UI", 10),
                     SelectionBackColor = Color.FromArgb(209, 231, 248),
-                    SelectionForeColor = Color.FromArgb(44, 62, 80)
+                    SelectionForeColor = Color.FromArgb(44, 62, 80),
+                    Padding = new Padding(6)
                 },
                 AlternatingRowsDefaultCellStyle = new DataGridViewCellStyle
                 {
                     BackColor = Color.FromArgb(250, 252, 255)
                 },
                 EnableHeadersVisualStyles = false,
-                RowHeadersVisible = false
+                RowHeadersVisible = false,
+                RowTemplate = { Height = 38 }
             };
 
             // Eventos
@@ -189,7 +195,7 @@ namespace SALC.Views.PanelAdministrador
             btnDetalle.Click += (s, e) => UsuariosDetalleClick?.Invoke(this, EventArgs.Empty);
             txtBuscar.TextChanged += (s, e) => UsuariosBuscarTextoChanged?.Invoke(this, txtBuscar.Text);
 
-            // IMPORTANTE: Agregar controles en el orden correcto al panel
+            // Agregar controles al panel en orden
             panelPrincipal.Controls.Add(gridUsuarios);
             panelPrincipal.Controls.Add(tool);
             panelPrincipal.Controls.Add(lblTitulo);
@@ -234,67 +240,76 @@ namespace SALC.Views.PanelAdministrador
             var tab = new TabPage("Obras Sociales")
             {
                 BackColor = Color.White,
-                Padding = new Padding(20)
+                Padding = new Padding(25)
             };
             
-            // Título - POSICIÓN CORREGIDA
+            // Título - MÁS ALTO
             var lblTitulo = new Label
             {
                 Text = "Gestión de Obras Sociales y Mutuales",
-                Font = new Font("Segoe UI", 13, FontStyle.Bold),
+                Font = new Font("Segoe UI", 15, FontStyle.Bold),
                 ForeColor = Color.FromArgb(39, 174, 96),
-                Location = new Point(20, 15),
-                Size = new Size(600, 28),
-                BackColor = Color.Transparent
+                Location = new Point(25, 25),
+                Size = new Size(1000, 40),
+                BackColor = Color.Transparent,
+                AutoSize = false
             };
 
-            // Toolbar rediseñada - POSICIÓN CORREGIDA
+            // Toolbar - MÁS ALTO
             var tool = new ToolStrip
             {
                 BackColor = Color.FromArgb(248, 255, 250),
                 GripStyle = ToolStripGripStyle.Hidden,
-                Padding = new Padding(8, 4, 8, 4),
-                Location = new Point(20, 50),  // CORREGIDO: Más abajo del título
-                Width = 1100,
+                Padding = new Padding(10, 8, 10, 8),
+                Location = new Point(25, 75),
+                Width = 1000,
                 AutoSize = false,
-                Height = 35
+                Height = 45
             };
             
             var btnNuevo = new ToolStripButton("Nueva Obra Social") 
             { 
                 DisplayStyle = ToolStripItemDisplayStyle.Text,
-                Font = new Font("Segoe UI", 9, FontStyle.Bold),
+                Font = new Font("Segoe UI", 10, FontStyle.Bold),
                 ForeColor = Color.FromArgb(39, 174, 96)
             };
             
-            var btnEditar = new ToolStripButton("Modificar") { DisplayStyle = ToolStripItemDisplayStyle.Text };
+            var btnEditar = new ToolStripButton("Modificar") 
+            { 
+                DisplayStyle = ToolStripItemDisplayStyle.Text,
+                Font = new Font("Segoe UI", 10, FontStyle.Regular)
+            };
+            
             var btnEliminar = new ToolStripButton("Dar de Baja") 
             { 
                 DisplayStyle = ToolStripItemDisplayStyle.Text,
+                Font = new Font("Segoe UI", 10, FontStyle.Regular),
                 ForeColor = Color.FromArgb(192, 57, 43)
             };
             
             var lblBuscar = new ToolStripLabel("Buscar:") 
             { 
-                Font = new Font("Segoe UI", 9, FontStyle.Bold) 
+                Font = new Font("Segoe UI", 10, FontStyle.Bold) 
             };
             
             var txtBuscar = new ToolStripTextBox 
             { 
-                Width = 200, 
-                ToolTipText = "CUIT o Nombre"
+                Width = 220, 
+                ToolTipText = "CUIT o Nombre",
+                Font = new Font("Segoe UI", 10)
             };
             
             var lblFiltroEstado = new ToolStripLabel("Estado:")
             {
-                Margin = new Padding(10, 0, 5, 0),
-                Font = new Font("Segoe UI", 9, FontStyle.Bold)
+                Margin = new Padding(12, 0, 5, 0),
+                Font = new Font("Segoe UI", 10, FontStyle.Bold)
             };
             
             var cboFiltroEstadoHost = new ToolStripControlHost(cboFiltroEstadoObrasSociales = new ComboBox
             {
                 DropDownStyle = ComboBoxStyle.DropDownList,
-                Width = 100
+                Width = 110,
+                Font = new Font("Segoe UI", 10)
             });
             
             cboFiltroEstadoObrasSociales.Items.AddRange(new object[] { "Todos", "Activo", "Inactivo" });
@@ -311,8 +326,8 @@ namespace SALC.Views.PanelAdministrador
             
             gridObrasSociales = new DataGridView 
             { 
-                Location = new Point(20, 95),   // CORREGIDO: Más abajo de la toolbar
-                Size = new Size(1100, 420),     // CORREGIDO: Altura ajustada
+                Location = new Point(25, 135),
+                Size = new Size(1000, 380),
                 ReadOnly = true, 
                 AllowUserToAddRows = false, 
                 SelectionMode = DataGridViewSelectionMode.FullRowSelect, 
@@ -321,24 +336,31 @@ namespace SALC.Views.PanelAdministrador
                 AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
                 BackgroundColor = Color.White,
                 BorderStyle = BorderStyle.FixedSingle,
+                ColumnHeadersHeight = 45,
+                ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing,
                 ColumnHeadersDefaultCellStyle = new DataGridViewCellStyle
                 {
                     BackColor = Color.FromArgb(39, 174, 96),
                     ForeColor = Color.White,
-                    Font = new Font("Segoe UI", 10, FontStyle.Bold)
+                    Font = new Font("Segoe UI", 11, FontStyle.Bold),
+                    Padding = new Padding(10),
+                    Alignment = DataGridViewContentAlignment.MiddleCenter,
+                    WrapMode = DataGridViewTriState.False
                 },
                 DefaultCellStyle = new DataGridViewCellStyle
                 {
-                    Font = new Font("Segoe UI", 9),
+                    Font = new Font("Segoe UI", 10),
                     SelectionBackColor = Color.FromArgb(212, 239, 223),
-                    SelectionForeColor = Color.FromArgb(44, 62, 80)
+                    SelectionForeColor = Color.FromArgb(44, 62, 80),
+                    Padding = new Padding(6)
                 },
                 AlternatingRowsDefaultCellStyle = new DataGridViewCellStyle
                 {
                     BackColor = Color.FromArgb(248, 255, 250)
                 },
                 EnableHeadersVisualStyles = false,
-                RowHeadersVisible = false
+                RowHeadersVisible = false,
+                RowTemplate = { Height = 38 }
             };
 
             btnNuevo.Click += (s, e) => ObrasSocialesNuevoClick?.Invoke(this, EventArgs.Empty);
@@ -346,7 +368,6 @@ namespace SALC.Views.PanelAdministrador
             btnEliminar.Click += (s, e) => ObrasSocialesEliminarClick?.Invoke(this, EventArgs.Empty);
             txtBuscar.TextChanged += (s, e) => ObrasSocialesBuscarTextoChanged?.Invoke(this, txtBuscar.Text);
 
-            // IMPORTANTE: Agregar en orden correcto
             tab.Controls.Add(gridObrasSociales);
             tab.Controls.Add(tool);
             tab.Controls.Add(lblTitulo);
@@ -359,67 +380,76 @@ namespace SALC.Views.PanelAdministrador
             var tab = new TabPage("Tipos de Análisis")
             {
                 BackColor = Color.White,
-                Padding = new Padding(20)
+                Padding = new Padding(25)
             };
             
-            // Título - POSICIÓN CORREGIDA
+            // Título - MÁS ALTO
             var lblTitulo = new Label
             {
                 Text = "Catálogo de Tipos de Análisis Clínicos",
-                Font = new Font("Segoe UI", 13, FontStyle.Bold),
+                Font = new Font("Segoe UI", 15, FontStyle.Bold),
                 ForeColor = Color.FromArgb(230, 126, 34),
-                Location = new Point(20, 15),
-                Size = new Size(700, 28),
-                BackColor = Color.Transparent
+                Location = new Point(25, 25),
+                Size = new Size(1000, 40),
+                BackColor = Color.Transparent,
+                AutoSize = false
             };
 
-            // Toolbar - POSICIÓN CORREGIDA
+            // Toolbar - MÁS ALTO
             var tool = new ToolStrip
             {
                 BackColor = Color.FromArgb(255, 250, 245),
                 GripStyle = ToolStripGripStyle.Hidden,
-                Padding = new Padding(8, 4, 8, 4),
-                Location = new Point(20, 50),  // CORREGIDO
-                Width = 1100,
+                Padding = new Padding(10, 8, 10, 8),
+                Location = new Point(25, 75),
+                Width = 1000,
                 AutoSize = false,
-                Height = 35
+                Height = 45
             };
             
             var btnNuevo = new ToolStripButton("Nuevo Tipo de Análisis") 
             { 
                 DisplayStyle = ToolStripItemDisplayStyle.Text,
-                Font = new Font("Segoe UI", 9, FontStyle.Bold),
+                Font = new Font("Segoe UI", 10, FontStyle.Bold),
                 ForeColor = Color.FromArgb(230, 126, 34)
             };
             
-            var btnEditar = new ToolStripButton("Modificar") { DisplayStyle = ToolStripItemDisplayStyle.Text };
+            var btnEditar = new ToolStripButton("Modificar") 
+            { 
+                DisplayStyle = ToolStripItemDisplayStyle.Text,
+                Font = new Font("Segoe UI", 10, FontStyle.Regular)
+            };
+            
             var btnEliminar = new ToolStripButton("Dar de Baja") 
             { 
                 DisplayStyle = ToolStripItemDisplayStyle.Text,
+                Font = new Font("Segoe UI", 10, FontStyle.Regular),
                 ForeColor = Color.FromArgb(192, 57, 43)
             };
             
             var lblBuscar = new ToolStripLabel("Buscar:") 
             { 
-                Font = new Font("Segoe UI", 9, FontStyle.Bold) 
+                Font = new Font("Segoe UI", 10, FontStyle.Bold) 
             };
             
             var txtBuscar = new ToolStripTextBox 
             { 
-                Width = 200, 
-                ToolTipText = "Descripción del tipo de análisis"
+                Width = 220, 
+                ToolTipText = "Descripción del tipo de análisis",
+                Font = new Font("Segoe UI", 10)
             };
             
             var lblFiltroEstado = new ToolStripLabel("Estado:")
             {
-                Margin = new Padding(10, 0, 5, 0),
-                Font = new Font("Segoe UI", 9, FontStyle.Bold)
+                Margin = new Padding(12, 0, 5, 0),
+                Font = new Font("Segoe UI", 10, FontStyle.Bold)
             };
             
             var cboFiltroEstadoHost = new ToolStripControlHost(cboFiltroEstadoTiposAnalisis = new ComboBox
             {
                 DropDownStyle = ComboBoxStyle.DropDownList,
-                Width = 100
+                Width = 110,
+                Font = new Font("Segoe UI", 10)
             });
             
             cboFiltroEstadoTiposAnalisis.Items.AddRange(new object[] { "Todos", "Activo", "Inactivo" });
@@ -436,8 +466,8 @@ namespace SALC.Views.PanelAdministrador
             
             gridTiposAnalisis = new DataGridView 
             { 
-                Location = new Point(20, 95),   // CORREGIDO
-                Size = new Size(1100, 420),     // CORREGIDO
+                Location = new Point(25, 135),
+                Size = new Size(1000, 380),
                 ReadOnly = true, 
                 AllowUserToAddRows = false, 
                 SelectionMode = DataGridViewSelectionMode.FullRowSelect, 
@@ -446,24 +476,31 @@ namespace SALC.Views.PanelAdministrador
                 AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
                 BackgroundColor = Color.White,
                 BorderStyle = BorderStyle.FixedSingle,
+                ColumnHeadersHeight = 45,
+                ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing,
                 ColumnHeadersDefaultCellStyle = new DataGridViewCellStyle
                 {
                     BackColor = Color.FromArgb(230, 126, 34),
                     ForeColor = Color.White,
-                    Font = new Font("Segoe UI", 10, FontStyle.Bold)
+                    Font = new Font("Segoe UI", 11, FontStyle.Bold),
+                    Padding = new Padding(10),
+                    Alignment = DataGridViewContentAlignment.MiddleCenter,
+                    WrapMode = DataGridViewTriState.False
                 },
                 DefaultCellStyle = new DataGridViewCellStyle
                 {
-                    Font = new Font("Segoe UI", 9),
+                    Font = new Font("Segoe UI", 10),
                     SelectionBackColor = Color.FromArgb(255, 235, 205),
-                    SelectionForeColor = Color.FromArgb(44, 62, 80)
+                    SelectionForeColor = Color.FromArgb(44, 62, 80),
+                    Padding = new Padding(6)
                 },
                 AlternatingRowsDefaultCellStyle = new DataGridViewCellStyle
                 {
                     BackColor = Color.FromArgb(255, 250, 245)
                 },
                 EnableHeadersVisualStyles = false,
-                RowHeadersVisible = false
+                RowHeadersVisible = false,
+                RowTemplate = { Height = 38 }
             };
 
             btnNuevo.Click += (s, e) => TiposAnalisisNuevoClick?.Invoke(this, EventArgs.Empty);
@@ -471,7 +508,6 @@ namespace SALC.Views.PanelAdministrador
             btnEliminar.Click += (s, e) => TiposAnalisisEliminarClick?.Invoke(this, EventArgs.Empty);
             txtBuscar.TextChanged += (s, e) => TiposAnalisisBuscarTextoChanged?.Invoke(this, txtBuscar.Text);
 
-            // IMPORTANTE: Agregar en orden correcto
             tab.Controls.Add(gridTiposAnalisis);
             tab.Controls.Add(tool);
             tab.Controls.Add(lblTitulo);
@@ -484,67 +520,76 @@ namespace SALC.Views.PanelAdministrador
             var tab = new TabPage("Métricas")
             {
                 BackColor = Color.White,
-                Padding = new Padding(20)
+                Padding = new Padding(25)
             };
             
-            // Título - POSICIÓN CORREGIDA
+            // Título - MÁS ALTO
             var lblTitulo = new Label
             {
                 Text = "Catálogo de Métricas y Parámetros de Laboratorio",
-                Font = new Font("Segoe UI", 13, FontStyle.Bold),
+                Font = new Font("Segoe UI", 15, FontStyle.Bold),
                 ForeColor = Color.FromArgb(142, 68, 173),
-                Location = new Point(20, 15),
-                Size = new Size(800, 28),
-                BackColor = Color.Transparent
+                Location = new Point(25, 25),
+                Size = new Size(1000, 40),
+                BackColor = Color.Transparent,
+                AutoSize = false
             };
 
-            // Toolbar - POSICIÓN CORREGIDA
+            // Toolbar - MÁS ALTO
             var tool = new ToolStrip
             {
                 BackColor = Color.FromArgb(250, 245, 255),
                 GripStyle = ToolStripGripStyle.Hidden,
-                Padding = new Padding(8, 4, 8, 4),
-                Location = new Point(20, 50),  // CORREGIDO
-                Width = 1100,
+                Padding = new Padding(10, 8, 10, 8),
+                Location = new Point(25, 75),
+                Width = 1000,
                 AutoSize = false,
-                Height = 35
+                Height = 45
             };
             
             var btnNuevo = new ToolStripButton("Nueva Métrica") 
             { 
                 DisplayStyle = ToolStripItemDisplayStyle.Text,
-                Font = new Font("Segoe UI", 9, FontStyle.Bold),
+                Font = new Font("Segoe UI", 10, FontStyle.Bold),
                 ForeColor = Color.FromArgb(142, 68, 173)
             };
             
-            var btnEditar = new ToolStripButton("Modificar") { DisplayStyle = ToolStripItemDisplayStyle.Text };
+            var btnEditar = new ToolStripButton("Modificar") 
+            { 
+                DisplayStyle = ToolStripItemDisplayStyle.Text,
+                Font = new Font("Segoe UI", 10, FontStyle.Regular)
+            };
+            
             var btnEliminar = new ToolStripButton("Dar de Baja") 
             { 
                 DisplayStyle = ToolStripItemDisplayStyle.Text,
+                Font = new Font("Segoe UI", 10, FontStyle.Regular),
                 ForeColor = Color.FromArgb(192, 57, 43)
             };
             
             var lblBuscar = new ToolStripLabel("Buscar:") 
             { 
-                Font = new Font("Segoe UI", 9, FontStyle.Bold) 
+                Font = new Font("Segoe UI", 10, FontStyle.Bold) 
             };
             
             var txtBuscar = new ToolStripTextBox 
             { 
-                Width = 200, 
-                ToolTipText = "Nombre o unidad de medida"
+                Width = 220, 
+                ToolTipText = "Nombre o unidad de medida",
+                Font = new Font("Segoe UI", 10)
             };
             
             var lblFiltroEstado = new ToolStripLabel("Estado:")
             {
-                Margin = new Padding(10, 0, 5, 0),
-                Font = new Font("Segoe UI", 9, FontStyle.Bold)
+                Margin = new Padding(12, 0, 5, 0),
+                Font = new Font("Segoe UI", 10, FontStyle.Bold)
             };
             
             var cboFiltroEstadoHost = new ToolStripControlHost(cboFiltroEstadoMetricas = new ComboBox
             {
                 DropDownStyle = ComboBoxStyle.DropDownList,
-                Width = 100
+                Width = 110,
+                Font = new Font("Segoe UI", 10)
             });
             
             cboFiltroEstadoMetricas.Items.AddRange(new object[] { "Todos", "Activo", "Inactivo" });
@@ -561,8 +606,8 @@ namespace SALC.Views.PanelAdministrador
             
             gridMetricas = new DataGridView 
             { 
-                Location = new Point(20, 95),   // CORREGIDO
-                Size = new Size(1100, 420),     // CORREGIDO
+                Location = new Point(25, 135),
+                Size = new Size(1000, 380),
                 ReadOnly = true, 
                 AllowUserToAddRows = false, 
                 SelectionMode = DataGridViewSelectionMode.FullRowSelect, 
@@ -571,24 +616,31 @@ namespace SALC.Views.PanelAdministrador
                 AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
                 BackgroundColor = Color.White,
                 BorderStyle = BorderStyle.FixedSingle,
+                ColumnHeadersHeight = 45,
+                ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing,
                 ColumnHeadersDefaultCellStyle = new DataGridViewCellStyle
                 {
                     BackColor = Color.FromArgb(142, 68, 173),
                     ForeColor = Color.White,
-                    Font = new Font("Segoe UI", 10, FontStyle.Bold)
+                    Font = new Font("Segoe UI", 11, FontStyle.Bold),
+                    Padding = new Padding(10),
+                    Alignment = DataGridViewContentAlignment.MiddleCenter,
+                    WrapMode = DataGridViewTriState.False
                 },
                 DefaultCellStyle = new DataGridViewCellStyle
                 {
-                    Font = new Font("Segoe UI", 9),
+                    Font = new Font("Segoe UI", 10),
                     SelectionBackColor = Color.FromArgb(235, 222, 240),
-                    SelectionForeColor = Color.FromArgb(44, 62, 80)
+                    SelectionForeColor = Color.FromArgb(44, 62, 80),
+                    Padding = new Padding(6)
                 },
                 AlternatingRowsDefaultCellStyle = new DataGridViewCellStyle
                 {
                     BackColor = Color.FromArgb(250, 245, 255)
                 },
                 EnableHeadersVisualStyles = false,
-                RowHeadersVisible = false
+                RowHeadersVisible = false,
+                RowTemplate = { Height = 38 }
             };
 
             btnNuevo.Click += (s, e) => MetricasNuevoClick?.Invoke(this, EventArgs.Empty);
@@ -596,7 +648,6 @@ namespace SALC.Views.PanelAdministrador
             btnEliminar.Click += (s, e) => MetricasEliminarClick?.Invoke(this, EventArgs.Empty);
             txtBuscar.TextChanged += (s, e) => MetricasBuscarTextoChanged?.Invoke(this, txtBuscar.Text);
 
-            // IMPORTANTE: Agregar en orden correcto
             tab.Controls.Add(gridMetricas);
             tab.Controls.Add(tool);
             tab.Controls.Add(lblTitulo);

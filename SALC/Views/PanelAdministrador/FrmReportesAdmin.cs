@@ -18,6 +18,8 @@ namespace SALC.Views.PanelAdministrador
         private Button btnDemanda;
         private Chart chartPrincipal;
         private Label lblTitulo;
+        private Label lblSubtitulo;
+        private Panel panelHeader;
         private Panel panelFiltros;
         private Panel panelGrafico;
 
@@ -29,147 +31,243 @@ namespace SALC.Views.PanelAdministrador
 
         private void InitializeComponent()
         {
-            this.Text = "Reportes Administrativos - SALC";
-            this.Size = new Size(1200, 700);
+            this.Text = "Módulo de Reportes Estadísticos y Análisis";
+            this.Size = new Size(1300, 800);
             this.StartPosition = FormStartPosition.CenterScreen;
-            this.FormBorderStyle = FormBorderStyle.FixedDialog;
-            this.MaximizeBox = false;
+            this.FormBorderStyle = FormBorderStyle.Sizable;
+            this.MinimumSize = new Size(1200, 700);
+            this.BackColor = Color.White;
 
-            // Panel de filtros (superior)
+            // ============ PANEL HEADER ============
+            panelHeader = new Panel
+            {
+                Dock = DockStyle.Top,
+                Height = 90,
+                BackColor = Color.White,
+                Padding = new Padding(30, 20, 30, 10)
+            };
+
+            lblTitulo = new Label
+            {
+                Text = "Reportes Administrativos del Laboratorio",
+                Font = new Font("Segoe UI", 16, FontStyle.Bold),
+                ForeColor = Color.FromArgb(39, 174, 96),
+                Location = new Point(0, 0),
+                Size = new Size(900, 35),
+                BackColor = Color.Transparent
+            };
+
+            lblSubtitulo = new Label
+            {
+                Text = "Análisis estadísticos y visualizaciones para la toma de decisiones",
+                Font = new Font("Segoe UI", 11, FontStyle.Regular),
+                ForeColor = Color.FromArgb(127, 140, 141),
+                Location = new Point(0, 35),
+                Size = new Size(900, 25),
+                BackColor = Color.Transparent
+            };
+
+            panelHeader.Controls.AddRange(new Control[] { lblTitulo, lblSubtitulo });
+
+            // ============ PANEL DE FILTROS Y BOTONES ============
             panelFiltros = new Panel
             {
                 Dock = DockStyle.Top,
-                Height = 120,
-                BackColor = Color.FromArgb(240, 240, 240),
-                Padding = new Padding(10)
+                Height = 140,
+                BackColor = Color.FromArgb(245, 250, 255),
+                Padding = new Padding(30, 15, 30, 15),
+                BorderStyle = BorderStyle.FixedSingle
             };
 
-            // Filtros de fechas
+            // Grupo de filtros de fechas
+            var grpFechas = new GroupBox
+            {
+                Text = "  Período de Análisis  ",
+                Location = new Point(0, 0),
+                Size = new Size(550, 110),
+                Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                ForeColor = Color.FromArgb(52, 152, 219),
+                BackColor = Color.White
+            };
+
             var lblDesde = new Label
             {
-                Text = "Fecha Desde:",
-                Location = new Point(20, 20),
-                AutoSize = true,
-                Font = new Font("Segoe UI", 9F, FontStyle.Bold)
+                Text = "Desde:",
+                Location = new Point(20, 35),
+                Size = new Size(70, 22),
+                Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                ForeColor = Color.FromArgb(44, 62, 80)
             };
 
             dtpDesde = new DateTimePicker
             {
-                Location = new Point(120, 17),
-                Width = 200,
+                Location = new Point(95, 32),
+                Width = 180,
                 Format = DateTimePickerFormat.Short,
-                Value = DateTime.Now.AddMonths(-1)
+                Value = DateTime.Now.AddMonths(-1),
+                Font = new Font("Segoe UI", 10),
+                CalendarForeColor = Color.FromArgb(52, 152, 219)
             };
 
             var lblHasta = new Label
             {
-                Text = "Fecha Hasta:",
-                Location = new Point(350, 20),
-                AutoSize = true,
-                Font = new Font("Segoe UI", 9F, FontStyle.Bold)
+                Text = "Hasta:",
+                Location = new Point(300, 35),
+                Size = new Size(70, 22),
+                Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                ForeColor = Color.FromArgb(44, 62, 80)
             };
 
             dtpHasta = new DateTimePicker
             {
-                Location = new Point(450, 17),
-                Width = 200,
+                Location = new Point(370, 32),
+                Width = 160,
                 Format = DateTimePickerFormat.Short,
-                Value = DateTime.Now
+                Value = DateTime.Now,
+                Font = new Font("Segoe UI", 10),
+                CalendarForeColor = Color.FromArgb(52, 152, 219)
             };
+
+            var lblInfoFiltro = new Label
+            {
+                Text = "Seleccione el rango de fechas para filtrar los datos del reporte",
+                Location = new Point(20, 70),
+                Size = new Size(500, 20),
+                Font = new Font("Segoe UI", 9, FontStyle.Italic),
+                ForeColor = Color.FromArgb(149, 165, 166)
+            };
+
+            grpFechas.Controls.AddRange(new Control[] { lblDesde, dtpDesde, lblHasta, dtpHasta, lblInfoFiltro });
 
             // Botones de reportes
             btnProductividad = new Button
             {
-                Text = "?? Productividad Médicos",
-                Location = new Point(20, 60),
-                Size = new Size(200, 40),
-                Font = new Font("Segoe UI", 9F, FontStyle.Regular),
-                BackColor = Color.FromArgb(0, 120, 215),
+                Text = "Productividad de Médicos",
+                Location = new Point(570, 10),
+                Size = new Size(220, 50),
+                Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                BackColor = Color.FromArgb(52, 152, 219),
                 ForeColor = Color.White,
                 FlatStyle = FlatStyle.Flat,
-                Cursor = Cursors.Hand
+                Cursor = Cursors.Hand,
+                TextAlign = ContentAlignment.MiddleCenter
             };
             btnProductividad.FlatAppearance.BorderSize = 0;
             btnProductividad.Click += (s, e) => GenerarReporteProductividadClick?.Invoke(s, e);
 
             btnFacturacion = new Button
             {
-                Text = "?? Facturación por Obra Social",
-                Location = new Point(240, 60),
-                Size = new Size(200, 40),
-                Font = new Font("Segoe UI", 9F, FontStyle.Regular),
-                BackColor = Color.FromArgb(0, 153, 51),
+                Text = "Distribución por Obra Social",
+                Location = new Point(810, 10),
+                Size = new Size(220, 50),
+                Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                BackColor = Color.FromArgb(39, 174, 96),
                 ForeColor = Color.White,
                 FlatStyle = FlatStyle.Flat,
-                Cursor = Cursors.Hand
+                Cursor = Cursors.Hand,
+                TextAlign = ContentAlignment.MiddleCenter
             };
             btnFacturacion.FlatAppearance.BorderSize = 0;
             btnFacturacion.Click += (s, e) => GenerarReporteFacturacionClick?.Invoke(s, e);
 
             btnDemanda = new Button
             {
-                Text = "?? Top Análisis Solicitados",
-                Location = new Point(460, 60),
-                Size = new Size(200, 40),
-                Font = new Font("Segoe UI", 9F, FontStyle.Regular),
-                BackColor = Color.FromArgb(255, 140, 0),
+                Text = "Análisis Más Solicitados",
+                Location = new Point(1050, 10),
+                Size = new Size(200, 50),
+                Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                BackColor = Color.FromArgb(230, 126, 34),
                 ForeColor = Color.White,
                 FlatStyle = FlatStyle.Flat,
-                Cursor = Cursors.Hand
+                Cursor = Cursors.Hand,
+                TextAlign = ContentAlignment.MiddleCenter
             };
             btnDemanda.FlatAppearance.BorderSize = 0;
             btnDemanda.Click += (s, e) => GenerarReporteDemandaClick?.Invoke(s, e);
 
-            panelFiltros.Controls.AddRange(new Control[] 
-            { 
-                lblDesde, dtpDesde, lblHasta, dtpHasta, 
-                btnProductividad, btnFacturacion, btnDemanda 
+            // Panel de ayuda
+            var panelAyuda = new Panel
+            {
+                Location = new Point(570, 70),
+                Size = new Size(680, 40),
+                BackColor = Color.FromArgb(255, 250, 245),
+                BorderStyle = BorderStyle.FixedSingle
+            };
+
+            var lblAyuda = new Label
+            {
+                Text = "Haga clic en cualquier botón de reporte para generar la visualización correspondiente",
+                Location = new Point(10, 10),
+                Size = new Size(650, 20),
+                Font = new Font("Segoe UI", 9, FontStyle.Regular),
+                ForeColor = Color.FromArgb(230, 126, 34),
+                BackColor = Color.Transparent
+            };
+
+            panelAyuda.Controls.Add(lblAyuda);
+
+            panelFiltros.Controls.AddRange(new Control[] { 
+                grpFechas, btnProductividad, btnFacturacion, btnDemanda, panelAyuda 
             });
 
-            // Panel de gráfico (centro)
+            // ============ PANEL DEL GRÁFICO ============
             panelGrafico = new Panel
             {
                 Dock = DockStyle.Fill,
                 BackColor = Color.White,
-                Padding = new Padding(20)
+                Padding = new Padding(30, 20, 30, 30)
             };
 
-            // Título del gráfico
-            lblTitulo = new Label
+            // Título del gráfico actual
+            var lblTituloGrafico = new Label
             {
-                Text = "Seleccione un reporte para visualizar",
+                Text = "Seleccione un reporte para visualizar las estadísticas",
                 Dock = DockStyle.Top,
-                Height = 40,
-                Font = new Font("Segoe UI", 14F, FontStyle.Bold),
+                Height = 50,
+                Font = new Font("Segoe UI", 13, FontStyle.Bold),
                 TextAlign = ContentAlignment.MiddleCenter,
-                ForeColor = Color.FromArgb(64, 64, 64)
+                ForeColor = Color.FromArgb(127, 140, 141),
+                BackColor = Color.Transparent
             };
 
-            // Chart principal
+            // Chart principal con diseño mejorado
             chartPrincipal = new Chart
             {
                 Dock = DockStyle.Fill,
-                BackColor = Color.White
+                BackColor = Color.White,
+                BorderlineColor = Color.FromArgb(189, 195, 199),
+                BorderlineDashStyle = ChartDashStyle.Solid,
+                BorderlineWidth = 1
             };
 
+            // Configurar área del gráfico
             var chartArea = new ChartArea("MainArea");
-            chartArea.AxisX.MajorGrid.LineColor = Color.LightGray;
-            chartArea.AxisY.MajorGrid.LineColor = Color.LightGray;
-            chartArea.BackColor = Color.White;
+            chartArea.BackColor = Color.FromArgb(250, 252, 255);
+            chartArea.AxisX.MajorGrid.LineColor = Color.FromArgb(220, 220, 220);
+            chartArea.AxisX.MajorGrid.LineDashStyle = ChartDashStyle.Dot;
+            chartArea.AxisY.MajorGrid.LineColor = Color.FromArgb(220, 220, 220);
+            chartArea.AxisY.MajorGrid.LineDashStyle = ChartDashStyle.Dot;
+            chartArea.AxisX.LabelStyle.Font = new Font("Segoe UI", 9);
+            chartArea.AxisY.LabelStyle.Font = new Font("Segoe UI", 9);
+            chartArea.AxisX.TitleFont = new Font("Segoe UI", 10, FontStyle.Bold);
+            chartArea.AxisY.TitleFont = new Font("Segoe UI", 10, FontStyle.Bold);
             chartPrincipal.ChartAreas.Add(chartArea);
 
-            panelGrafico.Controls.Add(chartPrincipal);
-            panelGrafico.Controls.Add(lblTitulo);
-
-            // Agregar paneles al formulario
-            this.Controls.Add(panelGrafico);
-            this.Controls.Add(panelFiltros);
-
-            // Configurar leyenda global del chart
+            // Configurar leyenda
             var legend = new Legend("MainLegend");
             legend.Docking = Docking.Right;
-            legend.Font = new Font("Segoe UI", 9F);
+            legend.Font = new Font("Segoe UI", 9);
+            legend.BackColor = Color.FromArgb(250, 252, 255);
+            legend.BorderColor = Color.FromArgb(189, 195, 199);
             chartPrincipal.Legends.Add(legend);
+
+            panelGrafico.Controls.Add(chartPrincipal);
+            panelGrafico.Controls.Add(lblTituloGrafico);
+
+            // Agregar todos los paneles al formulario
+            this.Controls.Add(panelGrafico);
+            this.Controls.Add(panelFiltros);
+            this.Controls.Add(panelHeader);
         }
 
         #region Implementación de IReportesAdminView
@@ -186,24 +284,34 @@ namespace SALC.Views.PanelAdministrador
             chartPrincipal.Series.Clear();
             chartPrincipal.Titles.Clear();
 
-            lblTitulo.Text = "Productividad de Médicos";
+            // Actualizar título del panel
+            var lblTitulo = panelGrafico.Controls.OfType<Label>().FirstOrDefault();
+            if (lblTitulo != null)
+                lblTitulo.Text = "Productividad del Personal Médico";
 
+            // Serie de análisis creados
             var series = new Series("Análisis Creados");
             series.ChartType = SeriesChartType.Column;
-            series.Color = Color.FromArgb(0, 120, 215);
-            series["PointWidth"] = "0.8";
+            series.Color = Color.FromArgb(52, 152, 219);
+            series["PointWidth"] = "0.7";
+            series.Font = new Font("Segoe UI", 9, FontStyle.Bold);
 
+            // Serie de análisis verificados
             var seriesVerificados = new Series("Análisis Verificados");
             seriesVerificados.ChartType = SeriesChartType.Column;
-            seriesVerificados.Color = Color.FromArgb(0, 153, 51);
-            seriesVerificados["PointWidth"] = "0.8";
+            seriesVerificados.Color = Color.FromArgb(39, 174, 96);
+            seriesVerificados["PointWidth"] = "0.7";
+            seriesVerificados.Font = new Font("Segoe UI", 9, FontStyle.Bold);
 
             var lista = datos.Cast<BLL.ReporteProductividad>().ToList();
 
             foreach (var item in lista)
             {
-                series.Points.AddXY(item.NombreMedico, item.CantidadCreados);
-                seriesVerificados.Points.AddXY(item.NombreMedico, item.CantidadVerificados);
+                var punto1 = series.Points.AddXY(item.NombreMedico, item.CantidadCreados);
+                var punto2 = seriesVerificados.Points.AddXY(item.NombreMedico, item.CantidadVerificados);
+                
+                series.Points[series.Points.Count - 1].Label = item.CantidadCreados.ToString();
+                seriesVerificados.Points[seriesVerificados.Points.Count - 1].Label = item.CantidadVerificados.ToString();
             }
 
             chartPrincipal.Series.Add(series);
@@ -213,12 +321,12 @@ namespace SALC.Views.PanelAdministrador
             chartPrincipal.ChartAreas[0].AxisY.Title = "Cantidad de Análisis";
             chartPrincipal.ChartAreas[0].AxisX.Interval = 1;
             chartPrincipal.ChartAreas[0].AxisX.LabelStyle.Angle = -45;
-            chartPrincipal.ChartAreas[0].AxisX.LabelStyle.Font = new Font("Segoe UI", 8F);
+            chartPrincipal.ChartAreas[0].AxisX.LabelStyle.Font = new Font("Segoe UI", 8);
 
-            // Agregar título al gráfico
+            // Título del gráfico
             var title = new Title($"Período: {FechaDesde:dd/MM/yyyy} - {FechaHasta:dd/MM/yyyy}");
-            title.Font = new Font("Segoe UI", 10F, FontStyle.Italic);
-            title.ForeColor = Color.Gray;
+            title.Font = new Font("Segoe UI", 10, FontStyle.Italic);
+            title.ForeColor = Color.FromArgb(127, 140, 141);
             chartPrincipal.Titles.Add(title);
         }
 
@@ -227,26 +335,30 @@ namespace SALC.Views.PanelAdministrador
             chartPrincipal.Series.Clear();
             chartPrincipal.Titles.Clear();
 
-            lblTitulo.Text = "Facturación por Obra Social";
+            // Actualizar título del panel
+            var lblTitulo = panelGrafico.Controls.OfType<Label>().FirstOrDefault();
+            if (lblTitulo != null)
+                lblTitulo.Text = "Distribución de Análisis por Obra Social";
 
             var series = new Series("Obras Sociales");
             series.ChartType = SeriesChartType.Pie;
             series["PieLabelStyle"] = "Outside";
-            series.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            series["PieLineColor"] = "Black";
+            series.Font = new Font("Segoe UI", 9, FontStyle.Bold);
 
             var lista = datos.Cast<BLL.ReporteFacturacion>().ToList();
 
-            // Colores personalizados para el gráfico de torta
+            // Colores pasteles profesionales
             var colores = new Color[]
             {
-                Color.FromArgb(0, 120, 215),
-                Color.FromArgb(0, 153, 51),
-                Color.FromArgb(255, 140, 0),
-                Color.FromArgb(153, 51, 255),
-                Color.FromArgb(255, 51, 51),
-                Color.FromArgb(0, 204, 204),
-                Color.FromArgb(255, 204, 0),
-                Color.FromArgb(102, 102, 102)
+                Color.FromArgb(52, 152, 219),   // Azul
+                Color.FromArgb(39, 174, 96),    // Verde
+                Color.FromArgb(230, 126, 34),   // Naranja
+                Color.FromArgb(142, 68, 173),   // Púrpura
+                Color.FromArgb(231, 76, 60),    // Rojo
+                Color.FromArgb(26, 188, 156),   // Turquesa
+                Color.FromArgb(241, 196, 15),   // Amarillo
+                Color.FromArgb(149, 165, 166)   // Gris
             };
 
             int colorIndex = 0;
@@ -254,17 +366,17 @@ namespace SALC.Views.PanelAdministrador
             {
                 var punto = series.Points.Add(item.CantidadAnalisis);
                 punto.Label = $"{item.NombreObraSocial}\n{item.Porcentaje:F1}%";
-                punto.LegendText = $"{item.NombreObraSocial} ({item.CantidadAnalisis})";
+                punto.LegendText = $"{item.NombreObraSocial}: {item.CantidadAnalisis} ({item.Porcentaje:F1}%)";
                 punto.Color = colores[colorIndex % colores.Length];
                 colorIndex++;
             }
 
             chartPrincipal.Series.Add(series);
 
-            // Agregar título al gráfico
+            // Título del gráfico
             var title = new Title($"Período: {FechaDesde:dd/MM/yyyy} - {FechaHasta:dd/MM/yyyy}");
-            title.Font = new Font("Segoe UI", 10F, FontStyle.Italic);
-            title.ForeColor = Color.Gray;
+            title.Font = new Font("Segoe UI", 10, FontStyle.Italic);
+            title.ForeColor = Color.FromArgb(127, 140, 141);
             chartPrincipal.Titles.Add(title);
         }
 
@@ -273,19 +385,23 @@ namespace SALC.Views.PanelAdministrador
             chartPrincipal.Series.Clear();
             chartPrincipal.Titles.Clear();
 
-            lblTitulo.Text = "Top 10 Análisis Más Solicitados";
+            // Actualizar título del panel
+            var lblTitulo = panelGrafico.Controls.OfType<Label>().FirstOrDefault();
+            if (lblTitulo != null)
+                lblTitulo.Text = "Top 10 Análisis Más Solicitados";
 
             var series = new Series("Demanda");
             series.ChartType = SeriesChartType.Bar;
-            series.Color = Color.FromArgb(255, 140, 0);
-            series["PointWidth"] = "0.7";
+            series.Color = Color.FromArgb(230, 126, 34);
+            series["PointWidth"] = "0.6";
+            series.Font = new Font("Segoe UI", 9, FontStyle.Bold);
 
             var lista = datos.Cast<BLL.ReporteDemanda>().ToList();
 
             foreach (var item in lista)
             {
-                var punto = series.Points.AddXY(item.TipoAnalisis, item.CantidadSolicitados);
-                series.Points[series.Points.Count - 1].Label = item.CantidadSolicitados.ToString();
+                series.Points.AddXY(item.TipoAnalisis, item.CantidadSolicitados);
+                series.Points[series.Points.Count - 1].Label = $" {item.CantidadSolicitados}";
             }
 
             chartPrincipal.Series.Add(series);
@@ -293,12 +409,12 @@ namespace SALC.Views.PanelAdministrador
             chartPrincipal.ChartAreas[0].AxisX.Title = "Cantidad Solicitada";
             chartPrincipal.ChartAreas[0].AxisY.Title = "Tipo de Análisis";
             chartPrincipal.ChartAreas[0].AxisY.Interval = 1;
-            chartPrincipal.ChartAreas[0].AxisY.LabelStyle.Font = new Font("Segoe UI", 8F);
+            chartPrincipal.ChartAreas[0].AxisY.LabelStyle.Font = new Font("Segoe UI", 9);
 
-            // Agregar título al gráfico
+            // Título del gráfico
             var title = new Title($"Período: {FechaDesde:dd/MM/yyyy} - {FechaHasta:dd/MM/yyyy}");
-            title.Font = new Font("Segoe UI", 10F, FontStyle.Italic);
-            title.ForeColor = Color.Gray;
+            title.Font = new Font("Segoe UI", 10, FontStyle.Italic);
+            title.ForeColor = Color.FromArgb(127, 140, 141);
             chartPrincipal.Titles.Add(title);
         }
 
@@ -306,7 +422,7 @@ namespace SALC.Views.PanelAdministrador
         {
             MessageBox.Show(
                 mensaje,
-                esError ? "Error" : "Reportes",
+                esError ? "SALC - Error en Reportes" : "SALC - Reportes",
                 MessageBoxButtons.OK,
                 esError ? MessageBoxIcon.Error : MessageBoxIcon.Information
             );
