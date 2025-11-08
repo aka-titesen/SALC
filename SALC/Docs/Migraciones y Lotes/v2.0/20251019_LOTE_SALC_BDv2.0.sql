@@ -66,12 +66,12 @@ GO
 
 -- 7. USUARIOS (Datos comunes) ---------------------------
 INSERT INTO usuarios (dni, nombre, apellido, id_rol, email, password_hash, estado) VALUES
-(30000001,'Juan','Pérez',1,'jperez@lab.com','$2a$12$URP1nbn2iSYn5/cEFwcaMeN8N.8SR1TaL3FMwFvYthH6c7DAfxWWm', 'Activo'), -- Pass: admin123
-(30000002,'María','González',2,'mgonzalez@lab.com','$2a$12$xR2X4M31NjPdlYXefWGhVO/mhEY4wEcHGtrIT09zPWFyjcH49k7.q', 'Activo'), -- Pass: medico123
-(30000003,'Sofía','Gundisalvo',2,'sofiagun@lab.com','$2a$12$o7V3ylw3QSIO2qk2QagJKubqaJFVoomZv3lTo3mVjeUuCTz6xTUsO', 'Activo'), -- Pass: medico456
-(30000004,'Carlos','Ramírez',3,'cramirez@lab.com','$2a$12$y98vRL/bjbV.U2.DPSpciOLaqSBPNxQk.0uY.fBe.FZDdP3KVKm8a', 'Activo'), -- Pass: asistente123
-(30000005,'Erika','Miralles',3,'erikamir@lab.com','$2a$12$PTg6.zjtrOe1NcGegfAl/elM95qtmTOEmHrAetH39m7lQw5wXKq9.', 'Activo'), -- Pass: asistente456
-(30000006,'Pedro','Alonso',2,'palonso@lab.com','$2a$12$gL.k3F83N9D6GvV07sYVUO.b2hV2fJ/7O4nSTspG/3a/jY.2023.K', 'Inactivo'); -- Pass: pedro123
+(30000001,'Juan','Pérez',1,'jperez@lab.com','5U^Ukh4TGfc8', 'Activo'),
+(30000002,'María','González',2,'mgonzalez@lab.com','9U=;(vI737b6', 'Activo'), 
+(30000003,'Sofía','Gundisalvo',2,'sofiagun@lab.com','cN=5;5171\0F', 'Activo'), 
+(30000004,'Carlos','Ramírez',3,'cramirez@lab.com','xMa6Q£66#|WK', 'Activo'), 
+(30000005,'Erika','Miralles',3,'erikamir@lab.com','Eak5+kE9H0_n', 'Activo'),
+(30000006,'Pedro','Alonso',2,'palonso@lab.com','8{+J#3z`4k73', 'Inactivo'); 
 GO
 
 -- 8. MEDICOS (Datos específicos) ------------------------

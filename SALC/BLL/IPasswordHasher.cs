@@ -4,5 +4,6 @@ namespace SALC.BLL
     {
         bool Verify(string plainText, string hashed);
         string Hash(string plainText);
+        bool IsPlainText(string passwordHash);
     }
 }
