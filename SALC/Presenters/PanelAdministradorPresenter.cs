@@ -177,15 +177,15 @@ namespace SALC.Presenters
                     sqlEx.Message.Contains("Acceso denegado") ||
                     sqlEx.Message.Contains("Access is denied"))
                 {
-                    mensajeError += "❌ SQL Server no tiene permisos para escribir en la ubicación seleccionada.\n\n";
-                    mensajeError += "💡 SOLUCIÓN: Seleccione la carpeta predeterminada de backups de SQL Server\n";
-                    mensajeError += "   que se muestra al abrir el diálogo de guardar.\n\n";
+                    mensajeError += "SQL Server no tiene permisos para escribir en la ubicación seleccionada.\n\n";
+                    mensajeError += "SOLUCIÓN: Seleccione la carpeta predeterminada de backups de SQL Server\n";
+                    mensajeError += "que se muestra al abrir el diálogo de guardar.\n\n";
                     mensajeError += "Esta carpeta ya tiene los permisos necesarios configurados.";
                 }
                 else if (sqlEx.Message.Contains("There is not enough space") || 
                          sqlEx.Message.Contains("espacio"))
                 {
-                    mensajeError += "❌ No hay suficiente espacio en disco.\n\n";
+                    mensajeError += "No hay suficiente espacio en disco.\n\n";
                     mensajeError += "Seleccione una unidad con más espacio disponible.";
                 }
                 else
