@@ -14,25 +14,25 @@ namespace SALC.Presenters
     // ViewModel para mostrar información enriquecida de usuarios en la grilla
     public class UsuarioViewModel
     {
-        public int Dni { get; set; }
+        public int DNI { get; set; }  // CAMBIADO de Dni
         public string Nombre { get; set; }
         public string Apellido { get; set; }
         public string Email { get; set; }
-        public string NombreRol { get; set; }
+        public string Rol { get; set; }
         public string Estado { get; set; }
-        public string DatosEspecificos { get; set; }
+        public string DatosEspecíficos { get; set; }  // CAMBIADO de DatosEspecificos
 
         public static UsuarioViewModel FromUsuario(Usuario usuario, string datosEspecificos = "")
         {
             return new UsuarioViewModel
             {
-                Dni = usuario.Dni,
+                DNI = usuario.Dni,  // CAMBIADO
                 Nombre = usuario.Nombre,
                 Apellido = usuario.Apellido,
                 Email = usuario.Email,
-                NombreRol = ObtenerNombreRol(usuario.IdRol),
+                Rol = ObtenerNombreRol(usuario.IdRol),
                 Estado = usuario.Estado,
-                DatosEspecificos = datosEspecificos
+                DatosEspecíficos = datosEspecificos  // CAMBIADO
             };
         }
 
@@ -690,7 +690,7 @@ namespace SALC.Presenters
 
             var confirm = MessageBox.Show(
                 $"¿Desactivar tipo de análisis '{tipoAnalisis.Descripcion}'?\n\n" +
-                "El tipo de análisis se marcará como inactivo pero se conservarán todos los datos asociados.",
+                "El tipo de análisis se marcará como inactivo pero se conserverán todos los datos asociados.",
                 "Confirmar Baja Lógica", 
                 MessageBoxButtons.YesNo, 
                 MessageBoxIcon.Question);
@@ -816,7 +816,7 @@ namespace SALC.Presenters
                 src = src.Where(u => u.Apellido.ToLowerInvariant().Contains(q)
                     || u.Nombre.ToLowerInvariant().Contains(q)
                     || u.Email.ToLowerInvariant().Contains(q)
-                    || u.Dni.ToString().Contains(q));
+                    || u.DNI.ToString().Contains(q));  // CAMBIADO de u.Dni a u.DNI
             }
             
             _view.CargarUsuarios(src.ToList());
