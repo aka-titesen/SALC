@@ -454,10 +454,13 @@ namespace SALC.Views
                 {
                     // Extraer pestañas en el orden correcto:
                     // 0 = Gestión de Pacientes, 1 = Crear Análisis, 2 = Cargar Resultados, 3 = Validar/Firmar
-                    ExtraerPestanaMedico(tabControlMedico, 0, "Gestión de Pacientes"); // NUEVA: Primera pestaña
-                    ExtraerPestanaMedico(tabControlMedico, 0, "Crear Análisis");       // Ahora índice 0 porque se removió la anterior
-                    ExtraerPestanaMedico(tabControlMedico, 0, "Cargar Resultados");    // Ahora índice 0 porque se removió la anterior
-                    ExtraerPestanaMedico(tabControlMedico, 0, "Validar/Firmar");       // Ahora índice 0 porque se removió la anterior
+                    ExtraerPestanaMedico(tabControlMedico, 0, "Gestión de Pacientes");
+                    ExtraerPestanaMedico(tabControlMedico, 0, "Crear Análisis");
+                    ExtraerPestanaMedico(tabControlMedico, 0, "Cargar Resultados");
+                    ExtraerPestanaMedico(tabControlMedico, 0, "Validar/Firmar");
+                    
+                    // ⭐ NUEVA: Agregar pestaña de Reportes para Médico
+                    AgregarPestanaReportesMedico();
                     
                     // Guardar referencia del presenter para que no se pierda
                     tabPrincipal.Tag = presenterMedico;
@@ -504,6 +507,130 @@ namespace SALC.Views
                 
                 tabError.Controls.Add(lblError);
                 tabPrincipal.TabPages.Add(tabError);
+            }
+        }
+
+        private void AgregarPestanaReportesMedico()
+        {
+            var tabReportes = new TabPage("📊 Mis Reportes")
+            {
+                BackColor = Color.White,
+                UseVisualStyleBackColor = false
+            };
+
+            try
+            {
+                // Crear un botón para abrir el módulo de reportes (similar al patrón del administrador)
+                var panelPrincipal = new Panel
+                {
+                    Dock = DockStyle.Fill,
+                    BackColor = Color.White,
+                    Padding = new Padding(20)
+                };
+
+                var lblTitulo = new Label
+                {
+                    Text = "🩺 Reportes de Calidad y Desempeño Personal",
+                    Location = new Point(20, 20),
+                    Size = new Size(600, 35),
+                    Font = new Font("Segoe UI", 16F, FontStyle.Bold),
+                    ForeColor = Color.FromArgb(0, 102, 204)
+                };
+
+                var grpInfo = new GroupBox
+                {
+                    Text = "Información de Reportes Disponibles",
+                    Location = new Point(20, 70),
+                    Size = new Size(750, 150)
+                };
+
+                var lblDescripcion = new Label
+                {
+                    Text = "Los reportes personalizados le ayudan a monitorear su calidad de trabajo\n" +
+                           "y a identificar proactivamente situaciones que requieren atención.\n\n" +
+                           "📊 Reportes disponibles:\n" +
+                           "   ⚠️ Reporte de Alertas (Valores Críticos fuera de rango)\n" +
+                           "   📈 Mi Carga de Trabajo (Pendientes y Verificados este mes)",
+                    Location = new Point(15, 25),
+                    Size = new Size(710, 110),
+                    Font = new Font("Segoe UI", 10F),
+                    AutoSize = false
+                };
+
+                grpInfo.Controls.Add(lblDescripcion);
+
+                var grpAcciones = new GroupBox
+                {
+                    Text = "Acceder a Mis Reportes",
+                    Location = new Point(20, 240),
+                    Size = new Size(750, 150)
+                };
+
+                var btnReportes = new Button
+                {
+                    Text = "📊 Abrir Módulo de Reportes Personales",
+                    Location = new Point(20, 35),
+                    Size = new Size(350, 45),
+                    Font = new Font("Segoe UI", 10F, FontStyle.Bold),
+                    BackColor = Color.FromArgb(0, 150, 136),
+                    ForeColor = Color.White,
+                    FlatStyle = FlatStyle.Flat,
+                    Cursor = Cursors.Hand
+                };
+                btnReportes.FlatAppearance.BorderSize = 0;
+                btnReportes.Click += (s, e) => AbrirReportesMedico();
+
+                var lblNota = new Label
+                {
+                    Text = "💡 Beneficios de usar los reportes:\n" +
+                           "   • Seguimiento proactivo de pacientes con valores críticos\n" +
+                           "   • Visualización rápida de su carga de trabajo actual\n" +
+                           "   • Mejora continua de la calidad asistencial",
+                    Location = new Point(20, 90),
+                    Size = new Size(660, 50),
+                    Font = new Font("Segoe UI", 9F),
+                    ForeColor = Color.FromArgb(64, 64, 64),
+                    AutoSize = false
+                };
+
+                grpAcciones.Controls.AddRange(new Control[] { btnReportes, lblNota });
+
+                panelPrincipal.Controls.AddRange(new Control[] { lblTitulo, grpInfo, grpAcciones });
+                tabReportes.Controls.Add(panelPrincipal);
+            }
+            catch (Exception ex)
+            {
+                var lblError = new Label
+                {
+                    Text = $"Error al configurar la pestaña de reportes:\n{ex.Message}",
+                    Font = new Font("Segoe UI", 12),
+                    ForeColor = Color.Red,
+                    TextAlign = ContentAlignment.MiddleCenter,
+                    Dock = DockStyle.Fill
+                };
+                tabReportes.Controls.Add(lblError);
+            }
+
+            tabPrincipal.TabPages.Add(tabReportes);
+        }
+
+        private void AbrirReportesMedico()
+        {
+            try
+            {
+                using (var dlg = new Views.PanelMedico.FrmReportesMedico(usuarioActual.Dni))
+                {
+                    dlg.ShowDialog();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    $"Error al abrir módulo de reportes:\n{ex.Message}",
+                    "Error - Reportes Médico",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error
+                );
             }
         }
 
