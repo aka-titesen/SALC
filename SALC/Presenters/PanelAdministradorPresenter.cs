@@ -108,6 +108,9 @@ namespace SALC.Presenters
 
             // Relaciones Tipo Análisis - Métricas
             _view.RelacionesTipoAnalisisMetricaGestionarClick += (s, e) => OnGestionarRelacionesTipoAnalisisMetricas();
+            
+            // Reportes
+            _view.ReportesClick += (s, e) => OnAbrirReportes();
         }
 
         private void OnProbarConexion()
@@ -300,6 +303,21 @@ namespace SALC.Presenters
             catch (Exception ex)
             {
                 _view.MostrarMensaje("Error al abrir gestión de relaciones: " + ex.Message, "Relaciones Tipo Análisis-Métricas", true);
+            }
+        }
+
+        private void OnAbrirReportes()
+        {
+            try
+            {
+                using (var dlg = new FrmReportesAdmin())
+                {
+                    dlg.ShowDialog();
+                }
+            }
+            catch (Exception ex)
+            {
+                _view.MostrarMensaje("Error al abrir módulo de reportes: " + ex.Message, "Reportes", true);
             }
         }
 

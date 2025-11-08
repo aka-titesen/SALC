@@ -298,7 +298,7 @@ namespace SALC.Views
                 var tabControlCatalogos = frmPanelCatalogos.Controls.OfType<TabControl>().FirstOrDefault();
                 if (tabControlCatalogos != null && tabControlCatalogos.TabPages.Count > 1)
                 {
-                    // Tomar la pestaña de catálogos (ahora índice 1, ya que se eliminó la de pacientes)
+                    // Tomar la pestaña de catálogos (índice 1)
                     var catalogosTabPage = tabControlCatalogos.TabPages[1];
                     tabControlCatalogos.TabPages.Remove(catalogosTabPage);
                     tabCatalogos.Controls.Add(catalogosTabPage.Controls[0]);
@@ -326,6 +326,57 @@ namespace SALC.Views
 
             tabPrincipal.TabPages.Add(tabCatalogos);
 
+            // Pestaña Reportes - NUEVA PESTAÑA AGREGADA
+            var tabReportes = new TabPage("Reportes")
+            {
+                BackColor = Color.White
+            };
+            
+            try
+            {
+                var frmPanelReportes = new Views.PanelAdministrador.FrmPanelAdministrador
+                {
+                    TopLevel = false,
+                    FormBorderStyle = FormBorderStyle.None,
+                    Dock = DockStyle.Fill
+                };
+
+                var presenterReportes = new SALC.Presenters.PanelAdministradorPresenter(frmPanelReportes);
+                
+                // IMPORTANTE: Establecer el DNI del usuario actual
+                presenterReportes.EstablecerUsuarioActual(usuarioActual.Dni);
+
+                var tabControlReportes = frmPanelReportes.Controls.OfType<TabControl>().FirstOrDefault();
+                if (tabControlReportes != null && tabControlReportes.TabPages.Count > 2)
+                {
+                    // Tomar la pestaña de reportes (índice 2)
+                    var reportesTabPage = tabControlReportes.TabPages[2];
+                    tabControlReportes.TabPages.Remove(reportesTabPage);
+                    tabReportes.Controls.Add(reportesTabPage.Controls[0]);
+                }
+                else
+                {
+                    tabReportes.Controls.Add(frmPanelReportes);
+                    frmPanelReportes.Show();
+                }
+
+                tabReportes.Tag = presenterReportes;
+            }
+            catch (Exception ex)
+            {
+                var lblError = new Label
+                {
+                    Text = $"Error al cargar panel de reportes:\n{ex.Message}",
+                    Font = new Font("Segoe UI", 12),
+                    ForeColor = Color.Red,
+                    TextAlign = ContentAlignment.MiddleCenter,
+                    Dock = DockStyle.Fill
+                };
+                tabReportes.Controls.Add(lblError);
+            }
+
+            tabPrincipal.TabPages.Add(tabReportes);
+
             // Pestaña Backups - Usar la misma lógica
             var tabBackups = new TabPage("Backups")
             {
@@ -347,10 +398,10 @@ namespace SALC.Views
                 presenterBackups.EstablecerUsuarioActual(usuarioActual.Dni);
 
                 var tabControlBackups = frmPanelBackups.Controls.OfType<TabControl>().FirstOrDefault();
-                if (tabControlBackups != null && tabControlBackups.TabPages.Count > 2)
+                if (tabControlBackups != null && tabControlBackups.TabPages.Count > 3)
                 {
-                    // Tomar la pestaña de backups (ahora índice 2, ya que se eliminó la de pacientes)
-                    var backupsTabPage = tabControlBackups.TabPages[2];
+                    // Tomar la pestaña de backups (índice 3)
+                    var backupsTabPage = tabControlBackups.TabPages[3];
                     tabControlBackups.TabPages.Remove(backupsTabPage);
                     tabBackups.Controls.Add(backupsTabPage.Controls[0]);
                 }

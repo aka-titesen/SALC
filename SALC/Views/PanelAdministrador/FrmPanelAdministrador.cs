@@ -30,6 +30,7 @@ namespace SALC.Views.PanelAdministrador
 
             AgregarTabUsuarios();
             AgregarTabCatalogos();
+            AgregarTabReportes();
             AgregarTabBackups();
         }
 
@@ -291,11 +292,10 @@ namespace SALC.Views.PanelAdministrador
             return tab;
         }
 
-        private void AgregarTabBackups()
+        private void AgregarTabReportes()
         {
-            var tab = new TabPage("Backups");
+            var tab = new TabPage("Reportes");
             
-            // Panel principal con scroll por si acaso
             var panelPrincipal = new Panel
             {
                 Dock = DockStyle.Fill,
@@ -303,7 +303,94 @@ namespace SALC.Views.PanelAdministrador
                 Padding = new System.Windows.Forms.Padding(20)
             };
             
-            // Grupo de información
+            var grpInfo = new GroupBox
+            {
+                Text = "Información de Reportes",
+                Left = 20,
+                Top = 20,
+                Width = 750,
+                Height = 130
+            };
+            
+            var lblDescripcion = new Label
+            {
+                Text = "Los reportes proporcionan análisis estadísticos y visualizaciones gráficas\n" +
+                       "para ayudar en la toma de decisiones basadas en datos.\n\n" +
+                       "📊 Reportes disponibles:\n" +
+                       "   • Productividad de Médicos\n" +
+                       "   • Facturación por Obra Social\n" +
+                       "   • Demanda de Análisis (Top 10)",
+                Left = 15,
+                Top = 25,
+                Width = 710,
+                Height = 90,
+                AutoSize = false
+            };
+            
+            grpInfo.Controls.Add(lblDescripcion);
+            
+            var grpAcciones = new GroupBox
+            {
+                Text = "Acceder a Reportes",
+                Left = 20,
+                Top = 170,
+                Width = 750,
+                Height = 150
+            };
+            
+            var btnReportes = new Button 
+            { 
+                Text = "📊 Abrir Módulo de Reportes", 
+                Left = 20, 
+                Top = 35, 
+                Width = 320,
+                Height = 45,
+                Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold),
+                BackColor = System.Drawing.Color.FromArgb(0, 153, 51),
+                ForeColor = System.Drawing.Color.White,
+                FlatStyle = FlatStyle.Flat,
+                Cursor = Cursors.Hand
+            };
+            btnReportes.FlatAppearance.BorderSize = 0;
+            btnReportes.Click += (s, e) => ReportesClick?.Invoke(this, EventArgs.Empty);
+            
+            var lblNota = new Label
+            {
+                Text = "💡 Los reportes permiten analizar:\n" +
+                       "   • Rendimiento y productividad del personal médico\n" +
+                       "   • Distribución de trabajo por obra social\n" +
+                       "   • Tipos de análisis más demandados",
+                Left = 20,
+                Top = 90,
+                Width = 660,
+                Height = 50,
+                AutoSize = false,
+                ForeColor = System.Drawing.Color.FromArgb(64, 64, 64),
+                Font = new System.Drawing.Font("Microsoft Sans Serif", 9F)
+            };
+            
+            grpAcciones.Controls.Add(btnReportes);
+            grpAcciones.Controls.Add(lblNota);
+            
+            panelPrincipal.Controls.Add(grpInfo);
+            panelPrincipal.Controls.Add(grpAcciones);
+            
+            tab.Controls.Add(panelPrincipal);
+            
+            tabs.TabPages.Add(tab);
+        }
+
+        private void AgregarTabBackups()
+        {
+            var tab = new TabPage("Backups");
+            
+            var panelPrincipal = new Panel
+            {
+                Dock = DockStyle.Fill,
+                AutoScroll = true,
+                Padding = new System.Windows.Forms.Padding(20)
+            };
+            
             var grpInfo = new GroupBox
             {
                 Text = "Información de Copias de Seguridad",
@@ -328,7 +415,6 @@ namespace SALC.Views.PanelAdministrador
             
             grpInfo.Controls.Add(lblDescripcion);
             
-            // Grupo de acciones - CRÍTICO: Aquí están los botones
             var grpAcciones = new GroupBox
             {
                 Text = "Acciones Disponibles",
@@ -381,20 +467,16 @@ namespace SALC.Views.PanelAdministrador
                 Font = new System.Drawing.Font("Microsoft Sans Serif", 9F)
             };
             
-            // IMPORTANTE: Conectar eventos
             btnEjecutar.Click += (s, e) => EjecutarBackupClick?.Invoke(this, EventArgs.Empty);
             btnProbarConexion.Click += (s, e) => ProbarConexionClick?.Invoke(this, EventArgs.Empty);
             
-            // AGREGAR CONTROLES AL GRUPO DE ACCIONES
             grpAcciones.Controls.Add(btnEjecutar);
             grpAcciones.Controls.Add(btnProbarConexion);
             grpAcciones.Controls.Add(lblNota);
             
-            // AGREGAR GRUPOS AL PANEL PRINCIPAL
             panelPrincipal.Controls.Add(grpInfo);
             panelPrincipal.Controls.Add(grpAcciones);
             
-            // AGREGAR PANEL PRINCIPAL AL TAB
             tab.Controls.Add(panelPrincipal);
             
             tabs.TabPages.Add(tab);
@@ -430,6 +512,9 @@ namespace SALC.Views.PanelAdministrador
         
         // Evento para relaciones Tipo Análisis - Métricas
         public event EventHandler RelacionesTipoAnalisisMetricaGestionarClick;
+        
+        // Evento para reportes
+        public event EventHandler ReportesClick;
         
         public event EventHandler EjecutarBackupClick;
         public event EventHandler ProbarConexionClick;
