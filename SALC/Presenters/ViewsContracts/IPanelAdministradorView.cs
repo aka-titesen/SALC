@@ -52,6 +52,9 @@ namespace SALC.Presenters.ViewsContracts
         // Relaciones Tipo Análisis - Métricas
         event EventHandler RelacionesTipoAnalisisMetricaGestionarClick;
         
+        // Reportes
+        event EventHandler ReportesClick;
+        
         // Backups
         event EventHandler EjecutarBackupClick;
 

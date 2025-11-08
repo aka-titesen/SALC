@@ -165,6 +165,7 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Windows.Forms.DataVisualization" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
@@ -216,6 +217,9 @@
     <Compile Include="Views\PanelAdministrador\FrmGestionRelacionesTipoAnalisisMetricas.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Views\PanelAdministrador\FrmReportesAdmin.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Views\Compartidos\SeleccionAnalisisControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -239,12 +243,14 @@
     <Compile Include="Presenters\GestionPacientesAsistentePresenter.cs" />
     <Compile Include="Presenters\PanelMedicoPresenter.cs" />
     <Compile Include="Presenters\PanelAdministradorPresenter.cs" />
+    <Compile Include="Presenters\ReportesAdminPresenter.cs" />
     <Compile Include="Presenters\LoginPresenter.cs" />
     <Compile Include="Presenters\ViewsContracts\IPanelAsistenteView.cs" />
     <Compile Include="Presenters\ViewsContracts\IInformesVerificadosView.cs" />
     <Compile Include="Presenters\ViewsContracts\IGestionPacientesAsistenteView.cs" />
     <Compile Include="Presenters\ViewsContracts\IPanelMedicoView.cs" />
     <Compile Include="Presenters\ViewsContracts\IPanelAdministradorView.cs" />
+    <Compile Include="Presenters\ViewsContracts\IReportesAdminView.cs" />
     <Compile Include="Presenters\ViewsContracts\ILoginView.cs" />
     <Compile Include="BLL\BackupService.cs" />
     <Compile Include="BLL\IBackupService.cs" />
@@ -252,6 +258,8 @@
     <Compile Include="BLL\IEmailService.cs" />
     <Compile Include="BLL\InformeService.cs" />
     <Compile Include="BLL\IInformeService.cs" />
+    <Compile Include="BLL\ReportesService.cs" />
+    <Compile Include="BLL\IReportesService.cs" />
     <Compile Include="BLL\AnalisisService.cs" />
     <Compile Include="BLL\IAnalisisService.cs" />
     <Compile Include="BLL\CatalogoService.cs" />
@@ -273,6 +281,7 @@
     <Compile Include="DAL\MedicoRepositorio.cs" />
     <Compile Include="DAL\AsistenteRepositorio.cs" />
     <Compile Include="DAL\ObraSocialRepositorio.cs" />
+    <Compile Include="DAL\ReportesRepositorio.cs" />
     <Compile Include="DAL\TipoAnalisisMetricaRepositorio.cs" />
     <Compile Include="DAL\IRepositorioBase.cs" />
     <Compile Include="Infraestructura\DbConexion.cs" />
