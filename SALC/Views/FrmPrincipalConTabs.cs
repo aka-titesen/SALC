@@ -13,8 +13,6 @@ namespace SALC.Views
     {
         private TabControl tabPrincipal;
         private StatusStrip statusStrip;
-        private ToolStripStatusLabel lblUsuario;
-        private ToolStripStatusLabel lblRol;
         private ToolStripStatusLabel lblFecha;
         private ToolStripStatusLabel lblEstado;
         
@@ -29,37 +27,42 @@ namespace SALC.Views
 
         private void InitializeComponent()
         {
-            Text = "SALC - Sistema de Administración de Laboratorio Clínico";
-            Size = new Size(1200, 800);
+            Text = "Sistema de Administración de Laboratorio Clínico - SALC";
+            Size = new Size(1280, 850);
             StartPosition = FormStartPosition.CenterScreen;
             WindowState = FormWindowState.Maximized;
             Icon = CargarIcono();
+            BackColor = Color.White;
 
-            // Agregar menú principal
+            // ============ MENÚ PRINCIPAL ============
             var menuStrip = new MenuStrip
             {
-                BackColor = Color.FromArgb(70, 130, 180),
+                BackColor = Color.FromArgb(46, 134, 193), // Azul médico profesional
                 ForeColor = Color.White,
-                Font = new Font("Segoe UI", 10, FontStyle.Regular)
+                Font = new Font("Segoe UI", 10, FontStyle.Regular),
+                Padding = new Padding(10, 4, 0, 4)
             };
 
             // Menú Archivo
             var menuArchivo = new ToolStripMenuItem("Archivo")
             {
-                ForeColor = Color.White
+                ForeColor = Color.White,
+                Font = new Font("Segoe UI", 10, FontStyle.Bold)
             };
 
             var menuCerrarSesion = new ToolStripMenuItem("Cerrar Sesión")
             {
-                ForeColor = Color.Black,
-                ShortcutKeys = Keys.Control | Keys.Q
+                ForeColor = Color.FromArgb(44, 62, 80),
+                ShortcutKeys = Keys.Control | Keys.Q,
+                Font = new Font("Segoe UI", 9, FontStyle.Regular)
             };
             menuCerrarSesion.Click += (s, e) => CerrarSesion();
 
-            var menuSalir = new ToolStripMenuItem("Salir")
+            var menuSalir = new ToolStripMenuItem("Salir del Sistema")
             {
-                ForeColor = Color.Black,
-                ShortcutKeys = Keys.Alt | Keys.F4
+                ForeColor = Color.FromArgb(44, 62, 80),
+                ShortcutKeys = Keys.Alt | Keys.F4,
+                Font = new Font("Segoe UI", 9, FontStyle.Regular)
             };
             menuSalir.Click += (s, e) => Close();
 
@@ -72,12 +75,14 @@ namespace SALC.Views
             // Menú Ayuda
             var menuAyuda = new ToolStripMenuItem("Ayuda")
             {
-                ForeColor = Color.White
+                ForeColor = Color.White,
+                Font = new Font("Segoe UI", 10, FontStyle.Bold)
             };
 
-            var menuAcercaDe = new ToolStripMenuItem("Acerca de SALC")
+            var menuAcercaDe = new ToolStripMenuItem("Acerca del Sistema")
             {
-                ForeColor = Color.Black
+                ForeColor = Color.FromArgb(44, 62, 80),
+                Font = new Font("Segoe UI", 9, FontStyle.Regular)
             };
             menuAcercaDe.Click += (s, e) => MostrarAcercaDe();
 
@@ -85,52 +90,131 @@ namespace SALC.Views
 
             menuStrip.Items.AddRange(new ToolStripItem[] { menuArchivo, menuAyuda });
 
-            // TabControl principal - ajustado para no solaparse con el menú
-            tabPrincipal = new TabControl
+            // ============ PANEL DE INFORMACIÓN DE USUARIO ============
+            var panelInfoUsuario = new Panel
             {
-                Location = new Point(0, menuStrip.Height),
-                Size = new Size(ClientSize.Width, ClientSize.Height - menuStrip.Height - 25), // 25 para la barra de estado
-                Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right,
-                Font = new Font("Segoe UI", 10, FontStyle.Regular),
-                Padding = new Point(20, 8),
-                ItemSize = new Size(120, 35),
-                SizeMode = TabSizeMode.Fixed
+                Height = 50,
+                Dock = DockStyle.Top,
+                BackColor = Color.FromArgb(245, 250, 255), // Azul muy claro
+                Padding = new Padding(20, 8, 20, 8)
             };
 
-            // Barra de estado
-            statusStrip = new StatusStrip
+            // Información del usuario en la esquina derecha
+            var lblInfoUsuario = new Label
             {
-                BackColor = Color.FromArgb(70, 130, 180),
-                ForeColor = Color.White
+                Text = $"Usuario conectado: {usuarioActual?.Nombre} {usuarioActual?.Apellido}",
+                Font = new Font("Segoe UI", 11, FontStyle.Bold),
+                ForeColor = Color.FromArgb(41, 128, 185),
+                AutoSize = true,
+                Location = new Point(20, 12)
             };
 
-            lblUsuario = new ToolStripStatusLabel
-            {
-                Text = $"Usuario: {usuarioActual?.Nombre} {usuarioActual?.Apellido}",
-                ForeColor = Color.White,
-                Font = new Font("Segoe UI", 9, FontStyle.Bold)
-            };
-
-            lblRol = new ToolStripStatusLabel
+            var lblRolUsuario = new Label
             {
                 Text = $"Rol: {ObtenerNombreRol(usuarioActual?.IdRol ?? 0)}",
+                Font = new Font("Segoe UI", 10, FontStyle.Regular),
+                ForeColor = Color.FromArgb(127, 140, 141),
+                AutoSize = true
+            };
+            // Posicionar a la derecha
+            panelInfoUsuario.Resize += (s, e) => {
+                lblRolUsuario.Location = new Point(panelInfoUsuario.Width - lblRolUsuario.Width - 20, 14);
+            };
+
+            var lblVersionSistema = new Label
+            {
+                Text = "SALC v1.0",
+                Font = new Font("Segoe UI", 9, FontStyle.Bold),
+                ForeColor = Color.FromArgb(149, 165, 166),
+                AutoSize = true
+            };
+            // Posicionar a la derecha, antes del rol
+            panelInfoUsuario.Resize += (s, e) => {
+                lblVersionSistema.Location = new Point(panelInfoUsuario.Width - lblVersionSistema.Width - lblRolUsuario.Width - 50, 14);
+            };
+
+            panelInfoUsuario.Controls.AddRange(new Control[] {
+                lblInfoUsuario, lblRolUsuario, lblVersionSistema
+            });
+
+            // ============ TAB CONTROL PRINCIPAL - REDISEÑADO ============
+            tabPrincipal = new TabControl
+            {
+                Dock = DockStyle.Fill,
+                Font = new Font("Segoe UI", 11, FontStyle.Regular),
+                Padding = new Point(25, 10), // Mayor separación entre pestañas
+                ItemSize = new Size(140, 40), // Pestañas más grandes
+                SizeMode = TabSizeMode.Fixed,
+                DrawMode = TabDrawMode.OwnerDrawFixed
+            };
+
+            // Dibujar pestañas con color de fondo para la activa
+            tabPrincipal.DrawItem += (s, e) => {
+                var tab = tabPrincipal.TabPages[e.Index];
+                var bounds = e.Bounds;
+                var isSelected = (e.Index == tabPrincipal.SelectedIndex);
+
+                // Color de fondo de la pestaña
+                Color backColor;
+                Color textColor;
+
+                if (isSelected)
+                {
+                    backColor = Color.FromArgb(209, 231, 248); // Azul pastel claro (pestaña activa)
+                    textColor = Color.FromArgb(41, 128, 185); // Azul oscuro
+                }
+                else
+                {
+                    backColor = Color.FromArgb(236, 240, 241); // Gris muy claro
+                    textColor = Color.FromArgb(127, 140, 141); // Gris
+                }
+
+                // Dibujar fondo
+                using (var brush = new SolidBrush(backColor))
+                {
+                    e.Graphics.FillRectangle(brush, bounds);
+                }
+
+                // Dibujar texto centrado
+                var textBounds = new Rectangle(bounds.X, bounds.Y, bounds.Width, bounds.Height);
+                TextRenderer.DrawText(e.Graphics, tab.Text, tabPrincipal.Font, textBounds, 
+                    textColor, TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter);
+
+                // Borde inferior para pestaña activa
+                if (isSelected)
+                {
+                    using (var pen = new Pen(Color.FromArgb(52, 152, 219), 3))
+                    {
+                        e.Graphics.DrawLine(pen, bounds.Left, bounds.Bottom - 1, 
+                            bounds.Right, bounds.Bottom - 1);
+                    }
+                }
+            };
+
+            // ============ BARRA DE ESTADO ============
+            statusStrip = new StatusStrip
+            {
+                BackColor = Color.FromArgb(46, 134, 193),
                 ForeColor = Color.White,
-                Margin = new Padding(20, 0, 0, 0)
+                Font = new Font("Segoe UI", 9, FontStyle.Regular),
+                Padding = new Padding(10, 0, 10, 0)
             };
 
             lblFecha = new ToolStripStatusLabel
             {
-                Text = $"Fecha: {DateTime.Now:dd/MM/yyyy HH:mm}",
+                Text = $"{DateTime.Now:dddd, dd 'de' MMMM 'de' yyyy - HH:mm}",
                 ForeColor = Color.White,
-                Margin = new Padding(20, 0, 0, 0)
+                Font = new Font("Segoe UI", 9, FontStyle.Regular),
+                Margin = new Padding(5, 0, 20, 0)
             };
 
             lblEstado = new ToolStripStatusLabel
             {
-                Text = "Sistema Operativo",
+                Text = "Sistema Operativo  •  Base de Datos Conectada",
                 ForeColor = Color.White,
                 Spring = true,
-                TextAlign = ContentAlignment.MiddleRight
+                TextAlign = ContentAlignment.MiddleRight,
+                Font = new Font("Segoe UI", 9, FontStyle.Regular)
             };
 
             // Botón de cerrar sesión en la barra de estado
@@ -139,7 +223,8 @@ namespace SALC.Views
                 Text = "Cerrar Sesión",
                 ForeColor = Color.White,
                 Font = new Font("Segoe UI", 9, FontStyle.Bold),
-                DisplayStyle = ToolStripItemDisplayStyle.Text
+                DisplayStyle = ToolStripItemDisplayStyle.Text,
+                Margin = new Padding(10, 0, 0, 0)
             };
             
             var itemCerrarSesion = new ToolStripMenuItem("Cerrar Sesión");
@@ -155,20 +240,17 @@ namespace SALC.Views
             });
 
             statusStrip.Items.AddRange(new ToolStripItem[] {
-                lblUsuario, lblRol, lblFecha, lblEstado, btnCerrarSesion
+                lblFecha, lblEstado, btnCerrarSesion
             });
 
             // Agregar controles en el orden correcto
-            Controls.AddRange(new Control[] { tabPrincipal, menuStrip, statusStrip });
-
-            // Ajustar el TabControl cuando la ventana cambie de tamaño
-            this.Resize += (s, e) => {
-                tabPrincipal.Size = new Size(ClientSize.Width, ClientSize.Height - menuStrip.Height - statusStrip.Height);
-            };
+            Controls.AddRange(new Control[] { 
+                tabPrincipal, panelInfoUsuario, menuStrip, statusStrip 
+            });
 
             // Timer para actualizar fecha
             var timer = new Timer { Interval = 60000 }; // 1 minuto
-            timer.Tick += (s, e) => lblFecha.Text = $"Fecha: {DateTime.Now:dd/MM/yyyy HH:mm}";
+            timer.Tick += (s, e) => lblFecha.Text = $"{DateTime.Now:dddd, dd 'de' MMMM 'de' yyyy - HH:mm}";
             timer.Start();
         }
 
