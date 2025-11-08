@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
+using System.Drawing;
 using SALC.Presenters.ViewsContracts;
 using SALC.Presenters;
 using SALC.Views.Compartidos;
@@ -39,403 +40,748 @@ namespace SALC.Views.PanelMedico
 
         public FrmPanelMedico()
         {
-            Text = "Panel de Médico - Sistema SALC";
+            Text = "Gestión Médica Clínica";
             Width = 1200;
             Height = 800;
             StartPosition = FormStartPosition.CenterScreen;
+            BackColor = Color.White;
 
-            tabs = new TabControl { Dock = DockStyle.Fill };
+            tabs = new TabControl 
+            { 
+                Dock = DockStyle.Fill,
+                Font = new Font("Segoe UI", 10, FontStyle.Regular),
+                Padding = new Point(15, 8),
+                ItemSize = new Size(140, 35),
+                SizeMode = TabSizeMode.Fixed
+            };
+            
             Controls.Add(tabs);
 
-            CrearTabGestionPacientes(); // SEPARADO: Solo gestión de pacientes
-            CrearTabCrearAnalisis();    // SEPARADO: Solo flujo de análisis
+            CrearTabGestionPacientes();
+            CrearTabCrearAnalisis();
             CrearTabCargarResultados();
             CrearTabValidarFirmar();
-            // ❌ ELIMINADO: CrearTabGenerarInforme() - Esta funcionalidad es exclusiva del Asistente según ERS
         }
 
-        #region RF-03: Gestión de Pacientes (Médico)
+        #region Gestión de Pacientes
 
         private void CrearTabGestionPacientes()
         {
-            var tab = new TabPage("Gestión de Pacientes");
-            
-            // Título y descripción
-            var lblTitulo = new Label { 
-                Text = "Gestión de Pacientes (RF-03) - Rol: Médico", 
-                Left = 20, Top = 20, Width = 500, Height = 25,
-                Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold)
+            var tab = new TabPage("Gestión de Pacientes")
+            {
+                BackColor = Color.White
             };
             
-            var lblDescripcion = new Label {
-                Text = "Como médico, puede modificar datos de pacientes y realizar baja lógica. Para crear pacientes, consulte al asistente.",
-                Left = 20, Top = 50, Width = 800, Height = 40,
-                ForeColor = System.Drawing.Color.Blue
+            var panelPrincipal = new Panel
+            {
+                Dock = DockStyle.Fill,
+                Padding = new Padding(20),
+                BackColor = Color.White
+            };
+
+            // Título
+            var lblTitulo = new Label 
+            { 
+                Text = "Administración de Información de Pacientes", 
+                Font = new Font("Segoe UI", 14, FontStyle.Bold),
+                ForeColor = Color.FromArgb(41, 128, 185),
+                Location = new Point(0, 0),
+                Size = new Size(800, 30)
+            };
+            
+            // Subtítulo descriptivo
+            var lblDescripcion = new Label 
+            {
+                Text = "Modifique datos de pacientes existentes y realice bajas lógicas según sea necesario",
+                Font = new Font("Segoe UI", 10, FontStyle.Regular),
+                ForeColor = Color.FromArgb(127, 140, 141),
+                Location = new Point(0, 35),
+                Size = new Size(900, 25)
             };
 
             // Toolbar
-            var tool = new ToolStrip();
-            var btnEditar = new ToolStripButton("Modificar Paciente") { DisplayStyle = ToolStripItemDisplayStyle.Text };
-            var btnEliminar = new ToolStripButton("Dar de Baja") { DisplayStyle = ToolStripItemDisplayStyle.Text };
-            var txtBuscar = new ToolStripTextBox { Width = 200, ToolTipText = "Buscar por DNI/Apellido/Nombre" };
+            var tool = new ToolStrip
+            {
+                BackColor = Color.FromArgb(245, 250, 255),
+                GripStyle = ToolStripGripStyle.Hidden,
+                Padding = new Padding(10, 5, 10, 5),
+                Location = new Point(0, 70),
+                Width = 1140
+            };
             
-            // Filtro de estado para pacientes
-            var lblFiltroEstado = new ToolStripLabel("Estado:");
+            var btnEditar = new ToolStripButton("Modificar Información") 
+            { 
+                DisplayStyle = ToolStripItemDisplayStyle.Text,
+                Font = new Font("Segoe UI", 9, FontStyle.Bold),
+                ForeColor = Color.FromArgb(52, 152, 219)
+            };
+            
+            var btnEliminar = new ToolStripButton("Dar de Baja") 
+            { 
+                DisplayStyle = ToolStripItemDisplayStyle.Text,
+                ForeColor = Color.FromArgb(192, 57, 43)
+            };
+            
+            var lblBuscar = new ToolStripLabel("Buscar:") 
+            { 
+                Font = new Font("Segoe UI", 9, FontStyle.Bold) 
+            };
+            
+            var txtBuscar = new ToolStripTextBox 
+            { 
+                Width = 220, 
+                ToolTipText = "DNI, Apellido o Nombre"
+            };
+            
+            var lblFiltroEstado = new ToolStripLabel("Estado:")
+            {
+                Margin = new Padding(10, 0, 5, 0),
+                Font = new Font("Segoe UI", 9, FontStyle.Bold)
+            };
+            
             var cboFiltroEstadoHost = new ToolStripControlHost(cboFiltroEstadoPacientes = new ComboBox
             {
                 DropDownStyle = ComboBoxStyle.DropDownList,
                 Width = 100
             });
+            
             cboFiltroEstadoPacientes.Items.AddRange(new object[] { "Todos", "Activo", "Inactivo" });
             cboFiltroEstadoPacientes.SelectedIndex = 0;
-            cboFiltroEstadoPacientes.SelectedIndexChanged += (s, e) => PacientesFiltroEstadoChanged?.Invoke(this, cboFiltroEstadoPacientes.SelectedItem.ToString());
+            cboFiltroEstadoPacientes.SelectedIndexChanged += (s, e) => 
+                PacientesFiltroEstadoChanged?.Invoke(this, cboFiltroEstadoPacientes.SelectedItem.ToString());
 
             tool.Items.AddRange(new ToolStripItem[] { 
                 btnEditar, btnEliminar,
                 new ToolStripSeparator(), 
-                new ToolStripLabel("Buscar:"), txtBuscar,
-                new ToolStripSeparator(),
+                lblBuscar, txtBuscar,
                 lblFiltroEstado, cboFiltroEstadoHost
             });
             
             // Grid de pacientes
-            gridPacientes = new DataGridView { 
-                Left = 20, Top = 120, Width = 1120, Height = 480,
+            gridPacientes = new DataGridView 
+            { 
+                Location = new Point(0, 120),
+                Size = new Size(1140, 460),
                 ReadOnly = true, 
                 AllowUserToAddRows = false, 
                 SelectionMode = DataGridViewSelectionMode.FullRowSelect, 
                 MultiSelect = false, 
                 AutoGenerateColumns = true,
-                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
+                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
+                BackgroundColor = Color.White,
+                BorderStyle = BorderStyle.FixedSingle,
+                ColumnHeadersDefaultCellStyle = new DataGridViewCellStyle
+                {
+                    BackColor = Color.FromArgb(52, 152, 219),
+                    ForeColor = Color.White,
+                    Font = new Font("Segoe UI", 10, FontStyle.Bold)
+                },
+                DefaultCellStyle = new DataGridViewCellStyle
+                {
+                    Font = new Font("Segoe UI", 9),
+                    SelectionBackColor = Color.FromArgb(209, 231, 248),
+                    SelectionForeColor = Color.FromArgb(44, 62, 80)
+                },
+                AlternatingRowsDefaultCellStyle = new DataGridViewCellStyle
+                {
+                    BackColor = Color.FromArgb(245, 250, 255)
+                },
+                EnableHeadersVisualStyles = false,
+                RowHeadersVisible = false
             };
 
-            // Información adicional
-            var lblInfo = new Label {
-                Text = "ℹ️ Permisos de Médico:\n" +
-                       "• ✅ Modificar datos de pacientes existentes\n" +
-                       "• ✅ Dar de baja lógica (cambiar estado a 'Inactivo')\n" +
-                       "• ❌ No puede crear nuevos pacientes (solo el Asistente)",
-                Left = 20, Top = 620, Width = 500, Height = 80,
-                ForeColor = System.Drawing.Color.DarkGreen
+            // Información de permisos
+            var panelInfo = new Panel
+            {
+                Location = new Point(0, 590),
+                Size = new Size(1140, 70),
+                BackColor = Color.FromArgb(232, 245, 233),
+                BorderStyle = BorderStyle.FixedSingle
             };
+
+            var lblInfo = new Label 
+            {
+                Text = "Permisos del Rol Médico:\n" +
+                       "• Modificar datos de pacientes existentes  •  Dar de baja lógica (cambiar a estado Inactivo)\n" +
+                       "Nota: La creación de nuevos pacientes es responsabilidad del personal asistente",
+                Location = new Point(15, 12),
+                Size = new Size(1100, 45),
+                Font = new Font("Segoe UI", 9, FontStyle.Regular),
+                ForeColor = Color.FromArgb(56, 142, 60),
+                BackColor = Color.Transparent
+            };
+
+            panelInfo.Controls.Add(lblInfo);
 
             // Eventos
             btnEditar.Click += (s, e) => PacientesEditarClick?.Invoke(this, EventArgs.Empty);
             btnEliminar.Click += (s, e) => PacientesEliminarClick?.Invoke(this, EventArgs.Empty);
             txtBuscar.TextChanged += (s, e) => PacientesBuscarTextoChanged?.Invoke(this, txtBuscar.Text);
 
-            // Layout
-            var panel = new Panel { Dock = DockStyle.Fill };
-            tool.Dock = DockStyle.Top;
-            tool.Top = 100;
-            panel.Controls.Add(gridPacientes);
-            panel.Controls.Add(tool);
-            
-            tab.Controls.AddRange(new Control[] { 
-                lblTitulo, lblDescripcion, panel, lblInfo
+            panelPrincipal.Controls.AddRange(new Control[] { 
+                lblTitulo, lblDescripcion, tool, gridPacientes, panelInfo
             });
+            
+            tab.Controls.Add(panelPrincipal);
             tabs.TabPages.Add(tab);
         }
 
         #endregion
 
-        #region RF-05: Crear Análisis
+        #region Crear Análisis
 
         private void CrearTabCrearAnalisis()
         {
-            var tab = new TabPage("1. Crear Análisis");
-            
-            // Título y descripción
-            var lblTitulo = new Label { 
-                Text = "Paso 1: Crear Nuevo Análisis (RF-05)", 
-                Left = 20, Top = 20, Width = 400, Height = 25,
-                Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold)
+            var tab = new TabPage("Crear Análisis Clínico")
+            {
+                BackColor = Color.White
             };
             
-            var lblDescripcion = new Label {
-                Text = "Seleccione un paciente existente y tipo de análisis para crear un nuevo análisis en estado 'Sin verificar'",
-                Left = 20, Top = 50, Width = 800, Height = 40,
-                ForeColor = System.Drawing.Color.Blue
+            var panelPrincipal = new Panel
+            {
+                Dock = DockStyle.Fill,
+                Padding = new Padding(30),
+                BackColor = Color.White
             };
 
-            // Información de flujo actualizada según ERS
-            var lblFlujo = new Label {
-                Text = "💡 Flujo de Análisis (Médico): 1️⃣ Crear → 2️⃣ Cargar Resultados → 3️⃣ Validar/Firmar ✅ | 4️⃣ Generar Informe (Solo Asistente)",
-                Left = 20, Top = 90, Width = 1000, Height = 20,
-                ForeColor = System.Drawing.Color.Green,
-                Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Italic)
+            // Título principal
+            var lblTitulo = new Label 
+            { 
+                Text = "Solicitud de Nuevo Análisis Clínico", 
+                Font = new Font("Segoe UI", 15, FontStyle.Bold),
+                ForeColor = Color.FromArgb(39, 174, 96),
+                Location = new Point(0, 0),
+                Size = new Size(700, 35)
+            };
+            
+            // Descripción del proceso
+            var lblDescripcion = new Label 
+            {
+                Text = "Seleccione el paciente y el tipo de análisis para crear una nueva solicitud en estado inicial",
+                Font = new Font("Segoe UI", 11, FontStyle.Regular),
+                ForeColor = Color.FromArgb(127, 140, 141),
+                Location = new Point(0, 40),
+                Size = new Size(900, 25)
             };
 
-            // Selección de paciente
-            var gbPaciente = new GroupBox { 
-                Text = "Paso 1: Seleccionar Paciente", 
-                Left = 20, Top = 130, Width = 500, Height = 120 
-            };
-            
-            btnSeleccionarPaciente = new Button { 
-                Text = "Buscar Paciente...", 
-                Left = 20, Top = 30, Width = 160, Height = 35,
-                BackColor = System.Drawing.Color.LightBlue
-            };
-            
-            lblPacienteSeleccionado = new Label { 
-                Text = "Ningún paciente seleccionado", 
-                Left = 20, Top = 75, Width = 450, Height = 35,
-                ForeColor = System.Drawing.Color.Gray,
+            // Indicador de flujo
+            var panelFlujo = new Panel
+            {
+                Location = new Point(0, 75),
+                Size = new Size(1080, 50),
+                BackColor = Color.FromArgb(248, 255, 250),
                 BorderStyle = BorderStyle.FixedSingle
+            };
+
+            var lblFlujo = new Label 
+            {
+                Text = "Flujo Completo del Proceso Médico:  1️⃣ Crear Análisis  →  2️⃣ Cargar Resultados  →  3️⃣ Validar y Firmar  ✅\n" +
+                       "Nota: El personal asistente se encargará posteriormente de generar el informe PDF para el paciente",
+                Font = new Font("Segoe UI", 9, FontStyle.Italic),
+                ForeColor = Color.FromArgb(56, 142, 60),
+                Location = new Point(15, 8),
+                Size = new Size(1050, 32),
+                BackColor = Color.Transparent
+            };
+
+            panelFlujo.Controls.Add(lblFlujo);
+
+            // Paso 1: Selección de paciente
+            var gbPaciente = new GroupBox 
+            { 
+                Text = "  Paso 1: Selección del Paciente  ", 
+                Location = new Point(0, 145), 
+                Size = new Size(530, 130),
+                Font = new Font("Segoe UI", 11, FontStyle.Bold),
+                ForeColor = Color.FromArgb(52, 152, 219),
+                BackColor = Color.FromArgb(245, 250, 255)
+            };
+            
+            btnSeleccionarPaciente = new Button 
+            { 
+                Text = "Buscar y Seleccionar Paciente", 
+                Location = new Point(20, 35), 
+                Size = new Size(240, 40),
+                Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                BackColor = Color.FromArgb(52, 152, 219),
+                ForeColor = Color.White,
+                FlatStyle = FlatStyle.Flat,
+                Cursor = Cursors.Hand
+            };
+            btnSeleccionarPaciente.FlatAppearance.BorderSize = 0;
+            
+            lblPacienteSeleccionado = new Label 
+            { 
+                Text = "Ningún paciente seleccionado", 
+                Location = new Point(20, 85), 
+                Size = new Size(490, 30),
+                Font = new Font("Segoe UI", 10, FontStyle.Regular),
+                ForeColor = Color.FromArgb(149, 165, 166),
+                BorderStyle = BorderStyle.FixedSingle,
+                TextAlign = ContentAlignment.MiddleLeft,
+                Padding = new Padding(10, 0, 0, 0)
             };
 
             gbPaciente.Controls.AddRange(new Control[] { btnSeleccionarPaciente, lblPacienteSeleccionado });
 
-            // Selección de tipo de análisis
-            var gbTipo = new GroupBox { 
-                Text = "Paso 2: Tipo de Análisis", 
-                Left = 540, Top = 130, Width = 400, Height = 120 
+            // Paso 2: Tipo de análisis
+            var gbTipo = new GroupBox 
+            { 
+                Text = "  Paso 2: Tipo de Análisis  ", 
+                Location = new Point(550, 145), 
+                Size = new Size(530, 130),
+                Font = new Font("Segoe UI", 11, FontStyle.Bold),
+                ForeColor = Color.FromArgb(230, 126, 34),
+                BackColor = Color.FromArgb(255, 250, 245)
             };
             
-            var lblTipo = new Label { Text = "Tipo:", Left = 20, Top = 40, Width = 80 };
-            cboTipoAnalisis = new ComboBox { 
-                Left = 100, Top = 38, Width = 280, 
+            var lblTipo = new Label 
+            { 
+                Text = "Seleccione el tipo:", 
+                Location = new Point(20, 40), 
+                Size = new Size(140, 25),
+                Font = new Font("Segoe UI", 10, FontStyle.Regular)
+            };
+            
+            cboTipoAnalisis = new ComboBox 
+            { 
+                Location = new Point(20, 70), 
+                Size = new Size(490, 30), 
                 DropDownStyle = ComboBoxStyle.DropDownList,
+                Font = new Font("Segoe UI", 10),
                 DisplayMember = "Descripcion", 
-                ValueMember = "IdTipoAnalisis" 
+                ValueMember = "IdTipoAnalisis"
             };
 
             gbTipo.Controls.AddRange(new Control[] { lblTipo, cboTipoAnalisis });
 
-            // Observaciones
-            var gbObservaciones = new GroupBox { 
-                Text = "Paso 3: Observaciones Iniciales (Opcional)", 
-                Left = 20, Top = 270, Width = 920, Height = 100 
+            // Paso 3: Observaciones
+            var gbObservaciones = new GroupBox 
+            { 
+                Text = "  Paso 3: Observaciones Iniciales (Opcional)  ", 
+                Location = new Point(0, 295), 
+                Size = new Size(1080, 120),
+                Font = new Font("Segoe UI", 11, FontStyle.Bold),
+                ForeColor = Color.FromArgb(142, 68, 173),
+                BackColor = Color.FromArgb(250, 245, 255)
             };
             
-            txtObservacionesCrear = new TextBox { 
-                Left = 20, Top = 30, Width = 880, Height = 50, 
-                Multiline = true, ScrollBars = ScrollBars.Vertical
+            txtObservacionesCrear = new TextBox 
+            { 
+                Location = new Point(20, 35), 
+                Size = new Size(1040, 70), 
+                Multiline = true, 
+                ScrollBars = ScrollBars.Vertical,
+                Font = new Font("Segoe UI", 10),
+                BorderStyle = BorderStyle.FixedSingle
             };
 
             gbObservaciones.Controls.Add(txtObservacionesCrear);
 
             // Botón crear
-            btnCrearAnalisis = new Button { 
-                Text = "CREAR ANÁLISIS", 
-                Left = 800, Top = 390, Width = 140, Height = 40,
-                BackColor = System.Drawing.Color.LightGreen,
-                Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold),
-                Enabled = false
+            btnCrearAnalisis = new Button 
+            { 
+                Text = "Crear Análisis Clínico", 
+                Location = new Point(900, 435), 
+                Size = new Size(180, 50),
+                Font = new Font("Segoe UI", 11, FontStyle.Bold),
+                BackColor = Color.FromArgb(39, 174, 96),
+                ForeColor = Color.White,
+                FlatStyle = FlatStyle.Flat,
+                Enabled = false,
+                Cursor = Cursors.Hand
+            };
+            btnCrearAnalisis.FlatAppearance.BorderSize = 0;
+
+            // Panel informativo
+            var panelInfoPost = new Panel
+            {
+                Location = new Point(0, 505),
+                Size = new Size(1080, 90),
+                BackColor = Color.FromArgb(232, 245, 233),
+                BorderStyle = BorderStyle.FixedSingle
             };
 
-            // Información adicional actualizada según ERS
-            var lblInfo = new Label {
-                Text = "ℹ️ Después de crear el análisis (según ERS):\n" +
-                       "• Vaya a la pestaña 'Cargar Resultados' para ingresar las métricas específicas\n" +
-                       "• Complete todos los valores y guarde los resultados\n" +
-                       "• Proceda a 'Validar/Firmar' cuando termine la carga\n" +
-                       "• 📋 NOTA: El Asistente será responsable de generar el informe PDF",
-                Left = 20, Top = 450, Width = 700, Height = 100,
-                ForeColor = System.Drawing.Color.DarkBlue
+            var lblInfoPost = new Label 
+            {
+                Text = "Pasos Siguientes después de Crear el Análisis:\n\n" +
+                       "1. Diríjase a la pestaña 'Cargar Resultados' para ingresar los valores de las métricas específicas\n" +
+                       "2. Complete todos los valores requeridos y guarde los resultados\n" +
+                       "3. Finalmente, proceda a la pestaña 'Validar y Firmar' para dar validez clínica al análisis",
+                Location = new Point(15, 10),
+                Size = new Size(1050, 70),
+                Font = new Font("Segoe UI", 9, FontStyle.Regular),
+                ForeColor = Color.FromArgb(27, 94, 32),
+                BackColor = Color.Transparent
             };
+
+            panelInfoPost.Controls.Add(lblInfoPost);
 
             // Eventos
             btnSeleccionarPaciente.Click += (s, e) => BuscarPacienteCrearClick?.Invoke(this, EventArgs.Empty);
             btnCrearAnalisis.Click += (s, e) => CrearAnalisisClick?.Invoke(this, EventArgs.Empty);
 
-            tab.Controls.AddRange(new Control[] { 
-                lblTitulo, lblDescripcion, lblFlujo, gbPaciente, gbTipo, gbObservaciones, btnCrearAnalisis, lblInfo
+            panelPrincipal.Controls.AddRange(new Control[] { 
+                lblTitulo, lblDescripcion, panelFlujo, gbPaciente, gbTipo, gbObservaciones, 
+                btnCrearAnalisis, panelInfoPost
             });
+            
+            tab.Controls.Add(panelPrincipal);
             tabs.TabPages.Add(tab);
         }
 
         #endregion
 
-        #region RF-06: Cargar Resultados
+        #region Cargar Resultados
 
         private void CrearTabCargarResultados()
         {
-            var tab = new TabPage("2. Cargar Resultados");
-            
-            // Título y descripción
-            var lblTitulo = new Label { 
-                Text = "Paso 2: Carga de Resultados (RF-06)", 
-                Left = 20, Top = 20, Width = 400, Height = 25,
-                Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold)
+            var tab = new TabPage("Cargar Resultados")
+            {
+                BackColor = Color.White
             };
             
-            var lblDescripcion = new Label {
-                Text = "Seleccione un análisis 'Sin verificar' de su autoría y cargue los valores de las métricas específicas del tipo de análisis",
-                Left = 20, Top = 50, Width = 800, Height = 40,
-                ForeColor = System.Drawing.Color.Blue
+            var panelPrincipal = new Panel
+            {
+                Dock = DockStyle.Fill,
+                Padding = new Padding(30),
+                BackColor = Color.White
             };
 
-            // Nota importante sobre métricas específicas
-            var lblMetricasEspecificas = new Label {
-                Text = "⚠️ IMPORTANTE: Solo se mostrarán las métricas asociadas al tipo de análisis seleccionado (no todas las métricas del sistema)",
-                Left = 20, Top = 90, Width = 900, Height = 20,
-                ForeColor = System.Drawing.Color.Red,
-                Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold)
+            // Título
+            var lblTitulo = new Label 
+            { 
+                Text = "Carga de Resultados de Laboratorio", 
+                Font = new Font("Segoe UI", 15, FontStyle.Bold),
+                ForeColor = Color.FromArgb(230, 126, 34),
+                Location = new Point(0, 0),
+                Size = new Size(700, 35)
             };
+            
+            var lblDescripcion = new Label 
+            {
+                Text = "Seleccione un análisis pendiente e ingrese los valores medidos para cada métrica asociada",
+                Font = new Font("Segoe UI", 11, FontStyle.Regular),
+                ForeColor = Color.FromArgb(127, 140, 141),
+                Location = new Point(0, 40),
+                Size = new Size(900, 25)
+            };
+
+            // Nota importante
+            var panelNota = new Panel
+            {
+                Location = new Point(0, 75),
+                Size = new Size(1080, 45),
+                BackColor = Color.FromArgb(255, 243, 224),
+                BorderStyle = BorderStyle.FixedSingle
+            };
+
+            var lblNota = new Label 
+            {
+                Text = "Importante: Solo se mostrarán las métricas específicas configuradas para el tipo de análisis seleccionado.\n" +
+                       "Los valores deben estar dentro de los rangos establecidos para cada parámetro de laboratorio.",
+                Font = new Font("Segoe UI", 9, FontStyle.Bold),
+                ForeColor = Color.FromArgb(230, 81, 0),
+                Location = new Point(15, 8),
+                Size = new Size(1050, 30),
+                BackColor = Color.Transparent
+            };
+
+            panelNota.Controls.Add(lblNota);
 
             // Selección de análisis
-            var gbAnalisis = new GroupBox { 
-                Text = "Seleccionar Análisis", 
-                Left = 20, Top = 120, Width = 600, Height = 120 
+            var gbAnalisis = new GroupBox 
+            { 
+                Text = "  Selección del Análisis  ", 
+                Location = new Point(0, 135), 
+                Size = new Size(730, 110),
+                Font = new Font("Segoe UI", 11, FontStyle.Bold),
+                ForeColor = Color.FromArgb(230, 126, 34),
+                BackColor = Color.FromArgb(255, 250, 245)
             };
             
-            btnSeleccionarAnalisisResultados = new Button { 
-                Text = "Seleccionar Análisis...", 
-                Left = 20, Top = 30, Width = 180, Height = 35,
-                BackColor = System.Drawing.Color.LightBlue
+            btnSeleccionarAnalisisResultados = new Button 
+            { 
+                Text = "Buscar Análisis Pendiente", 
+                Location = new Point(20, 30), 
+                Size = new Size(220, 35),
+                Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                BackColor = Color.FromArgb(230, 126, 34),
+                ForeColor = Color.White,
+                FlatStyle = FlatStyle.Flat,
+                Cursor = Cursors.Hand
             };
+            btnSeleccionarAnalisisResultados.FlatAppearance.BorderSize = 0;
             
-            lblAnalisisResultadosSeleccionado = new Label { 
+            lblAnalisisResultadosSeleccionado = new Label 
+            { 
                 Text = "Ningún análisis seleccionado", 
-                Left = 20, Top = 75, Width = 550, Height = 35,
-                ForeColor = System.Drawing.Color.Gray,
-                BorderStyle = BorderStyle.FixedSingle
+                Location = new Point(20, 73), 
+                Size = new Size(690, 27),
+                Font = new Font("Segoe UI", 9, FontStyle.Regular),
+                ForeColor = Color.FromArgb(149, 165, 166),
+                BorderStyle = BorderStyle.FixedSingle,
+                TextAlign = ContentAlignment.MiddleLeft,
+                Padding = new Padding(10, 0, 0, 0)
             };
 
             gbAnalisis.Controls.AddRange(new Control[] { btnSeleccionarAnalisisResultados, lblAnalisisResultadosSeleccionado });
 
             // Botón cargar métricas
-            btnCargarMetricas = new Button { 
+            btnCargarMetricas = new Button 
+            { 
                 Text = "Cargar Métricas Específicas", 
-                Left = 640, Top = 150, Width = 180, Height = 35,
-                BackColor = System.Drawing.Color.LightBlue,
-                Enabled = false
+                Location = new Point(760, 165), 
+                Size = new Size(320, 35),
+                Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                BackColor = Color.FromArgb(52, 152, 219),
+                ForeColor = Color.White,
+                FlatStyle = FlatStyle.Flat,
+                Enabled = false,
+                Cursor = Cursors.Hand
             };
+            btnCargarMetricas.FlatAppearance.BorderSize = 0;
 
             // Grid de resultados
-            var lblGrid = new Label { 
+            var lblGrid = new Label 
+            { 
                 Text = "Métricas Específicas del Tipo de Análisis:", 
-                Left = 20, Top = 260, Width = 300,
-                Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold)
+                Location = new Point(0, 260), 
+                Size = new Size(400, 25),
+                Font = new Font("Segoe UI", 11, FontStyle.Bold),
+                ForeColor = Color.FromArgb(44, 62, 80)
             };
 
-            gridResultados = new DataGridView { 
-                Left = 20, Top = 290, Width = 1120, Height = 320,
+            gridResultados = new DataGridView 
+            { 
+                Location = new Point(0, 290), 
+                Size = new Size(1080, 290),
                 AllowUserToAddRows = false,
                 AllowUserToDeleteRows = false,
                 AutoGenerateColumns = true,
                 AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
-                SelectionMode = DataGridViewSelectionMode.CellSelect
+                SelectionMode = DataGridViewSelectionMode.CellSelect,
+                BackgroundColor = Color.White,
+                BorderStyle = BorderStyle.FixedSingle,
+                ColumnHeadersDefaultCellStyle = new DataGridViewCellStyle
+                {
+                    BackColor = Color.FromArgb(230, 126, 34),
+                    ForeColor = Color.White,
+                    Font = new Font("Segoe UI", 10, FontStyle.Bold)
+                },
+                DefaultCellStyle = new DataGridViewCellStyle
+                {
+                    Font = new Font("Segoe UI", 9),
+                    SelectionBackColor = Color.FromArgb(255, 224, 178),
+                    SelectionForeColor = Color.FromArgb(44, 62, 80)
+                },
+                AlternatingRowsDefaultCellStyle = new DataGridViewCellStyle
+                {
+                    BackColor = Color.FromArgb(255, 250, 245)
+                },
+                EnableHeadersVisualStyles = false,
+                RowHeadersVisible = false
             };
 
             // Botón guardar
-            btnGuardarResultados = new Button { 
+            btnGuardarResultados = new Button 
+            { 
                 Text = "Guardar Resultados", 
-                Left = 1020, Top = 625, Width = 120, Height = 35,
-                BackColor = System.Drawing.Color.LightGreen,
-                Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold),
-                Enabled = false
+                Location = new Point(930, 595), 
+                Size = new Size(150, 40),
+                Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                BackColor = Color.FromArgb(39, 174, 96),
+                ForeColor = Color.White,
+                FlatStyle = FlatStyle.Flat,
+                Enabled = false,
+                Cursor = Cursors.Hand
             };
+            btnGuardarResultados.FlatAppearance.BorderSize = 0;
 
             // Eventos
             btnSeleccionarAnalisisResultados.Click += (s, e) => BuscarAnalisisResultadosClick?.Invoke(this, EventArgs.Empty);
             btnCargarMetricas.Click += (s, e) => CargarMetricasAnalisisClick?.Invoke(this, EventArgs.Empty);
             btnGuardarResultados.Click += (s, e) => CargarResultadosGuardarClick?.Invoke(this, EventArgs.Empty);
 
-            tab.Controls.AddRange(new Control[] { 
-                lblTitulo, lblDescripcion, lblMetricasEspecificas, gbAnalisis, btnCargarMetricas, lblGrid, gridResultados, btnGuardarResultados 
+            panelPrincipal.Controls.AddRange(new Control[] { 
+                lblTitulo, lblDescripcion, panelNota, gbAnalisis, btnCargarMetricas, 
+                lblGrid, gridResultados, btnGuardarResultados 
             });
+            
+            tab.Controls.Add(panelPrincipal);
             tabs.TabPages.Add(tab);
         }
 
         #endregion
 
-        #region RF-07: Validar/Firmar
+        #region Validar/Firmar
 
         private void CrearTabValidarFirmar()
         {
-            var tab = new TabPage("3. Validar / Firmar");
-            
-            // Título y descripción
-            var lblTitulo = new Label { 
-                Text = "Paso 3: Validación y Firma (RF-07) - FINAL del flujo Médico", 
-                Left = 20, Top = 20, Width = 500, Height = 25,
-                Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold)
+            var tab = new TabPage("Validar y Firmar")
+            {
+                BackColor = Color.White
             };
             
-            var lblDescripcion = new Label {
-                Text = "Seleccione un análisis con resultados cargados y proceda a firmarlo para darle validez clínica",
-                Left = 20, Top = 50, Width = 800, Height = 40,
-                ForeColor = System.Drawing.Color.Blue
+            var panelPrincipal = new Panel
+            {
+                Dock = DockStyle.Fill,
+                Padding = new Padding(30),
+                BackColor = Color.White
             };
 
-            var lblAdvertencia = new Label {
-                Text = "⚠️ ATENCIÓN: Una vez firmado, el análisis no podrá modificarse",
-                Left = 20, Top = 90, Width = 800, Height = 20,
-                ForeColor = System.Drawing.Color.Red,
-                Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold)
+            // Título
+            var lblTitulo = new Label 
+            { 
+                Text = "Validación y Firma Profesional del Análisis", 
+                Font = new Font("Segoe UI", 15, FontStyle.Bold),
+                ForeColor = Color.FromArgb(142, 68, 173),
+                Location = new Point(0, 0),
+                Size = new Size(750, 35)
+            };
+            
+            var lblDescripcion = new Label 
+            {
+                Text = "Revise cuidadosamente los resultados y proceda a firmar digitalmente el análisis clínico",
+                Font = new Font("Segoe UI", 11, FontStyle.Regular),
+                ForeColor = Color.FromArgb(127, 140, 141),
+                Location = new Point(0, 40),
+                Size = new Size(900, 25)
             };
 
-            // Información sobre continuación del flujo
-            var lblFlujoPost = new Label {
-                Text = "📋 Después de firmar: El Asistente podrá generar el informe PDF para el paciente",
-                Left = 20, Top = 115, Width = 700, Height = 20,
-                ForeColor = System.Drawing.Color.Green,
-                Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Italic)
+            // Advertencias
+            var panelAdvertencia = new Panel
+            {
+                Location = new Point(0, 75),
+                Size = new Size(1080, 70),
+                BackColor = Color.FromArgb(255, 235, 238),
+                BorderStyle = BorderStyle.FixedSingle
             };
+
+            var lblAdvertencia = new Label 
+            {
+                Text = "Atención: Una vez firmado digitalmente, el análisis NO podrá modificarse\n\n" +
+                       "La firma profesional valida los resultados y habilita al personal asistente para generar\n" +
+                       "el informe PDF que será entregado al paciente.",
+                Font = new Font("Segoe UI", 9, FontStyle.Bold),
+                ForeColor = Color.FromArgb(183, 28, 28),
+                Location = new Point(15, 10),
+                Size = new Size(1050, 50),
+                BackColor = Color.Transparent
+            };
+
+            panelAdvertencia.Controls.Add(lblAdvertencia);
 
             // Selección de análisis
-            var gbAnalisis = new GroupBox { 
-                Text = "Seleccionar Análisis para Firmar", 
-                Left = 20, Top = 150, Width = 600, Height = 120 
+            var gbAnalisis = new GroupBox 
+            { 
+                Text = "  Selección del Análisis para Firmar  ", 
+                Location = new Point(0, 160), 
+                Size = new Size(730, 110),
+                Font = new Font("Segoe UI", 11, FontStyle.Bold),
+                ForeColor = Color.FromArgb(142, 68, 173),
+                BackColor = Color.FromArgb(250, 245, 255)
             };
             
-            btnSeleccionarAnalisisFirmar = new Button { 
-                Text = "Seleccionar Análisis...", 
-                Left = 20, Top = 30, Width = 180, Height = 35,
-                BackColor = System.Drawing.Color.Orange
+            btnSeleccionarAnalisisFirmar = new Button 
+            { 
+                Text = "Buscar Análisis para Firmar", 
+                Location = new Point(20, 30), 
+                Size = new Size(240, 35),
+                Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                BackColor = Color.FromArgb(142, 68, 173),
+                ForeColor = Color.White,
+                FlatStyle = FlatStyle.Flat,
+                Cursor = Cursors.Hand
             };
+            btnSeleccionarAnalisisFirmar.FlatAppearance.BorderSize = 0;
             
-            lblAnalisisFirmarSeleccionado = new Label { 
+            lblAnalisisFirmarSeleccionado = new Label 
+            { 
                 Text = "Ningún análisis seleccionado", 
-                Left = 20, Top = 75, Width = 550, Height = 35,
-                ForeColor = System.Drawing.Color.Gray,
-                BorderStyle = BorderStyle.FixedSingle
+                Location = new Point(20, 73), 
+                Size = new Size(690, 27),
+                Font = new Font("Segoe UI", 9, FontStyle.Regular),
+                ForeColor = Color.FromArgb(149, 165, 166),
+                BorderStyle = BorderStyle.FixedSingle,
+                TextAlign = ContentAlignment.MiddleLeft,
+                Padding = new Padding(10, 0, 0, 0)
             };
 
             gbAnalisis.Controls.AddRange(new Control[] { btnSeleccionarAnalisisFirmar, lblAnalisisFirmarSeleccionado });
 
-            // Grid de validación (solo lectura)
-            var lblValidacion = new Label { 
-                Text = "Revisión de Resultados:", 
-                Left = 20, Top = 290, Width = 200,
-                Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold)
+            // Grid de validación
+            var lblValidacion = new Label 
+            { 
+                Text = "Revisión de Resultados de Laboratorio:", 
+                Location = new Point(0, 285), 
+                Size = new Size(400, 25),
+                Font = new Font("Segoe UI", 11, FontStyle.Bold),
+                ForeColor = Color.FromArgb(44, 62, 80)
             };
 
-            gridValidacion = new DataGridView { 
-                Left = 20, Top = 320, Width = 1120, Height = 280,
+            gridValidacion = new DataGridView 
+            { 
+                Location = new Point(0, 315), 
+                Size = new Size(1080, 280),
                 AllowUserToAddRows = false,
                 AllowUserToDeleteRows = false,
                 ReadOnly = true,
                 AutoGenerateColumns = true,
                 AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
-                SelectionMode = DataGridViewSelectionMode.FullRowSelect
+                SelectionMode = DataGridViewSelectionMode.FullRowSelect,
+                BackgroundColor = Color.White,
+                BorderStyle = BorderStyle.FixedSingle,
+                ColumnHeadersDefaultCellStyle = new DataGridViewCellStyle
+                {
+                    BackColor = Color.FromArgb(142, 68, 173),
+                    ForeColor = Color.White,
+                    Font = new Font("Segoe UI", 10, FontStyle.Bold)
+                },
+                DefaultCellStyle = new DataGridViewCellStyle
+                {
+                    Font = new Font("Segoe UI", 9),
+                    SelectionBackColor = Color.FromArgb(225, 190, 231),
+                    SelectionForeColor = Color.FromArgb(44, 62, 80)
+                },
+                AlternatingRowsDefaultCellStyle = new DataGridViewCellStyle
+                {
+                    BackColor = Color.FromArgb(250, 245, 255)
+                },
+                EnableHeadersVisualStyles = false,
+                RowHeadersVisible = false
             };
 
             // Botón firmar
-            btnFirmarAnalisis = new Button { 
-                Text = "FIRMAR ANÁLISIS", 
-                Left = 1000, Top = 620, Width = 140, Height = 40,
-                BackColor = System.Drawing.Color.Orange,
-                Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold),
-                Enabled = false
+            btnFirmarAnalisis = new Button 
+            { 
+                Text = "Firmar Digitalmente", 
+                Location = new Point(900, 610), 
+                Size = new Size(180, 50),
+                Font = new Font("Segoe UI", 11, FontStyle.Bold),
+                BackColor = Color.FromArgb(142, 68, 173),
+                ForeColor = Color.White,
+                FlatStyle = FlatStyle.Flat,
+                Enabled = false,
+                Cursor = Cursors.Hand
             };
+            btnFirmarAnalisis.FlatAppearance.BorderSize = 0;
 
             // Eventos
             btnSeleccionarAnalisisFirmar.Click += (s, e) => BuscarAnalisisFirmarClick?.Invoke(this, EventArgs.Empty);
             btnFirmarAnalisis.Click += (s, e) => FirmarAnalisisClick?.Invoke(this, EventArgs.Empty);
 
-            tab.Controls.AddRange(new Control[] { 
-                lblTitulo, lblDescripcion, lblAdvertencia, lblFlujoPost, gbAnalisis, lblValidacion, gridValidacion, btnFirmarAnalisis 
+            panelPrincipal.Controls.AddRange(new Control[] { 
+                lblTitulo, lblDescripcion, panelAdvertencia, gbAnalisis, lblValidacion, gridValidacion, btnFirmarAnalisis 
             });
+            
+            tab.Controls.Add(panelPrincipal);
             tabs.TabPages.Add(tab);
         }
 
         #endregion
 
-        #region Eventos e Implementación de IPanelMedicoView
+        #region Eventos e Implementación
 
         // Eventos - Análisis
         public event EventHandler CrearAnalisisClick;
@@ -453,8 +799,9 @@ namespace SALC.Views.PanelMedico
         public event EventHandler<string> PacientesFiltroEstadoChanged;
 
         // RF-05: Crear análisis
-        public string CrearAnalisisDniPacienteTexto => "";  // Ya no se usa
-        public int? TipoAnalisisSeleccionadoId => cboTipoAnalisis?.SelectedValue as int? ?? (cboTipoAnalisis?.SelectedValue != null ? (int?)Convert.ToInt32(cboTipoAnalisis.SelectedValue) : null);
+        public string CrearAnalisisDniPacienteTexto => "";
+        public int? TipoAnalisisSeleccionadoId => cboTipoAnalisis?.SelectedValue as int? ?? 
+            (cboTipoAnalisis?.SelectedValue != null ? (int?)Convert.ToInt32(cboTipoAnalisis.SelectedValue) : null);
         public string CrearAnalisisObservaciones => txtObservacionesCrear?.Text?.Trim();
 
         public void CargarTiposAnalisis(IEnumerable<TipoAnalisis> tipos)
@@ -468,7 +815,8 @@ namespace SALC.Views.PanelMedico
             if (paciente != null)
             {
                 lblPacienteSeleccionado.Text = $"✓ {paciente.Nombre} {paciente.Apellido} (DNI: {paciente.Dni})";
-                lblPacienteSeleccionado.ForeColor = System.Drawing.Color.Green;
+                lblPacienteSeleccionado.ForeColor = Color.FromArgb(56, 142, 60);
+                lblPacienteSeleccionado.Font = new Font("Segoe UI", 10, FontStyle.Bold);
                 btnCrearAnalisis.Enabled = true;
             }
         }
@@ -476,26 +824,25 @@ namespace SALC.Views.PanelMedico
         public void LimpiarPacienteSeleccionado()
         {
             lblPacienteSeleccionado.Text = "Ningún paciente seleccionado";
-            lblPacienteSeleccionado.ForeColor = System.Drawing.Color.Gray;
+            lblPacienteSeleccionado.ForeColor = Color.FromArgb(149, 165, 166);
+            lblPacienteSeleccionado.Font = new Font("Segoe UI", 10, FontStyle.Regular);
             btnCrearAnalisis.Enabled = false;
             txtObservacionesCrear.Text = "";
         }
 
         // RF-06: Cargar resultados
-        public string AnalisisIdParaResultadosTexto => "";  // Ya no se usa
+        public string AnalisisIdParaResultadosTexto => "";
 
         public void CargarResultadosParaEdicion(IList<MetricaConResultado> filas)
         {
             gridResultados.DataSource = null;
             gridResultados.DataSource = filas;
             
-            // Configurar columnas editables
             if (gridResultados.Columns["Resultado"] != null)
                 gridResultados.Columns["Resultado"].ReadOnly = false;
             if (gridResultados.Columns["Observaciones"] != null)
                 gridResultados.Columns["Observaciones"].ReadOnly = false;
                 
-            // Hacer otras columnas solo lectura
             foreach (DataGridViewColumn col in gridResultados.Columns)
             {
                 if (col.Name != "Resultado" && col.Name != "Observaciones")
@@ -523,7 +870,8 @@ namespace SALC.Views.PanelMedico
             if (analisis != null && paciente != null && tipo != null)
             {
                 lblAnalisisResultadosSeleccionado.Text = $"✓ ID: {analisis.IdAnalisis} | Paciente: {paciente.Nombre} {paciente.Apellido} | Tipo: {tipo.Descripcion}";
-                lblAnalisisResultadosSeleccionado.ForeColor = System.Drawing.Color.Green;
+                lblAnalisisResultadosSeleccionado.ForeColor = Color.FromArgb(230, 81, 0);
+                lblAnalisisResultadosSeleccionado.Font = new Font("Segoe UI", 9, FontStyle.Bold);
                 btnCargarMetricas.Enabled = true;
             }
         }
@@ -531,21 +879,23 @@ namespace SALC.Views.PanelMedico
         public void LimpiarAnalisisParaResultados()
         {
             lblAnalisisResultadosSeleccionado.Text = "Ningún análisis seleccionado";
-            lblAnalisisResultadosSeleccionado.ForeColor = System.Drawing.Color.Gray;
+            lblAnalisisResultadosSeleccionado.ForeColor = Color.FromArgb(149, 165, 166);
+            lblAnalisisResultadosSeleccionado.Font = new Font("Segoe UI", 9, FontStyle.Regular);
             btnCargarMetricas.Enabled = false;
             btnGuardarResultados.Enabled = false;
             gridResultados.DataSource = null;
         }
 
         // RF-07: Validar/Firmar
-        public string AnalisisIdParaFirmaTexto => "";  // Ya no se usa
+        public string AnalisisIdParaFirmaTexto => "";
 
         public void MostrarAnalisisParaFirmar(Analisis analisis, Paciente paciente, TipoAnalisis tipo)
         {
             if (analisis != null && paciente != null && tipo != null)
             {
                 lblAnalisisFirmarSeleccionado.Text = $"✓ ID: {analisis.IdAnalisis} | Paciente: {paciente.Nombre} {paciente.Apellido} | Tipo: {tipo.Descripcion}";
-                lblAnalisisFirmarSeleccionado.ForeColor = System.Drawing.Color.Green;
+                lblAnalisisFirmarSeleccionado.ForeColor = Color.FromArgb(106, 27, 154);
+                lblAnalisisFirmarSeleccionado.Font = new Font("Segoe UI", 9, FontStyle.Bold);
                 btnFirmarAnalisis.Enabled = true;
             }
         }
@@ -553,14 +903,14 @@ namespace SALC.Views.PanelMedico
         public void LimpiarAnalisisParaFirmar()
         {
             lblAnalisisFirmarSeleccionado.Text = "Ningún análisis seleccionado";
-            lblAnalisisFirmarSeleccionado.ForeColor = System.Drawing.Color.Gray;
+            lblAnalisisFirmarSeleccionado.ForeColor = Color.FromArgb(149, 165, 166);
+            lblAnalisisFirmarSeleccionado.Font = new Font("Segoe UI", 9, FontStyle.Regular);
             btnFirmarAnalisis.Enabled = false;
             gridValidacion.DataSource = null;
         }
 
         public void MostrarResultadosParaValidacion(IList<AnalisisMetrica> resultados)
         {
-            // Preparar datos para mostrar en grid de validación
             var datosValidacion = resultados.Select(r => new {
                 IdMetrica = r.IdMetrica,
                 Resultado = r.Resultado,
@@ -589,18 +939,18 @@ namespace SALC.Views.PanelMedico
         // Navegación
         public void ActivarTabResultados()
         {
-            tabs.SelectedIndex = 2; // Tab "Cargar Resultados" 
+            tabs.SelectedIndex = 2;
         }
 
         public void ActivarTabValidacion()
         {
-            tabs.SelectedIndex = 3; // Tab "Validar / Firmar"
+            tabs.SelectedIndex = 3;
         }
 
         // Mensajes
         public void MostrarMensaje(string texto, bool esError = false)
         {
-            MessageBox.Show(this, texto, "Panel Médico - SALC", MessageBoxButtons.OK, 
+            MessageBox.Show(this, texto, "SALC - Panel Médico", MessageBoxButtons.OK, 
                 esError ? MessageBoxIcon.Error : MessageBoxIcon.Information);
         }
 

@@ -1,5 +1,6 @@
 using System;
 using System.Windows.Forms;
+using System.Drawing;
 using SALC.Presenters.ViewsContracts;
 using System.Collections.Generic;
 using SALC.Domain;
@@ -10,6 +11,9 @@ namespace SALC.Views.PanelAsistente
     public class FrmPanelAsistente : Form, IPanelAsistenteView
     {
         // Controles principales
+        private Panel panelSuperior;
+        private Panel panelInferior;
+        
         private GroupBox groupPacientes;
         private TextBox txtBusqueda;
         private Button btnBuscar;
@@ -33,84 +37,209 @@ namespace SALC.Views.PanelAsistente
         {
             base.OnShown(e);
             
-            // Inicializar el presenter después de que la vista esté completamente cargada
             var presenter = Tag as Presenters.PanelAsistentePresenter;
             presenter?.InicializarVista();
         }
 
         private void InitializeComponent()
         {
-            Text = "Panel de Asistente - SALC";
-            Size = new System.Drawing.Size(1200, 800);
+            Text = "Consulta y Gestión de Historiales Clínicos";
+            Size = new Size(1200, 800);
             StartPosition = FormStartPosition.CenterScreen;
+            BackColor = Color.White;
 
-            // GroupBox para pacientes
-            groupPacientes = new GroupBox
+            // ============ PANEL SUPERIOR - BÚSQUEDA Y PACIENTES ============
+            panelSuperior = new Panel
             {
-                Text = "Lista de Pacientes",
-                Location = new System.Drawing.Point(10, 10),
-                Size = new System.Drawing.Size(580, 350)
+                Dock = DockStyle.Top,
+                Height = 420,
+                BackColor = Color.White,
+                Padding = new Padding(20, 20, 20, 10)
             };
 
-            // Búsqueda de pacientes
+            // Título principal
+            var lblTitulo = new Label
+            {
+                Text = "Consulta de Pacientes y Historiales Médicos",
+                Font = new Font("Segoe UI", 15, FontStyle.Bold),
+                ForeColor = Color.FromArgb(41, 128, 185),
+                Location = new Point(0, 0),
+                Size = new Size(800, 35),
+                BackColor = Color.Transparent
+            };
+
+            // Subtítulo
+            var lblSubtitulo = new Label
+            {
+                Text = "Acceda al historial completo de análisis clínicos de cualquier paciente del sistema",
+                Font = new Font("Segoe UI", 11, FontStyle.Regular),
+                ForeColor = Color.FromArgb(127, 140, 141),
+                Location = new Point(0, 35),
+                Size = new Size(900, 25),
+                BackColor = Color.Transparent
+            };
+
+            // GroupBox para búsqueda y lista de pacientes
+            groupPacientes = new GroupBox
+            {
+                Text = "  Búsqueda y Selección de Pacientes  ",
+                Location = new Point(0, 75),
+                Size = new Size(1140, 325),
+                Font = new Font("Segoe UI", 11, FontStyle.Bold),
+                ForeColor = Color.FromArgb(52, 152, 219),
+                BackColor = Color.FromArgb(245, 250, 255)
+            };
+
+            // Panel de búsqueda
+            var panelBusqueda = new Panel
+            {
+                Location = new Point(15, 30),
+                Size = new Size(1110, 50),
+                BackColor = Color.White,
+                BorderStyle = BorderStyle.FixedSingle
+            };
+
             var lblBusqueda = new Label
             {
                 Text = "Buscar por DNI o Apellido:",
-                Location = new System.Drawing.Point(10, 25),
-                Size = new System.Drawing.Size(150, 20)
+                Location = new Point(10, 14),
+                Size = new Size(180, 22),
+                Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                ForeColor = Color.FromArgb(44, 62, 80),
+                BackColor = Color.Transparent
             };
 
             txtBusqueda = new TextBox
             {
-                Location = new System.Drawing.Point(165, 23),
-                Size = new System.Drawing.Size(200, 20)
+                Location = new Point(200, 12),
+                Size = new Size(280, 25),
+                Font = new Font("Segoe UI", 10),
+                BorderStyle = BorderStyle.FixedSingle
             };
 
             btnBuscar = new Button
             {
-                Text = "Buscar",
-                Location = new System.Drawing.Point(375, 21),
-                Size = new System.Drawing.Size(80, 25)
+                Text = "Buscar Paciente",
+                Location = new Point(495, 10),
+                Size = new Size(150, 30),
+                Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                BackColor = Color.FromArgb(52, 152, 219),
+                ForeColor = Color.White,
+                FlatStyle = FlatStyle.Flat,
+                Cursor = Cursors.Hand
             };
+            btnBuscar.FlatAppearance.BorderSize = 0;
+
+            var lblInfo = new Label
+            {
+                Text = "Presione Enter o haga clic en Buscar para filtrar la lista",
+                Location = new Point(660, 14),
+                Size = new Size(420, 22),
+                Font = new Font("Segoe UI", 9, FontStyle.Italic),
+                ForeColor = Color.FromArgb(149, 165, 166),
+                BackColor = Color.Transparent
+            };
+
+            panelBusqueda.Controls.AddRange(new Control[] { lblBusqueda, txtBusqueda, btnBuscar, lblInfo });
 
             // Grid de pacientes
             gridPacientes = new DataGridView
             {
-                Location = new System.Drawing.Point(10, 55),
-                Size = new System.Drawing.Size(560, 250),
+                Location = new Point(15, 95),
+                Size = new Size(1110, 180),
                 ReadOnly = true,
                 AllowUserToAddRows = false,
                 SelectionMode = DataGridViewSelectionMode.FullRowSelect,
                 MultiSelect = false,
-                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
+                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
+                BackgroundColor = Color.White,
+                BorderStyle = BorderStyle.FixedSingle,
+                ColumnHeadersDefaultCellStyle = new DataGridViewCellStyle
+                {
+                    BackColor = Color.FromArgb(52, 152, 219),
+                    ForeColor = Color.White,
+                    Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                    Padding = new Padding(5)
+                },
+                DefaultCellStyle = new DataGridViewCellStyle
+                {
+                    Font = new Font("Segoe UI", 9),
+                    SelectionBackColor = Color.FromArgb(209, 231, 248),
+                    SelectionForeColor = Color.FromArgb(44, 62, 80)
+                },
+                AlternatingRowsDefaultCellStyle = new DataGridViewCellStyle
+                {
+                    BackColor = Color.FromArgb(245, 250, 255)
+                },
+                EnableHeadersVisualStyles = false,
+                RowHeadersVisible = false
             };
 
             btnVerHistorial = new Button
             {
                 Text = "Ver Historial del Paciente Seleccionado",
-                Location = new System.Drawing.Point(10, 315),
-                Size = new System.Drawing.Size(250, 25)
+                Location = new Point(15, 285),
+                Size = new Size(300, 30),
+                Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                BackColor = Color.FromArgb(39, 174, 96),
+                ForeColor = Color.White,
+                FlatStyle = FlatStyle.Flat,
+                Cursor = Cursors.Hand
             };
+            btnVerHistorial.FlatAppearance.BorderSize = 0;
 
-            groupPacientes.Controls.AddRange(new Control[] { lblBusqueda, txtBusqueda, btnBuscar, gridPacientes, btnVerHistorial });
+            groupPacientes.Controls.AddRange(new Control[] { panelBusqueda, gridPacientes, btnVerHistorial });
+
+            panelSuperior.Controls.AddRange(new Control[] { lblTitulo, lblSubtitulo, groupPacientes });
+
+            // ============ PANEL INFERIOR - HISTORIAL Y ACCIONES ============
+            panelInferior = new Panel
+            {
+                Dock = DockStyle.Fill,
+                BackColor = Color.White,
+                Padding = new Padding(20, 10, 20, 20)
+            };
 
             // GroupBox para historial
             groupHistorial = new GroupBox
             {
-                Text = "Historial de Análisis",
-                Location = new System.Drawing.Point(600, 10),
-                Size = new System.Drawing.Size(580, 350)
+                Text = "  Historial de Análisis Clínicos del Paciente  ",
+                Location = new Point(0, 0),
+                Size = new Size(1140, 230),
+                Font = new Font("Segoe UI", 11, FontStyle.Bold),
+                ForeColor = Color.FromArgb(39, 174, 96),
+                BackColor = Color.FromArgb(248, 255, 250)
             };
 
             gridHistorial = new DataGridView
             {
-                Location = new System.Drawing.Point(10, 25),
-                Size = new System.Drawing.Size(560, 315),
+                Location = new Point(15, 30),
+                Size = new Size(1110, 185),
                 ReadOnly = true,
                 AllowUserToAddRows = false,
                 SelectionMode = DataGridViewSelectionMode.FullRowSelect,
                 MultiSelect = false,
-                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
+                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
+                BackgroundColor = Color.White,
+                BorderStyle = BorderStyle.FixedSingle,
+                ColumnHeadersDefaultCellStyle = new DataGridViewCellStyle
+                {
+                    BackColor = Color.FromArgb(39, 174, 96),
+                    ForeColor = Color.White,
+                    Font = new Font("Segoe UI", 10, FontStyle.Bold)
+                },
+                DefaultCellStyle = new DataGridViewCellStyle
+                {
+                    Font = new Font("Segoe UI", 9),
+                    SelectionBackColor = Color.FromArgb(212, 239, 223),
+                    SelectionForeColor = Color.FromArgb(44, 62, 80)
+                },
+                AlternatingRowsDefaultCellStyle = new DataGridViewCellStyle
+                {
+                    BackColor = Color.FromArgb(248, 255, 250)
+                },
+                EnableHeadersVisualStyles = false,
+                RowHeadersVisible = false
             };
 
             groupHistorial.Controls.Add(gridHistorial);
@@ -118,47 +247,88 @@ namespace SALC.Views.PanelAsistente
             // GroupBox para acciones
             groupAcciones = new GroupBox
             {
-                Text = "Acciones sobre Análisis Verificados",
-                Location = new System.Drawing.Point(10, 370),
-                Size = new System.Drawing.Size(1170, 120)
+                Text = "  Generación y Envío de Informes  ",
+                Location = new Point(0, 245),
+                Size = new Size(1140, 120),
+                Font = new Font("Segoe UI", 11, FontStyle.Bold),
+                ForeColor = Color.FromArgb(142, 68, 173),
+                BackColor = Color.FromArgb(250, 245, 255)
+            };
+
+            // Panel informativo
+            var panelInfoAcciones = new Panel
+            {
+                Location = new Point(15, 30),
+                Size = new Size(1110, 35),
+                BackColor = Color.FromArgb(209, 231, 248),
+                BorderStyle = BorderStyle.FixedSingle
             };
 
             lblInstrucciones = new Label
             {
-                Text = "Seleccione un análisis en estado 'Verificado' para habilitar las acciones de generación y envío de informes.",
-                Location = new System.Drawing.Point(10, 25),
-                Size = new System.Drawing.Size(800, 20),
-                ForeColor = System.Drawing.Color.DarkBlue
+                Text = "Seleccione un análisis en estado 'Verificado' para habilitar la generación y envío de informes",
+                Location = new Point(10, 8),
+                Size = new Size(1080, 20),
+                Font = new Font("Segoe UI", 9, FontStyle.Regular),
+                ForeColor = Color.FromArgb(21, 101, 192),
+                BackColor = Color.Transparent
             };
+
+            panelInfoAcciones.Controls.Add(lblInstrucciones);
 
             btnGenerarPdf = new Button
             {
-                Text = "Generar PDF del Análisis",
-                Location = new System.Drawing.Point(10, 55),
-                Size = new System.Drawing.Size(200, 30),
-                Enabled = false
+                Text = "Generar Informe PDF",
+                Location = new Point(15, 75),
+                Size = new Size(240, 35),
+                Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                BackColor = Color.FromArgb(230, 126, 34),
+                ForeColor = Color.White,
+                FlatStyle = FlatStyle.Flat,
+                Enabled = false,
+                Cursor = Cursors.Hand
             };
+            btnGenerarPdf.FlatAppearance.BorderSize = 0;
 
             btnEnviarInforme = new Button
             {
                 Text = "Enviar Informe al Paciente",
-                Location = new System.Drawing.Point(220, 55),
-                Size = new System.Drawing.Size(200, 30),
-                Enabled = false
+                Location = new Point(270, 75),
+                Size = new Size(240, 35),
+                Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                BackColor = Color.FromArgb(142, 68, 173),
+                ForeColor = Color.White,
+                FlatStyle = FlatStyle.Flat,
+                Enabled = false,
+                Cursor = Cursors.Hand
+            };
+            btnEnviarInforme.FlatAppearance.BorderSize = 0;
+
+            var lblNota = new Label
+            {
+                Text = "Nota: Solo puede generar y enviar informes de análisis previamente verificados por un médico",
+                Location = new Point(525, 82),
+                Size = new Size(580, 20),
+                Font = new Font("Segoe UI", 9, FontStyle.Italic),
+                ForeColor = Color.FromArgb(149, 165, 166),
+                BackColor = Color.Transparent
             };
 
-            groupAcciones.Controls.AddRange(new Control[] { lblInstrucciones, btnGenerarPdf, btnEnviarInforme });
+            groupAcciones.Controls.AddRange(new Control[] { 
+                panelInfoAcciones, btnGenerarPdf, btnEnviarInforme, lblNota 
+            });
 
-            // Agregar todos los grupos al formulario
-            Controls.AddRange(new Control[] { groupPacientes, groupHistorial, groupAcciones });
+            panelInferior.Controls.AddRange(new Control[] { groupHistorial, groupAcciones });
 
-            // Eventos
+            // Agregar paneles al formulario
+            Controls.AddRange(new Control[] { panelInferior, panelSuperior });
+
+            // ============ EVENTOS ============
             btnBuscar.Click += (s, e) => BuscarPacientesClick?.Invoke(this, EventArgs.Empty);
             btnVerHistorial.Click += (s, e) => VerHistorialClick?.Invoke(this, EventArgs.Empty);
             btnGenerarPdf.Click += (s, e) => GenerarPdfClick?.Invoke(this, EventArgs.Empty);
             btnEnviarInforme.Click += (s, e) => EnviarInformeClick?.Invoke(this, EventArgs.Empty);
             
-            // Evento cuando cambia la selección en el grid de historial
             gridHistorial.SelectionChanged += (s, e) => {
                 if (gridHistorial.SelectedRows.Count > 0)
                 {
@@ -167,7 +337,6 @@ namespace SALC.Views.PanelAsistente
                 }
             };
 
-            // Permitir búsqueda con Enter
             txtBusqueda.KeyPress += (s, e) => {
                 if (e.KeyChar == (char)Keys.Enter)
                 {
@@ -246,20 +415,23 @@ namespace SALC.Views.PanelAsistente
                 gridHistorial.Columns["FechaCreacion"].Width = 120;
                 gridHistorial.Columns["FechaFirma"].Width = 120;
                 
-                // Colorear filas según el estado
+                // Colorear filas según el estado con colores pasteles
                 foreach (DataGridViewRow row in gridHistorial.Rows)
                 {
                     var estado = row.Cells["Estado"].Value?.ToString();
                     switch (estado)
                     {
                         case "Verificado":
-                            row.DefaultCellStyle.BackColor = System.Drawing.Color.LightGreen;
+                            row.DefaultCellStyle.BackColor = Color.FromArgb(212, 239, 223); // Verde pastel
+                            row.DefaultCellStyle.ForeColor = Color.FromArgb(27, 94, 32);
                             break;
                         case "Sin verificar":
-                            row.DefaultCellStyle.BackColor = System.Drawing.Color.LightYellow;
+                            row.DefaultCellStyle.BackColor = Color.FromArgb(255, 243, 224); // Naranja pastel
+                            row.DefaultCellStyle.ForeColor = Color.FromArgb(230, 81, 0);
                             break;
                         case "Anulado":
-                            row.DefaultCellStyle.BackColor = System.Drawing.Color.LightCoral;
+                            row.DefaultCellStyle.BackColor = Color.FromArgb(255, 235, 238); // Rojo pastel
+                            row.DefaultCellStyle.ForeColor = Color.FromArgb(183, 28, 28);
                             break;
                     }
                 }
@@ -297,13 +469,13 @@ namespace SALC.Views.PanelAsistente
             {
                 if (habilitar)
                 {
-                    lblInstrucciones.Text = "Análisis verificado seleccionado. Puede generar PDF y enviar el informe al paciente.";
-                    lblInstrucciones.ForeColor = System.Drawing.Color.DarkGreen;
+                    lblInstrucciones.Text = "Análisis verificado seleccionado - Puede generar el informe PDF y enviarlo al paciente por email";
+                    lblInstrucciones.ForeColor = Color.FromArgb(27, 94, 32); // Verde oscuro
                 }
                 else
                 {
-                    lblInstrucciones.Text = "Seleccione un análisis en estado 'Verificado' para habilitar las acciones de generación y envío de informes.";
-                    lblInstrucciones.ForeColor = System.Drawing.Color.DarkBlue;
+                    lblInstrucciones.Text = "Seleccione un análisis en estado 'Verificado' para habilitar la generación y envío de informes";
+                    lblInstrucciones.ForeColor = Color.FromArgb(21, 101, 192); // Azul
                 }
             }
         }
@@ -311,7 +483,7 @@ namespace SALC.Views.PanelAsistente
         public void MostrarMensaje(string texto, bool esError = false)
         {
             var icon = esError ? MessageBoxIcon.Error : MessageBoxIcon.Information;
-            var titulo = esError ? "Error - Panel Asistente" : "Información - Panel Asistente";
+            var titulo = esError ? "SALC - Error en Panel Asistente" : "SALC - Información";
             MessageBox.Show(this, texto, titulo, MessageBoxButtons.OK, icon);
         }
     }

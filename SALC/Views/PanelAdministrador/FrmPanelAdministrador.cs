@@ -1,5 +1,6 @@
 using System;
 using System.Windows.Forms;
+using System.Drawing;
 using SALC.Presenters.ViewsContracts;
 
 namespace SALC.Views.PanelAdministrador
@@ -13,7 +14,7 @@ namespace SALC.Views.PanelAdministrador
         private DataGridView gridTiposAnalisis;
         private DataGridView gridMetricas;
 
-        // Controles adicionales para usuarios, obras sociales, tipos de análisis y métricas
+        // Controles adicionales
         private ComboBox cboFiltroEstadoUsuarios;
         private ComboBox cboFiltroEstadoObrasSociales;
         private ComboBox cboFiltroEstadoTiposAnalisis;
@@ -21,11 +22,20 @@ namespace SALC.Views.PanelAdministrador
 
         public FrmPanelAdministrador()
         {
-            Text = "Panel de Administrador";
+            Text = "Gestión Administrativa del Sistema";
+            BackColor = Color.White;
             Width = 1200;
             Height = 700;
 
-            tabs = new TabControl { Dock = DockStyle.Fill };
+            tabs = new TabControl 
+            { 
+                Dock = DockStyle.Fill,
+                Font = new Font("Segoe UI", 10, FontStyle.Regular),
+                Padding = new Point(15, 8),
+                ItemSize = new Size(120, 35),
+                SizeMode = TabSizeMode.Fixed
+            };
+            
             Controls.Add(tabs);
 
             AgregarTabUsuarios();
@@ -36,72 +46,183 @@ namespace SALC.Views.PanelAdministrador
 
         private void AgregarTabUsuarios()
         {
-            var tab = new TabPage("Usuarios");
-            var tool = new ToolStrip();
-            var btnNuevo = new ToolStripButton("Nuevo") { DisplayStyle = ToolStripItemDisplayStyle.Text };
-            var btnEditar = new ToolStripButton("Editar") { DisplayStyle = ToolStripItemDisplayStyle.Text };
-            var btnEliminar = new ToolStripButton("Eliminar") { DisplayStyle = ToolStripItemDisplayStyle.Text };
-            var btnDetalle = new ToolStripButton("Ver Detalle") { DisplayStyle = ToolStripItemDisplayStyle.Text };
-            var txtBuscar = new ToolStripTextBox { Width = 200, ToolTipText = "Buscar por DNI/Apellido/Email" };
+            var tab = new TabPage("Gestión de Usuarios")
+            {
+                BackColor = Color.White
+            };
+            
+            // Panel principal con padding
+            var panelPrincipal = new Panel
+            {
+                Dock = DockStyle.Fill,
+                Padding = new Padding(20),
+                BackColor = Color.White,
+                AutoScroll = true
+            };
+
+            // Título de la sección
+            var lblTitulo = new Label
+            {
+                Text = "Administración de Personal Médico y Asistentes",
+                Font = new Font("Segoe UI", 14, FontStyle.Bold),
+                ForeColor = Color.FromArgb(41, 128, 185),
+                Location = new Point(20, 20),
+                Size = new Size(800, 30),
+                BackColor = Color.Transparent
+            };
+
+            // Barra de herramientas rediseñada - POSICIÓN CORREGIDA
+            var tool = new ToolStrip
+            {
+                BackColor = Color.FromArgb(236, 240, 241),
+                GripStyle = ToolStripGripStyle.Hidden,
+                Padding = new Padding(10, 5, 10, 5),
+                Font = new Font("Segoe UI", 9, FontStyle.Regular),
+                Location = new Point(20, 60),  // CORREGIDO: Más abajo del título
+                Width = 1140,
+                AutoSize = false,
+                Height = 35
+            };
+            
+            var btnNuevo = new ToolStripButton("Nuevo Usuario") 
+            { 
+                DisplayStyle = ToolStripItemDisplayStyle.Text,
+                Font = new Font("Segoe UI", 9, FontStyle.Bold),
+                ForeColor = Color.FromArgb(39, 174, 96)
+            };
+            
+            var btnEditar = new ToolStripButton("Modificar") 
+            { 
+                DisplayStyle = ToolStripItemDisplayStyle.Text,
+                Font = new Font("Segoe UI", 9, FontStyle.Regular)
+            };
+            
+            var btnEliminar = new ToolStripButton("Dar de Baja") 
+            { 
+                DisplayStyle = ToolStripItemDisplayStyle.Text,
+                Font = new Font("Segoe UI", 9, FontStyle.Regular),
+                ForeColor = Color.FromArgb(192, 57, 43)
+            };
+            
+            var btnDetalle = new ToolStripButton("Ver Información Completa") 
+            { 
+                DisplayStyle = ToolStripItemDisplayStyle.Text,
+                Font = new Font("Segoe UI", 9, FontStyle.Regular)
+            };
+            
+            var lblBuscar = new ToolStripLabel("Buscar:") 
+            { 
+                Font = new Font("Segoe UI", 9, FontStyle.Bold) 
+            };
+            
+            var txtBuscar = new ToolStripTextBox 
+            { 
+                Width = 220, 
+                ToolTipText = "DNI, Apellido o Email",
+                Font = new Font("Segoe UI", 9)
+            };
             
             // Filtro de estado
-            var lblFiltroEstado = new ToolStripLabel("Estado:");
+            var lblFiltroEstado = new ToolStripLabel("Filtrar por Estado:")
+            {
+                Font = new Font("Segoe UI", 9, FontStyle.Bold),
+                Margin = new Padding(10, 0, 5, 0)
+            };
+            
             var cboFiltroEstadoHost = new ToolStripControlHost(cboFiltroEstadoUsuarios = new ComboBox
             {
                 DropDownStyle = ComboBoxStyle.DropDownList,
-                Width = 100
+                Width = 110,
+                Font = new Font("Segoe UI", 9)
             });
+            
             cboFiltroEstadoUsuarios.Items.AddRange(new object[] { "Todos", "Activo", "Inactivo" });
             cboFiltroEstadoUsuarios.SelectedIndex = 0;
-            cboFiltroEstadoUsuarios.SelectedIndexChanged += (s, e) => UsuariosFiltroEstadoChanged?.Invoke(this, cboFiltroEstadoUsuarios.SelectedItem.ToString());
+            cboFiltroEstadoUsuarios.SelectedIndexChanged += (s, e) => 
+                UsuariosFiltroEstadoChanged?.Invoke(this, cboFiltroEstadoUsuarios.SelectedItem.ToString());
 
             tool.Items.AddRange(new ToolStripItem[] { 
                 btnNuevo, btnEditar, btnEliminar, btnDetalle,
                 new ToolStripSeparator(), 
-                new ToolStripLabel("Buscar:"), txtBuscar,
-                new ToolStripSeparator(),
+                lblBuscar, txtBuscar,
                 lblFiltroEstado, cboFiltroEstadoHost
             });
             
-            gridUsuarios = new DataGridView { 
-                Dock = DockStyle.Fill, 
+            // DataGridView rediseñado - POSICIÓN CORREGIDA
+            gridUsuarios = new DataGridView 
+            { 
+                Location = new Point(20, 105),  // CORREGIDO: Más abajo de la toolbar
+                Size = new Size(1140, 490),     // CORREGIDO: Altura ajustada
                 ReadOnly = true, 
                 AllowUserToAddRows = false, 
                 SelectionMode = DataGridViewSelectionMode.FullRowSelect, 
                 MultiSelect = false, 
                 AutoGenerateColumns = true,
-                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
+                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
+                BackgroundColor = Color.White,
+                BorderStyle = BorderStyle.FixedSingle,
+                ColumnHeadersDefaultCellStyle = new DataGridViewCellStyle
+                {
+                    BackColor = Color.FromArgb(52, 152, 219),
+                    ForeColor = Color.White,
+                    Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                    Padding = new Padding(5)
+                },
+                DefaultCellStyle = new DataGridViewCellStyle
+                {
+                    Font = new Font("Segoe UI", 9),
+                    SelectionBackColor = Color.FromArgb(209, 231, 248),
+                    SelectionForeColor = Color.FromArgb(44, 62, 80)
+                },
+                AlternatingRowsDefaultCellStyle = new DataGridViewCellStyle
+                {
+                    BackColor = Color.FromArgb(250, 252, 255)
+                },
+                EnableHeadersVisualStyles = false,
+                RowHeadersVisible = false
             };
 
+            // Eventos
             btnNuevo.Click += (s, e) => UsuariosNuevoClick?.Invoke(this, EventArgs.Empty);
             btnEditar.Click += (s, e) => UsuariosEditarClick?.Invoke(this, EventArgs.Empty);
             btnEliminar.Click += (s, e) => UsuariosEliminarClick?.Invoke(this, EventArgs.Empty);
             btnDetalle.Click += (s, e) => UsuariosDetalleClick?.Invoke(this, EventArgs.Empty);
             txtBuscar.TextChanged += (s, e) => UsuariosBuscarTextoChanged?.Invoke(this, txtBuscar.Text);
 
-            var panel = new Panel { Dock = DockStyle.Fill };
-            tool.Dock = DockStyle.Top;
-            panel.Controls.Add(gridUsuarios);
-            panel.Controls.Add(tool);
-            tab.Controls.Add(panel);
+            // IMPORTANTE: Agregar controles en el orden correcto al panel
+            panelPrincipal.Controls.Add(gridUsuarios);
+            panelPrincipal.Controls.Add(tool);
+            panelPrincipal.Controls.Add(lblTitulo);
+            
+            tab.Controls.Add(panelPrincipal);
             tabs.TabPages.Add(tab);
         }
 
         private void AgregarTabCatalogos()
         {
-            var tab = new TabPage("Catálogos");
-            var tabsCat = new TabControl { Dock = DockStyle.Fill };
+            var tab = new TabPage("Catálogos Clínicos")
+            {
+                BackColor = Color.White
+            };
+            
+            var tabsCat = new TabControl 
+            { 
+                Dock = DockStyle.Fill,
+                Font = new Font("Segoe UI", 10, FontStyle.Regular),
+                Padding = new Point(12, 6),
+                ItemSize = new Size(110, 30)
+            };
 
-            // Obras Sociales - con filtro de estado personalizado
+            // Obras Sociales
             tabsCat.TabPages.Add(CrearTabObrasSociales());
 
-            // Tipos de Análisis - con filtro de estado personalizado
+            // Tipos de Análisis
             tabsCat.TabPages.Add(CrearTabTiposAnalisis());
 
-            // Métricas - con filtro de estado personalizado
+            // Métricas
             tabsCat.TabPages.Add(CrearTabMetricas());
 
-            // Relaciones Tipo Análisis - Métricas
+            // Relaciones
             tabsCat.TabPages.Add(CrearTabRelacionesTipoAnalisisMetricas());
 
             tab.Controls.Add(tabsCat);
@@ -110,40 +231,114 @@ namespace SALC.Views.PanelAdministrador
 
         private TabPage CrearTabObrasSociales()
         {
-            var tab = new TabPage("Obras Sociales");
-            var tool = new ToolStrip();
-            var btnNuevo = new ToolStripButton("Nuevo") { DisplayStyle = ToolStripItemDisplayStyle.Text };
-            var btnEditar = new ToolStripButton("Editar") { DisplayStyle = ToolStripItemDisplayStyle.Text };
-            var btnEliminar = new ToolStripButton("Eliminar") { DisplayStyle = ToolStripItemDisplayStyle.Text };
-            var txtBuscar = new ToolStripTextBox { Width = 200, ToolTipText = "Buscar por CUIT/Nombre" };
+            var tab = new TabPage("Obras Sociales")
+            {
+                BackColor = Color.White,
+                Padding = new Padding(20)
+            };
             
-            // Filtro de estado para obras sociales
-            var lblFiltroEstado = new ToolStripLabel("Estado:");
+            // Título - POSICIÓN CORREGIDA
+            var lblTitulo = new Label
+            {
+                Text = "Gestión de Obras Sociales y Mutuales",
+                Font = new Font("Segoe UI", 13, FontStyle.Bold),
+                ForeColor = Color.FromArgb(39, 174, 96),
+                Location = new Point(20, 15),
+                Size = new Size(600, 28),
+                BackColor = Color.Transparent
+            };
+
+            // Toolbar rediseñada - POSICIÓN CORREGIDA
+            var tool = new ToolStrip
+            {
+                BackColor = Color.FromArgb(248, 255, 250),
+                GripStyle = ToolStripGripStyle.Hidden,
+                Padding = new Padding(8, 4, 8, 4),
+                Location = new Point(20, 50),  // CORREGIDO: Más abajo del título
+                Width = 1100,
+                AutoSize = false,
+                Height = 35
+            };
+            
+            var btnNuevo = new ToolStripButton("Nueva Obra Social") 
+            { 
+                DisplayStyle = ToolStripItemDisplayStyle.Text,
+                Font = new Font("Segoe UI", 9, FontStyle.Bold),
+                ForeColor = Color.FromArgb(39, 174, 96)
+            };
+            
+            var btnEditar = new ToolStripButton("Modificar") { DisplayStyle = ToolStripItemDisplayStyle.Text };
+            var btnEliminar = new ToolStripButton("Dar de Baja") 
+            { 
+                DisplayStyle = ToolStripItemDisplayStyle.Text,
+                ForeColor = Color.FromArgb(192, 57, 43)
+            };
+            
+            var lblBuscar = new ToolStripLabel("Buscar:") 
+            { 
+                Font = new Font("Segoe UI", 9, FontStyle.Bold) 
+            };
+            
+            var txtBuscar = new ToolStripTextBox 
+            { 
+                Width = 200, 
+                ToolTipText = "CUIT o Nombre"
+            };
+            
+            var lblFiltroEstado = new ToolStripLabel("Estado:")
+            {
+                Margin = new Padding(10, 0, 5, 0),
+                Font = new Font("Segoe UI", 9, FontStyle.Bold)
+            };
+            
             var cboFiltroEstadoHost = new ToolStripControlHost(cboFiltroEstadoObrasSociales = new ComboBox
             {
                 DropDownStyle = ComboBoxStyle.DropDownList,
                 Width = 100
             });
+            
             cboFiltroEstadoObrasSociales.Items.AddRange(new object[] { "Todos", "Activo", "Inactivo" });
             cboFiltroEstadoObrasSociales.SelectedIndex = 0;
-            cboFiltroEstadoObrasSociales.SelectedIndexChanged += (s, e) => ObrasSocialesFiltroEstadoChanged?.Invoke(this, cboFiltroEstadoObrasSociales.SelectedItem.ToString());
+            cboFiltroEstadoObrasSociales.SelectedIndexChanged += (s, e) => 
+                ObrasSocialesFiltroEstadoChanged?.Invoke(this, cboFiltroEstadoObrasSociales.SelectedItem.ToString());
 
             tool.Items.AddRange(new ToolStripItem[] { 
                 btnNuevo, btnEditar, btnEliminar, 
                 new ToolStripSeparator(), 
-                new ToolStripLabel("Buscar:"), txtBuscar,
-                new ToolStripSeparator(),
+                lblBuscar, txtBuscar,
                 lblFiltroEstado, cboFiltroEstadoHost
             });
             
-            gridObrasSociales = new DataGridView { 
-                Dock = DockStyle.Fill, 
+            gridObrasSociales = new DataGridView 
+            { 
+                Location = new Point(20, 95),   // CORREGIDO: Más abajo de la toolbar
+                Size = new Size(1100, 420),     // CORREGIDO: Altura ajustada
                 ReadOnly = true, 
                 AllowUserToAddRows = false, 
                 SelectionMode = DataGridViewSelectionMode.FullRowSelect, 
                 MultiSelect = false, 
                 AutoGenerateColumns = true,
-                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
+                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
+                BackgroundColor = Color.White,
+                BorderStyle = BorderStyle.FixedSingle,
+                ColumnHeadersDefaultCellStyle = new DataGridViewCellStyle
+                {
+                    BackColor = Color.FromArgb(39, 174, 96),
+                    ForeColor = Color.White,
+                    Font = new Font("Segoe UI", 10, FontStyle.Bold)
+                },
+                DefaultCellStyle = new DataGridViewCellStyle
+                {
+                    Font = new Font("Segoe UI", 9),
+                    SelectionBackColor = Color.FromArgb(212, 239, 223),
+                    SelectionForeColor = Color.FromArgb(44, 62, 80)
+                },
+                AlternatingRowsDefaultCellStyle = new DataGridViewCellStyle
+                {
+                    BackColor = Color.FromArgb(248, 255, 250)
+                },
+                EnableHeadersVisualStyles = false,
+                RowHeadersVisible = false
             };
 
             btnNuevo.Click += (s, e) => ObrasSocialesNuevoClick?.Invoke(this, EventArgs.Empty);
@@ -151,50 +346,124 @@ namespace SALC.Views.PanelAdministrador
             btnEliminar.Click += (s, e) => ObrasSocialesEliminarClick?.Invoke(this, EventArgs.Empty);
             txtBuscar.TextChanged += (s, e) => ObrasSocialesBuscarTextoChanged?.Invoke(this, txtBuscar.Text);
 
-            var panel = new Panel { Dock = DockStyle.Fill };
-            tool.Dock = DockStyle.Top;
-            panel.Controls.Add(gridObrasSociales);
-            panel.Controls.Add(tool);
-            tab.Controls.Add(panel);
+            // IMPORTANTE: Agregar en orden correcto
+            tab.Controls.Add(gridObrasSociales);
+            tab.Controls.Add(tool);
+            tab.Controls.Add(lblTitulo);
+            
             return tab;
         }
 
         private TabPage CrearTabTiposAnalisis()
         {
-            var tab = new TabPage("Tipos de Análisis");
-            var tool = new ToolStrip();
-            var btnNuevo = new ToolStripButton("Nuevo") { DisplayStyle = ToolStripItemDisplayStyle.Text };
-            var btnEditar = new ToolStripButton("Editar") { DisplayStyle = ToolStripItemDisplayStyle.Text };
-            var btnEliminar = new ToolStripButton("Eliminar") { DisplayStyle = ToolStripItemDisplayStyle.Text };
-            var txtBuscar = new ToolStripTextBox { Width = 200, ToolTipText = "Buscar por descripción" };
+            var tab = new TabPage("Tipos de Análisis")
+            {
+                BackColor = Color.White,
+                Padding = new Padding(20)
+            };
             
-            // Filtro de estado para tipos de análisis
-            var lblFiltroEstado = new ToolStripLabel("Estado:");
+            // Título - POSICIÓN CORREGIDA
+            var lblTitulo = new Label
+            {
+                Text = "Catálogo de Tipos de Análisis Clínicos",
+                Font = new Font("Segoe UI", 13, FontStyle.Bold),
+                ForeColor = Color.FromArgb(230, 126, 34),
+                Location = new Point(20, 15),
+                Size = new Size(700, 28),
+                BackColor = Color.Transparent
+            };
+
+            // Toolbar - POSICIÓN CORREGIDA
+            var tool = new ToolStrip
+            {
+                BackColor = Color.FromArgb(255, 250, 245),
+                GripStyle = ToolStripGripStyle.Hidden,
+                Padding = new Padding(8, 4, 8, 4),
+                Location = new Point(20, 50),  // CORREGIDO
+                Width = 1100,
+                AutoSize = false,
+                Height = 35
+            };
+            
+            var btnNuevo = new ToolStripButton("Nuevo Tipo de Análisis") 
+            { 
+                DisplayStyle = ToolStripItemDisplayStyle.Text,
+                Font = new Font("Segoe UI", 9, FontStyle.Bold),
+                ForeColor = Color.FromArgb(230, 126, 34)
+            };
+            
+            var btnEditar = new ToolStripButton("Modificar") { DisplayStyle = ToolStripItemDisplayStyle.Text };
+            var btnEliminar = new ToolStripButton("Dar de Baja") 
+            { 
+                DisplayStyle = ToolStripItemDisplayStyle.Text,
+                ForeColor = Color.FromArgb(192, 57, 43)
+            };
+            
+            var lblBuscar = new ToolStripLabel("Buscar:") 
+            { 
+                Font = new Font("Segoe UI", 9, FontStyle.Bold) 
+            };
+            
+            var txtBuscar = new ToolStripTextBox 
+            { 
+                Width = 200, 
+                ToolTipText = "Descripción del tipo de análisis"
+            };
+            
+            var lblFiltroEstado = new ToolStripLabel("Estado:")
+            {
+                Margin = new Padding(10, 0, 5, 0),
+                Font = new Font("Segoe UI", 9, FontStyle.Bold)
+            };
+            
             var cboFiltroEstadoHost = new ToolStripControlHost(cboFiltroEstadoTiposAnalisis = new ComboBox
             {
                 DropDownStyle = ComboBoxStyle.DropDownList,
                 Width = 100
             });
+            
             cboFiltroEstadoTiposAnalisis.Items.AddRange(new object[] { "Todos", "Activo", "Inactivo" });
             cboFiltroEstadoTiposAnalisis.SelectedIndex = 0;
-            cboFiltroEstadoTiposAnalisis.SelectedIndexChanged += (s, e) => TiposAnalisisFiltroEstadoChanged?.Invoke(this, cboFiltroEstadoTiposAnalisis.SelectedItem.ToString());
+            cboFiltroEstadoTiposAnalisis.SelectedIndexChanged += (s, e) => 
+                TiposAnalisisFiltroEstadoChanged?.Invoke(this, cboFiltroEstadoTiposAnalisis.SelectedItem.ToString());
 
             tool.Items.AddRange(new ToolStripItem[] { 
                 btnNuevo, btnEditar, btnEliminar, 
                 new ToolStripSeparator(), 
-                new ToolStripLabel("Buscar:"), txtBuscar,
-                new ToolStripSeparator(),
+                lblBuscar, txtBuscar,
                 lblFiltroEstado, cboFiltroEstadoHost
             });
             
-            gridTiposAnalisis = new DataGridView { 
-                Dock = DockStyle.Fill, 
+            gridTiposAnalisis = new DataGridView 
+            { 
+                Location = new Point(20, 95),   // CORREGIDO
+                Size = new Size(1100, 420),     // CORREGIDO
                 ReadOnly = true, 
                 AllowUserToAddRows = false, 
                 SelectionMode = DataGridViewSelectionMode.FullRowSelect, 
                 MultiSelect = false, 
                 AutoGenerateColumns = true,
-                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
+                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
+                BackgroundColor = Color.White,
+                BorderStyle = BorderStyle.FixedSingle,
+                ColumnHeadersDefaultCellStyle = new DataGridViewCellStyle
+                {
+                    BackColor = Color.FromArgb(230, 126, 34),
+                    ForeColor = Color.White,
+                    Font = new Font("Segoe UI", 10, FontStyle.Bold)
+                },
+                DefaultCellStyle = new DataGridViewCellStyle
+                {
+                    Font = new Font("Segoe UI", 9),
+                    SelectionBackColor = Color.FromArgb(255, 235, 205),
+                    SelectionForeColor = Color.FromArgb(44, 62, 80)
+                },
+                AlternatingRowsDefaultCellStyle = new DataGridViewCellStyle
+                {
+                    BackColor = Color.FromArgb(255, 250, 245)
+                },
+                EnableHeadersVisualStyles = false,
+                RowHeadersVisible = false
             };
 
             btnNuevo.Click += (s, e) => TiposAnalisisNuevoClick?.Invoke(this, EventArgs.Empty);
@@ -202,50 +471,124 @@ namespace SALC.Views.PanelAdministrador
             btnEliminar.Click += (s, e) => TiposAnalisisEliminarClick?.Invoke(this, EventArgs.Empty);
             txtBuscar.TextChanged += (s, e) => TiposAnalisisBuscarTextoChanged?.Invoke(this, txtBuscar.Text);
 
-            var panel = new Panel { Dock = DockStyle.Fill };
-            tool.Dock = DockStyle.Top;
-            panel.Controls.Add(gridTiposAnalisis);
-            panel.Controls.Add(tool);
-            tab.Controls.Add(panel);
+            // IMPORTANTE: Agregar en orden correcto
+            tab.Controls.Add(gridTiposAnalisis);
+            tab.Controls.Add(tool);
+            tab.Controls.Add(lblTitulo);
+            
             return tab;
         }
 
         private TabPage CrearTabMetricas()
         {
-            var tab = new TabPage("Métricas");
-            var tool = new ToolStrip();
-            var btnNuevo = new ToolStripButton("Nuevo") { DisplayStyle = ToolStripItemDisplayStyle.Text };
-            var btnEditar = new ToolStripButton("Editar") { DisplayStyle = ToolStripItemDisplayStyle.Text };
-            var btnEliminar = new ToolStripButton("Eliminar") { DisplayStyle = ToolStripItemDisplayStyle.Text };
-            var txtBuscar = new ToolStripTextBox { Width = 200, ToolTipText = "Buscar por nombre/unidad" };
+            var tab = new TabPage("Métricas")
+            {
+                BackColor = Color.White,
+                Padding = new Padding(20)
+            };
             
-            // Filtro de estado para métricas
-            var lblFiltroEstado = new ToolStripLabel("Estado:");
+            // Título - POSICIÓN CORREGIDA
+            var lblTitulo = new Label
+            {
+                Text = "Catálogo de Métricas y Parámetros de Laboratorio",
+                Font = new Font("Segoe UI", 13, FontStyle.Bold),
+                ForeColor = Color.FromArgb(142, 68, 173),
+                Location = new Point(20, 15),
+                Size = new Size(800, 28),
+                BackColor = Color.Transparent
+            };
+
+            // Toolbar - POSICIÓN CORREGIDA
+            var tool = new ToolStrip
+            {
+                BackColor = Color.FromArgb(250, 245, 255),
+                GripStyle = ToolStripGripStyle.Hidden,
+                Padding = new Padding(8, 4, 8, 4),
+                Location = new Point(20, 50),  // CORREGIDO
+                Width = 1100,
+                AutoSize = false,
+                Height = 35
+            };
+            
+            var btnNuevo = new ToolStripButton("Nueva Métrica") 
+            { 
+                DisplayStyle = ToolStripItemDisplayStyle.Text,
+                Font = new Font("Segoe UI", 9, FontStyle.Bold),
+                ForeColor = Color.FromArgb(142, 68, 173)
+            };
+            
+            var btnEditar = new ToolStripButton("Modificar") { DisplayStyle = ToolStripItemDisplayStyle.Text };
+            var btnEliminar = new ToolStripButton("Dar de Baja") 
+            { 
+                DisplayStyle = ToolStripItemDisplayStyle.Text,
+                ForeColor = Color.FromArgb(192, 57, 43)
+            };
+            
+            var lblBuscar = new ToolStripLabel("Buscar:") 
+            { 
+                Font = new Font("Segoe UI", 9, FontStyle.Bold) 
+            };
+            
+            var txtBuscar = new ToolStripTextBox 
+            { 
+                Width = 200, 
+                ToolTipText = "Nombre o unidad de medida"
+            };
+            
+            var lblFiltroEstado = new ToolStripLabel("Estado:")
+            {
+                Margin = new Padding(10, 0, 5, 0),
+                Font = new Font("Segoe UI", 9, FontStyle.Bold)
+            };
+            
             var cboFiltroEstadoHost = new ToolStripControlHost(cboFiltroEstadoMetricas = new ComboBox
             {
                 DropDownStyle = ComboBoxStyle.DropDownList,
                 Width = 100
             });
+            
             cboFiltroEstadoMetricas.Items.AddRange(new object[] { "Todos", "Activo", "Inactivo" });
             cboFiltroEstadoMetricas.SelectedIndex = 0;
-            cboFiltroEstadoMetricas.SelectedIndexChanged += (s, e) => MetricasFiltroEstadoChanged?.Invoke(this, cboFiltroEstadoMetricas.SelectedItem.ToString());
+            cboFiltroEstadoMetricas.SelectedIndexChanged += (s, e) => 
+                MetricasFiltroEstadoChanged?.Invoke(this, cboFiltroEstadoMetricas.SelectedItem.ToString());
 
             tool.Items.AddRange(new ToolStripItem[] { 
                 btnNuevo, btnEditar, btnEliminar, 
                 new ToolStripSeparator(), 
-                new ToolStripLabel("Buscar:"), txtBuscar,
-                new ToolStripSeparator(),
+                lblBuscar, txtBuscar,
                 lblFiltroEstado, cboFiltroEstadoHost
             });
             
-            gridMetricas = new DataGridView { 
-                Dock = DockStyle.Fill, 
+            gridMetricas = new DataGridView 
+            { 
+                Location = new Point(20, 95),   // CORREGIDO
+                Size = new Size(1100, 420),     // CORREGIDO
                 ReadOnly = true, 
                 AllowUserToAddRows = false, 
                 SelectionMode = DataGridViewSelectionMode.FullRowSelect, 
                 MultiSelect = false, 
                 AutoGenerateColumns = true,
-                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
+                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
+                BackgroundColor = Color.White,
+                BorderStyle = BorderStyle.FixedSingle,
+                ColumnHeadersDefaultCellStyle = new DataGridViewCellStyle
+                {
+                    BackColor = Color.FromArgb(142, 68, 173),
+                    ForeColor = Color.White,
+                    Font = new Font("Segoe UI", 10, FontStyle.Bold)
+                },
+                DefaultCellStyle = new DataGridViewCellStyle
+                {
+                    Font = new Font("Segoe UI", 9),
+                    SelectionBackColor = Color.FromArgb(235, 222, 240),
+                    SelectionForeColor = Color.FromArgb(44, 62, 80)
+                },
+                AlternatingRowsDefaultCellStyle = new DataGridViewCellStyle
+                {
+                    BackColor = Color.FromArgb(250, 245, 255)
+                },
+                EnableHeadersVisualStyles = false,
+                RowHeadersVisible = false
             };
 
             btnNuevo.Click += (s, e) => MetricasNuevoClick?.Invoke(this, EventArgs.Empty);
@@ -253,187 +596,276 @@ namespace SALC.Views.PanelAdministrador
             btnEliminar.Click += (s, e) => MetricasEliminarClick?.Invoke(this, EventArgs.Empty);
             txtBuscar.TextChanged += (s, e) => MetricasBuscarTextoChanged?.Invoke(this, txtBuscar.Text);
 
-            var panel = new Panel { Dock = DockStyle.Fill };
-            tool.Dock = DockStyle.Top;
-            panel.Controls.Add(gridMetricas);
-            panel.Controls.Add(tool);
-            tab.Controls.Add(panel);
+            // IMPORTANTE: Agregar en orden correcto
+            tab.Controls.Add(gridMetricas);
+            tab.Controls.Add(tool);
+            tab.Controls.Add(lblTitulo);
+            
             return tab;
         }
 
         private TabPage CrearTabRelacionesTipoAnalisisMetricas()
         {
-            var tab = new TabPage("Relaciones Análisis-Métricas");
+            var tab = new TabPage("Configuración")
+            {
+                BackColor = Color.White,
+                Padding = new Padding(30)
+            };
             
-            var lblDescripcion = new Label
+            // Título principal
+            var lblTitulo = new Label
             {
-                Text = "Gestione qué métricas componen cada tipo de análisis.\nLas relaciones definen los valores que se pueden cargar para cada tipo de análisis.",
-                Left = 20,
-                Top = 20,
-                Width = 600,
-                Height = 50,
-                AutoSize = false
+                Text = "Configuración de Relaciones entre Análisis y Métricas",
+                Font = new Font("Segoe UI", 15, FontStyle.Bold),
+                ForeColor = Color.FromArgb(41, 128, 185),
+                Location = new Point(30, 30),
+                Size = new Size(900, 35)
             };
 
-            var btnGestionarRelaciones = new Button
+            // Subtítulo descriptivo
+            var lblSubtitulo = new Label
             {
-                Text = "Gestionar Relaciones Tipo Análisis - Métricas",
-                Left = 20,
-                Top = 80,
-                Width = 350,
-                Height = 30
+                Text = "Gestione qué métricas específicas componen cada tipo de análisis clínico",
+                Font = new Font("Segoe UI", 11, FontStyle.Regular),
+                ForeColor = Color.FromArgb(127, 140, 141),
+                Location = new Point(30, 70),
+                Size = new Size(900, 25)
             };
 
-            btnGestionarRelaciones.Click += (s, e) => RelacionesTipoAnalisisMetricaGestionarClick?.Invoke(this, EventArgs.Empty);
+            // Panel informativo
+            var panelInfo = new Panel
+            {
+                Location = new Point(30, 110),
+                Size = new Size(900, 150),
+                BackColor = Color.FromArgb(245, 250, 255),
+                BorderStyle = BorderStyle.FixedSingle
+            };
 
-            tab.Controls.Add(lblDescripcion);
-            tab.Controls.Add(btnGestionarRelaciones);
+            var lblInfo = new Label
+            {
+                Text = "Importancia de las Relaciones:\n\n" +
+                       "• Define qué parámetros se pueden medir en cada tipo de análisis\n" +
+                       "• Determina qué campos aparecerán al cargar resultados\n" +
+                       "• Garantiza consistencia en los informes generados\n\n" +
+                       "Las relaciones establecidas son fundamentales para la integridad de los datos clínicos.",
+                Font = new Font("Segoe UI", 10, FontStyle.Regular),
+                ForeColor = Color.FromArgb(52, 73, 94),
+                Location = new Point(20, 15),
+                Size = new Size(850, 120),
+                BackColor = Color.Transparent
+            };
+
+            panelInfo.Controls.Add(lblInfo);
+
+            // Botón de gestión
+            var btnGestionar = new Button
+            {
+                Text = "Gestionar Relaciones Análisis-Métricas",
+                Location = new Point(30, 280),
+                Size = new Size(380, 50),
+                Font = new Font("Segoe UI", 11, FontStyle.Bold),
+                BackColor = Color.FromArgb(52, 152, 219),
+                ForeColor = Color.White,
+                FlatStyle = FlatStyle.Flat,
+                Cursor = Cursors.Hand
+            };
+            btnGestionar.FlatAppearance.BorderSize = 0;
+            btnGestionar.Click += (s, e) => RelacionesTipoAnalisisMetricaGestionarClick?.Invoke(this, EventArgs.Empty);
+
+            // Nota adicional
+            var lblNota = new Label
+            {
+                Text = "Nota: Los cambios en las relaciones solo afectarán a futuros análisis.\n" +
+                       "Los análisis existentes mantendrán su configuración original.",
+                Font = new Font("Segoe UI", 9, FontStyle.Italic),
+                ForeColor = Color.FromArgb(149, 165, 166),
+                Location = new Point(30, 350),
+                Size = new Size(600, 25)
+            };
+            
+            tab.Controls.AddRange(new Control[] { 
+                lblTitulo, lblSubtitulo, panelInfo, btnGestionar, lblNota 
+            });
             
             return tab;
         }
 
         private void AgregarTabReportes()
         {
-            var tab = new TabPage("Reportes");
+            var tab = new TabPage("Reportes y Análisis")
+            {
+                BackColor = Color.White
+            };
             
             var panelPrincipal = new Panel
             {
                 Dock = DockStyle.Fill,
                 AutoScroll = true,
-                Padding = new System.Windows.Forms.Padding(20)
+                Padding = new Padding(30),
+                BackColor = Color.White
             };
             
+            // Título principal
+            var lblTitulo = new Label
+            {
+                Text = "Módulo de Reportes Estadísticos y Visualizaciones",
+                Font = new Font("Segoe UI", 15, FontStyle.Bold),
+                ForeColor = Color.FromArgb(39, 174, 96),
+                Location = new Point(0, 0),
+                Size = new Size(900, 35)
+            };
+
+            // Información
             var grpInfo = new GroupBox
             {
-                Text = "Información de Reportes",
-                Left = 20,
-                Top = 20,
-                Width = 750,
-                Height = 130
+                Text = "  Información de Reportes Disponibles  ",
+                Location = new Point(0, 50),
+                Size = new Size(900, 160),
+                Font = new Font("Segoe UI", 11, FontStyle.Bold),
+                ForeColor = Color.FromArgb(39, 174, 96),
+                BackColor = Color.FromArgb(248, 255, 250)
             };
             
             var lblDescripcion = new Label
             {
                 Text = "Los reportes proporcionan análisis estadísticos y visualizaciones gráficas\n" +
-                       "para ayudar en la toma de decisiones basadas en datos.\n\n" +
-                       "📊 Reportes disponibles:\n" +
-                       "   • Productividad de Médicos\n" +
-                       "   • Facturación por Obra Social\n" +
-                       "   • Demanda de Análisis (Top 10)",
-                Left = 15,
-                Top = 25,
-                Width = 710,
-                Height = 90,
-                AutoSize = false
+                       "que facilitan la toma de decisiones basadas en datos del laboratorio.\n\n" +
+                       "Reportes Disponibles:\n\n" +
+                       "• Productividad de Personal Médico (análisis por profesional)\n" +
+                       "• Facturación por Obra Social (distribución económica)\n" +
+                       "• Demanda de Análisis (top 10 más solicitados)",
+                Location = new Point(20, 30),
+                Size = new Size(850, 115),
+                Font = new Font("Segoe UI", 10, FontStyle.Regular),
+                ForeColor = Color.FromArgb(52, 73, 94),
+                AutoSize = false,
+                BackColor = Color.Transparent
             };
             
             grpInfo.Controls.Add(lblDescripcion);
             
+            // Acciones
             var grpAcciones = new GroupBox
             {
-                Text = "Acceder a Reportes",
-                Left = 20,
-                Top = 170,
-                Width = 750,
-                Height = 150
+                Text = "  Acceder al Módulo de Reportes  ",
+                Location = new Point(0, 230),
+                Size = new Size(900, 170),
+                Font = new Font("Segoe UI", 11, FontStyle.Bold),
+                ForeColor = Color.FromArgb(39, 174, 96),
+                BackColor = Color.FromArgb(248, 255, 250)
             };
             
             var btnReportes = new Button 
             { 
-                Text = "📊 Abrir Módulo de Reportes", 
-                Left = 20, 
-                Top = 35, 
-                Width = 320,
-                Height = 45,
-                Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold),
-                BackColor = System.Drawing.Color.FromArgb(0, 153, 51),
-                ForeColor = System.Drawing.Color.White,
+                Text = "Abrir Módulo de Reportes", 
+                Location = new Point(25, 40), 
+                Size = new Size(350, 50),
+                Font = new Font("Segoe UI", 11, FontStyle.Bold),
+                BackColor = Color.FromArgb(39, 174, 96),
+                ForeColor = Color.White,
                 FlatStyle = FlatStyle.Flat,
                 Cursor = Cursors.Hand
             };
             btnReportes.FlatAppearance.BorderSize = 0;
             btnReportes.Click += (s, e) => ReportesClick?.Invoke(this, EventArgs.Empty);
             
-            var lblNota = new Label
+            var lblBeneficios = new Label
             {
-                Text = "💡 Los reportes permiten analizar:\n" +
-                       "   • Rendimiento y productividad del personal médico\n" +
-                       "   • Distribución de trabajo por obra social\n" +
-                       "   • Tipos de análisis más demandados",
-                Left = 20,
-                Top = 90,
-                Width = 660,
-                Height = 50,
+                Text = "Beneficios de usar los reportes:\n" +
+                       "• Análisis del rendimiento y productividad del personal médico\n" +
+                       "• Comprensión de la distribución del trabajo por obra social\n" +
+                       "• Identificación de los tipos de análisis más demandados",
+                Location = new Point(25, 100),
+                Size = new Size(840, 55),
                 AutoSize = false,
-                ForeColor = System.Drawing.Color.FromArgb(64, 64, 64),
-                Font = new System.Drawing.Font("Microsoft Sans Serif", 9F)
+                ForeColor = Color.FromArgb(52, 73, 94),
+                Font = new Font("Segoe UI", 9, FontStyle.Regular),
+                BackColor = Color.Transparent
             };
             
-            grpAcciones.Controls.Add(btnReportes);
-            grpAcciones.Controls.Add(lblNota);
+            grpAcciones.Controls.AddRange(new Control[] { btnReportes, lblBeneficios });
             
-            panelPrincipal.Controls.Add(grpInfo);
-            panelPrincipal.Controls.Add(grpAcciones);
+            panelPrincipal.Controls.AddRange(new Control[] { 
+                lblTitulo, grpInfo, grpAcciones 
+            });
             
             tab.Controls.Add(panelPrincipal);
-            
             tabs.TabPages.Add(tab);
         }
 
         private void AgregarTabBackups()
         {
-            var tab = new TabPage("Backups");
+            var tab = new TabPage("Copias de Seguridad")
+            {
+                BackColor = Color.White
+            };
             
             var panelPrincipal = new Panel
             {
                 Dock = DockStyle.Fill,
                 AutoScroll = true,
-                Padding = new System.Windows.Forms.Padding(20)
+                Padding = new Padding(30),
+                BackColor = Color.White
             };
             
+            // Título principal
+            var lblTitulo = new Label
+            {
+                Text = "Gestión de Copias de Seguridad del Sistema",
+                Font = new Font("Segoe UI", 15, FontStyle.Bold),
+                ForeColor = Color.FromArgb(52, 152, 219),
+                Location = new Point(0, 0),
+                Size = new Size(900, 35)
+            };
+
+            // Información
             var grpInfo = new GroupBox
             {
-                Text = "Información de Copias de Seguridad",
-                Left = 20,
-                Top = 20,
-                Width = 750,
-                Height = 130
+                Text = "  Información sobre Copias de Seguridad  ",
+                Location = new Point(0, 50),
+                Size = new Size(900, 170),
+                Font = new Font("Segoe UI", 11, FontStyle.Bold),
+                ForeColor = Color.FromArgb(52, 152, 219),
+                BackColor = Color.FromArgb(245, 250, 255)
             };
             
             var lblDescripcion = new Label
             {
-                Text = "Las copias de seguridad protegen los datos del sistema.\n" +
-                       "Se recomienda ejecutar backups regularmente según la política del laboratorio.\n\n" +
-                       "💡 El sistema usa la carpeta predeterminada de SQL Server que ya tiene los permisos configurados.\n" +
-                       "   Puede cambiar la ubicación, pero asegúrese de que SQL Server tenga permisos de escritura.",
-                Left = 15,
-                Top = 25,
-                Width = 710,
-                Height = 90,
-                AutoSize = false
+                Text = "Las copias de seguridad son fundamentales para proteger la información del laboratorio.\n\n" +
+                       "Recomendaciones:\n" +
+                       "• Ejecute backups regularmente según la política establecida\n" +
+                       "• El sistema utiliza la carpeta predeterminada de SQL Server con permisos configurados\n" +
+                       "• Puede cambiar la ubicación, asegurándose que SQL Server tenga permisos de escritura\n\n" +
+                       "Las copias de seguridad garantizan la recuperación de datos ante cualquier eventualidad.",
+                Location = new Point(20, 30),
+                Size = new Size(850, 125),
+                Font = new Font("Segoe UI", 10, FontStyle.Regular),
+                ForeColor = Color.FromArgb(52, 73, 94),
+                AutoSize = false,
+                BackColor = Color.Transparent
             };
             
             grpInfo.Controls.Add(lblDescripcion);
             
+            // Acciones
             var grpAcciones = new GroupBox
             {
-                Text = "Acciones Disponibles",
-                Left = 20,
-                Top = 170,
-                Width = 750,
-                Height = 150
+                Text = "  Acciones de Respaldo Disponibles  ",
+                Location = new Point(0, 240),
+                Size = new Size(900, 200),
+                Font = new Font("Segoe UI", 11, FontStyle.Bold),
+                ForeColor = Color.FromArgb(52, 152, 219),
+                BackColor = Color.FromArgb(245, 250, 255)
             };
             
             var btnEjecutar = new Button 
             { 
-                Text = "🔄 Ejecutar Copia de Seguridad Ahora", 
-                Left = 20, 
-                Top = 35, 
-                Width = 320,
-                Height = 45,
-                Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold),
-                BackColor = System.Drawing.Color.FromArgb(0, 122, 204),
-                ForeColor = System.Drawing.Color.White,
+                Text = "Ejecutar Copia de Seguridad", 
+                Location = new Point(25, 40), 
+                Size = new Size(400, 50),
+                Font = new Font("Segoe UI", 11, FontStyle.Bold),
+                BackColor = Color.FromArgb(52, 152, 219),
+                ForeColor = Color.White,
                 FlatStyle = FlatStyle.Flat,
                 Cursor = Cursors.Hand
             };
@@ -441,44 +873,51 @@ namespace SALC.Views.PanelAdministrador
             
             var btnProbarConexion = new Button 
             { 
-                Text = "🔌 Probar Conexión a Base de Datos", 
-                Left = 360, 
-                Top = 35, 
-                Width = 320,
-                Height = 45,
-                Font = new System.Drawing.Font("Microsoft Sans Serif", 9F),
-                BackColor = System.Drawing.Color.FromArgb(243, 243, 243),
-                ForeColor = System.Drawing.Color.Black,
+                Text = "Probar Conexión a Base de Datos", 
+                Location = new Point(445, 40), 
+                Size = new Size(400, 50),
+                Font = new Font("Segoe UI", 10, FontStyle.Regular),
+                BackColor = Color.FromArgb(236, 240, 241),
+                ForeColor = Color.FromArgb(44, 62, 80),
                 FlatStyle = FlatStyle.Flat,
                 Cursor = Cursors.Hand
             };
-            btnProbarConexion.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(204, 204, 204);
+            btnProbarConexion.FlatAppearance.BorderColor = Color.FromArgb(189, 195, 199);
             
+            var lblUbicacion = new Label
+            {
+                Text = "La ubicación predeterminada tiene los permisos necesarios para SQL Server.\n" +
+                       "Los archivos se guardarán en la carpeta de backups del servidor SQL por defecto.",
+                Location = new Point(25, 110),
+                Size = new Size(840, 40),
+                AutoSize = false,
+                ForeColor = Color.FromArgb(39, 174, 96),
+                Font = new Font("Segoe UI", 9, FontStyle.Regular),
+                BackColor = Color.Transparent
+            };
+
             var lblNota = new Label
             {
-                Text = "✅ La ubicación predeterminada tiene los permisos necesarios para SQL Server.\n" +
-                       "📁 Se guardará en la carpeta de backups de SQL Server por defecto.",
-                Left = 20,
-                Top = 90,
-                Width = 660,
-                Height = 45,
-                AutoSize = false,
-                ForeColor = System.Drawing.Color.FromArgb(0, 100, 0),
-                Font = new System.Drawing.Font("Microsoft Sans Serif", 9F)
+                Text = "Importante: Conserve las copias de seguridad en un lugar seguro y externo al servidor.",
+                Location = new Point(25, 155),
+                Size = new Size(840, 25),
+                ForeColor = Color.FromArgb(192, 57, 43),
+                Font = new Font("Segoe UI", 9, FontStyle.Italic),
+                BackColor = Color.Transparent
             };
             
             btnEjecutar.Click += (s, e) => EjecutarBackupClick?.Invoke(this, EventArgs.Empty);
             btnProbarConexion.Click += (s, e) => ProbarConexionClick?.Invoke(this, EventArgs.Empty);
             
-            grpAcciones.Controls.Add(btnEjecutar);
-            grpAcciones.Controls.Add(btnProbarConexion);
-            grpAcciones.Controls.Add(lblNota);
+            grpAcciones.Controls.AddRange(new Control[] { 
+                btnEjecutar, btnProbarConexion, lblUbicacion, lblNota 
+            });
             
-            panelPrincipal.Controls.Add(grpInfo);
-            panelPrincipal.Controls.Add(grpAcciones);
+            panelPrincipal.Controls.AddRange(new Control[] { 
+                lblTitulo, grpInfo, grpAcciones 
+            });
             
             tab.Controls.Add(panelPrincipal);
-            
             tabs.TabPages.Add(tab);
         }
 
@@ -487,8 +926,6 @@ namespace SALC.Views.PanelAdministrador
         public event EventHandler UsuariosEditarClick;
         public event EventHandler UsuariosEliminarClick;
         public event EventHandler<string> UsuariosBuscarTextoChanged;
-        
-        // Nuevos eventos para usuarios
         public event EventHandler UsuariosDetalleClick;
         public event EventHandler<string> UsuariosFiltroEstadoChanged;
         
@@ -510,16 +947,12 @@ namespace SALC.Views.PanelAdministrador
         public event EventHandler<string> MetricasBuscarTextoChanged;
         public event EventHandler<string> MetricasFiltroEstadoChanged;
         
-        // Evento para relaciones Tipo Análisis - Métricas
         public event EventHandler RelacionesTipoAnalisisMetricaGestionarClick;
-        
-        // Evento para reportes
         public event EventHandler ReportesClick;
-        
         public event EventHandler EjecutarBackupClick;
         public event EventHandler ProbarConexionClick;
 
-        // Implementación de métodos de datos/selección
+        // Implementación de métodos de datos
         public void CargarUsuarios(System.Collections.IEnumerable usuarios)
         {
             if (gridUsuarios != null) gridUsuarios.DataSource = usuarios;
@@ -529,7 +962,7 @@ namespace SALC.Views.PanelAdministrador
         {
             if (gridUsuarios?.CurrentRow?.DataBoundItem == null) return null;
             var row = gridUsuarios.CurrentRow.DataBoundItem;
-            var dniProp = row.GetType().GetProperty("Dni");
+            var dniProp = row.GetType().GetProperty("DNI");  // CAMBIADO de "Dni" a "DNI"
             if (dniProp == null) return null;
             var val = dniProp.GetValue(row);
             return val as int? ?? (val != null ? (int?)System.Convert.ToInt32(val) : null);
@@ -580,7 +1013,7 @@ namespace SALC.Views.PanelAdministrador
             return val as int? ?? (val != null ? (int?)System.Convert.ToInt32(val) : null);
         }
 
-        public void MostrarMensaje(string texto, string titulo = "SALC", bool esError = false)
+        public void MostrarMensaje(string texto, string titulo = "SALC - Administración", bool esError = false)
         {
             MessageBox.Show(texto, titulo, MessageBoxButtons.OK, esError ? MessageBoxIcon.Error : MessageBoxIcon.Information);
         }
