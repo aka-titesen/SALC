@@ -5,7 +5,7 @@ using System.Windows.Forms;
 using SALC.BLL;
 using SALC.Domain;
 using SALC.Presenters.ViewsContracts;
-using SALC.Views.PanelAdministrador;
+using SALC.Views.PanelAsistente; // ? USAR FORMULARIO ESPECÍFICO DEL ASISTENTE
 
 namespace SALC.Presenters
 {
@@ -40,7 +40,7 @@ namespace SALC.Presenters
             {
                 _view.MostrarCargando(true);
                 CargarPacientes();
-                _view.HabilitarAcciones(false); // No habilitar hasta seleccionar un paciente
+                _view.HabilitarAcciones(false);
                 _view.MostrarCargando(false);
             }
             catch (Exception ex)
@@ -66,13 +66,10 @@ namespace SALC.Presenters
             {
                 _view.MostrarCargando(true);
                 
-                // Cargar todos los pacientes (el asistente puede ver activos e inactivos)
                 _todosLosPacientes = _pacienteService.ObtenerTodos().ToList();
                 
-                // Aplicar filtro si hay texto de búsqueda
                 FiltrarPacientes();
                 
-                // Actualizar contadores
                 var pacientesActivos = _todosLosPacientes.Count(p => p.Estado == "Activo");
                 _view.ActualizarContadores(_todosLosPacientes.Count, pacientesActivos);
                 
@@ -109,7 +106,6 @@ namespace SALC.Presenters
 
                 _view.CargarListaPacientes(pacientesFiltrados);
                 
-                // Actualizar estado de botones según selección
                 _view.HabilitarAcciones(_view.PacienteSeleccionado != null);
             }
             catch (Exception ex)
@@ -122,31 +118,16 @@ namespace SALC.Presenters
         {
             try
             {
-                using (var frmEdit = new FrmPacienteEdit())
+                // ? USAR FORMULARIO ESPECÍFICO DEL ASISTENTE
+                using (var frmEdit = new FrmPacienteEditAsistente())
                 {
                     if (frmEdit.ShowDialog() == DialogResult.OK)
                     {
                         var nuevoPaciente = frmEdit.ObtenerPaciente();
                         
-                        // Validación: El asistente solo puede crear pacientes en estado "Activo"
-                        // Según ERS v2.9 - RF-03: "El sistema permitirá al Asistente el alta y modificación de Pacientes"
-                        if (nuevoPaciente.Estado != "Activo")
-                        {
-                            _view.MostrarMensaje(
-                                "? RESTRICCIÓN DE ASISTENTE ?\n\n" +
-                                "Los asistentes solo pueden crear pacientes en estado 'Activo'.\n" +
-                                "No es posible crear pacientes inactivos directamente.\n\n" +
-                                "El paciente será creado automáticamente como 'Activo'.", 
-                                true);
-                            
-                            // Forzar estado activo
-                            nuevoPaciente.Estado = "Activo";
-                        }
-
-                        // Crear paciente en la base de datos
+                        // El formulario ya garantiza que el estado es "Activo"
                         _pacienteService.CrearPaciente(nuevoPaciente);
                         
-                        // Mensaje de confirmación con información del paciente creado
                         _view.MostrarMensaje(
                             $"? Paciente creado exitosamente\n\n" +
                             $"DNI: {nuevoPaciente.Dni}\n" +
@@ -156,7 +137,6 @@ namespace SALC.Presenters
                             $"Email: {nuevoPaciente.Email ?? "No especificado"}\n" +
                             $"Teléfono: {nuevoPaciente.Telefono ?? "No especificado"}");
                         
-                        // Recargar lista para mostrar el nuevo paciente
                         CargarPacientes();
                     }
                 }
@@ -178,47 +158,21 @@ namespace SALC.Presenters
 
             try
             {
-                using (var frmEdit = new FrmPacienteEdit(pacienteSeleccionado))
+                // ? USAR FORMULARIO ESPECÍFICO DEL ASISTENTE
+                using (var frmEdit = new FrmPacienteEditAsistente(pacienteSeleccionado))
                 {
                     if (frmEdit.ShowDialog() == DialogResult.OK)
                     {
                         var pacienteEditado = frmEdit.ObtenerPaciente();
                         
-                        // Validaciones específicas para el rol Asistente según ERS v2.9 (RF-03)
+                        // ? EL FORMULARIO YA GARANTIZA QUE EL ESTADO NO SE MODIFICÓ
+                        // No es necesaria validación adicional aquí
                         
-                        // 1. El asistente NO puede cambiar el estado a "Inactivo" (baja lógica)
-                        if (pacienteSeleccionado.Estado == "Activo" && pacienteEditado.Estado == "Inactivo")
-                        {
-                            _view.MostrarMensaje(
-                                "? RESTRICCIÓN DE ASISTENTE ?\n\n" +
-                                "Los asistentes no pueden realizar bajas de pacientes (cambio a estado 'Inactivo').\n" +
-                                "Esta acción está restringida exclusivamente a médicos.\n\n" +
-                                "Puede modificar todos los demás datos del paciente.", 
-                                true);
-                            return;
-                        }
-
-                        // 2. El asistente puede modificar todos los demás campos
-                        // (DNI, Nombre, Apellido, Email, Teléfono, Obra Social, etc.)
-                        // sin restricciones adicionales
-
-                        // 3. Si el paciente está inactivo, el asistente puede reactivarlo
-                        if (pacienteSeleccionado.Estado == "Inactivo" && pacienteEditado.Estado == "Activo")
-                        {
-                            _view.MostrarMensaje(
-                                "?? INFORMACIÓN\n\n" +
-                                "El paciente será reactivado (cambiado a estado 'Activo').\n" +
-                                "Esta acción es permitida para asistentes.");
-                        }
-
-                        // Actualizar en base de datos
                         _pacienteService.ActualizarPaciente(pacienteEditado);
                         
-                        // Mensaje de confirmación detallado
                         var cambios = DetectarCambios(pacienteSeleccionado, pacienteEditado);
                         _view.MostrarMensaje($"? Paciente actualizado exitosamente.\n\nCambios realizados:\n{cambios}");
                         
-                        // Recargar lista para reflejar cambios
                         CargarPacientes();
                     }
                 }
@@ -229,9 +183,6 @@ namespace SALC.Presenters
             }
         }
 
-        /// <summary>
-        /// Detecta los cambios realizados entre el paciente original y el editado
-        /// </summary>
         private string DetectarCambios(Paciente original, Paciente editado)
         {
             var cambios = new List<string>();
@@ -253,9 +204,6 @@ namespace SALC.Presenters
             
             if (original.Sexo != editado.Sexo)
                 cambios.Add($"• Sexo: '{original.Sexo}' ? '{editado.Sexo}'");
-            
-            if (original.Estado != editado.Estado)
-                cambios.Add($"• Estado: '{original.Estado}' ? '{editado.Estado}'");
             
             if (original.IdObraSocial != editado.IdObraSocial)
                 cambios.Add($"• Obra Social: {(original.IdObraSocial?.ToString() ?? "Sin obra social")} ? {(editado.IdObraSocial?.ToString() ?? "Sin obra social")}");
