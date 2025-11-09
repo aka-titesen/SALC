@@ -18,6 +18,8 @@ namespace SALC.Views.PanelMedico
         private DataGridView gridAlertas;
         private Panel panelResumen;
         private Label lblTitulo;
+        private Label lblSubtitulo;
+        private Panel panelHeader;
         private Panel panelFiltros;
         private Panel panelContenido;
 
@@ -30,73 +32,122 @@ namespace SALC.Views.PanelMedico
 
         private void InitializeComponent()
         {
-            this.Text = "Reportes de Calidad y Desempeño - SALC (Médico)";
-            this.Size = new Size(1200, 700);
+            this.Text = "Módulo de Reportes de Calidad y Desempeño Personal";
+            this.Size = new Size(1300, 800);
             this.StartPosition = FormStartPosition.CenterScreen;
             this.FormBorderStyle = FormBorderStyle.Sizable;
-            this.MaximizeBox = true;
-            this.MinimumSize = new Size(1000, 600);
+            this.MinimumSize = new Size(1200, 700);
+            this.BackColor = Color.White;
 
-            // Panel de filtros (superior)
+            // ============ PANEL HEADER ============
+            panelHeader = new Panel
+            {
+                Dock = DockStyle.Top,
+                Height = 90,
+                BackColor = Color.White,
+                Padding = new Padding(30, 20, 30, 10)
+            };
+
+            lblTitulo = new Label
+            {
+                Text = "Reportes de Calidad y Desempeño Médico",
+                Font = new Font("Segoe UI", 16, FontStyle.Bold),
+                ForeColor = Color.FromArgb(0, 150, 136),
+                Location = new Point(0, 0),
+                Size = new Size(900, 35),
+                BackColor = Color.Transparent
+            };
+
+            lblSubtitulo = new Label
+            {
+                Text = "Análisis personalizados para monitorear su calidad de trabajo y carga laboral",
+                Font = new Font("Segoe UI", 11, FontStyle.Regular),
+                ForeColor = Color.FromArgb(127, 140, 141),
+                Location = new Point(0, 35),
+                Size = new Size(900, 25),
+                BackColor = Color.Transparent
+            };
+
+            panelHeader.Controls.AddRange(new Control[] { lblTitulo, lblSubtitulo });
+
+            // ============ PANEL DE FILTROS Y BOTONES ============
             panelFiltros = new Panel
             {
                 Dock = DockStyle.Top,
-                Height = 120,
-                BackColor = Color.FromArgb(240, 240, 240),
-                Padding = new Padding(10)
+                Height = 140,
+                BackColor = Color.FromArgb(245, 250, 255),
+                Padding = new Padding(30, 15, 30, 15),
+                BorderStyle = BorderStyle.FixedSingle
             };
 
-            // Título informativo
-            var lblInfoRol = new Label
+            // Grupo de filtros de fechas
+            var grpFechas = new GroupBox
             {
-                Text = "?? Reportes para Médicos - Calidad y Desempeño Personal",
-                Location = new Point(20, 10),
-                AutoSize = true,
-                Font = new Font("Segoe UI", 11F, FontStyle.Bold),
-                ForeColor = Color.FromArgb(0, 102, 204)
+                Text = "  Período de Análisis  ",
+                Location = new Point(0, 0),
+                Size = new Size(550, 110),
+                Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                ForeColor = Color.FromArgb(0, 150, 136),
+                BackColor = Color.White
             };
 
-            // Filtros de fechas
             var lblDesde = new Label
             {
-                Text = "Fecha Desde:",
-                Location = new Point(20, 45),
-                AutoSize = true,
-                Font = new Font("Segoe UI", 9F, FontStyle.Bold)
+                Text = "Desde:",
+                Location = new Point(20, 35),
+                Size = new Size(70, 22),
+                Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                ForeColor = Color.FromArgb(44, 62, 80)
             };
 
             dtpDesde = new DateTimePicker
             {
-                Location = new Point(120, 42),
-                Width = 200,
+                Location = new Point(95, 32),
+                Width = 180,
                 Format = DateTimePickerFormat.Short,
-                Value = DateTime.Now.AddDays(-7) // Última semana por defecto
+                Value = DateTime.Now.AddDays(-7),
+                Font = new Font("Segoe UI", 10),
+                CalendarForeColor = Color.FromArgb(0, 150, 136)
             };
 
             var lblHasta = new Label
             {
-                Text = "Fecha Hasta:",
-                Location = new Point(350, 45),
-                AutoSize = true,
-                Font = new Font("Segoe UI", 9F, FontStyle.Bold)
+                Text = "Hasta:",
+                Location = new Point(300, 35),
+                Size = new Size(70, 22),
+                Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                ForeColor = Color.FromArgb(44, 62, 80)
             };
 
             dtpHasta = new DateTimePicker
             {
-                Location = new Point(450, 42),
-                Width = 200,
+                Location = new Point(370, 32),
+                Width = 160,
                 Format = DateTimePickerFormat.Short,
-                Value = DateTime.Now
+                Value = DateTime.Now,
+                Font = new Font("Segoe UI", 10),
+                CalendarForeColor = Color.FromArgb(0, 150, 136)
             };
+
+            var lblInfoFiltro = new Label
+            {
+                Text = "Seleccione el rango de fechas para filtrar los datos del reporte",
+                Location = new Point(20, 70),
+                Size = new Size(500, 20),
+                Font = new Font("Segoe UI", 9, FontStyle.Italic),
+                ForeColor = Color.FromArgb(149, 165, 166)
+            };
+
+            grpFechas.Controls.AddRange(new Control[] { lblDesde, dtpDesde, lblHasta, dtpHasta, lblInfoFiltro });
 
             // Botones de reportes
             btnAlertas = new Button
             {
-                Text = "?? Reporte de Alertas\n(Valores Críticos)",
-                Location = new Point(20, 75),
-                Size = new Size(200, 40),
-                Font = new Font("Segoe UI", 9F, FontStyle.Regular),
-                BackColor = Color.FromArgb(255, 87, 34), // Naranja rojizo
+                Text = "Reporte de Alertas\n(Valores Críticos)",
+                Location = new Point(570, 10),
+                Size = new Size(300, 50),
+                Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                BackColor = Color.FromArgb(255, 87, 34),
                 ForeColor = Color.White,
                 FlatStyle = FlatStyle.Flat,
                 Cursor = Cursors.Hand,
@@ -107,11 +158,11 @@ namespace SALC.Views.PanelMedico
 
             btnCargaTrabajo = new Button
             {
-                Text = "?? Mi Carga de Trabajo\n(Pendientes y Verificados)",
-                Location = new Point(240, 75),
-                Size = new Size(220, 40),
-                Font = new Font("Segoe UI", 9F, FontStyle.Regular),
-                BackColor = Color.FromArgb(0, 150, 136), // Verde azulado
+                Text = "Mi Carga de Trabajo\n(Pendientes y Verificados)",
+                Location = new Point(890, 10),
+                Size = new Size(300, 50),
+                Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                BackColor = Color.FromArgb(0, 150, 136),
                 ForeColor = Color.White,
                 FlatStyle = FlatStyle.Flat,
                 Cursor = Cursors.Hand,
@@ -120,29 +171,49 @@ namespace SALC.Views.PanelMedico
             btnCargaTrabajo.FlatAppearance.BorderSize = 0;
             btnCargaTrabajo.Click += (s, e) => GenerarReporteCargaTrabajoClick?.Invoke(s, e);
 
-            panelFiltros.Controls.AddRange(new Control[] 
-            { 
-                lblInfoRol, lblDesde, dtpDesde, lblHasta, dtpHasta, 
-                btnAlertas, btnCargaTrabajo 
+            // Panel de ayuda
+            var panelAyuda = new Panel
+            {
+                Location = new Point(570, 70),
+                Size = new Size(620, 40),
+                BackColor = Color.FromArgb(232, 245, 233),
+                BorderStyle = BorderStyle.FixedSingle
+            };
+
+            var lblAyuda = new Label
+            {
+                Text = "Haga clic en cualquier botón de reporte para generar la visualización correspondiente",
+                Location = new Point(10, 10),
+                Size = new Size(590, 20),
+                Font = new Font("Segoe UI", 9, FontStyle.Regular),
+                ForeColor = Color.FromArgb(56, 142, 60),
+                BackColor = Color.Transparent
+            };
+
+            panelAyuda.Controls.Add(lblAyuda);
+
+            panelFiltros.Controls.AddRange(new Control[] { 
+                grpFechas, btnAlertas, btnCargaTrabajo, panelAyuda 
             });
 
-            // Panel de contenido (centro)
+            // ============ PANEL DEL CONTENIDO ============
             panelContenido = new Panel
             {
                 Dock = DockStyle.Fill,
                 BackColor = Color.White,
-                Padding = new Padding(20)
+                Padding = new Padding(30, 20, 30, 30)
             };
 
-            // Título del contenido
-            lblTitulo = new Label
+            // Título del contenido actual
+            var lblTituloContenido = new Label
             {
-                Text = "Seleccione un reporte para visualizar",
+                Text = "Seleccione un reporte para visualizar las estadísticas personales",
                 Dock = DockStyle.Top,
-                Height = 40,
-                Font = new Font("Segoe UI", 14F, FontStyle.Bold),
+                Height = 50,
+                Font = new Font("Segoe UI", 13, FontStyle.Bold),
                 TextAlign = ContentAlignment.MiddleCenter,
-                ForeColor = Color.FromArgb(64, 64, 64)
+                ForeColor = Color.FromArgb(127, 140, 141),
+                BackColor = Color.Transparent
             };
 
             // Grid para alertas
@@ -156,7 +227,26 @@ namespace SALC.Views.PanelMedico
                 SelectionMode = DataGridViewSelectionMode.FullRowSelect,
                 AutoGenerateColumns = true,
                 AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
-                Visible = false
+                Visible = false,
+                BorderStyle = BorderStyle.FixedSingle,
+                ColumnHeadersDefaultCellStyle = new DataGridViewCellStyle
+                {
+                    BackColor = Color.FromArgb(255, 87, 34),
+                    ForeColor = Color.White,
+                    Font = new Font("Segoe UI", 10, FontStyle.Bold)
+                },
+                DefaultCellStyle = new DataGridViewCellStyle
+                {
+                    Font = new Font("Segoe UI", 9),
+                    SelectionBackColor = Color.FromArgb(255, 224, 178),
+                    SelectionForeColor = Color.FromArgb(44, 62, 80)
+                },
+                AlternatingRowsDefaultCellStyle = new DataGridViewCellStyle
+                {
+                    BackColor = Color.FromArgb(255, 250, 245)
+                },
+                EnableHeadersVisualStyles = false,
+                RowHeadersVisible = false
             };
 
             // Panel de resumen (para carga de trabajo)
@@ -169,11 +259,12 @@ namespace SALC.Views.PanelMedico
 
             panelContenido.Controls.Add(gridAlertas);
             panelContenido.Controls.Add(panelResumen);
-            panelContenido.Controls.Add(lblTitulo);
+            panelContenido.Controls.Add(lblTituloContenido);
 
             // Agregar paneles al formulario
             this.Controls.Add(panelContenido);
             this.Controls.Add(panelFiltros);
+            this.Controls.Add(panelHeader);
         }
 
         #region Implementación de IReportesMedicoView
@@ -190,13 +281,17 @@ namespace SALC.Views.PanelMedico
             panelResumen.Visible = false;
             gridAlertas.Visible = true;
 
-            lblTitulo.Text = "?? Reporte de Alertas - Valores Fuera de Rango";
+            // Actualizar título del panel
+            var lblTituloContenido = panelContenido.Controls.OfType<Label>().FirstOrDefault();
+            if (lblTituloContenido != null)
+                lblTituloContenido.Text = "Reporte de Alertas - Valores Fuera de Rango Crítico";
 
             var lista = datos.Cast<BLL.ReporteAlerta>().ToList();
 
             if (lista.Count == 0)
             {
-                lblTitulo.Text = "? No se encontraron valores críticos en el período seleccionado";
+                if (lblTituloContenido != null)
+                    lblTituloContenido.Text = "No se encontraron valores críticos en el período seleccionado";
                 gridAlertas.DataSource = null;
                 return;
             }
@@ -219,9 +314,9 @@ namespace SALC.Views.PanelMedico
             foreach (DataGridViewRow row in gridAlertas.Rows)
             {
                 var estado = row.Cells["Estado"].Value?.ToString();
-                if (estado == "?? Crítico Alto")
+                if (estado == "Crítico Alto")
                     row.DefaultCellStyle.BackColor = Color.FromArgb(255, 235, 238);
-                else if (estado == "?? Crítico Bajo")
+                else if (estado == "Crítico Bajo")
                     row.DefaultCellStyle.BackColor = Color.FromArgb(255, 243, 224);
             }
         }
@@ -229,9 +324,9 @@ namespace SALC.Views.PanelMedico
         private string DeterminarEstadoValor(BLL.ReporteAlerta alerta)
         {
             if (alerta.ValorMinimo.HasValue && alerta.Resultado < alerta.ValorMinimo.Value)
-                return "?? Crítico Bajo";
+                return "Crítico Bajo";
             if (alerta.ValorMaximo.HasValue && alerta.Resultado > alerta.ValorMaximo.Value)
-                return "?? Crítico Alto";
+                return "Crítico Alto";
             return "Normal";
         }
 
@@ -242,54 +337,146 @@ namespace SALC.Views.PanelMedico
             panelResumen.Visible = true;
             panelResumen.Controls.Clear();
 
-            lblTitulo.Text = "?? Mi Carga de Trabajo Personal";
+            // Actualizar título del panel
+            var lblTituloContenido = panelContenido.Controls.OfType<Label>().FirstOrDefault();
+            if (lblTituloContenido != null)
+                lblTituloContenido.Text = "Mi Carga de Trabajo Personal - Estado Actual";
 
-            // Crear tarjetas de resumen visual
-            var lblPendientes = new Label
+            // Crear tarjetas de resumen visual con mejor distribución
+            var tarjetaPendientes = new Panel
             {
-                Text = $"{datos.AnalisisPendientes}\nAnálisis Pendientes\nde Verificar",
-                Location = new Point(100, 100),
-                Size = new Size(300, 150),
-                Font = new Font("Segoe UI", 16F, FontStyle.Bold),
-                TextAlign = ContentAlignment.MiddleCenter,
+                Location = new Point(150, 80),
+                Size = new Size(400, 200),
                 BackColor = Color.FromArgb(255, 243, 224),
-                ForeColor = Color.FromArgb(230, 81, 0),
                 BorderStyle = BorderStyle.FixedSingle
             };
 
-            var lblVerificados = new Label
+            var lblCategoriaPendientes = new Label
             {
-                Text = $"{datos.AnalisisVerificadosMes}\nAnálisis Verificados\neste Mes",
-                Location = new Point(450, 100),
-                Size = new Size(300, 150),
-                Font = new Font("Segoe UI", 16F, FontStyle.Bold),
+                Text = "Análisis Pendientes de Verificar",
+                Location = new Point(0, 15),
+                Size = new Size(400, 30),
+                Font = new Font("Segoe UI", 12, FontStyle.Bold),
                 TextAlign = ContentAlignment.MiddleCenter,
+                ForeColor = Color.FromArgb(230, 81, 0),
+                BackColor = Color.Transparent
+            };
+
+            var lblValorPendientes = new Label
+            {
+                Text = datos.AnalisisPendientes.ToString(),
+                Location = new Point(0, 60),
+                Size = new Size(400, 80),
+                Font = new Font("Segoe UI", 48, FontStyle.Bold),
+                TextAlign = ContentAlignment.MiddleCenter,
+                ForeColor = Color.FromArgb(230, 81, 0),
+                BackColor = Color.Transparent
+            };
+
+            var lblDescPendientes = new Label
+            {
+                Text = "requieren su atención inmediata",
+                Location = new Point(0, 150),
+                Size = new Size(400, 25),
+                Font = new Font("Segoe UI", 10, FontStyle.Regular),
+                TextAlign = ContentAlignment.MiddleCenter,
+                ForeColor = Color.FromArgb(100, 100, 100),
+                BackColor = Color.Transparent
+            };
+
+            tarjetaPendientes.Controls.AddRange(new Control[] { 
+                lblCategoriaPendientes, lblValorPendientes, lblDescPendientes 
+            });
+
+            var tarjetaVerificados = new Panel
+            {
+                Location = new Point(600, 80),
+                Size = new Size(400, 200),
                 BackColor = Color.FromArgb(232, 245, 233),
-                ForeColor = Color.FromArgb(56, 142, 60),
                 BorderStyle = BorderStyle.FixedSingle
             };
 
-            // Información adicional
-            var lblInfo = new Label
+            var lblCategoriaVerificados = new Label
             {
-                Text = "?? Información:\n\n" +
-                       "• Los análisis pendientes requieren su verificación y firma\n" +
-                       "• Los análisis verificados este mes reflejan su productividad reciente\n" +
-                       "• Revise regularmente los valores críticos en el reporte de alertas",
-                Location = new Point(100, 280),
-                Size = new Size(650, 120),
-                Font = new Font("Segoe UI", 10F),
-                ForeColor = Color.FromArgb(100, 100, 100)
+                Text = "Análisis Verificados este Mes",
+                Location = new Point(0, 15),
+                Size = new Size(400, 30),
+                Font = new Font("Segoe UI", 12, FontStyle.Bold),
+                TextAlign = ContentAlignment.MiddleCenter,
+                ForeColor = Color.FromArgb(56, 142, 60),
+                BackColor = Color.Transparent
             };
 
-            panelResumen.Controls.AddRange(new Control[] { lblPendientes, lblVerificados, lblInfo });
+            var lblValorVerificados = new Label
+            {
+                Text = datos.AnalisisVerificadosMes.ToString(),
+                Location = new Point(0, 60),
+                Size = new Size(400, 80),
+                Font = new Font("Segoe UI", 48, FontStyle.Bold),
+                TextAlign = ContentAlignment.MiddleCenter,
+                ForeColor = Color.FromArgb(56, 142, 60),
+                BackColor = Color.Transparent
+            };
+
+            var lblDescVerificados = new Label
+            {
+                Text = "completados exitosamente",
+                Location = new Point(0, 150),
+                Size = new Size(400, 25),
+                Font = new Font("Segoe UI", 10, FontStyle.Regular),
+                TextAlign = ContentAlignment.MiddleCenter,
+                ForeColor = Color.FromArgb(100, 100, 100),
+                BackColor = Color.Transparent
+            };
+
+            tarjetaVerificados.Controls.AddRange(new Control[] { 
+                lblCategoriaVerificados, lblValorVerificados, lblDescVerificados 
+            });
+
+            // Panel de información adicional
+            var panelInfo = new Panel
+            {
+                Location = new Point(150, 300),
+                Size = new Size(850, 150),
+                BackColor = Color.FromArgb(245, 250, 255),
+                BorderStyle = BorderStyle.FixedSingle
+            };
+
+            var lblInfoTitulo = new Label
+            {
+                Text = "Información Importante sobre su Desempeño",
+                Location = new Point(20, 15),
+                Size = new Size(810, 25),
+                Font = new Font("Segoe UI", 11, FontStyle.Bold),
+                ForeColor = Color.FromArgb(52, 152, 219),
+                BackColor = Color.Transparent
+            };
+
+            var lblInfoDetalle = new Label
+            {
+                Text = "• Los análisis pendientes requieren su verificación y firma profesional para ser completados\n\n" +
+                       "• Los análisis verificados este mes reflejan su productividad y contribución al laboratorio\n\n" +
+                       "• Revise regularmente el Reporte de Alertas para identificar valores críticos que requieran\n" +
+                       "  atención médica inmediata o seguimiento especial del paciente",
+                Location = new Point(25, 45),
+                Size = new Size(800, 90),
+                Font = new Font("Segoe UI", 9, FontStyle.Regular),
+                ForeColor = Color.FromArgb(100, 100, 100),
+                BackColor = Color.Transparent
+            };
+
+            panelInfo.Controls.AddRange(new Control[] { lblInfoTitulo, lblInfoDetalle });
+
+            panelResumen.Controls.AddRange(new Control[] { 
+                tarjetaPendientes, tarjetaVerificados, panelInfo 
+            });
         }
 
         public void MostrarMensaje(string mensaje, bool esError = false)
         {
             MessageBox.Show(
                 mensaje,
-                esError ? "Error" : "Reportes - Médico",
+                esError ? "SALC - Error en Reportes Médicos" : "SALC - Reportes Médicos",
                 MessageBoxButtons.OK,
                 esError ? MessageBoxIcon.Error : MessageBoxIcon.Information
             );
