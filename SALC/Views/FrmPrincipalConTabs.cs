@@ -594,7 +594,7 @@ namespace SALC.Views
 
         private void AgregarPestanaReportesMedico()
         {
-            var tabReportes = new TabPage("📊 Mis Reportes")
+            var tabReportes = new TabPage("Mis Reportes")
             {
                 BackColor = Color.White,
                 UseVisualStyleBackColor = false
@@ -607,53 +607,69 @@ namespace SALC.Views
                 {
                     Dock = DockStyle.Fill,
                     BackColor = Color.White,
-                    Padding = new Padding(20)
+                    Padding = new Padding(30)
                 };
 
                 var lblTitulo = new Label
                 {
-                    Text = "🩺 Reportes de Calidad y Desempeño Personal",
-                    Location = new Point(20, 20),
-                    Size = new Size(600, 35),
-                    Font = new Font("Segoe UI", 16F, FontStyle.Bold),
-                    ForeColor = Color.FromArgb(0, 102, 204)
+                    Text = "Reportes de Calidad y Desempeño Personal",
+                    Location = new Point(0, 0),
+                    Size = new Size(900, 35),
+                    Font = new Font("Segoe UI", 16, FontStyle.Bold),
+                    ForeColor = Color.FromArgb(0, 150, 136)
+                };
+
+                var lblSubtitulo = new Label
+                {
+                    Text = "Acceda a sus reportes personalizados para monitorear calidad de trabajo y carga laboral",
+                    Location = new Point(0, 40),
+                    Size = new Size(900, 25),
+                    Font = new Font("Segoe UI", 11, FontStyle.Regular),
+                    ForeColor = Color.FromArgb(127, 140, 141)
                 };
 
                 var grpInfo = new GroupBox
                 {
-                    Text = "Información de Reportes Disponibles",
-                    Location = new Point(20, 70),
-                    Size = new Size(750, 150)
+                    Text = "  Información de Reportes Disponibles  ",
+                    Location = new Point(0, 80),
+                    Size = new Size(1000, 180),
+                    Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                    ForeColor = Color.FromArgb(0, 150, 136),
+                    BackColor = Color.White
                 };
 
                 var lblDescripcion = new Label
                 {
                     Text = "Los reportes personalizados le ayudan a monitorear su calidad de trabajo\n" +
-                           "y a identificar proactivamente situaciones que requieren atención.\n\n" +
-                           "📊 Reportes disponibles:\n" +
-                           "   ⚠️ Reporte de Alertas (Valores Críticos fuera de rango)\n" +
-                           "   📈 Mi Carga de Trabajo (Pendientes y Verificados este mes)",
-                    Location = new Point(15, 25),
-                    Size = new Size(710, 110),
-                    Font = new Font("Segoe UI", 10F),
-                    AutoSize = false
+                           "y a identificar proactivamente situaciones que requieren atención médica.\n\n" +
+                           "Reportes disponibles:\n\n" +
+                           "• Reporte de Alertas: Identifica valores críticos fuera de rango que requieren seguimiento\n" +
+                           "• Mi Carga de Trabajo: Visualiza análisis pendientes y verificados en el período actual",
+                    Location = new Point(20, 30),
+                    Size = new Size(960, 140),
+                    Font = new Font("Segoe UI", 10),
+                    ForeColor = Color.FromArgb(44, 62, 80),
+                    BackColor = Color.Transparent
                 };
 
                 grpInfo.Controls.Add(lblDescripcion);
 
                 var grpAcciones = new GroupBox
                 {
-                    Text = "Acceder a Mis Reportes",
-                    Location = new Point(20, 240),
-                    Size = new Size(750, 150)
+                    Text = "  Acceder a Mis Reportes  ",
+                    Location = new Point(0, 280),
+                    Size = new Size(1000, 180),
+                    Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                    ForeColor = Color.FromArgb(0, 150, 136),
+                    BackColor = Color.White
                 };
 
                 var btnReportes = new Button
                 {
-                    Text = "📊 Abrir Módulo de Reportes Personales",
-                    Location = new Point(20, 35),
-                    Size = new Size(350, 45),
-                    Font = new Font("Segoe UI", 10F, FontStyle.Bold),
+                    Text = "Abrir Módulo de Reportes Personales",
+                    Location = new Point(300, 45),
+                    Size = new Size(400, 50),
+                    Font = new Font("Segoe UI", 11, FontStyle.Bold),
                     BackColor = Color.FromArgb(0, 150, 136),
                     ForeColor = Color.White,
                     FlatStyle = FlatStyle.Flat,
@@ -664,20 +680,20 @@ namespace SALC.Views
 
                 var lblNota = new Label
                 {
-                    Text = "💡 Beneficios de usar los reportes:\n" +
-                           "   • Seguimiento proactivo de pacientes con valores críticos\n" +
-                           "   • Visualización rápida de su carga de trabajo actual\n" +
-                           "   • Mejora continua de la calidad asistencial",
-                    Location = new Point(20, 90),
-                    Size = new Size(660, 50),
-                    Font = new Font("Segoe UI", 9F),
-                    ForeColor = Color.FromArgb(64, 64, 64),
-                    AutoSize = false
+                    Text = "Beneficios de usar los reportes:\n\n" +
+                           "• Seguimiento proactivo de pacientes con valores críticos\n" +
+                           "• Visualización rápida de su carga de trabajo actual\n" +
+                           "• Mejora continua de la calidad asistencial",
+                    Location = new Point(200, 110),
+                    Size = new Size(600, 60),
+                    Font = new Font("Segoe UI", 9),
+                    ForeColor = Color.FromArgb(100, 100, 100),
+                    BackColor = Color.Transparent
                 };
 
                 grpAcciones.Controls.AddRange(new Control[] { btnReportes, lblNota });
 
-                panelPrincipal.Controls.AddRange(new Control[] { lblTitulo, grpInfo, grpAcciones });
+                panelPrincipal.Controls.AddRange(new Control[] { lblTitulo, lblSubtitulo, grpInfo, grpAcciones });
                 tabReportes.Controls.Add(panelPrincipal);
             }
             catch (Exception ex)
