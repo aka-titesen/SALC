@@ -799,9 +799,6 @@ namespace SALC.Views
                 // Inicializar la vista del asistente
                 presenterAsistente.InicializarVista();
 
-                // Pestaña 3: Informes Verificados (RF-08)
-                AgregarPestanaInformesVerificados();
-
                 // Guardar referencia del presenter para que no se pierda
                 tabPrincipal.Tag = presenterAsistente;
             }
@@ -814,7 +811,7 @@ namespace SALC.Views
 
                 var lblError = new Label
                 {
-                    Text = $"Error al cargar funcionalidades del asistente:\n{ex.Message}",
+                    Text = string.Format("Error al cargar funcionalidades del asistente:\n{0}", ex.Message),
                     Font = new Font("Segoe UI", 11),
                     ForeColor = Color.Red,
                     TextAlign = ContentAlignment.MiddleCenter,
@@ -911,88 +908,6 @@ namespace SALC.Views
             }
 
             tabPrincipal.TabPages.Add(tabGestionPacientes);
-        }
-
-        private void AgregarPestanaInformesVerificados()
-        {
-            var tabInformesVerificados = new TabPage("Informes")
-            {
-                BackColor = Color.White,
-                UseVisualStyleBackColor = false
-            };
-
-            try
-            {
-                // Crear formulario de informes verificados para asistente
-                var frmInformesAsistente = new SALC.Views.PanelAsistente.FrmInformesVerificados
-                {
-                    TopLevel = false,
-                    FormBorderStyle = FormBorderStyle.None,
-                    Dock = DockStyle.Fill
-                };
-
-                // Crear presenter para informes verificados
-                var presenterInformes = new SALC.Presenters.InformesVerificadosPresenter(frmInformesAsistente);
-                frmInformesAsistente.Tag = presenterInformes;
-
-                tabInformesVerificados.Controls.Add(frmInformesAsistente);
-                frmInformesAsistente.Show();
-
-                // Inicializar la vista
-                presenterInformes.InicializarVista();
-            }
-            catch (Exception ex)
-            {
-                // Si hay error, mostrar placeholder mejorado
-                var panel = new Panel { Dock = DockStyle.Fill, BackColor = Color.White };
-
-                var lblTitulo = new Label
-                {
-                    Text = "📋 Informes Verificados",
-                    Font = new Font("Segoe UI", 16, FontStyle.Bold),
-                    ForeColor = Color.FromArgb(70, 130, 180),
-                    Location = new Point(50, 50),
-                    Size = new Size(400, 35)
-                };
-
-                var lblDescripcion = new Label
-                {
-                    Text = "RF-08: Generar y Enviar Informes de Análisis Verificados\n\n" +
-                           "Funcionalidades para Asistente:\n" +
-                           "• Consultar análisis en estado 'Verificado'\n" +
-                           "• Generar informes PDF de resultados\n" +
-                           "• Enviar informes a pacientes por email\n" +
-                           "• Gestionar comunicaciones con pacientes\n\n" +
-                           "Restricción: Solo análisis previamente verificados por un Médico",
-                    Font = new Font("Segoe UI", 11),
-                    ForeColor = Color.FromArgb(70, 130, 180),
-                    Location = new Point(50, 100),
-                    Size = new Size(600, 200)
-                };
-
-                var lblEstado = new Label
-                {
-                    Text = $"⚠️ Error al cargar componente: {ex.Message}",
-                    Font = new Font("Segoe UI", 9, FontStyle.Italic),
-                    ForeColor = Color.Orange,
-                    Location = new Point(50, 320),
-                    Size = new Size(600, 30)
-                };
-
-                var lblImplementacion = new Label
-                {
-                    Text = $"💡 Error técnico: {ex.StackTrace}",
-                    Font = new Font("Segoe UI", 9, FontStyle.Italic),
-                    ForeColor = Color.Gray,
-                    Location = new Point(50, 350),
-                    Size = new Size(600, 30)
-                };
-
-                panel.Controls.AddRange(new Control[] { lblTitulo, lblDescripcion, lblEstado, lblImplementacion });
-                tabInformesVerificados.Controls.Add(panel);
-            }
-
-            tabPrincipal.TabPages.Add(tabInformesVerificados);
         }
 
         private void CerrarSesion()

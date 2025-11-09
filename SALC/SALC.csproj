@@ -175,9 +175,6 @@
     <Compile Include="Views\PanelAsistente\FrmPanelAsistente.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Views\PanelAsistente\FrmInformesVerificados.cs">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="Views\PanelAsistente\FrmGestionPacientes.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -254,7 +251,6 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Presenters\PanelAsistentePresenter.cs" />
-    <Compile Include="Presenters\InformesVerificadosPresenter.cs" />
     <Compile Include="Presenters\GestionPacientesAsistentePresenter.cs" />
     <Compile Include="Presenters\PanelMedicoPresenter.cs" />
     <Compile Include="Presenters\PanelAdministradorPresenter.cs" />
@@ -262,7 +258,6 @@
     <Compile Include="Presenters\ReportesMedicoPresenter.cs" />
     <Compile Include="Presenters\LoginPresenter.cs" />
     <Compile Include="Presenters\ViewsContracts\IPanelAsistenteView.cs" />
-    <Compile Include="Presenters\ViewsContracts\IInformesVerificadosView.cs" />
     <Compile Include="Presenters\ViewsContracts\IGestionPacientesAsistenteView.cs" />
     <Compile Include="Presenters\ViewsContracts\IPanelMedicoView.cs" />
     <Compile Include="Presenters\ViewsContracts\IPanelAdministradorView.cs" />
