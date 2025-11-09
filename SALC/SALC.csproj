@@ -181,6 +181,15 @@
     <Compile Include="Views\PanelAsistente\FrmGestionPacientes.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Views\PanelAsistente\FrmPacienteEditAsistente.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Views\PanelAsistente\FrmHistorialPaciente.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Views\PanelAsistente\FrmDetalleAnalisis.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Views\PanelMedico\FrmPanelMedico.cs">
       <SubType>Form</SubType>
     </Compile>

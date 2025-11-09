@@ -12,15 +12,12 @@ namespace SALC.Presenters.ViewsContracts
         void CargarListaPacientes(IEnumerable<Paciente> pacientes);
         Paciente PacienteSeleccionado { get; }
 
-        // Historial de análisis
+        // Historial de análisis - Solo apertura de ventana modal
         event EventHandler VerHistorialClick;
-        void CargarHistorialAnalisis(IEnumerable<object> analisisConEstados);
-        object AnalisisSeleccionado { get; }
 
-        // Acciones para análisis verificados
+        // Eventos heredados (no usados en nueva implementación)
         event EventHandler GenerarPdfClick;
         event EventHandler EnviarInformeClick;
-        void HabilitarAccionesAnalisis(bool habilitar);
 
         // Mensajes
         void MostrarMensaje(string texto, bool esError = false);

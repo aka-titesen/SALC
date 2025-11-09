@@ -56,83 +56,153 @@ namespace SALC.Views.PanelAsistente
             Width = 1200;
             Height = 800;
             StartPosition = FormStartPosition.CenterScreen;
+            BackColor = Color.White;
 
             tabs = new TabControl { Dock = DockStyle.Fill };
             Controls.Add(tabs);
 
-            CrearTabGestionPacientes(); // EXACTAMENTE IGUAL AL MÉDICO
+            CrearTabGestionPacientes();
             
             // Evento cuando se carga el formulario
             Load += (s, e) => VistaInicializada?.Invoke(this, EventArgs.Empty);
         }
 
-        #region RF-03: Gestión de Pacientes (Asistente) - COPIA EXACTA DEL MÉDICO
+        #region RF-03: Gestión de Pacientes (Asistente) - ESTILO IGUAL AL MÉDICO
 
         private void CrearTabGestionPacientes()
         {
-            var tab = new TabPage("Gestión de Pacientes");
-            
-            // Título y descripción - EXACTO AL MÉDICO
-            var lblTitulo = new Label { 
-                Text = "Gestión de Pacientes (RF-03) - Rol: Asistente", 
-                Left = 20, Top = 20, Width = 500, Height = 25,
-                Font = new Font("Microsoft Sans Serif", 10F, FontStyle.Bold)
+            var tab = new TabPage("Gestión de Pacientes")
+            {
+                BackColor = Color.White
             };
             
-            var lblDescripcion = new Label {
-                Text = "Como asistente, puede crear nuevos pacientes y modificar datos de pacientes existentes. No puede dar de baja pacientes.",
-                Left = 20, Top = 50, Width = 800, Height = 40,
-                ForeColor = Color.Blue
+            var panelPrincipal = new Panel
+            {
+                Dock = DockStyle.Fill,
+                BackColor = Color.White,
+                Padding = new Padding(25)
             };
 
-            // Toolbar - EXACTO AL MÉDICO
-            var tool = new ToolStrip();
-            var btnNuevo = new ToolStripButton("Nuevo Paciente") { DisplayStyle = ToolStripItemDisplayStyle.Text };
-            var btnEditar = new ToolStripButton("Modificar Paciente") { DisplayStyle = ToolStripItemDisplayStyle.Text };
-            txtBuscarTool = new ToolStripTextBox { Width = 200, ToolTipText = "Buscar por DNI/Apellido/Nombre" };
+            // Título - IGUAL QUE MÉDICO
+            var lblTitulo = new Label 
+            { 
+                Text = "Administración de Información de Pacientes", 
+                Font = new Font("Segoe UI", 16, FontStyle.Bold),
+                ForeColor = Color.FromArgb(70, 130, 180),
+                Location = new Point(25, 25),
+                Size = new Size(1100, 40),
+                BackColor = Color.White,
+                AutoSize = false
+            };
+
+            // Toolbar - IGUAL QUE MÉDICO (más alto y más abajo)
+            var tool = new ToolStrip
+            {
+                BackColor = Color.FromArgb(236, 240, 241),
+                GripStyle = ToolStripGripStyle.Hidden,
+                Padding = new Padding(12, 8, 12, 8),
+                Font = new Font("Segoe UI", 10, FontStyle.Regular),
+                Location = new Point(25, 80),
+                Width = 1100,
+                AutoSize = false,
+                Height = 45
+            };
             
-            // Filtro de estado para pacientes - EXACTO AL MÉDICO
-            var lblFiltroEstado = new ToolStripLabel("Estado:");
+            var btnNuevo = new ToolStripButton("Nuevo Paciente") 
+            { 
+                DisplayStyle = ToolStripItemDisplayStyle.Text,
+                Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                ForeColor = Color.FromArgb(39, 174, 96)
+            };
+            
+            var btnEditar = new ToolStripButton("Modificar") 
+            { 
+                DisplayStyle = ToolStripItemDisplayStyle.Text,
+                Font = new Font("Segoe UI", 10, FontStyle.Regular),
+                ForeColor = Color.FromArgb(70, 130, 180)
+            };
+            
+            var lblBuscar = new ToolStripLabel("Buscar:") 
+            { 
+                Font = new Font("Segoe UI", 10, FontStyle.Bold) 
+            };
+            
+            txtBuscarTool = new ToolStripTextBox 
+            { 
+                Width = 240, 
+                ToolTipText = "DNI, Apellido o Nombre",
+                Font = new Font("Segoe UI", 10)
+            };
+            
+            var lblFiltroEstado = new ToolStripLabel("Filtrar por Estado:")
+            {
+                Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                Margin = new Padding(15, 0, 5, 0)
+            };
+            
             var cboFiltroEstadoHost = new ToolStripControlHost(cboFiltroEstadoPacientes = new ComboBox
             {
                 DropDownStyle = ComboBoxStyle.DropDownList,
-                Width = 100
+                Width = 120,
+                Font = new Font("Segoe UI", 10)
             });
+            
             cboFiltroEstadoPacientes.Items.AddRange(new object[] { "Todos", "Activo", "Inactivo" });
             cboFiltroEstadoPacientes.SelectedIndex = 0;
             cboFiltroEstadoPacientes.SelectedIndexChanged += (s, e) => BuscarPacientesClick?.Invoke(this, EventArgs.Empty);
 
             tool.Items.AddRange(new ToolStripItem[] { 
-                btnNuevo, btnEditar,
-                new ToolStripSeparator(), 
-                new ToolStripLabel("Buscar:"), txtBuscarTool,
+                btnNuevo,
                 new ToolStripSeparator(),
-                lblFiltroEstado, cboFiltroEstadoHost
+                btnEditar, 
+                new ToolStripSeparator(), 
+                lblBuscar, 
+                txtBuscarTool,
+                lblFiltroEstado, 
+                cboFiltroEstadoHost
             });
             
-            // Grid de pacientes - EXACTO AL MÉDICO
-            gridPacientes = new DataGridView { 
-                Left = 20, Top = 120, Width = 1120, Height = 480,
+            // Grid - IGUAL QUE MÉDICO (posición, altura de encabezados y filas)
+            gridPacientes = new DataGridView 
+            { 
+                Location = new Point(25, 140),
+                Size = new Size(1100, 430),
                 ReadOnly = true, 
                 AllowUserToAddRows = false, 
                 SelectionMode = DataGridViewSelectionMode.FullRowSelect, 
                 MultiSelect = false, 
                 AutoGenerateColumns = true,
-                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
+                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
+                BackgroundColor = Color.White,
+                BorderStyle = BorderStyle.FixedSingle,
+                ColumnHeadersHeight = 45,
+                ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing,
+                ColumnHeadersDefaultCellStyle = new DataGridViewCellStyle
+                {
+                    BackColor = Color.FromArgb(70, 130, 180),
+                    ForeColor = Color.White,
+                    Font = new Font("Segoe UI", 11, FontStyle.Bold),
+                    Padding = new Padding(10),
+                    Alignment = DataGridViewContentAlignment.MiddleCenter,
+                    WrapMode = DataGridViewTriState.False
+                },
+                DefaultCellStyle = new DataGridViewCellStyle
+                {
+                    Font = new Font("Segoe UI", 10),
+                    SelectionBackColor = Color.FromArgb(176, 196, 222),
+                    SelectionForeColor = Color.FromArgb(44, 62, 80),
+                    Padding = new Padding(6)
+                },
+                AlternatingRowsDefaultCellStyle = new DataGridViewCellStyle
+                {
+                    BackColor = Color.FromArgb(250, 252, 255)
+                },
+                EnableHeadersVisualStyles = false,
+                RowHeadersVisible = false,
+                RowTemplate = { Height = 38 }
             };
 
-            // Información adicional - ADAPTADO PARA ASISTENTE
-            var lblInfo = new Label {
-                Text = "?? Permisos de Asistente:\n" +
-                       "• ? Crear nuevos pacientes (automáticamente en estado 'Activo')\n" +
-                       "• ? Modificar datos de pacientes existentes\n" +
-                       "• ? No puede dar de baja lógica (cambiar estado a 'Inactivo')\n" +
-                       "• Para dar de baja pacientes, consulte a un Médico",
-                Left = 20, Top = 620, Width = 500, Height = 80,
-                ForeColor = Color.DarkGreen
-            };
-
-            // Eventos - EXACTO AL MÉDICO
+            // Eventos
             btnNuevo.Click += (s, e) => NuevoPacienteClick?.Invoke(this, EventArgs.Empty);
             btnEditar.Click += (s, e) => EditarPacienteClick?.Invoke(this, EventArgs.Empty);
             txtBuscarTool.TextChanged += (s, e) => BuscarPacientesClick?.Invoke(this, EventArgs.Empty);
@@ -151,16 +221,12 @@ namespace SALC.Views.PanelAsistente
                 }
             };
 
-            // Layout - EXACTO AL MÉDICO
-            var panel = new Panel { Dock = DockStyle.Fill };
-            tool.Dock = DockStyle.Top;
-            tool.Top = 100;
-            panel.Controls.Add(gridPacientes);
-            panel.Controls.Add(tool);
+            // Agregar controles al panel en orden (grid, tool, título)
+            panelPrincipal.Controls.Add(gridPacientes);
+            panelPrincipal.Controls.Add(tool);
+            panelPrincipal.Controls.Add(lblTitulo);
             
-            tab.Controls.AddRange(new Control[] { 
-                lblTitulo, lblDescripcion, panel, lblInfo
-            });
+            tab.Controls.Add(panelPrincipal);
             tabs.TabPages.Add(tab);
         }
 
@@ -168,7 +234,7 @@ namespace SALC.Views.PanelAsistente
 
         #region Implementación de la interfaz
 
-        // Método para cargar pacientes - IGUAL AL MÉDICO
+        // Método para cargar pacientes
         public void CargarPacientes(System.Collections.IEnumerable pacientes)
         {
             if (gridPacientes != null) 
@@ -204,7 +270,6 @@ namespace SALC.Views.PanelAsistente
             CargarPacientes(pacientes);
         }
 
-        // Método para obtener DNI del paciente seleccionado - IGUAL AL MÉDICO
         public int? ObtenerPacienteSeleccionadoDni()
         {
             if (gridPacientes?.CurrentRow?.DataBoundItem == null) return null;
@@ -227,7 +292,7 @@ namespace SALC.Views.PanelAsistente
 
         public void MostrarMensaje(string mensaje, bool esError = false)
         {
-            MessageBox.Show(this, mensaje, "Panel Asistente - SALC", MessageBoxButtons.OK, 
+            MessageBox.Show(this, mensaje, "SALC - Panel Asistente", MessageBoxButtons.OK, 
                 esError ? MessageBoxIcon.Error : MessageBoxIcon.Information);
         }
 
