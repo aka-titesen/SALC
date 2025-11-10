@@ -450,7 +450,8 @@ namespace SALC.Views.PanelMedico
             {
                 Dock = DockStyle.Fill,
                 Padding = new Padding(30),
-                BackColor = Color.White
+                BackColor = Color.White,
+                AutoScroll = true
             };
 
             // Título
@@ -499,7 +500,7 @@ namespace SALC.Views.PanelMedico
             { 
                 Text = "  Selección del Análisis  ", 
                 Location = new Point(0, 135), 
-                Size = new Size(730, 110),
+                Size = new Size(520, 110),
                 Font = new Font("Segoe UI", 11, FontStyle.Bold),
                 ForeColor = Color.FromArgb(230, 126, 34),
                 BackColor = Color.FromArgb(255, 250, 245)
@@ -522,7 +523,7 @@ namespace SALC.Views.PanelMedico
             { 
                 Text = "Ningún análisis seleccionado", 
                 Location = new Point(20, 73), 
-                Size = new Size(690, 27),
+                Size = new Size(480, 27),
                 Font = new Font("Segoe UI", 9, FontStyle.Regular),
                 ForeColor = Color.FromArgb(149, 165, 166),
                 BorderStyle = BorderStyle.FixedSingle,
@@ -535,9 +536,9 @@ namespace SALC.Views.PanelMedico
             // Botón cargar métricas
             btnCargarMetricas = new Button 
             { 
-                Text = "Cargar Métricas Específicas", 
-                Location = new Point(760, 165), 
-                Size = new Size(320, 35),
+                Text = "Cargar Métricas", 
+                Location = new Point(550, 165), 
+                Size = new Size(240, 35),
                 Font = new Font("Segoe UI", 10, FontStyle.Bold),
                 BackColor = Color.FromArgb(52, 152, 219),
                 ForeColor = Color.White,
@@ -547,11 +548,26 @@ namespace SALC.Views.PanelMedico
             };
             btnCargarMetricas.FlatAppearance.BorderSize = 0;
 
-            // Grid de resultados
+            // Botón guardar - POSICIONADO AL LADO DEL BOTÓN CARGAR MÉTRICAS
+            btnGuardarResultados = new Button 
+            { 
+                Text = "Guardar Resultados", 
+                Location = new Point(810, 165), 
+                Size = new Size(240, 35),
+                Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                BackColor = Color.FromArgb(39, 174, 96),
+                ForeColor = Color.White,
+                FlatStyle = FlatStyle.Flat,
+                Enabled = false,
+                Cursor = Cursors.Hand
+            };
+            btnGuardarResultados.FlatAppearance.BorderSize = 0;
+
+            // Grid de resultados - MÁS GRANDE VERTICALMENTE
             var lblGrid = new Label 
             { 
                 Text = "Métricas Específicas del Tipo de Análisis:", 
-                Location = new Point(0, 260), 
+                Location = new Point(0, 220), 
                 Size = new Size(400, 25),
                 Font = new Font("Segoe UI", 11, FontStyle.Bold),
                 ForeColor = Color.FromArgb(44, 62, 80)
@@ -559,8 +575,8 @@ namespace SALC.Views.PanelMedico
 
             gridResultados = new DataGridView 
             { 
-                Location = new Point(0, 290), 
-                Size = new Size(1080, 290),
+                Location = new Point(0, 250), 
+                Size = new Size(1080, 400),
                 AllowUserToAddRows = false,
                 AllowUserToDeleteRows = false,
                 AutoGenerateColumns = true,
@@ -572,36 +588,25 @@ namespace SALC.Views.PanelMedico
                 {
                     BackColor = Color.FromArgb(230, 126, 34),
                     ForeColor = Color.White,
-                    Font = new Font("Segoe UI", 10, FontStyle.Bold)
+                    Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                    Padding = new Padding(5)
                 },
                 DefaultCellStyle = new DataGridViewCellStyle
                 {
                     Font = new Font("Segoe UI", 9),
                     SelectionBackColor = Color.FromArgb(255, 224, 178),
-                    SelectionForeColor = Color.FromArgb(44, 62, 80)
+                    SelectionForeColor = Color.FromArgb(44, 62, 80),
+                    Padding = new Padding(5)
                 },
                 AlternatingRowsDefaultCellStyle = new DataGridViewCellStyle
                 {
-                    BackColor = Color.FromArgb(255, 250, 245)
+                    BackColor = Color.FromArgb(255, 250, 245),
+                    Padding = new Padding(5)
                 },
                 EnableHeadersVisualStyles = false,
-                RowHeadersVisible = false
+                RowHeadersVisible = false,
+                RowTemplate = { Height = 35 }
             };
-
-            // Botón guardar
-            btnGuardarResultados = new Button 
-            { 
-                Text = "Guardar Resultados", 
-                Location = new Point(930, 595), 
-                Size = new Size(150, 40),
-                Font = new Font("Segoe UI", 10, FontStyle.Bold),
-                BackColor = Color.FromArgb(39, 174, 96),
-                ForeColor = Color.White,
-                FlatStyle = FlatStyle.Flat,
-                Enabled = false,
-                Cursor = Cursors.Hand
-            };
-            btnGuardarResultados.FlatAppearance.BorderSize = 0;
 
             // Eventos
             btnSeleccionarAnalisisResultados.Click += (s, e) => BuscarAnalisisResultadosClick?.Invoke(this, EventArgs.Empty);
@@ -610,7 +615,7 @@ namespace SALC.Views.PanelMedico
 
             panelPrincipal.Controls.AddRange(new Control[] { 
                 lblTitulo, lblDescripcion, panelNota, gbAnalisis, btnCargarMetricas, 
-                lblGrid, gridResultados, btnGuardarResultados 
+                btnGuardarResultados, lblGrid, gridResultados
             });
             
             tab.Controls.Add(panelPrincipal);
