@@ -165,7 +165,7 @@ namespace SALC.Views
                 Location = new Point(30, 113),
                 Size = new Size(340, 28),
                 Font = new Font("Segoe UI", 11),
-                PasswordChar = '?',
+                PasswordChar = '•',
                 TabIndex = 1,
                 BorderStyle = BorderStyle.FixedSingle
             };

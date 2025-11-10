@@ -13,7 +13,6 @@ namespace SALC.Views.PanelAsistente
         private Panel panelPrincipal;
         private DataGridView gridPacientes;
         private TextBox txtBusqueda;
-        private Button btnBuscar;
         private Button btnVerHistorial;
 
         public FrmPanelAsistente()
@@ -88,29 +87,16 @@ namespace SALC.Views.PanelAsistente
             txtBusqueda = new TextBox
             {
                 Location = new Point(150, 12),
-                Size = new Size(300, 26),
+                Size = new Size(400, 26),
                 Font = new Font("Segoe UI", 10),
                 BorderStyle = BorderStyle.FixedSingle
             };
 
-            btnBuscar = new Button
-            {
-                Text = "Buscar",
-                Location = new Point(465, 10),
-                Size = new Size(120, 30),
-                Font = new Font("Segoe UI", 10, FontStyle.Bold),
-                BackColor = Color.FromArgb(70, 130, 180),
-                ForeColor = Color.White,
-                FlatStyle = FlatStyle.Flat,
-                Cursor = Cursors.Hand
-            };
-            btnBuscar.FlatAppearance.BorderSize = 0;
-
             var lblInfoBusqueda = new Label
             {
-                Text = "Ingrese DNI o Apellido del paciente - Presione Enter para buscar",
-                Location = new Point(600, 14),
-                Size = new Size(400, 22),
+                Text = "Búsqueda en tiempo real - Ingrese DNI o Apellido del paciente",
+                Location = new Point(565, 14),
+                Size = new Size(450, 22),
                 Font = new Font("Segoe UI", 9, FontStyle.Italic),
                 ForeColor = Color.FromArgb(149, 165, 166),
                 BackColor = Color.Transparent
@@ -130,7 +116,7 @@ namespace SALC.Views.PanelAsistente
             btnVerHistorial.FlatAppearance.BorderSize = 0;
 
             panelBusqueda.Controls.AddRange(new Control[] { 
-                lblBusqueda, txtBusqueda, btnBuscar, lblInfoBusqueda, btnVerHistorial 
+                lblBusqueda, txtBusqueda, lblInfoBusqueda, btnVerHistorial 
             });
 
             // Grid de pacientes - MÁS GRANDE
@@ -178,17 +164,9 @@ namespace SALC.Views.PanelAsistente
 
             Controls.Add(panelPrincipal);
 
-            // Eventos
-            btnBuscar.Click += (s, e) => BuscarPacientesClick?.Invoke(this, EventArgs.Empty);
+            // Eventos - BÚSQUEDA EN TIEMPO REAL
+            txtBusqueda.TextChanged += (s, e) => BuscarPacientesClick?.Invoke(this, EventArgs.Empty);
             btnVerHistorial.Click += (s, e) => VerHistorialClick?.Invoke(this, EventArgs.Empty);
-            
-            txtBusqueda.KeyPress += (s, e) => {
-                if (e.KeyChar == (char)Keys.Enter)
-                {
-                    e.Handled = true;
-                    BuscarPacientesClick?.Invoke(this, EventArgs.Empty);
-                }
-            };
         }
 
         // Implementación de IPanelAsistenteView
