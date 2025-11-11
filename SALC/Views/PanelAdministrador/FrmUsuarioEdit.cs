@@ -1,5 +1,6 @@
 using System;
 using System.Windows.Forms;
+using System.Drawing;
 using SALC.Domain;
 
 namespace SALC.Views.PanelAdministrador
@@ -8,204 +9,267 @@ namespace SALC.Views.PanelAdministrador
     {
         private TextBox txtDni, txtNombre, txtApellido, txtEmail, txtPassword;
         private ComboBox cboRol, cboEstado;
-        // Médico
         private TextBox txtMatricula, txtEspecialidad;
-        // Asistente
         private TextBox txtDniSupervisor;
         private DateTimePicker dtpIngreso;
-
         private Button btnOk, btnCancel;
         private Usuario baseUsuario;
+        private Label lblMedicoSec, lblAsistenteSec;
 
         public FrmUsuarioEdit(Usuario existente = null)
         {
             Text = existente == null ? "Nuevo Usuario" : "Editar Usuario";
-            Width = 520; Height = 500; FormBorderStyle = FormBorderStyle.FixedDialog; MaximizeBox = false; MinimizeBox = false;
+            Width = 500;
+            Height = 650;
+            FormBorderStyle = FormBorderStyle.FixedDialog;
+            MaximizeBox = false;
+            MinimizeBox = false;
             StartPosition = FormStartPosition.CenterParent;
+            BackColor = Color.White;
             baseUsuario = existente;
 
             InicializarControles();
+            
             if (existente != null)
             {
                 CargarDatosExistentes(existente);
             }
             else
             {
-                cboRol.SelectedIndex = 0; 
+                cboRol.SelectedIndex = 0;
                 cboEstado.SelectedIndex = 0;
                 dtpIngreso.Value = DateTime.Today;
             }
+            
             ToggleRoleSections();
         }
 
         private void InicializarControles()
         {
-            int L = 20, T = 20, Wl = 140, Wt = 300, Hstep = 30;
+            // Título del formulario
+            var lblTitulo = new Label
+            {
+                Text = baseUsuario == null ? "Crear Nuevo Usuario" : "Modificar Información del Usuario",
+                Font = new Font("Segoe UI", 14, FontStyle.Bold),
+                ForeColor = Color.FromArgb(70, 130, 180),
+                Location = new Point(20, 15),
+                Size = new Size(450, 30),
+                BackColor = Color.Transparent
+            };
 
-            // DNI
-            var lblDni = new Label { Text = "DNI:", Left = L, Top = T, Width = Wl };
-            txtDni = new TextBox { Left = L + Wl, Top = T - 2, Width = Wt };
-            Controls.Add(lblDni);
-            Controls.Add(txtDni);
-            T += Hstep;
+            var lblSubtitulo = new Label
+            {
+                Text = baseUsuario == null
+                    ? "Complete los datos del nuevo usuario del sistema"
+                    : "Actualice los datos necesarios del usuario",
+                Font = new Font("Segoe UI", 9, FontStyle.Regular),
+                ForeColor = Color.FromArgb(127, 140, 141),
+                Location = new Point(20, 45),
+                Size = new Size(450, 20),
+                BackColor = Color.Transparent
+            };
 
-            // Nombre
-            var lblNombre = new Label { Text = "Nombre:", Left = L, Top = T, Width = Wl };
-            txtNombre = new TextBox { Left = L + Wl, Top = T - 2, Width = Wt };
-            Controls.Add(lblNombre);
-            Controls.Add(txtNombre);
-            T += Hstep;
+            // Campos comunes
+            var lblDni = new Label { Text = "DNI:", Left = 20, Top = 80, Width = 140, Font = new Font("Segoe UI", 10, FontStyle.Bold), ForeColor = Color.FromArgb(44, 62, 80) };
+            txtDni = new TextBox { Left = 170, Top = 78, Width = 280, Font = new Font("Segoe UI", 10), BorderStyle = BorderStyle.FixedSingle };
 
-            // Apellido
-            var lblApellido = new Label { Text = "Apellido:", Left = L, Top = T, Width = Wl };
-            txtApellido = new TextBox { Left = L + Wl, Top = T - 2, Width = Wt };
-            Controls.Add(lblApellido);
-            Controls.Add(txtApellido);
-            T += Hstep;
+            var lblNombre = new Label { Text = "Nombre:", Left = 20, Top = 115, Width = 140, Font = new Font("Segoe UI", 10, FontStyle.Bold), ForeColor = Color.FromArgb(44, 62, 80) };
+            txtNombre = new TextBox { Left = 170, Top = 113, Width = 280, Font = new Font("Segoe UI", 10), BorderStyle = BorderStyle.FixedSingle };
 
-            // Email
-            var lblEmail = new Label { Text = "Email:", Left = L, Top = T, Width = Wl };
-            txtEmail = new TextBox { Left = L + Wl, Top = T - 2, Width = Wt };
-            Controls.Add(lblEmail);
-            Controls.Add(txtEmail);
-            T += Hstep;
+            var lblApellido = new Label { Text = "Apellido:", Left = 20, Top = 150, Width = 140, Font = new Font("Segoe UI", 10, FontStyle.Bold), ForeColor = Color.FromArgb(44, 62, 80) };
+            txtApellido = new TextBox { Left = 170, Top = 148, Width = 280, Font = new Font("Segoe UI", 10), BorderStyle = BorderStyle.FixedSingle };
 
-            // Contraseña
-            var lblPassword = new Label { Text = "Contraseña:", Left = L, Top = T, Width = Wl };
-            txtPassword = new TextBox { Left = L + Wl, Top = T - 2, Width = Wt, PasswordChar = '•' };
-            Controls.Add(lblPassword);
-            Controls.Add(txtPassword);
-            T += Hstep;
+            var lblEmail = new Label { Text = "Email:", Left = 20, Top = 185, Width = 140, Font = new Font("Segoe UI", 10, FontStyle.Bold), ForeColor = Color.FromArgb(44, 62, 80) };
+            txtEmail = new TextBox { Left = 170, Top = 183, Width = 280, Font = new Font("Segoe UI", 10), BorderStyle = BorderStyle.FixedSingle };
 
-            // Rol
-            var lblRol = new Label { Text = "Rol:", Left = L, Top = T, Width = Wl };
-            cboRol = new ComboBox { Left = L + Wl, Top = T - 2, Width = Wt, DropDownStyle = ComboBoxStyle.DropDownList };
+            var lblPassword = new Label { Text = "Contraseña:", Left = 20, Top = 220, Width = 140, Font = new Font("Segoe UI", 10, FontStyle.Bold), ForeColor = Color.FromArgb(44, 62, 80) };
+            txtPassword = new TextBox { Left = 170, Top = 218, Width = 280, Font = new Font("Segoe UI", 10), PasswordChar = '•', BorderStyle = BorderStyle.FixedSingle };
+
+            var lblRol = new Label { Text = "Rol:", Left = 20, Top = 255, Width = 140, Font = new Font("Segoe UI", 10, FontStyle.Bold), ForeColor = Color.FromArgb(44, 62, 80) };
+            cboRol = new ComboBox { Left = 170, Top = 253, Width = 280, DropDownStyle = ComboBoxStyle.DropDownList, Font = new Font("Segoe UI", 10) };
             cboRol.Items.AddRange(new object[] { "Administrador", "Médico", "Asistente" });
             cboRol.SelectedIndexChanged += (s, e) => ToggleRoleSections();
-            Controls.Add(lblRol);
-            Controls.Add(cboRol);
-            T += Hstep;
 
-            // Estado
-            var lblEstado = new Label { Text = "Estado:", Left = L, Top = T, Width = Wl };
-            cboEstado = new ComboBox { Left = L + Wl, Top = T - 2, Width = Wt, DropDownStyle = ComboBoxStyle.DropDownList };
+            var lblEstado = new Label { Text = "Estado:", Left = 20, Top = 290, Width = 140, Font = new Font("Segoe UI", 10, FontStyle.Bold), ForeColor = Color.FromArgb(44, 62, 80) };
+            cboEstado = new ComboBox { Left = 170, Top = 288, Width = 140, DropDownStyle = ComboBoxStyle.DropDownList, Font = new Font("Segoe UI", 10) };
             cboEstado.Items.AddRange(new object[] { "Activo", "Inactivo" });
-            Controls.Add(lblEstado);
-            Controls.Add(cboEstado);
 
-            // Línea separador para datos de Médico
-            T += Hstep + 15;
-            var lblMedicoSec = new Label { Text = "Datos de Médico:", Left = L, Top = T, Width = Wl + 80, Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold) };
-            Controls.Add(lblMedicoSec);
-            T += 25;
+            // Sección Médico
+            lblMedicoSec = new Label
+            {
+                Text = "Datos Específicos de Médico",
+                Left = 20,
+                Top = 335,
+                Width = 450,
+                Height = 25,
+                Font = new Font("Segoe UI", 11, FontStyle.Bold),
+                ForeColor = Color.FromArgb(70, 130, 180),
+                BackColor = Color.FromArgb(245, 250, 255),
+                BorderStyle = BorderStyle.FixedSingle,
+                TextAlign = ContentAlignment.MiddleLeft,
+                Padding = new Padding(10, 0, 0, 0)
+            };
 
-            // Matrícula
-            var lblMatricula = new Label { Text = "Matrícula:", Left = L, Top = T, Width = Wl };
-            txtMatricula = new TextBox { Left = L + Wl, Top = T - 2, Width = Wt };
-            Controls.Add(lblMatricula);
-            Controls.Add(txtMatricula);
-            T += Hstep;
+            var lblMatricula = new Label { Text = "Matrícula:", Left = 20, Top = 370, Width = 140, Font = new Font("Segoe UI", 10, FontStyle.Bold), ForeColor = Color.FromArgb(44, 62, 80) };
+            txtMatricula = new TextBox { Left = 170, Top = 368, Width = 280, Font = new Font("Segoe UI", 10), BorderStyle = BorderStyle.FixedSingle };
 
-            // Especialidad
-            var lblEspecialidad = new Label { Text = "Especialidad:", Left = L, Top = T, Width = Wl };
-            txtEspecialidad = new TextBox { Left = L + Wl, Top = T - 2, Width = Wt };
-            Controls.Add(lblEspecialidad);
-            Controls.Add(txtEspecialidad);
+            var lblEspecialidad = new Label { Text = "Especialidad:", Left = 20, Top = 405, Width = 140, Font = new Font("Segoe UI", 10, FontStyle.Bold), ForeColor = Color.FromArgb(44, 62, 80) };
+            txtEspecialidad = new TextBox { Left = 170, Top = 403, Width = 280, Font = new Font("Segoe UI", 10), BorderStyle = BorderStyle.FixedSingle };
 
-            // Línea separador para datos de Asistente
-            T += Hstep + 15;
-            var lblAsistenteSec = new Label { Text = "Datos de Asistente:", Left = L, Top = T, Width = Wl + 80, Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold) };
-            Controls.Add(lblAsistenteSec);
-            T += 25;
+            // Sección Asistente
+            lblAsistenteSec = new Label
+            {
+                Text = "Datos Específicos de Asistente",
+                Left = 20,
+                Top = 450,
+                Width = 450,
+                Height = 25,
+                Font = new Font("Segoe UI", 11, FontStyle.Bold),
+                ForeColor = Color.FromArgb(70, 130, 180),
+                BackColor = Color.FromArgb(245, 250, 255),
+                BorderStyle = BorderStyle.FixedSingle,
+                TextAlign = ContentAlignment.MiddleLeft,
+                Padding = new Padding(10, 0, 0, 0)
+            };
 
-            // DNI Supervisor
-            var lblDniSupervisor = new Label { Text = "DNI Supervisor:", Left = L, Top = T, Width = Wl };
-            txtDniSupervisor = new TextBox { Left = L + Wl, Top = T - 2, Width = Wt };
-            Controls.Add(lblDniSupervisor);
-            Controls.Add(txtDniSupervisor);
-            T += Hstep;
+            var lblDniSupervisor = new Label { Text = "DNI Supervisor:", Left = 20, Top = 485, Width = 140, Font = new Font("Segoe UI", 10, FontStyle.Bold), ForeColor = Color.FromArgb(44, 62, 80) };
+            txtDniSupervisor = new TextBox { Left = 170, Top = 483, Width = 280, Font = new Font("Segoe UI", 10), BorderStyle = BorderStyle.FixedSingle };
 
-            // Fecha Ingreso
-            var lblFechaIngreso = new Label { Text = "Fecha Ingreso:", Left = L, Top = T, Width = Wl };
-            dtpIngreso = new DateTimePicker { Left = L + Wl, Top = T - 2, Width = Wt, Format = DateTimePickerFormat.Short };
-            Controls.Add(lblFechaIngreso);
-            Controls.Add(dtpIngreso);
+            var lblFechaIngreso = new Label { Text = "Fecha Ingreso:", Left = 20, Top = 520, Width = 140, Font = new Font("Segoe UI", 10, FontStyle.Bold), ForeColor = Color.FromArgb(44, 62, 80) };
+            dtpIngreso = new DateTimePicker { Left = 170, Top = 518, Width = 280, Format = DateTimePickerFormat.Short, Font = new Font("Segoe UI", 10) };
 
             // Botones
-            btnOk = new Button { Text = "Aceptar", Left = Width - 240, Top = Height - 70, Width = 90, DialogResult = DialogResult.OK };
-            btnCancel = new Button { Text = "Cancelar", Left = Width - 140, Top = Height - 70, Width = 90, DialogResult = DialogResult.Cancel };
-            AcceptButton = btnOk; 
+            btnOk = new Button
+            {
+                Text = baseUsuario == null ? "Crear Usuario" : "Guardar Cambios",
+                Left = 230,
+                Top = 575,
+                Width = 120,
+                Height = 35,
+                DialogResult = DialogResult.OK,
+                Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                BackColor = Color.FromArgb(39, 174, 96),
+                ForeColor = Color.White,
+                FlatStyle = FlatStyle.Flat,
+                Cursor = Cursors.Hand
+            };
+            btnOk.FlatAppearance.BorderSize = 0;
+
+            btnCancel = new Button
+            {
+                Text = "Cancelar",
+                Left = 360,
+                Top = 575,
+                Width = 90,
+                Height = 35,
+                DialogResult = DialogResult.Cancel,
+                Font = new Font("Segoe UI", 10, FontStyle.Regular),
+                BackColor = Color.FromArgb(149, 165, 166),
+                ForeColor = Color.White,
+                FlatStyle = FlatStyle.Flat,
+                Cursor = Cursors.Hand
+            };
+            btnCancel.FlatAppearance.BorderSize = 0;
+
+            AcceptButton = btnOk;
             CancelButton = btnCancel;
             btnOk.Click += (s, e) => { if (!Validar()) this.DialogResult = DialogResult.None; };
-            Controls.Add(btnOk);
-            Controls.Add(btnCancel);
+
+            Controls.AddRange(new Control[]
+            {
+                lblTitulo, lblSubtitulo,
+                lblDni, txtDni,
+                lblNombre, txtNombre,
+                lblApellido, txtApellido,
+                lblEmail, txtEmail,
+                lblPassword, txtPassword,
+                lblRol, cboRol,
+                lblEstado, cboEstado,
+                lblMedicoSec, lblMatricula, txtMatricula, lblEspecialidad, txtEspecialidad,
+                lblAsistenteSec, lblDniSupervisor, txtDniSupervisor, lblFechaIngreso, dtpIngreso,
+                btnOk, btnCancel
+            });
         }
 
         private void CargarDatosExistentes(Usuario existente)
         {
-            txtDni.Text = existente.Dni.ToString(); 
-            txtDni.ReadOnly = true; // Solo lectura en edición
-            txtNombre.Text = existente.Nombre; 
-            txtApellido.Text = existente.Apellido; 
+            txtDni.Text = existente.Dni.ToString();
+            txtDni.ReadOnly = true;
+            txtDni.BackColor = Color.FromArgb(240, 240, 240);
+            
+            txtNombre.Text = existente.Nombre;
+            txtApellido.Text = existente.Apellido;
             txtEmail.Text = existente.Email;
             cboRol.SelectedIndex = existente.IdRol - 1;
-            cboRol.Enabled = false; // Deshabilitar cambio de rol en edición
+            cboRol.Enabled = false;
+            cboRol.BackColor = Color.FromArgb(240, 240, 240);
             cboEstado.SelectedItem = existente.Estado;
-            
-            // Agregar información visual sobre por qué el rol está deshabilitado
-            var lblRolInfo = new Label 
-            { 
-                Text = "(No se puede modificar el rol de un usuario existente)", 
-                Left = cboRol.Left + cboRol.Width + 10, 
-                Top = cboRol.Top + 2, 
-                Width = 250, 
-                ForeColor = System.Drawing.Color.Gray,
-                Font = new System.Drawing.Font("Microsoft Sans Serif", 7.5F, System.Drawing.FontStyle.Italic)
-            };
-            Controls.Add(lblRolInfo);
-            
-            // Para .NET Framework 4.7.2, usamos un enfoque alternativo al PlaceholderText
-            if (baseUsuario != null)
+
+            // Nota sobre rol bloqueado
+            var lblNotaRol = new Label
             {
-                txtPassword.ForeColor = System.Drawing.Color.Gray;
-                txtPassword.Text = "Dejar vacío para mantener contraseña actual";
-                txtPassword.Enter += (s, e) => {
-                    if (txtPassword.Text == "Dejar vacío para mantener contraseña actual")
-                    {
-                        txtPassword.Text = "";
-                        txtPassword.ForeColor = System.Drawing.Color.Black;
-                        txtPassword.PasswordChar = '•';
-                    }
-                };
-                txtPassword.Leave += (s, e) => {
-                    if (string.IsNullOrEmpty(txtPassword.Text))
-                    {
-                        txtPassword.PasswordChar = '\0';
-                        txtPassword.Text = "Dejar vacío para mantener contraseña actual";
-                        txtPassword.ForeColor = System.Drawing.Color.Gray;
-                    }
-                };
-            }
+                Text = "El rol no puede modificarse una vez creado el usuario",
+                Left = 20,
+                Top = 315,
+                Width = 450,
+                Height = 15,
+                Font = new Font("Segoe UI", 8, FontStyle.Italic),
+                ForeColor = Color.FromArgb(192, 57, 43),
+                BackColor = Color.Transparent
+            };
+            Controls.Add(lblNotaRol);
+
+            // Placeholder para contraseña
+            txtPassword.PasswordChar = '\0';
+            txtPassword.Text = "Dejar vacío para mantener contraseña actual";
+            txtPassword.ForeColor = Color.Gray;
+            
+            txtPassword.Enter += (s, e) =>
+            {
+                if (txtPassword.Text == "Dejar vacío para mantener contraseña actual")
+                {
+                    txtPassword.Text = "";
+                    txtPassword.ForeColor = Color.Black;
+                    txtPassword.PasswordChar = '•';
+                }
+            };
+            
+            txtPassword.Leave += (s, e) =>
+            {
+                if (string.IsNullOrEmpty(txtPassword.Text))
+                {
+                    txtPassword.PasswordChar = '\0';
+                    txtPassword.Text = "Dejar vacío para mantener contraseña actual";
+                    txtPassword.ForeColor = Color.Gray;
+                }
+            };
         }
 
         private void ToggleRoleSections()
         {
-            var rolIdx = cboRol.SelectedIndex; // 0=Admin,1=Medico,2=Asistente
-            var isMed = rolIdx == 1; 
+            var rolIdx = cboRol.SelectedIndex;
+            var isMed = rolIdx == 1;
             var isAsis = rolIdx == 2;
-            
-            // Habilitar/deshabilitar campos según el rol
-            txtMatricula.Enabled = isMed; 
-            txtEspecialidad.Enabled = isMed;
-            txtDniSupervisor.Enabled = isAsis; 
-            dtpIngreso.Enabled = isAsis;
 
-            // Limpiar campos si no corresponden al rol actual
+            // Sección Médico
+            lblMedicoSec.Visible = true;
+            txtMatricula.Enabled = isMed;
+            txtEspecialidad.Enabled = isMed;
+            txtMatricula.BackColor = isMed ? Color.White : Color.FromArgb(240, 240, 240);
+            txtEspecialidad.BackColor = isMed ? Color.White : Color.FromArgb(240, 240, 240);
+
+            // Sección Asistente
+            lblAsistenteSec.Visible = true;
+            txtDniSupervisor.Enabled = isAsis;
+            dtpIngreso.Enabled = isAsis;
+            txtDniSupervisor.BackColor = isAsis ? Color.White : Color.FromArgb(240, 240, 240);
+
             if (!isMed)
             {
                 txtMatricula.Clear();
                 txtEspecialidad.Clear();
             }
+            
             if (!isAsis)
             {
                 txtDniSupervisor.Clear();
@@ -214,79 +278,81 @@ namespace SALC.Views.PanelAdministrador
 
         private bool Validar()
         {
-            if (!int.TryParse(txtDni.Text.Trim(), out var dni) || dni <= 0) 
-            { 
-                MessageBox.Show("DNI inválido", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning); 
+            if (!int.TryParse(txtDni.Text.Trim(), out var dni) || dni <= 0)
+            {
+                MessageBox.Show("El DNI debe ser un número válido.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 txtDni.Focus();
-                return false; 
+                return false;
             }
-            if (string.IsNullOrWhiteSpace(txtNombre.Text)) 
-            { 
-                MessageBox.Show("Nombre requerido", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning); 
+            
+            if (string.IsNullOrWhiteSpace(txtNombre.Text))
+            {
+                MessageBox.Show("El nombre es obligatorio.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 txtNombre.Focus();
-                return false; 
+                return false;
             }
-            if (string.IsNullOrWhiteSpace(txtApellido.Text)) 
-            { 
-                MessageBox.Show("Apellido requerido", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning); 
+            
+            if (string.IsNullOrWhiteSpace(txtApellido.Text))
+            {
+                MessageBox.Show("El apellido es obligatorio.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 txtApellido.Focus();
-                return false; 
+                return false;
             }
-            if (string.IsNullOrWhiteSpace(txtEmail.Text) || !txtEmail.Text.Contains("@")) 
-            { 
-                MessageBox.Show("Email inválido", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning); 
+            
+            if (string.IsNullOrWhiteSpace(txtEmail.Text) || !txtEmail.Text.Contains("@"))
+            {
+                MessageBox.Show("Debe ingresar un email válido.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 txtEmail.Focus();
-                return false; 
+                return false;
             }
-            
-            // En creación, exigir contraseña; en edición permitir dejar vacía para conservar
-            if (baseUsuario == null && string.IsNullOrWhiteSpace(txtPassword.Text)) 
-            { 
-                MessageBox.Show("Contraseña requerida", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning); 
+
+            if (baseUsuario == null && string.IsNullOrWhiteSpace(txtPassword.Text))
+            {
+                MessageBox.Show("La contraseña es obligatoria para usuarios nuevos.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 txtPassword.Focus();
-                return false; 
+                return false;
             }
-            
-            // Validaciones específicas por rol
-            if (cboRol.SelectedIndex == 1) // Médico
+
+            if (cboRol.SelectedIndex == 1)
             {
-                if (!int.TryParse(txtMatricula.Text.Trim(), out var _)) 
-                { 
-                    MessageBox.Show("Matrícula inválida para médico", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning); 
+                if (!int.TryParse(txtMatricula.Text.Trim(), out var _))
+                {
+                    MessageBox.Show("La matrícula debe ser un número válido.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     txtMatricula.Focus();
-                    return false; 
+                    return false;
                 }
-                if (string.IsNullOrWhiteSpace(txtEspecialidad.Text)) 
-                { 
-                    MessageBox.Show("Especialidad requerida para médico", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning); 
+                
+                if (string.IsNullOrWhiteSpace(txtEspecialidad.Text))
+                {
+                    MessageBox.Show("La especialidad es obligatoria para médicos.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     txtEspecialidad.Focus();
-                    return false; 
+                    return false;
+                }
+            }
+
+            if (cboRol.SelectedIndex == 2)
+            {
+                if (!int.TryParse(txtDniSupervisor.Text.Trim(), out var _))
+                {
+                    MessageBox.Show("El DNI del supervisor debe ser un número válido.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    txtDniSupervisor.Focus();
+                    return false;
                 }
             }
             
-            if (cboRol.SelectedIndex == 2) // Asistente
-            {
-                if (!int.TryParse(txtDniSupervisor.Text.Trim(), out var _)) 
-                { 
-                    MessageBox.Show("DNI Supervisor inválido para asistente", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning); 
-                    txtDniSupervisor.Focus();
-                    return false; 
-                }
-            }
             return true;
         }
 
         public (Usuario Usuario, Medico Medico, Asistente Asistente) ObtenerDatos()
         {
             var rolId = cboRol.SelectedIndex + 1;
-            
-            // Si es edición y el campo de contraseña contiene el texto placeholder, conservar la contraseña actual
+
             string passwordValue = txtPassword.Text;
             if (baseUsuario != null && txtPassword.Text == "Dejar vacío para mantener contraseña actual")
             {
                 passwordValue = baseUsuario.PasswordHash;
             }
-            
+
             var usuario = new Usuario
             {
                 Dni = int.Parse(txtDni.Text.Trim()),
@@ -298,9 +364,9 @@ namespace SALC.Views.PanelAdministrador
                 Estado = cboEstado.SelectedItem?.ToString() ?? "Activo"
             };
 
-            Medico medico = null; 
+            Medico medico = null;
             Asistente asistente = null;
-            
+
             if (rolId == 2)
             {
                 medico = new Medico

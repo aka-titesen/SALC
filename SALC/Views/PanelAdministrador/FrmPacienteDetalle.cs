@@ -1,5 +1,6 @@
 using System;
 using System.Windows.Forms;
+using System.Drawing;
 using SALC.Domain;
 using SALC.DAL;
 
@@ -7,191 +8,216 @@ namespace SALC.Views.PanelAdministrador
 {
     public class FrmPacienteDetalle : Form
     {
-        private GroupBox gbDatosPersonales;
-        private GroupBox gbDatosContacto;
-        private GroupBox gbObraSocial;
-        private Label lblDni, lblNombre, lblApellido, lblFechaNac, lblEdad, lblSexo, lblEstado;
-        private Label lblDniVal, lblNombreVal, lblApellidoVal, lblFechaNacVal, lblEdadVal, lblSexoVal, lblEstadoVal;
-        private Label lblEmail, lblTelefono;
-        private Label lblEmailVal, lblTelefonoVal;
-        private Label lblObraSocialNombre, lblObraSocialCuit;
-        private Label lblObraSocialNombreVal, lblObraSocialCuitVal;
-        private Button btnCerrar;
-
         private readonly int _dniPaciente;
         private readonly ObraSocialRepositorio _obraSocialRepo;
+        private Button btnCerrar;
 
         public FrmPacienteDetalle(Paciente paciente)
         {
             if (paciente == null) throw new ArgumentNullException(nameof(paciente));
-            
+
             _dniPaciente = paciente.Dni;
             _obraSocialRepo = new ObraSocialRepositorio();
 
-            InitializeComponent();
-            CargarDatosPaciente(paciente);
-            CargarDatosObraSocial(paciente.IdObraSocial);
+            InitializeComponent(paciente);
         }
 
-        private void InitializeComponent()
+        private void InitializeComponent(Paciente paciente)
         {
-            Text = "Detalle de Paciente";
+            Text = "Información del Paciente";
             Width = 520;
-            Height = 480;
+            Height = 600;
             FormBorderStyle = FormBorderStyle.FixedDialog;
             MaximizeBox = false;
             MinimizeBox = false;
             StartPosition = FormStartPosition.CenterParent;
+            BackColor = Color.White;
 
-            // GroupBox Datos Personales
-            gbDatosPersonales = new GroupBox
+            // Título
+            var lblTitulo = new Label
+            {
+                Text = "Información Completa del Paciente",
+                Font = new Font("Segoe UI", 14, FontStyle.Bold),
+                ForeColor = Color.FromArgb(70, 130, 180),
+                Location = new Point(20, 15),
+                Size = new Size(470, 30),
+                BackColor = Color.Transparent
+            };
+
+            var lblSubtitulo = new Label
+            {
+                Text = "Vista detallada de todos los datos del paciente (solo lectura)",
+                Font = new Font("Segoe UI", 9, FontStyle.Regular),
+                ForeColor = Color.FromArgb(127, 140, 141),
+                Location = new Point(20, 45),
+                Size = new Size(470, 20),
+                BackColor = Color.Transparent
+            };
+
+            // Sección: Datos Personales
+            var lblSeccionPersonal = new Label
             {
                 Text = "Datos Personales",
                 Left = 20,
-                Top = 20,
-                Width = 460,
-                Height = 160
+                Top = 80,
+                Width = 470,
+                Height = 25,
+                Font = new Font("Segoe UI", 11, FontStyle.Bold),
+                ForeColor = Color.FromArgb(70, 130, 180),
+                BackColor = Color.FromArgb(245, 250, 255),
+                BorderStyle = BorderStyle.FixedSingle,
+                TextAlign = ContentAlignment.MiddleLeft,
+                Padding = new Padding(10, 0, 0, 0)
             };
-            Controls.Add(gbDatosPersonales);
 
-            int labelTop = 30;
-            int valueTop = 30;
-            int leftLabel = 20;
-            int leftValue = 120;
-            int step = 22;
+            var lblDni = new Label { Text = "DNI:", Left = 20, Top = 115, Width = 140, Font = new Font("Segoe UI", 10, FontStyle.Bold), ForeColor = Color.FromArgb(44, 62, 80) };
+            var lblDniVal = CreateReadOnlyLabel(paciente.Dni.ToString(), 170, 115);
 
-            // DNI
-            lblDni = new Label { Text = "DNI:", Left = leftLabel, Top = labelTop, Width = 80, Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold) };
-            lblDniVal = new Label { Text = "", Left = leftValue, Top = valueTop, Width = 150 };
-            gbDatosPersonales.Controls.Add(lblDni);
-            gbDatosPersonales.Controls.Add(lblDniVal);
-            labelTop += step;
-            valueTop += step;
+            var lblNombre = new Label { Text = "Nombre:", Left = 20, Top = 150, Width = 140, Font = new Font("Segoe UI", 10, FontStyle.Bold), ForeColor = Color.FromArgb(44, 62, 80) };
+            var lblNombreVal = CreateReadOnlyLabel(paciente.Nombre, 170, 150);
 
-            // Nombre
-            lblNombre = new Label { Text = "Nombre:", Left = leftLabel, Top = labelTop, Width = 80, Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold) };
-            lblNombreVal = new Label { Text = "", Left = leftValue, Top = valueTop, Width = 200 };
-            gbDatosPersonales.Controls.Add(lblNombre);
-            gbDatosPersonales.Controls.Add(lblNombreVal);
-            labelTop += step;
-            valueTop += step;
+            var lblApellido = new Label { Text = "Apellido:", Left = 20, Top = 185, Width = 140, Font = new Font("Segoe UI", 10, FontStyle.Bold), ForeColor = Color.FromArgb(44, 62, 80) };
+            var lblApellidoVal = CreateReadOnlyLabel(paciente.Apellido, 170, 185);
 
-            // Apellido
-            lblApellido = new Label { Text = "Apellido:", Left = leftLabel, Top = labelTop, Width = 80, Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold) };
-            lblApellidoVal = new Label { Text = "", Left = leftValue, Top = valueTop, Width = 200 };
-            gbDatosPersonales.Controls.Add(lblApellido);
-            gbDatosPersonales.Controls.Add(lblApellidoVal);
-            labelTop += step;
-            valueTop += step;
+            var lblFechaNac = new Label { Text = "Fecha Nac:", Left = 20, Top = 220, Width = 140, Font = new Font("Segoe UI", 10, FontStyle.Bold), ForeColor = Color.FromArgb(44, 62, 80) };
+            var edad = CalcularEdad(paciente.FechaNac);
+            var lblFechaNacVal = CreateReadOnlyLabel(string.Format("{0} ({1} años)", paciente.FechaNac.ToString("dd/MM/yyyy"), edad), 170, 220);
 
-            // Fecha de Nacimiento y Edad en la misma línea
-            lblFechaNac = new Label { Text = "Fecha Nac:", Left = leftLabel, Top = labelTop, Width = 80, Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold) };
-            lblFechaNacVal = new Label { Text = "", Left = leftValue, Top = valueTop, Width = 100 };
-            lblEdad = new Label { Text = "Edad:", Left = leftValue + 110, Top = labelTop, Width = 40, Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold) };
-            lblEdadVal = new Label { Text = "", Left = leftValue + 150, Top = valueTop, Width = 80 };
-            gbDatosPersonales.Controls.Add(lblFechaNac);
-            gbDatosPersonales.Controls.Add(lblFechaNacVal);
-            gbDatosPersonales.Controls.Add(lblEdad);
-            gbDatosPersonales.Controls.Add(lblEdadVal);
-            labelTop += step;
-            valueTop += step;
+            var lblSexo = new Label { Text = "Sexo:", Left = 20, Top = 255, Width = 140, Font = new Font("Segoe UI", 10, FontStyle.Bold), ForeColor = Color.FromArgb(44, 62, 80) };
+            var lblSexoVal = CreateReadOnlyLabel(ObtenerDescripcionSexo(paciente.Sexo), 170, 255);
 
-            // Sexo y Estado en la misma línea
-            lblSexo = new Label { Text = "Sexo:", Left = leftLabel, Top = labelTop, Width = 80, Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold) };
-            lblSexoVal = new Label { Text = "", Left = leftValue, Top = valueTop, Width = 100 };
-            lblEstado = new Label { Text = "Estado:", Left = leftValue + 110, Top = labelTop, Width = 50, Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold) };
-            lblEstadoVal = new Label { Text = "", Left = leftValue + 160, Top = valueTop, Width = 80 };
-            gbDatosPersonales.Controls.Add(lblSexo);
-            gbDatosPersonales.Controls.Add(lblSexoVal);
-            gbDatosPersonales.Controls.Add(lblEstado);
-            gbDatosPersonales.Controls.Add(lblEstadoVal);
+            var lblEstado = new Label { Text = "Estado:", Left = 20, Top = 290, Width = 140, Font = new Font("Segoe UI", 10, FontStyle.Bold), ForeColor = Color.FromArgb(44, 62, 80) };
+            var lblEstadoVal = new Label
+            {
+                Text = paciente.Estado,
+                Left = 170,
+                Top = 290,
+                Width = 300,
+                Height = 25,
+                Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                BorderStyle = BorderStyle.FixedSingle,
+                BackColor = Color.FromArgb(250, 252, 255),
+                ForeColor = paciente.Estado == "Activo" ? Color.FromArgb(39, 174, 96) : Color.FromArgb(192, 57, 43),
+                TextAlign = ContentAlignment.MiddleLeft,
+                Padding = new Padding(10, 0, 0, 0)
+            };
 
-            // GroupBox Datos de Contacto
-            gbDatosContacto = new GroupBox
+            // Sección: Datos de Contacto
+            var lblSeccionContacto = new Label
             {
                 Text = "Datos de Contacto",
                 Left = 20,
-                Top = 200,
-                Width = 460,
-                Height = 80
+                Top = 330,
+                Width = 470,
+                Height = 25,
+                Font = new Font("Segoe UI", 11, FontStyle.Bold),
+                ForeColor = Color.FromArgb(70, 130, 180),
+                BackColor = Color.FromArgb(245, 250, 255),
+                BorderStyle = BorderStyle.FixedSingle,
+                TextAlign = ContentAlignment.MiddleLeft,
+                Padding = new Padding(10, 0, 0, 0)
             };
-            Controls.Add(gbDatosContacto);
 
-            // Email
-            lblEmail = new Label { Text = "Email:", Left = 20, Top = 30, Width = 80, Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold) };
-            lblEmailVal = new Label { Text = "", Left = 100, Top = 30, Width = 340 };
-            gbDatosContacto.Controls.Add(lblEmail);
-            gbDatosContacto.Controls.Add(lblEmailVal);
+            var lblEmail = new Label { Text = "Email:", Left = 20, Top = 365, Width = 140, Font = new Font("Segoe UI", 10, FontStyle.Bold), ForeColor = Color.FromArgb(44, 62, 80) };
+            var lblEmailVal = CreateReadOnlyLabel(
+                string.IsNullOrWhiteSpace(paciente.Email) ? "(No especificado)" : paciente.Email,
+                170, 365);
 
-            // Teléfono
-            lblTelefono = new Label { Text = "Teléfono:", Left = 20, Top = 52, Width = 80, Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold) };
-            lblTelefonoVal = new Label { Text = "", Left = 100, Top = 52, Width = 200 };
-            gbDatosContacto.Controls.Add(lblTelefono);
-            gbDatosContacto.Controls.Add(lblTelefonoVal);
+            var lblTelefono = new Label { Text = "Teléfono:", Left = 20, Top = 400, Width = 140, Font = new Font("Segoe UI", 10, FontStyle.Bold), ForeColor = Color.FromArgb(44, 62, 80) };
+            var lblTelefonoVal = CreateReadOnlyLabel(
+                string.IsNullOrWhiteSpace(paciente.Telefono) ? "(No especificado)" : paciente.Telefono,
+                170, 400);
 
-            // GroupBox Obra Social
-            gbObraSocial = new GroupBox
+            // Sección: Obra Social
+            var lblSeccionObraSocial = new Label
             {
                 Text = "Obra Social",
                 Left = 20,
-                Top = 300,
-                Width = 460,
-                Height = 80
+                Top = 440,
+                Width = 470,
+                Height = 25,
+                Font = new Font("Segoe UI", 11, FontStyle.Bold),
+                ForeColor = Color.FromArgb(70, 130, 180),
+                BackColor = Color.FromArgb(245, 250, 255),
+                BorderStyle = BorderStyle.FixedSingle,
+                TextAlign = ContentAlignment.MiddleLeft,
+                Padding = new Padding(10, 0, 0, 0)
             };
-            Controls.Add(gbObraSocial);
 
-            // Nombre Obra Social
-            lblObraSocialNombre = new Label { Text = "Nombre:", Left = 20, Top = 30, Width = 80, Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold) };
-            lblObraSocialNombreVal = new Label { Text = "", Left = 100, Top = 30, Width = 340 };
-            gbObraSocial.Controls.Add(lblObraSocialNombre);
-            gbObraSocial.Controls.Add(lblObraSocialNombreVal);
+            var datosObraSocial = ObtenerDatosObraSocial(paciente.IdObraSocial);
 
-            // CUIT Obra Social
-            lblObraSocialCuit = new Label { Text = "CUIT:", Left = 20, Top = 52, Width = 80, Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold) };
-            lblObraSocialCuitVal = new Label { Text = "", Left = 100, Top = 52, Width = 200 };
-            gbObraSocial.Controls.Add(lblObraSocialCuit);
-            gbObraSocial.Controls.Add(lblObraSocialCuitVal);
+            var lblObraSocial = new Label { Text = "Nombre:", Left = 20, Top = 475, Width = 140, Font = new Font("Segoe UI", 10, FontStyle.Bold), ForeColor = Color.FromArgb(44, 62, 80) };
+            var lblObraSocialVal = CreateReadOnlyLabel(datosObraSocial.Item1, 170, 475);
+
+            var lblCuitOS = new Label { Text = "CUIT:", Left = 20, Top = 510, Width = 140, Font = new Font("Segoe UI", 10, FontStyle.Bold), ForeColor = Color.FromArgb(44, 62, 80) };
+            var lblCuitOSVal = CreateReadOnlyLabel(datosObraSocial.Item2, 170, 510);
 
             // Botón Cerrar
             btnCerrar = new Button
             {
                 Text = "Cerrar",
-                Left = 405,
-                Top = 400,
-                Width = 80,
-                DialogResult = DialogResult.OK
+                Left = 380,
+                Top = 555,
+                Width = 90,
+                Height = 35,
+                DialogResult = DialogResult.OK,
+                Font = new Font("Segoe UI", 10, FontStyle.Regular),
+                BackColor = Color.FromArgb(70, 130, 180),
+                ForeColor = Color.White,
+                FlatStyle = FlatStyle.Flat,
+                Cursor = Cursors.Hand
             };
+            btnCerrar.FlatAppearance.BorderSize = 0;
+
             AcceptButton = btnCerrar;
-            Controls.Add(btnCerrar);
+
+            Controls.AddRange(new Control[]
+            {
+                lblTitulo, lblSubtitulo,
+                lblSeccionPersonal,
+                lblDni, lblDniVal,
+                lblNombre, lblNombreVal,
+                lblApellido, lblApellidoVal,
+                lblFechaNac, lblFechaNacVal,
+                lblSexo, lblSexoVal,
+                lblEstado, lblEstadoVal,
+                lblSeccionContacto,
+                lblEmail, lblEmailVal,
+                lblTelefono, lblTelefonoVal,
+                lblSeccionObraSocial,
+                lblObraSocial, lblObraSocialVal,
+                lblCuitOS, lblCuitOSVal,
+                btnCerrar
+            });
         }
 
-        private void CargarDatosPaciente(Paciente paciente)
+        private Label CreateReadOnlyLabel(string text, int left, int top)
         {
-            lblDniVal.Text = paciente.Dni.ToString();
-            lblNombreVal.Text = paciente.Nombre;
-            lblApellidoVal.Text = paciente.Apellido;
-            lblFechaNacVal.Text = paciente.FechaNac.ToString("dd/MM/yyyy");
-            
-            // Calcular edad
-            var hoy = DateTime.Today;
-            var edad = hoy.Year - paciente.FechaNac.Year;
-            if (paciente.FechaNac.Date > hoy.AddYears(-edad)) edad--;
-            lblEdadVal.Text = $"{edad} años";
-
-            lblSexoVal.Text = ObtenerDescripcionSexo(paciente.Sexo);
-            lblEstadoVal.Text = paciente.Estado;
-
-            // Colorear el estado
-            lblEstadoVal.ForeColor = paciente.Estado == "Activo" 
-                ? System.Drawing.Color.Green 
-                : System.Drawing.Color.Red;
-
-            // Datos de contacto
-            lblEmailVal.Text = string.IsNullOrWhiteSpace(paciente.Email) ? "(No especificado)" : paciente.Email;
-            lblTelefonoVal.Text = string.IsNullOrWhiteSpace(paciente.Telefono) ? "(No especificado)" : paciente.Telefono;
+            return new Label
+            {
+                Text = text,
+                Left = left,
+                Top = top,
+                Width = 300,
+                Height = 25,
+                Font = new Font("Segoe UI", 10),
+                BorderStyle = BorderStyle.FixedSingle,
+                BackColor = Color.FromArgb(250, 252, 255),
+                ForeColor = Color.FromArgb(44, 62, 80),
+                TextAlign = ContentAlignment.MiddleLeft,
+                Padding = new Padding(10, 0, 0, 0)
+            };
         }
 
-        private void CargarDatosObraSocial(int? idObraSocial)
+        private int CalcularEdad(DateTime fechaNacimiento)
+        {
+            var hoy = DateTime.Today;
+            var edad = hoy.Year - fechaNacimiento.Year;
+            if (fechaNacimiento.Date > hoy.AddYears(-edad)) edad--;
+            return edad;
+        }
+
+        private Tuple<string, string> ObtenerDatosObraSocial(int? idObraSocial)
         {
             try
             {
@@ -200,35 +226,18 @@ namespace SALC.Views.PanelAdministrador
                     var obraSocial = _obraSocialRepo.ObtenerPorId(idObraSocial.Value);
                     if (obraSocial != null)
                     {
-                        lblObraSocialNombreVal.Text = obraSocial.Nombre;
-                        lblObraSocialCuitVal.Text = obraSocial.Cuit;
-                        
-                        // Si la obra social está inactiva, mostrarlo
+                        var nombre = obraSocial.Nombre;
                         if (obraSocial.Estado == "Inactivo")
-                        {
-                            lblObraSocialNombreVal.Text += " (INACTIVA)";
-                            lblObraSocialNombreVal.ForeColor = System.Drawing.Color.Red;
-                        }
+                            nombre += " (INACTIVA)";
+                        return Tuple.Create(nombre, obraSocial.Cuit);
                     }
-                    else
-                    {
-                        lblObraSocialNombreVal.Text = "Obra social no encontrada";
-                        lblObraSocialCuitVal.Text = "-";
-                        lblObraSocialNombreVal.ForeColor = System.Drawing.Color.Red;
-                    }
+                    return Tuple.Create("Obra social no encontrada", "-");
                 }
-                else
-                {
-                    lblObraSocialNombreVal.Text = "Sin obra social";
-                    lblObraSocialCuitVal.Text = "-";
-                    lblObraSocialNombreVal.ForeColor = System.Drawing.Color.Gray;
-                }
+                return Tuple.Create("Sin obra social", "-");
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                lblObraSocialNombreVal.Text = $"Error al cargar obra social: {ex.Message}";
-                lblObraSocialCuitVal.Text = "-";
-                lblObraSocialNombreVal.ForeColor = System.Drawing.Color.Red;
+                return Tuple.Create("Error al cargar obra social", "-");
             }
         }
 
