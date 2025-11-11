@@ -31,8 +31,8 @@ namespace SALC.Views
             Size = new Size(1280, 850);
             StartPosition = FormStartPosition.CenterScreen;
             WindowState = FormWindowState.Maximized;
-            Icon = CargarIcono();
             BackColor = Color.White;
+            ShowIcon = false; // No mostrar icono personalizado - usar default de Windows
 
             // ============ MENÚ PRINCIPAL ============
             var menuStrip = new MenuStrip
@@ -968,23 +968,6 @@ namespace SALC.Views
                 case 3: return "Asistente";
                 default: return "Sin Rol";
             }
-        }
-
-        private Icon CargarIcono()
-        {
-            try
-            {
-                string iconPath = System.IO.Path.Combine(Application.StartupPath, "..", "..", "..", "icono.png");
-                if (System.IO.File.Exists(iconPath))
-                {
-                    using (var bmp = new Bitmap(iconPath))
-                    {
-                        return Icon.FromHandle(bmp.GetHicon());
-                    }
-                }
-            }
-            catch { }
-            return null;
         }
     }
 }
