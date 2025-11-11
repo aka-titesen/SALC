@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
+using System.Drawing;
 using SALC.Domain;
 using SALC.BLL;
 
@@ -28,58 +29,141 @@ namespace SALC.Views.PanelMedico
         private void InitializeComponent()
         {
             Text = "Seleccionar Análisis para Cargar Resultados";
-            Width = 900;
-            Height = 600;
+            Width = 950;
+            Height = 650;
             StartPosition = FormStartPosition.CenterParent;
             FormBorderStyle = FormBorderStyle.FixedDialog;
             MaximizeBox = false;
             MinimizeBox = false;
+            BackColor = Color.White;
+            ShowIcon = false;
 
-            // Título
+            // Título principal
             var lblTitulo = new Label
             {
-                Text = "Seleccione un análisis 'Sin verificar' de su autoría",
-                Left = 20, Top = 20, Width = 400, Height = 25,
-                Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold)
+                Text = "Selección de Análisis Pendiente",
+                Font = new Font("Segoe UI", 14, FontStyle.Bold),
+                ForeColor = Color.FromArgb(230, 126, 34),
+                Location = new Point(20, 15),
+                Size = new Size(900, 30),
+                BackColor = Color.Transparent
+            };
+
+            var lblSubtitulo = new Label
+            {
+                Text = "Seleccione el análisis al que desea cargar los resultados de las métricas",
+                Font = new Font("Segoe UI", 9, FontStyle.Regular),
+                ForeColor = Color.FromArgb(127, 140, 141),
+                Location = new Point(20, 45),
+                Size = new Size(900, 20),
+                BackColor = Color.Transparent
+            };
+
+            // Panel informativo
+            var panelInfo = new Panel
+            {
+                Location = new Point(20, 75),
+                Size = new Size(890, 50),
+                BackColor = Color.FromArgb(255, 250, 245),
+                BorderStyle = BorderStyle.FixedSingle
             };
 
             var lblInfo = new Label
             {
-                Text = "Solo se muestran análisis en estado 'Sin verificar' que usted creó",
-                Left = 20, Top = 50, Width = 500, Height = 20,
-                ForeColor = System.Drawing.Color.Blue
+                Text = "Solo se muestran análisis en estado 'Sin verificar' que usted creó.\n" +
+                       "Después de cargar los resultados, deberá proceder a la pestaña 'Validar y Firmar'.",
+                Location = new Point(15, 10),
+                Size = new Size(860, 35),
+                Font = new Font("Segoe UI", 9, FontStyle.Regular),
+                ForeColor = Color.FromArgb(52, 73, 94),
+                BackColor = Color.Transparent
             };
+            panelInfo.Controls.Add(lblInfo);
 
             // Búsqueda
-            var lblBuscar = new Label { Text = "Buscar:", Left = 20, Top = 80, Width = 60 };
+            var lblBuscar = new Label 
+            { 
+                Text = "Buscar:", 
+                Left = 20, 
+                Top = 145, 
+                Width = 80,
+                Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                ForeColor = Color.FromArgb(44, 62, 80)
+            };
+            
             txtBuscar = new TextBox 
             { 
-                Left = 80, Top = 78, Width = 200
+                Left = 110, 
+                Top = 143, 
+                Width = 300,
+                Font = new Font("Segoe UI", 10),
+                BorderStyle = BorderStyle.FixedSingle
             };
             txtBuscar.TextChanged += OnBuscarTextChanged;
 
-            // Grid
+            var lblAyuda = new Label
+            {
+                Text = "Escriba ID, nombre de paciente o tipo de análisis",
+                Left = 420,
+                Top = 145,
+                Width = 350,
+                Font = new Font("Segoe UI", 8, FontStyle.Italic),
+                ForeColor = Color.FromArgb(149, 165, 166)
+            };
+
+            // Grid de análisis
             gridAnalisis = new DataGridView
             {
-                Left = 20, Top = 120, Width = 840, Height = 380,
+                Left = 20, 
+                Top = 185, 
+                Width = 890, 
+                Height = 370,
                 ReadOnly = true,
                 AllowUserToAddRows = false,
                 AllowUserToDeleteRows = false,
                 SelectionMode = DataGridViewSelectionMode.FullRowSelect,
                 MultiSelect = false,
                 AutoGenerateColumns = false,
-                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
+                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
+                BackgroundColor = Color.White,
+                BorderStyle = BorderStyle.FixedSingle,
+                ColumnHeadersHeight = 40,
+                ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing,
+                ColumnHeadersDefaultCellStyle = new DataGridViewCellStyle
+                {
+                    BackColor = Color.FromArgb(230, 126, 34),
+                    ForeColor = Color.White,
+                    Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                    Padding = new Padding(8),
+                    Alignment = DataGridViewContentAlignment.MiddleCenter,
+                    WrapMode = DataGridViewTriState.False
+                },
+                DefaultCellStyle = new DataGridViewCellStyle
+                {
+                    Font = new Font("Segoe UI", 9),
+                    SelectionBackColor = Color.FromArgb(255, 235, 205),
+                    SelectionForeColor = Color.FromArgb(44, 62, 80),
+                    Padding = new Padding(5)
+                },
+                AlternatingRowsDefaultCellStyle = new DataGridViewCellStyle
+                {
+                    BackColor = Color.FromArgb(255, 250, 245),
+                    Padding = new Padding(5)
+                },
+                EnableHeadersVisualStyles = false,
+                RowHeadersVisible = false,
+                RowTemplate = { Height = 35 }
             };
 
             // Configurar columnas
             gridAnalisis.Columns.AddRange(new DataGridViewColumn[]
             {
                 new DataGridViewTextBoxColumn { Name = "IdAnalisis", HeaderText = "ID", DataPropertyName = "IdAnalisis", Width = 60 },
-                new DataGridViewTextBoxColumn { Name = "PacienteNombre", HeaderText = "Paciente", DataPropertyName = "PacienteNombre", Width = 200 },
-                new DataGridViewTextBoxColumn { Name = "TipoAnalisis", HeaderText = "Tipo Análisis", DataPropertyName = "TipoAnalisis", Width = 200 },
+                new DataGridViewTextBoxColumn { Name = "PacienteNombre", HeaderText = "Paciente", DataPropertyName = "PacienteNombre", Width = 220 },
+                new DataGridViewTextBoxColumn { Name = "TipoAnalisis", HeaderText = "Tipo Análisis", DataPropertyName = "TipoAnalisis", Width = 180 },
                 new DataGridViewTextBoxColumn { Name = "FechaCreacion", HeaderText = "Fecha Creación", DataPropertyName = "FechaCreacion", Width = 120 },
                 new DataGridViewTextBoxColumn { Name = "Estado", HeaderText = "Estado", DataPropertyName = "Estado", Width = 100 },
-                new DataGridViewTextBoxColumn { Name = "Observaciones", HeaderText = "Observaciones", DataPropertyName = "Observaciones", Width = 200 }
+                new DataGridViewTextBoxColumn { Name = "Observaciones", HeaderText = "Observaciones", DataPropertyName = "Observaciones", Width = 170 }
             });
 
             gridAnalisis.CellDoubleClick += OnCellDoubleClick;
@@ -87,19 +171,37 @@ namespace SALC.Views.PanelMedico
             // Botones
             btnSeleccionar = new Button
             {
-                Text = "Seleccionar",
-                Left = 680, Top = 520, Width = 90, Height = 35,
+                Text = "Seleccionar Análisis",
+                Left = 680, 
+                Top = 575, 
+                Width = 150, 
+                Height = 40,
                 DialogResult = DialogResult.OK,
-                Enabled = false
+                Enabled = false,
+                Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                BackColor = Color.FromArgb(230, 126, 34),
+                ForeColor = Color.White,
+                FlatStyle = FlatStyle.Flat,
+                Cursor = Cursors.Hand
             };
+            btnSeleccionar.FlatAppearance.BorderSize = 0;
             btnSeleccionar.Click += OnSeleccionar;
 
             btnCancelar = new Button
             {
                 Text = "Cancelar",
-                Left = 780, Top = 520, Width = 90, Height = 35,
-                DialogResult = DialogResult.Cancel
+                Left = 840, 
+                Top = 575, 
+                Width = 90, 
+                Height = 40,
+                DialogResult = DialogResult.Cancel,
+                Font = new Font("Segoe UI", 10, FontStyle.Regular),
+                BackColor = Color.FromArgb(149, 165, 166),
+                ForeColor = Color.White,
+                FlatStyle = FlatStyle.Flat,
+                Cursor = Cursors.Hand
             };
+            btnCancelar.FlatAppearance.BorderSize = 0;
 
             gridAnalisis.SelectionChanged += (s, e) => 
             {
@@ -109,7 +211,10 @@ namespace SALC.Views.PanelMedico
             // Agregar controles
             Controls.AddRange(new Control[] 
             { 
-                lblTitulo, lblInfo, lblBuscar, txtBuscar, gridAnalisis, btnSeleccionar, btnCancelar 
+                lblTitulo, lblSubtitulo, panelInfo,
+                lblBuscar, txtBuscar, lblAyuda,
+                gridAnalisis, 
+                btnSeleccionar, btnCancelar 
             });
 
             AcceptButton = btnSeleccionar;
@@ -144,7 +249,7 @@ namespace SALC.Views.PanelMedico
                         {
                             Analisis = analisis,
                             IdAnalisis = analisis.IdAnalisis,
-                            PacienteNombre = paciente != null ? $"{paciente.Nombre} {paciente.Apellido} (DNI: {paciente.Dni})" : "Paciente no encontrado",
+                            PacienteNombre = paciente != null ? $"{paciente.Apellido}, {paciente.Nombre} (DNI: {paciente.Dni})" : "Paciente no encontrado",
                             TipoAnalisis = tipoAnalisis?.Descripcion ?? "Tipo no encontrado",
                             FechaCreacion = analisis.FechaCreacion.ToString("dd/MM/yyyy HH:mm"),
                             Estado = "Sin verificar",
@@ -153,7 +258,6 @@ namespace SALC.Views.PanelMedico
                     }
                     catch (Exception ex)
                     {
-                        // Log error but continue
                         System.Diagnostics.Debug.WriteLine($"Error procesando análisis {analisis.IdAnalisis}: {ex.Message}");
                     }
                 }
@@ -163,8 +267,12 @@ namespace SALC.Views.PanelMedico
 
                 if (!_analisisViewModel.Any())
                 {
-                    MessageBox.Show("No se encontraron análisis 'Sin verificar' de su autoría.", "Información", 
-                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show(
+                        "No se encontraron análisis en estado 'Sin verificar' de su autoría.\n\n" +
+                        "Primero debe crear un análisis en la pestaña 'Crear Análisis Clínico'.", 
+                        "Información", 
+                        MessageBoxButtons.OK, 
+                        MessageBoxIcon.Information);
                 }
             }
             catch (Exception ex)

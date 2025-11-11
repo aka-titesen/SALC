@@ -825,7 +825,8 @@ namespace SALC.Views.PanelMedico
         {
             if (paciente != null)
             {
-                lblPacienteSeleccionado.Text = $"✓ {paciente.Nombre} {paciente.Apellido} (DNI: {paciente.Dni})";
+                lblPacienteSeleccionado.Text = string.Format("Seleccionado: {0} {1} (DNI: {2})", 
+                    paciente.Nombre, paciente.Apellido, paciente.Dni);
                 lblPacienteSeleccionado.ForeColor = Color.FromArgb(56, 142, 60);
                 lblPacienteSeleccionado.Font = new Font("Segoe UI", 10, FontStyle.Bold);
                 btnCrearAnalisis.Enabled = true;
@@ -880,7 +881,9 @@ namespace SALC.Views.PanelMedico
         {
             if (analisis != null && paciente != null && tipo != null)
             {
-                lblAnalisisResultadosSeleccionado.Text = $"✓ ID: {analisis.IdAnalisis} | Paciente: {paciente.Nombre} {paciente.Apellido} | Tipo: {tipo.Descripcion}";
+                lblAnalisisResultadosSeleccionado.Text = string.Format(
+                    "Seleccionado: ID {0} | Paciente: {1} {2} | Tipo: {3}",
+                    analisis.IdAnalisis, paciente.Nombre, paciente.Apellido, tipo.Descripcion);
                 lblAnalisisResultadosSeleccionado.ForeColor = Color.FromArgb(230, 81, 0);
                 lblAnalisisResultadosSeleccionado.Font = new Font("Segoe UI", 9, FontStyle.Bold);
                 btnCargarMetricas.Enabled = true;
@@ -904,7 +907,9 @@ namespace SALC.Views.PanelMedico
         {
             if (analisis != null && paciente != null && tipo != null)
             {
-                lblAnalisisFirmarSeleccionado.Text = $"✓ ID: {analisis.IdAnalisis} | Paciente: {paciente.Nombre} {paciente.Apellido} | Tipo: {tipo.Descripcion}";
+                lblAnalisisFirmarSeleccionado.Text = string.Format(
+                    "Seleccionado: ID {0} | Paciente: {1} {2} | Tipo: {3}",
+                    analisis.IdAnalisis, paciente.Nombre, paciente.Apellido, tipo.Descripcion);
                 lblAnalisisFirmarSeleccionado.ForeColor = Color.FromArgb(106, 27, 154);
                 lblAnalisisFirmarSeleccionado.Font = new Font("Segoe UI", 9, FontStyle.Bold);
                 btnFirmarAnalisis.Enabled = true;

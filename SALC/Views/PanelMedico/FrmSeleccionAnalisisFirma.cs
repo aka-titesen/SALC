@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
+using System.Drawing;
 using SALC.Domain;
 using SALC.BLL;
 
@@ -27,66 +28,161 @@ namespace SALC.Views.PanelMedico
 
         private void InitializeComponent()
         {
-            Text = "Seleccionar Análisis para Firmar";
-            Width = 950;
-            Height = 600;
+            Text = "Seleccionar Análisis para Validar y Firmar";
+            Width = 1000;
+            Height = 700;
             StartPosition = FormStartPosition.CenterParent;
             FormBorderStyle = FormBorderStyle.FixedDialog;
             MaximizeBox = false;
             MinimizeBox = false;
+            BackColor = Color.White;
+            ShowIcon = false;
 
-            // Título
+            // Título principal
             var lblTitulo = new Label
             {
-                Text = "Seleccione un análisis 'Sin verificar' con resultados cargados",
-                Left = 20, Top = 20, Width = 500, Height = 25,
-                Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold)
+                Text = "Selección de Análisis para Firma Digital",
+                Font = new Font("Segoe UI", 14, FontStyle.Bold),
+                ForeColor = Color.FromArgb(142, 68, 173),
+                Location = new Point(20, 15),
+                Size = new Size(950, 30),
+                BackColor = Color.Transparent
+            };
+
+            var lblSubtitulo = new Label
+            {
+                Text = "Seleccione el análisis que desea revisar y firmar digitalmente",
+                Font = new Font("Segoe UI", 9, FontStyle.Regular),
+                ForeColor = Color.FromArgb(127, 140, 141),
+                Location = new Point(20, 45),
+                Size = new Size(950, 20),
+                BackColor = Color.Transparent
+            };
+
+            // Panel informativo
+            var panelInfo = new Panel
+            {
+                Location = new Point(20, 75),
+                Size = new Size(940, 50),
+                BackColor = Color.FromArgb(250, 245, 255),
+                BorderStyle = BorderStyle.FixedSingle
             };
 
             var lblInfo = new Label
             {
-                Text = "Solo se muestran análisis de su autoría con métricas cargadas, listos para firmar",
-                Left = 20, Top = 50, Width = 600, Height = 20,
-                ForeColor = System.Drawing.Color.Blue
+                Text = "Solo se muestran análisis en estado 'Sin verificar' con resultados cargados.\n" +
+                       "Revise cuidadosamente los resultados antes de firmar.",
+                Location = new Point(15, 10),
+                Size = new Size(910, 35),
+                Font = new Font("Segoe UI", 9, FontStyle.Regular),
+                ForeColor = Color.FromArgb(52, 73, 94),
+                BackColor = Color.Transparent
+            };
+            panelInfo.Controls.Add(lblInfo);
+
+            // Panel de advertencia
+            var panelAdvertencia = new Panel
+            {
+                Location = new Point(20, 135),
+                Size = new Size(940, 40),
+                BackColor = Color.FromArgb(255, 235, 238),
+                BorderStyle = BorderStyle.FixedSingle
             };
 
             var lblAdvertencia = new Label
             {
-                Text = "?? Una vez firmado, el análisis no podrá modificarse",
-                Left = 20, Top = 75, Width = 400, Height = 20,
-                ForeColor = System.Drawing.Color.Red,
-                Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold)
+                Text = "IMPORTANTE: Una vez firmado digitalmente, el análisis NO podrá modificarse",
+                Location = new Point(15, 10),
+                Size = new Size(910, 22),
+                Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                ForeColor = Color.FromArgb(183, 28, 28),
+                BackColor = Color.Transparent
             };
+            panelAdvertencia.Controls.Add(lblAdvertencia);
 
             // Búsqueda
-            var lblBuscar = new Label { Text = "Buscar:", Left = 20, Top = 105, Width = 60 };
+            var lblBuscar = new Label 
+            { 
+                Text = "Buscar:", 
+                Left = 20, 
+                Top = 195, 
+                Width = 80,
+                Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                ForeColor = Color.FromArgb(44, 62, 80)
+            };
+            
             txtBuscar = new TextBox 
             { 
-                Left = 80, Top = 103, Width = 200
+                Left = 110, 
+                Top = 193, 
+                Width = 300,
+                Font = new Font("Segoe UI", 10),
+                BorderStyle = BorderStyle.FixedSingle
             };
             txtBuscar.TextChanged += OnBuscarTextChanged;
 
-            // Grid
+            var lblAyuda = new Label
+            {
+                Text = "Escriba ID, nombre de paciente o tipo de análisis",
+                Left = 420,
+                Top = 195,
+                Width = 350,
+                Font = new Font("Segoe UI", 8, FontStyle.Italic),
+                ForeColor = Color.FromArgb(149, 165, 166)
+            };
+
+            // Grid de análisis
             gridAnalisis = new DataGridView
             {
-                Left = 20, Top = 140, Width = 890, Height = 360,
+                Left = 20, 
+                Top = 235, 
+                Width = 940, 
+                Height = 360,
                 ReadOnly = true,
                 AllowUserToAddRows = false,
                 AllowUserToDeleteRows = false,
                 SelectionMode = DataGridViewSelectionMode.FullRowSelect,
                 MultiSelect = false,
                 AutoGenerateColumns = false,
-                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
+                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
+                BackgroundColor = Color.White,
+                BorderStyle = BorderStyle.FixedSingle,
+                ColumnHeadersHeight = 40,
+                ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing,
+                ColumnHeadersDefaultCellStyle = new DataGridViewCellStyle
+                {
+                    BackColor = Color.FromArgb(142, 68, 173),
+                    ForeColor = Color.White,
+                    Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                    Padding = new Padding(8),
+                    Alignment = DataGridViewContentAlignment.MiddleCenter,
+                    WrapMode = DataGridViewTriState.False
+                },
+                DefaultCellStyle = new DataGridViewCellStyle
+                {
+                    Font = new Font("Segoe UI", 9),
+                    SelectionBackColor = Color.FromArgb(235, 222, 240),
+                    SelectionForeColor = Color.FromArgb(44, 62, 80),
+                    Padding = new Padding(5)
+                },
+                AlternatingRowsDefaultCellStyle = new DataGridViewCellStyle
+                {
+                    BackColor = Color.FromArgb(250, 245, 255),
+                    Padding = new Padding(5)
+                },
+                EnableHeadersVisualStyles = false,
+                RowHeadersVisible = false,
+                RowTemplate = { Height = 35 }
             };
 
             // Configurar columnas
             gridAnalisis.Columns.AddRange(new DataGridViewColumn[]
             {
                 new DataGridViewTextBoxColumn { Name = "IdAnalisis", HeaderText = "ID", DataPropertyName = "IdAnalisis", Width = 60 },
-                new DataGridViewTextBoxColumn { Name = "PacienteNombre", HeaderText = "Paciente", DataPropertyName = "PacienteNombre", Width = 200 },
-                new DataGridViewTextBoxColumn { Name = "TipoAnalisis", HeaderText = "Tipo Análisis", DataPropertyName = "TipoAnalisis", Width = 180 },
+                new DataGridViewTextBoxColumn { Name = "PacienteNombre", HeaderText = "Paciente", DataPropertyName = "PacienteNombre", Width = 220 },
+                new DataGridViewTextBoxColumn { Name = "TipoAnalisis", HeaderText = "Tipo Análisis", DataPropertyName = "TipoAnalisis", Width = 170 },
                 new DataGridViewTextBoxColumn { Name = "FechaCreacion", HeaderText = "Fecha Creación", DataPropertyName = "FechaCreacion", Width = 110 },
-                new DataGridViewTextBoxColumn { Name = "CantidadMetricas", HeaderText = "Métricas", DataPropertyName = "CantidadMetricas", Width = 80 },
+                new DataGridViewTextBoxColumn { Name = "CantidadMetricas", HeaderText = "Métricas", DataPropertyName = "CantidadMetricas", Width = 90 },
                 new DataGridViewTextBoxColumn { Name = "Estado", HeaderText = "Estado", DataPropertyName = "Estado", Width = 100 },
                 new DataGridViewTextBoxColumn { Name = "Observaciones", HeaderText = "Observaciones", DataPropertyName = "Observaciones", Width = 150 }
             });
@@ -97,19 +193,36 @@ namespace SALC.Views.PanelMedico
             btnSeleccionar = new Button
             {
                 Text = "Seleccionar para Firmar",
-                Left = 720, Top = 520, Width = 130, Height = 35,
+                Left = 710, 
+                Top = 620, 
+                Width = 170, 
+                Height = 45,
                 DialogResult = DialogResult.OK,
                 Enabled = false,
-                BackColor = System.Drawing.Color.Orange
+                Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                BackColor = Color.FromArgb(142, 68, 173),
+                ForeColor = Color.White,
+                FlatStyle = FlatStyle.Flat,
+                Cursor = Cursors.Hand
             };
+            btnSeleccionar.FlatAppearance.BorderSize = 0;
             btnSeleccionar.Click += OnSeleccionar;
 
             btnCancelar = new Button
             {
                 Text = "Cancelar",
-                Left = 860, Top = 520, Width = 80, Height = 35,
-                DialogResult = DialogResult.Cancel
+                Left = 890, 
+                Top = 620, 
+                Width = 90, 
+                Height = 45,
+                DialogResult = DialogResult.Cancel,
+                Font = new Font("Segoe UI", 10, FontStyle.Regular),
+                BackColor = Color.FromArgb(149, 165, 166),
+                ForeColor = Color.White,
+                FlatStyle = FlatStyle.Flat,
+                Cursor = Cursors.Hand
             };
+            btnCancelar.FlatAppearance.BorderSize = 0;
 
             gridAnalisis.SelectionChanged += (s, e) => 
             {
@@ -119,7 +232,10 @@ namespace SALC.Views.PanelMedico
             // Agregar controles
             Controls.AddRange(new Control[] 
             { 
-                lblTitulo, lblInfo, lblAdvertencia, lblBuscar, txtBuscar, gridAnalisis, btnSeleccionar, btnCancelar 
+                lblTitulo, lblSubtitulo, panelInfo, panelAdvertencia,
+                lblBuscar, txtBuscar, lblAyuda,
+                gridAnalisis, 
+                btnSeleccionar, btnCancelar 
             });
 
             AcceptButton = btnSeleccionar;
@@ -161,7 +277,7 @@ namespace SALC.Views.PanelMedico
                         {
                             Analisis = analisis,
                             IdAnalisis = analisis.IdAnalisis,
-                            PacienteNombre = paciente != null ? $"{paciente.Nombre} {paciente.Apellido} (DNI: {paciente.Dni})" : "Paciente no encontrado",
+                            PacienteNombre = paciente != null ? $"{paciente.Apellido}, {paciente.Nombre} (DNI: {paciente.Dni})" : "Paciente no encontrado",
                             TipoAnalisis = tipoAnalisis?.Descripcion ?? "Tipo no encontrado",
                             FechaCreacion = analisis.FechaCreacion.ToString("dd/MM/yyyy HH:mm"),
                             CantidadMetricas = $"{resultados.Count} métricas",
@@ -171,7 +287,6 @@ namespace SALC.Views.PanelMedico
                     }
                     catch (Exception ex)
                     {
-                        // Log error but continue
                         System.Diagnostics.Debug.WriteLine($"Error procesando análisis {analisis.IdAnalisis}: {ex.Message}");
                     }
                 }
@@ -181,19 +296,14 @@ namespace SALC.Views.PanelMedico
 
                 if (!_analisisViewModel.Any())
                 {
-                    MessageBox.Show("No se encontraron análisis 'Sin verificar' con resultados cargados.\n\n" +
-                                  "Para firmar un análisis, primero debe cargar las métricas en la pestaña 'Cargar Resultados'.", 
-                                  "Información", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
-                else
-                {
-                    var lblConteo = new Label
-                    {
-                        Text = $"Se encontraron {_analisisViewModel.Count} análisis listos para firmar",
-                        Left = 300, Top = 105, Width = 300, Height = 20,
-                        ForeColor = System.Drawing.Color.Green
-                    };
-                    Controls.Add(lblConteo);
+                    MessageBox.Show(
+                        "No se encontraron análisis 'Sin verificar' con resultados cargados.\n\n" +
+                        "Para firmar un análisis, primero debe:\n" +
+                        "1. Crear el análisis en 'Crear Análisis Clínico'\n" +
+                        "2. Cargar las métricas en 'Cargar Resultados'", 
+                        "Información", 
+                        MessageBoxButtons.OK, 
+                        MessageBoxIcon.Information);
                 }
             }
             catch (Exception ex)
@@ -240,15 +350,15 @@ namespace SALC.Views.PanelMedico
                 {
                     var analisisViewModel = _analisisFiltrados[rowIndex];
                     
-                    // Confirmación adicional
+                    // Confirmación adicional con diseño consistente
                     var confirmacion = MessageBox.Show(
                         $"¿Está seguro de que desea seleccionar este análisis para firmar?\n\n" +
                         $"ID: {analisisViewModel.IdAnalisis}\n" +
                         $"Paciente: {analisisViewModel.PacienteNombre}\n" +
                         $"Tipo: {analisisViewModel.TipoAnalisis}\n" +
                         $"Métricas: {analisisViewModel.CantidadMetricas}\n\n" +
-                        "Una vez firmado, no podrá modificarse.",
-                        "Confirmar Selección para Firma",
+                        "ATENCIÓN: Una vez firmado, el análisis NO podrá modificarse.",
+                        "Confirmar Selección para Firma Digital",
                         MessageBoxButtons.YesNo,
                         MessageBoxIcon.Question
                     );

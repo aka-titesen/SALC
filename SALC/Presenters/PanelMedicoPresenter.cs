@@ -325,12 +325,26 @@ namespace SALC.Presenters
                     _view.CrearAnalisisObservaciones ?? ""
                 );
 
-                _view.MostrarMensaje($"✅ Análisis creado correctamente (ID: {analisis.IdAnalisis})\n\n" +
-                                   $"📋 Paciente: {_pacienteParaCrearAnalisis.Nombre} {_pacienteParaCrearAnalisis.Apellido}\n\n" +
-                                   "🔄 Flujo siguiente:\n" +
-                                   "1. Vaya a la pestaña 'Cargar Resultados'\n" +
-                                   "2. Seleccione este análisis recién creado\n" +
-                                   "3. Complete los valores de las métricas");
+                // ✅ REFACTORIZADO: Modal de confirmación con diseño limpio y profesional
+                var mensaje = string.Format(
+                    "ANÁLISIS CREADO CORRECTAMENTE\n\n" +
+                    "ID del Análisis: {0}\n" +
+                    "Paciente: {1} {2}\n\n" +
+                    "FLUJO SIGUIENTE:\n\n" +
+                    "1. Vaya a la pestaña 'Cargar Resultados'\n" +
+                    "2. Seleccione este análisis recién creado\n" +
+                    "3. Complete los valores de las métricas",
+                    analisis.IdAnalisis,
+                    _pacienteParaCrearAnalisis.Nombre,
+                    _pacienteParaCrearAnalisis.Apellido
+                );
+
+                System.Windows.Forms.MessageBox.Show(
+                    mensaje,
+                    "Análisis Creado Exitosamente",
+                    System.Windows.Forms.MessageBoxButtons.OK,
+                    System.Windows.Forms.MessageBoxIcon.Information
+                );
 
                 // Limpiar formulario de análisis (NO afecta la gestión de pacientes)
                 _view.LimpiarPacienteSeleccionado();
@@ -365,7 +379,7 @@ namespace SALC.Presenters
                             .FirstOrDefault(t => t.IdTipoAnalisis == _analisisParaResultados.IdTipoAnalisis);
 
                         _view.MostrarAnalisisParaResultados(_analisisParaResultados, paciente, tipoAnalisis);
-                        _view.MostrarMensaje($"Análisis seleccionado. Use 'Cargar Métricas' para comenzar a ingresar resultados.");
+                        _view.MostrarMensaje("Análisis seleccionado. Use 'Cargar Métricas' para comenzar a ingresar resultados.");
                     }
                 }
             }
@@ -422,8 +436,23 @@ namespace SALC.Presenters
 
                 if (resultadosGuardados > 0)
                 {
-                    _view.MostrarMensaje($"Se guardaron {resultadosGuardados} resultados.\n" +
-                                       "Cuando termine de cargar todos los resultados, puede proceder a validar el análisis.");
+                    // ✅ REFACTORIZADO: Modal de confirmación con diseño limpio
+                    var mensaje = string.Format(
+                        "RESULTADOS GUARDADOS CORRECTAMENTE\n\n" +
+                        "Se guardaron {0} resultado(s) de laboratorio.\n\n" +
+                        "PRÓXIMO PASO:\n\n" +
+                        "Cuando termine de cargar todos los resultados,\n" +
+                        "proceda a la pestaña 'Validar y Firmar' para\n" +
+                        "dar validez clínica al análisis.",
+                        resultadosGuardados
+                    );
+
+                    System.Windows.Forms.MessageBox.Show(
+                        mensaje,
+                        "Resultados Guardados",
+                        System.Windows.Forms.MessageBoxButtons.OK,
+                        System.Windows.Forms.MessageBoxIcon.Information
+                    );
                 }
                 else
                 {
@@ -460,7 +489,7 @@ namespace SALC.Presenters
 
                         _view.MostrarAnalisisParaFirmar(_analisisParaFirmar, paciente, tipoAnalisis);
                         _view.MostrarResultadosParaValidacion(resultados);
-                        _view.MostrarMensaje($"Análisis seleccionado. Revise los resultados y presione 'Firmar Análisis'.");
+                        _view.MostrarMensaje("Análisis seleccionado. Revise los resultados y presione 'Firmar Digitalmente'.");
                     }
                 }
             }
@@ -482,11 +511,12 @@ namespace SALC.Presenters
 
             try
             {
-                // Confirmar la acción
+                // ✅ REFACTORIZADO: Modal de confirmación con diseño limpio
                 var confirmacion = System.Windows.Forms.MessageBox.Show(
-                    "¿Está seguro de que desea firmar este análisis?\n\n" +
-                    "Una vez firmado, el análisis quedará verificado y no podrá modificarse.",
-                    "Confirmar Firma",
+                    "¿Está seguro de que desea firmar digitalmente este análisis?\n\n" +
+                    "Una vez firmado, el análisis quedará VERIFICADO y NO podrá modificarse.\n\n" +
+                    "¿Desea continuar con la firma digital?",
+                    "Confirmar Firma Digital del Análisis",
                     System.Windows.Forms.MessageBoxButtons.YesNo,
                     System.Windows.Forms.MessageBoxIcon.Question
                 );
@@ -496,8 +526,22 @@ namespace SALC.Presenters
 
                 _analisisService.ValidarAnalisis(_analisisParaFirmar.IdAnalisis, _dniMedico);
 
-                _view.MostrarMensaje($"✅ Análisis ID {_analisisParaFirmar.IdAnalisis} firmado correctamente.\n\n" +
-                                   "El análisis está ahora verificado y disponible para que el Asistente genere el informe PDF.");
+                // ✅ REFACTORIZADO: Modal de éxito con diseño limpio
+                var mensaje = string.Format(
+                    "ANÁLISIS FIRMADO EXITOSAMENTE\n\n" +
+                    "ID del Análisis: {0}\n\n" +
+                    "El análisis está ahora VERIFICADO y disponible\n" +
+                    "para que el personal asistente genere el informe\n" +
+                    "PDF para entrega al paciente.",
+                    _analisisParaFirmar.IdAnalisis
+                );
+
+                System.Windows.Forms.MessageBox.Show(
+                    mensaje,
+                    "Análisis Firmado Digitalmente",
+                    System.Windows.Forms.MessageBoxButtons.OK,
+                    System.Windows.Forms.MessageBoxIcon.Information
+                );
 
                 // Limpiar estado
                 _view.LimpiarAnalisisParaFirmar();
@@ -526,13 +570,16 @@ namespace SALC.Presenters
                     return;
                 }
 
-                // ✅ CORRECCIÓN: Obtener solo las métricas asociadas a este tipo de análisis (según ERS)
+                // Obtener solo las métricas asociadas a este tipo de análisis
                 var metricas = _catalogoService.ObtenerMetricasPorTipoAnalisis(analisis.IdTipoAnalisis).ToList();
 
                 if (metricas.Count == 0)
                 {
-                    _view.MostrarMensaje($"El tipo de análisis seleccionado no tiene métricas asociadas.\n" +
-                                       "Contacte al administrador para configurar las relaciones tipo análisis-métricas.", true);
+                    _view.MostrarMensaje(
+                        "El tipo de análisis seleccionado no tiene métricas asociadas.\n\n" +
+                        "Contacte al administrador para configurar las relaciones\n" +
+                        "entre tipos de análisis y métricas en el sistema.", 
+                        true);
                     return;
                 }
 
@@ -548,8 +595,24 @@ namespace SALC.Presenters
                 }
 
                 _view.CargarResultadosParaEdicion(filas);
-                _view.MostrarMensaje($"✅ Se cargaron {filas.Count} métricas específicas para este tipo de análisis.\n\n" +
-                                   "Complete los valores en la columna 'Resultado' y presione 'Guardar Resultados'.");
+                
+                // ✅ REFACTORIZADO: Modal informativo con diseño limpio
+                var mensaje = string.Format(
+                    "MÉTRICAS CARGADAS CORRECTAMENTE\n\n" +
+                    "Se cargaron {0} métrica(s) específica(s)\n" +
+                    "para este tipo de análisis.\n\n" +
+                    "INSTRUCCIONES:\n\n" +
+                    "1. Complete los valores en la columna 'Resultado'\n" +
+                    "2. Presione el botón 'Guardar Resultados'",
+                    filas.Count
+                );
+
+                System.Windows.Forms.MessageBox.Show(
+                    mensaje,
+                    "Métricas del Análisis",
+                    System.Windows.Forms.MessageBoxButtons.OK,
+                    System.Windows.Forms.MessageBoxIcon.Information
+                );
 
             }
             catch (Exception ex)
