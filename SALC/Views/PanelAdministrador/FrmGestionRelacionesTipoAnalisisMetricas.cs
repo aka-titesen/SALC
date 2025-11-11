@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
+using System.Drawing;
 using SALC.BLL;
 using SALC.Domain;
 
@@ -13,10 +14,8 @@ namespace SALC.Views.PanelAdministrador
         private ComboBox cboTiposAnalisis;
         private CheckedListBox clbMetricas;
         private DataGridView gridRelaciones;
-        private Button btnGuardar;
-        private Button btnCancelar;
-        private Button btnEliminarRelacion;
-        
+        private Button btnGuardar, btnCancelar, btnEliminarRelacion, btnActualizar;
+
         private List<TipoAnalisis> _tiposAnalisis;
         private List<Metrica> _metricas;
         private List<TipoAnalisisMetrica> _relaciones;
@@ -30,122 +29,224 @@ namespace SALC.Views.PanelAdministrador
 
         private void InitializeComponent()
         {
-            Text = "Gestión de Relaciones Tipo Análisis - Métricas";
-            Size = new System.Drawing.Size(900, 600);
+            Text = "Gestión de Relaciones";
+            Size = new Size(950, 650);
             StartPosition = FormStartPosition.CenterParent;
             FormBorderStyle = FormBorderStyle.FixedDialog;
             MaximizeBox = false;
             MinimizeBox = false;
+            BackColor = Color.White;
 
-            // Panel izquierdo para configurar relaciones
+            // Título principal
+            var lblTitulo = new Label
+            {
+                Text = "Configuración de Tipos de Análisis y Métricas",
+                Font = new Font("Segoe UI", 14, FontStyle.Bold),
+                ForeColor = Color.FromArgb(70, 130, 180),
+                Location = new Point(20, 15),
+                Size = new Size(900, 30),
+                BackColor = Color.Transparent
+            };
+
+            var lblSubtitulo = new Label
+            {
+                Text = "Defina qué métricas componen cada tipo de análisis clínico",
+                Font = new Font("Segoe UI", 9, FontStyle.Regular),
+                ForeColor = Color.FromArgb(127, 140, 141),
+                Location = new Point(20, 45),
+                Size = new Size(900, 20),
+                BackColor = Color.Transparent
+            };
+
+            // Panel izquierdo - Configuración
             var pnlConfiguracion = new Panel
             {
-                Dock = DockStyle.Left,
-                Width = 400,
-                Padding = new Padding(10)
+                Location = new Point(20, 75),
+                Size = new Size(420, 490),
+                BackColor = Color.FromArgb(250, 252, 255),
+                BorderStyle = BorderStyle.FixedSingle
+            };
+
+            var lblSeccionConfig = new Label
+            {
+                Text = "Configurar Relaciones",
+                Location = new Point(0, 0),
+                Size = new Size(420, 35),
+                Font = new Font("Segoe UI", 11, FontStyle.Bold),
+                ForeColor = Color.White,
+                BackColor = Color.FromArgb(70, 130, 180),
+                TextAlign = ContentAlignment.MiddleLeft,
+                Padding = new Padding(15, 0, 0, 0)
             };
 
             var lblTipoAnalisis = new Label
             {
-                Text = "Seleccionar Tipo de Análisis:",
-                Location = new System.Drawing.Point(10, 10),
-                Size = new System.Drawing.Size(180, 20)
+                Text = "1. Seleccione el Tipo de Análisis:",
+                Location = new Point(15, 50),
+                Size = new Size(390, 20),
+                Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                ForeColor = Color.FromArgb(44, 62, 80)
             };
 
             cboTiposAnalisis = new ComboBox
             {
-                Location = new System.Drawing.Point(10, 35),
-                Size = new System.Drawing.Size(350, 25),
+                Location = new Point(15, 75),
+                Size = new Size(385, 25),
                 DropDownStyle = ComboBoxStyle.DropDownList,
                 DisplayMember = "Descripcion",
-                ValueMember = "IdTipoAnalisis"
+                ValueMember = "IdTipoAnalisis",
+                Font = new Font("Segoe UI", 10)
             };
             cboTiposAnalisis.SelectedIndexChanged += CboTiposAnalisis_SelectedIndexChanged;
 
             var lblMetricas = new Label
             {
-                Text = "Métricas disponibles (marcar las que componen el análisis):",
-                Location = new System.Drawing.Point(10, 70),
-                Size = new System.Drawing.Size(350, 20)
+                Text = "2. Marque las Métricas que lo componen:",
+                Location = new Point(15, 115),
+                Size = new Size(390, 20),
+                Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                ForeColor = Color.FromArgb(44, 62, 80)
             };
 
             clbMetricas = new CheckedListBox
             {
-                Location = new System.Drawing.Point(10, 95),
-                Size = new System.Drawing.Size(350, 300),
+                Location = new Point(15, 140),
+                Size = new Size(385, 280),
                 DisplayMember = "NombreCompleto",
                 ValueMember = "IdMetrica",
-                CheckOnClick = true
+                CheckOnClick = true,
+                Font = new Font("Segoe UI", 9),
+                BorderStyle = BorderStyle.FixedSingle
             };
 
             btnGuardar = new Button
             {
                 Text = "Guardar Relaciones",
-                Location = new System.Drawing.Point(10, 410),
-                Size = new System.Drawing.Size(150, 30)
+                Location = new Point(15, 435),
+                Size = new Size(180, 35),
+                Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                BackColor = Color.FromArgb(39, 174, 96),
+                ForeColor = Color.White,
+                FlatStyle = FlatStyle.Flat,
+                Cursor = Cursors.Hand
             };
+            btnGuardar.FlatAppearance.BorderSize = 0;
             btnGuardar.Click += BtnGuardar_Click;
 
-            var btnActualizar = new Button
+            btnActualizar = new Button
             {
                 Text = "Actualizar Vista",
-                Location = new System.Drawing.Point(170, 410),
-                Size = new System.Drawing.Size(120, 30)
+                Location = new Point(210, 435),
+                Size = new Size(140, 35),
+                Font = new Font("Segoe UI", 10, FontStyle.Regular),
+                BackColor = Color.FromArgb(52, 152, 219),
+                ForeColor = Color.White,
+                FlatStyle = FlatStyle.Flat,
+                Cursor = Cursors.Hand
             };
+            btnActualizar.FlatAppearance.BorderSize = 0;
             btnActualizar.Click += (s, e) => CargarRelacionesExistentes();
 
-            pnlConfiguracion.Controls.AddRange(new Control[] { 
-                lblTipoAnalisis, cboTiposAnalisis, lblMetricas, clbMetricas, btnGuardar, btnActualizar 
+            pnlConfiguracion.Controls.AddRange(new Control[]
+            {
+                lblSeccionConfig, lblTipoAnalisis, cboTiposAnalisis,
+                lblMetricas, clbMetricas, btnGuardar, btnActualizar
             });
 
-            // Panel derecho para mostrar relaciones existentes
+            // Panel derecho - Relaciones Existentes
             var pnlRelaciones = new Panel
             {
-                Dock = DockStyle.Fill,
-                Padding = new Padding(10)
+                Location = new Point(460, 75),
+                Size = new Size(465, 490),
+                BackColor = Color.FromArgb(250, 252, 255),
+                BorderStyle = BorderStyle.FixedSingle
             };
 
-            var lblRelacionesExistentes = new Label
+            var lblSeccionRelaciones = new Label
             {
-                Text = "Relaciones Existentes:",
-                Location = new System.Drawing.Point(10, 10),
-                Size = new System.Drawing.Size(200, 20)
+                Text = "Relaciones Existentes",
+                Location = new Point(0, 0),
+                Size = new Size(465, 35),
+                Font = new Font("Segoe UI", 11, FontStyle.Bold),
+                ForeColor = Color.White,
+                BackColor = Color.FromArgb(230, 126, 34),
+                TextAlign = ContentAlignment.MiddleLeft,
+                Padding = new Padding(15, 0, 0, 0)
             };
 
             gridRelaciones = new DataGridView
             {
-                Location = new System.Drawing.Point(10, 35),
-                Size = new System.Drawing.Size(460, 350),
+                Location = new Point(15, 50),
+                Size = new Size(435, 370),
                 ReadOnly = true,
                 AllowUserToAddRows = false,
                 SelectionMode = DataGridViewSelectionMode.FullRowSelect,
                 MultiSelect = false,
-                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
+                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
+                BackgroundColor = Color.White,
+                BorderStyle = BorderStyle.FixedSingle,
+                ColumnHeadersDefaultCellStyle = new DataGridViewCellStyle
+                {
+                    BackColor = Color.FromArgb(230, 126, 34),
+                    ForeColor = Color.White,
+                    Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                    Padding = new Padding(5)
+                },
+                DefaultCellStyle = new DataGridViewCellStyle
+                {
+                    Font = new Font("Segoe UI", 9),
+                    SelectionBackColor = Color.FromArgb(255, 224, 178),
+                    SelectionForeColor = Color.FromArgb(44, 62, 80),
+                    Padding = new Padding(5)
+                },
+                AlternatingRowsDefaultCellStyle = new DataGridViewCellStyle
+                {
+                    BackColor = Color.FromArgb(255, 250, 245)
+                },
+                EnableHeadersVisualStyles = false,
+                RowHeadersVisible = false
             };
 
             btnEliminarRelacion = new Button
             {
-                Text = "Eliminar Relación Seleccionada",
-                Location = new System.Drawing.Point(10, 395),
-                Size = new System.Drawing.Size(200, 30)
+                Text = "Eliminar Relación",
+                Location = new Point(15, 435),
+                Size = new Size(180, 35),
+                Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                BackColor = Color.FromArgb(192, 57, 43),
+                ForeColor = Color.White,
+                FlatStyle = FlatStyle.Flat,
+                Cursor = Cursors.Hand
             };
+            btnEliminarRelacion.FlatAppearance.BorderSize = 0;
             btnEliminarRelacion.Click += BtnEliminarRelacion_Click;
 
+            pnlRelaciones.Controls.AddRange(new Control[]
+            {
+                lblSeccionRelaciones, gridRelaciones, btnEliminarRelacion
+            });
+
+            // Botón Cerrar (global)
             btnCancelar = new Button
             {
                 Text = "Cerrar",
-                Location = new System.Drawing.Point(350, 395),
-                Size = new System.Drawing.Size(100, 30),
-                DialogResult = DialogResult.Cancel
+                Location = new Point(835, 580),
+                Size = new Size(90, 35),
+                DialogResult = DialogResult.Cancel,
+                Font = new Font("Segoe UI", 10, FontStyle.Regular),
+                BackColor = Color.FromArgb(149, 165, 166),
+                ForeColor = Color.White,
+                FlatStyle = FlatStyle.Flat,
+                Cursor = Cursors.Hand
             };
+            btnCancelar.FlatAppearance.BorderSize = 0;
 
-            pnlRelaciones.Controls.AddRange(new Control[] { 
-                lblRelacionesExistentes, gridRelaciones, btnEliminarRelacion, btnCancelar 
+            Controls.AddRange(new Control[]
+            {
+                lblTitulo, lblSubtitulo,
+                pnlConfiguracion, pnlRelaciones,
+                btnCancelar
             });
-
-            // Añadir paneles al formulario
-            Controls.Add(pnlRelaciones);
-            Controls.Add(pnlConfiguracion);
 
             CancelButton = btnCancelar;
         }
@@ -163,7 +264,7 @@ namespace SALC.Views.PanelAdministrador
                 var metricasConNombreCompleto = _metricas.Select(m => new
                 {
                     IdMetrica = m.IdMetrica,
-                    NombreCompleto = $"{m.Nombre} ({m.UnidadMedida})",
+                    NombreCompleto = string.Format("{0} ({1})", m.Nombre, m.UnidadMedida),
                     Metrica = m
                 }).ToList();
 
@@ -175,7 +276,7 @@ namespace SALC.Views.PanelAdministrador
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error al cargar datos: {ex.Message}", "Error", 
+                MessageBox.Show(string.Format("Error al cargar datos: {0}", ex.Message), "Error",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
@@ -202,7 +303,7 @@ namespace SALC.Views.PanelAdministrador
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error al cargar relaciones: {ex.Message}", "Error", 
+                MessageBox.Show(string.Format("Error al cargar relaciones: {0}", ex.Message), "Error",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
@@ -212,7 +313,7 @@ namespace SALC.Views.PanelAdministrador
             if (cboTiposAnalisis.SelectedItem == null) return;
 
             var tipoAnalisisSeleccionado = (TipoAnalisis)cboTiposAnalisis.SelectedItem;
-            
+
             try
             {
                 // Obtener métricas asociadas al tipo de análisis seleccionado
@@ -234,7 +335,7 @@ namespace SALC.Views.PanelAdministrador
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error al cargar métricas del tipo de análisis: {ex.Message}", "Error", 
+                MessageBox.Show(string.Format("Error al cargar métricas del tipo de análisis: {0}", ex.Message), "Error",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
@@ -243,7 +344,7 @@ namespace SALC.Views.PanelAdministrador
         {
             if (cboTiposAnalisis.SelectedItem == null)
             {
-                MessageBox.Show("Seleccione un tipo de análisis.", "Validación", 
+                MessageBox.Show("Seleccione un tipo de análisis.", "Validación",
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
@@ -270,7 +371,7 @@ namespace SALC.Views.PanelAdministrador
                 var resultado = MessageBox.Show(
                     "No ha seleccionado ninguna métrica. Esto eliminará todas las relaciones existentes para este tipo de análisis. ¿Continuar?",
                     "Confirmación", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                
+
                 if (resultado != DialogResult.Yes) return;
             }
 
@@ -278,12 +379,12 @@ namespace SALC.Views.PanelAdministrador
             {
                 _catalogoService.ActualizarRelacionesTipoAnalisis(tipoAnalisisSeleccionado.IdTipoAnalisis, metricasSeleccionadas);
                 CargarRelacionesExistentes();
-                MessageBox.Show("Relaciones actualizadas correctamente.", "Éxito", 
+                MessageBox.Show("Relaciones actualizadas correctamente.", "Éxito",
                     MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error al guardar relaciones: {ex.Message}", "Error", 
+                MessageBox.Show(string.Format("Error al guardar relaciones: {0}", ex.Message), "Error",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
@@ -292,7 +393,7 @@ namespace SALC.Views.PanelAdministrador
         {
             if (gridRelaciones.CurrentRow?.DataBoundItem == null)
             {
-                MessageBox.Show("Seleccione una relación para eliminar.", "Validación", 
+                MessageBox.Show("Seleccione una relación para eliminar.", "Validación",
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
@@ -306,7 +407,7 @@ namespace SALC.Views.PanelAdministrador
             var idTipoAnalisis = (int)idTipoAnalisisProp.GetValue(relacionSeleccionada);
             var idMetrica = (int)idMetricaProp.GetValue(relacionSeleccionada);
 
-            var resultado = MessageBox.Show("¿Está seguro que desea eliminar esta relación?", 
+            var resultado = MessageBox.Show("¿Está seguro que desea eliminar esta relación?",
                 "Confirmar Eliminación", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
             if (resultado != DialogResult.Yes) return;
@@ -315,20 +416,20 @@ namespace SALC.Views.PanelAdministrador
             {
                 _catalogoService.EliminarRelacionTipoAnalisisMetrica(idTipoAnalisis, idMetrica);
                 CargarRelacionesExistentes();
-                
+
                 // Actualizar la vista si el tipo de análisis eliminado está seleccionado
-                if (cboTiposAnalisis.SelectedItem is TipoAnalisis tipoSelected && 
+                if (cboTiposAnalisis.SelectedItem is TipoAnalisis tipoSelected &&
                     tipoSelected.IdTipoAnalisis == idTipoAnalisis)
                 {
                     CboTiposAnalisis_SelectedIndexChanged(cboTiposAnalisis, EventArgs.Empty);
                 }
-                
-                MessageBox.Show("Relación eliminada correctamente.", "Éxito", 
+
+                MessageBox.Show("Relación eliminada correctamente.", "Éxito",
                     MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error al eliminar relación: {ex.Message}", "Error", 
+                MessageBox.Show(string.Format("Error al eliminar relación: {0}", ex.Message), "Error",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }

@@ -1,5 +1,6 @@
 using System;
 using System.Windows.Forms;
+using System.Drawing;
 using SALC.Domain;
 
 namespace SALC.Views.PanelAdministrador
@@ -14,50 +15,138 @@ namespace SALC.Views.PanelAdministrador
         public FrmMetricaEdit(Metrica existente = null)
         {
             Text = existente == null ? "Nueva Métrica" : "Editar Métrica";
-            Width = 420; Height = 320; FormBorderStyle = FormBorderStyle.FixedDialog; MaximizeBox = false; MinimizeBox = false;
+            Width = 450;
+            Height = 450;
+            FormBorderStyle = FormBorderStyle.FixedDialog;
+            MaximizeBox = false;
+            MinimizeBox = false;
             StartPosition = FormStartPosition.CenterParent;
+            BackColor = Color.White;
 
-            var lblNombre = new Label { Text = "Nombre:", Left = 20, Top = 20, Width = 120 };
-            txtNombre = new TextBox { Left = 150, Top = 18, Width = 200, MaxLength = 100 };
-            
-            var lblUnidadMedida = new Label { Text = "Unidad de Medida:", Left = 20, Top = 55, Width = 120 };
-            txtUnidadMedida = new TextBox { Left = 150, Top = 53, Width = 200, MaxLength = 20 };
-            
-            var lblValorMinimo = new Label { Text = "Valor Mínimo:", Left = 20, Top = 90, Width = 120 };
-            txtValorMinimo = new TextBox { Left = 150, Top = 88, Width = 200 };
-            
-            var lblValorMaximo = new Label { Text = "Valor Máximo:", Left = 20, Top = 125, Width = 120 };
-            txtValorMaximo = new TextBox { Left = 150, Top = 123, Width = 200 };
-            
-            // Agregar combo de estado
-            var lblEstado = new Label { Text = "Estado:", Left = 20, Top = 160, Width = 120 };
-            cboEstado = new ComboBox { Left = 150, Top = 158, Width = 120, DropDownStyle = ComboBoxStyle.DropDownList };
+            // Título del formulario
+            var lblTitulo = new Label
+            {
+                Text = existente == null ? "Crear Nueva Métrica de Laboratorio" : "Modificar Métrica",
+                Font = new Font("Segoe UI", 14, FontStyle.Bold),
+                ForeColor = Color.FromArgb(70, 130, 180),
+                Location = new Point(20, 15),
+                Size = new Size(400, 30),
+                BackColor = Color.Transparent
+            };
+
+            var lblSubtitulo = new Label
+            {
+                Text = existente == null
+                    ? "Defina los parámetros de la nueva métrica de análisis"
+                    : "Actualice la información de la métrica",
+                Font = new Font("Segoe UI", 9, FontStyle.Regular),
+                ForeColor = Color.FromArgb(127, 140, 141),
+                Location = new Point(20, 45),
+                Size = new Size(400, 20),
+                BackColor = Color.Transparent
+            };
+
+            // Campos
+            var lblNombre = new Label { Text = "Nombre:", Left = 20, Top = 80, Width = 120, Font = new Font("Segoe UI", 10, FontStyle.Bold), ForeColor = Color.FromArgb(44, 62, 80) };
+            txtNombre = new TextBox { Left = 150, Top = 78, Width = 250, MaxLength = 100, Font = new Font("Segoe UI", 10), BorderStyle = BorderStyle.FixedSingle };
+
+            var lblUnidadMedida = new Label { Text = "Unidad Medida:", Left = 20, Top = 115, Width = 120, Font = new Font("Segoe UI", 10, FontStyle.Bold), ForeColor = Color.FromArgb(44, 62, 80) };
+            txtUnidadMedida = new TextBox { Left = 150, Top = 113, Width = 250, MaxLength = 20, Font = new Font("Segoe UI", 10), BorderStyle = BorderStyle.FixedSingle };
+
+            var lblValorMinimo = new Label { Text = "Valor Mínimo:", Left = 20, Top = 150, Width = 120, Font = new Font("Segoe UI", 10, FontStyle.Bold), ForeColor = Color.FromArgb(44, 62, 80) };
+            txtValorMinimo = new TextBox { Left = 150, Top = 148, Width = 250, Font = new Font("Segoe UI", 10), BorderStyle = BorderStyle.FixedSingle };
+
+            var lblAyudaMin = new Label
+            {
+                Text = "Valor mínimo de referencia (opcional, solo números)",
+                Left = 150,
+                Top = 175,
+                Width = 280,
+                Height = 15,
+                Font = new Font("Segoe UI", 8, FontStyle.Italic),
+                ForeColor = Color.FromArgb(127, 140, 141),
+                BackColor = Color.Transparent
+            };
+
+            var lblValorMaximo = new Label { Text = "Valor Máximo:", Left = 20, Top = 200, Width = 120, Font = new Font("Segoe UI", 10, FontStyle.Bold), ForeColor = Color.FromArgb(44, 62, 80) };
+            txtValorMaximo = new TextBox { Left = 150, Top = 198, Width = 250, Font = new Font("Segoe UI", 10), BorderStyle = BorderStyle.FixedSingle };
+
+            var lblAyudaMax = new Label
+            {
+                Text = "Valor máximo de referencia (opcional, solo números)",
+                Left = 150,
+                Top = 225,
+                Width = 280,
+                Height = 15,
+                Font = new Font("Segoe UI", 8, FontStyle.Italic),
+                ForeColor = Color.FromArgb(127, 140, 141),
+                BackColor = Color.Transparent
+            };
+
+            var lblEstado = new Label { Text = "Estado:", Left = 20, Top = 250, Width = 120, Font = new Font("Segoe UI", 10, FontStyle.Bold), ForeColor = Color.FromArgb(44, 62, 80) };
+            cboEstado = new ComboBox { Left = 150, Top = 248, Width = 120, DropDownStyle = ComboBoxStyle.DropDownList, Font = new Font("Segoe UI", 10) };
             cboEstado.Items.AddRange(new object[] { "Activo", "Inactivo" });
 
-            // Agregar etiquetas de ayuda
-            var lblAyudaMin = new Label { 
-                Text = "(Opcional - Solo números decimales)", 
-                Left = 150, Top = 110, Width = 200, 
-                ForeColor = System.Drawing.Color.Gray,
-                Font = new System.Drawing.Font("Microsoft Sans Serif", 7.5F)
-            };
-            var lblAyudaMax = new Label { 
-                Text = "(Opcional - Solo números decimales)", 
-                Left = 150, Top = 145, Width = 200, 
-                ForeColor = System.Drawing.Color.Gray,
-                Font = new System.Drawing.Font("Microsoft Sans Serif", 7.5F)
+            // Nota informativa
+            var lblNota = new Label
+            {
+                Text = "Ejemplos: Glucosa (mg/dL), Hemoglobina (g/dL), Colesterol (mg/dL)",
+                Left = 20,
+                Top = 285,
+                Width = 400,
+                Height = 30,
+                Font = new Font("Segoe UI", 8, FontStyle.Italic),
+                ForeColor = Color.FromArgb(127, 140, 141),
+                BackColor = Color.Transparent
             };
 
-            btnOk = new Button { Text = "Aceptar", Left = 170, Top = 210, Width = 80, DialogResult = DialogResult.OK };
-            btnCancel = new Button { Text = "Cancelar", Left = 260, Top = 210, Width = 90, DialogResult = DialogResult.Cancel };
-            AcceptButton = btnOk; CancelButton = btnCancel;
+            // Botones
+            btnOk = new Button
+            {
+                Text = existente == null ? "Crear Métrica" : "Guardar Cambios",
+                Left = 180,
+                Top = 365,
+                Width = 120,
+                Height = 35,
+                DialogResult = DialogResult.OK,
+                Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                BackColor = Color.FromArgb(39, 174, 96),
+                ForeColor = Color.White,
+                FlatStyle = FlatStyle.Flat,
+                Cursor = Cursors.Hand
+            };
+            btnOk.FlatAppearance.BorderSize = 0;
+
+            btnCancel = new Button
+            {
+                Text = "Cancelar",
+                Left = 310,
+                Top = 365,
+                Width = 90,
+                Height = 35,
+                DialogResult = DialogResult.Cancel,
+                Font = new Font("Segoe UI", 10, FontStyle.Regular),
+                BackColor = Color.FromArgb(149, 165, 166),
+                ForeColor = Color.White,
+                FlatStyle = FlatStyle.Flat,
+                Cursor = Cursors.Hand
+            };
+            btnCancel.FlatAppearance.BorderSize = 0;
+
+            AcceptButton = btnOk;
+            CancelButton = btnCancel;
             btnOk.Click += (s, e) => { if (!Validar()) this.DialogResult = DialogResult.None; };
 
-            Controls.AddRange(new Control[] { 
-                lblNombre, txtNombre, lblUnidadMedida, txtUnidadMedida, 
+            Controls.AddRange(new Control[]
+            {
+                lblTitulo, lblSubtitulo,
+                lblNombre, txtNombre,
+                lblUnidadMedida, txtUnidadMedida,
                 lblValorMinimo, txtValorMinimo, lblAyudaMin,
                 lblValorMaximo, txtValorMaximo, lblAyudaMax,
-                lblEstado, cboEstado, btnOk, btnCancel 
+                lblEstado, cboEstado,
+                lblNota,
+                btnOk, btnCancel
             });
 
             if (existente != null)
@@ -71,18 +160,17 @@ namespace SALC.Views.PanelAdministrador
             }
             else
             {
-                // Valores por defecto para nueva métrica
                 cboEstado.SelectedItem = "Activo";
             }
         }
 
         private bool Validar()
         {
-            if (string.IsNullOrWhiteSpace(txtNombre.Text)) 
-            { 
-                MessageBox.Show("Nombre requerido.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning); 
-                txtNombre.Focus(); 
-                return false; 
+            if (string.IsNullOrWhiteSpace(txtNombre.Text))
+            {
+                MessageBox.Show("El nombre es obligatorio.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtNombre.Focus();
+                return false;
             }
 
             if (txtNombre.Text.Trim().Length < 2)
@@ -92,14 +180,13 @@ namespace SALC.Views.PanelAdministrador
                 return false;
             }
 
-            if (string.IsNullOrWhiteSpace(txtUnidadMedida.Text)) 
-            { 
-                MessageBox.Show("Unidad de medida requerida.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning); 
-                txtUnidadMedida.Focus(); 
-                return false; 
+            if (string.IsNullOrWhiteSpace(txtUnidadMedida.Text))
+            {
+                MessageBox.Show("La unidad de medida es obligatoria.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtUnidadMedida.Focus();
+                return false;
             }
 
-            // Validar valores mínimo y máximo si se proporcionan
             decimal? valorMinimo = null, valorMaximo = null;
 
             if (!string.IsNullOrWhiteSpace(txtValorMinimo.Text))
@@ -124,21 +211,20 @@ namespace SALC.Views.PanelAdministrador
                 valorMaximo = max;
             }
 
-            // Validar que mínimo <= máximo si ambos están presentes
             if (valorMinimo.HasValue && valorMaximo.HasValue && valorMinimo.Value > valorMaximo.Value)
             {
                 MessageBox.Show("El valor mínimo no puede ser mayor que el valor máximo.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 txtValorMinimo.Focus();
                 return false;
             }
-            
-            if (cboEstado.SelectedItem == null) 
-            { 
-                MessageBox.Show("Seleccione un estado.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning); 
-                cboEstado.Focus(); 
-                return false; 
+
+            if (cboEstado.SelectedItem == null)
+            {
+                MessageBox.Show("Seleccione un estado.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                cboEstado.Focus();
+                return false;
             }
-            
+
             return true;
         }
 
@@ -154,7 +240,7 @@ namespace SALC.Views.PanelAdministrador
 
             return new Metrica
             {
-                IdMetrica = idOriginal ?? 0, // Para nuevas será 0, se asigna en la BD
+                IdMetrica = idOriginal ?? 0,
                 Nombre = txtNombre.Text.Trim(),
                 UnidadMedida = txtUnidadMedida.Text.Trim(),
                 ValorMinimo = valorMinimo,
