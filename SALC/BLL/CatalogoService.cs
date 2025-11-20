@@ -9,6 +9,10 @@ using SALC.Infraestructura.Exceptions;
 
 namespace SALC.BLL
 {
+    /// <summary>
+    /// Servicio de lógica de negocio para la gestión de catálogos del sistema.
+    /// Administra obras sociales, tipos de análisis, métricas y sus relaciones.
+    /// </summary>
     public class CatalogoService : ICatalogoService
     {
         private readonly CatalogoRepositorio _repo = new CatalogoRepositorio();
@@ -16,6 +20,10 @@ namespace SALC.BLL
         
         #region Métodos de Consulta
 
+        /// <summary>
+        /// Obtiene todas las métricas del sistema
+        /// </summary>
+        /// <returns>Colección de métricas</returns>
         public IEnumerable<Metrica> ObtenerMetricas()
         {
             try
@@ -28,6 +36,10 @@ namespace SALC.BLL
             }
         }
 
+        /// <summary>
+        /// Obtiene todas las obras sociales del sistema
+        /// </summary>
+        /// <returns>Colección de obras sociales</returns>
         public IEnumerable<ObraSocial> ObtenerObrasSociales()
         {
             try
@@ -40,6 +52,10 @@ namespace SALC.BLL
             }
         }
 
+        /// <summary>
+        /// Obtiene todos los tipos de análisis del sistema
+        /// </summary>
+        /// <returns>Colección de tipos de análisis</returns>
         public IEnumerable<TipoAnalisis> ObtenerTiposAnalisis()
         {
             try
@@ -52,6 +68,10 @@ namespace SALC.BLL
             }
         }
 
+        /// <summary>
+        /// Obtiene las métricas activas del sistema
+        /// </summary>
+        /// <returns>Colección de métricas activas</returns>
         public IEnumerable<Metrica> ObtenerMetricasActivas()
         {
             try
@@ -64,6 +84,10 @@ namespace SALC.BLL
             }
         }
 
+        /// <summary>
+        /// Obtiene las obras sociales activas del sistema
+        /// </summary>
+        /// <returns>Colección de obras sociales activas</returns>
         public IEnumerable<ObraSocial> ObtenerObrasSocialesActivas()
         {
             try
@@ -76,6 +100,10 @@ namespace SALC.BLL
             }
         }
 
+        /// <summary>
+        /// Obtiene los tipos de análisis activos del sistema
+        /// </summary>
+        /// <returns>Colección de tipos de análisis activos</returns>
         public IEnumerable<TipoAnalisis> ObtenerTiposAnalisisActivos()
         {
             try
@@ -92,6 +120,10 @@ namespace SALC.BLL
 
         #region Obras Sociales
 
+        /// <summary>
+        /// Crea una nueva obra social
+        /// </summary>
+        /// <param name="os">Datos de la obra social a crear</param>
         public void CrearObraSocial(ObraSocial os)
         {
             try
@@ -114,6 +146,10 @@ namespace SALC.BLL
             }
         }
 
+        /// <summary>
+        /// Actualiza una obra social existente
+        /// </summary>
+        /// <param name="os">Obra social con los datos actualizados</param>
         public void ActualizarObraSocial(ObraSocial os)
         {
             try
@@ -139,6 +175,10 @@ namespace SALC.BLL
             }
         }
 
+        /// <summary>
+        /// Elimina una obra social mediante baja lógica
+        /// </summary>
+        /// <param name="id">Identificador de la obra social</param>
         public void EliminarObraSocial(int id)
         {
             try
@@ -166,6 +206,10 @@ namespace SALC.BLL
 
         #region Tipos de Análisis
 
+        /// <summary>
+        /// Crea un nuevo tipo de análisis
+        /// </summary>
+        /// <param name="ta">Datos del tipo de análisis a crear</param>
         public void CrearTipoAnalisis(TipoAnalisis ta)
         {
             try
@@ -188,6 +232,10 @@ namespace SALC.BLL
             }
         }
 
+        /// <summary>
+        /// Actualiza un tipo de análisis existente
+        /// </summary>
+        /// <param name="ta">Tipo de análisis con los datos actualizados</param>
         public void ActualizarTipoAnalisis(TipoAnalisis ta)
         {
             try
@@ -213,6 +261,10 @@ namespace SALC.BLL
             }
         }
 
+        /// <summary>
+        /// Elimina un tipo de análisis mediante baja lógica
+        /// </summary>
+        /// <param name="id">Identificador del tipo de análisis</param>
         public void EliminarTipoAnalisis(int id)
         {
             try
@@ -240,6 +292,10 @@ namespace SALC.BLL
 
         #region Métricas
 
+        /// <summary>
+        /// Crea una nueva métrica
+        /// </summary>
+        /// <param name="m">Datos de la métrica a crear</param>
         public void CrearMetrica(Metrica m)
         {
             try
@@ -262,6 +318,10 @@ namespace SALC.BLL
             }
         }
 
+        /// <summary>
+        /// Actualiza una métrica existente
+        /// </summary>
+        /// <param name="m">Métrica con los datos actualizados</param>
         public void ActualizarMetrica(Metrica m)
         {
             try
@@ -287,6 +347,10 @@ namespace SALC.BLL
             }
         }
 
+        /// <summary>
+        /// Elimina una métrica mediante baja lógica
+        /// </summary>
+        /// <param name="id">Identificador de la métrica</param>
         public void EliminarMetrica(int id)
         {
             try
@@ -314,6 +378,10 @@ namespace SALC.BLL
 
         #region Relaciones Tipo Análisis - Métricas
 
+        /// <summary>
+        /// Obtiene todas las relaciones entre tipos de análisis y métricas
+        /// </summary>
+        /// <returns>Colección de relaciones tipo análisis-métrica</returns>
         public IEnumerable<TipoAnalisisMetrica> ObtenerRelacionesTipoAnalisisMetricas()
         {
             try
@@ -326,6 +394,11 @@ namespace SALC.BLL
             }
         }
 
+        /// <summary>
+        /// Obtiene las métricas asociadas a un tipo de análisis específico
+        /// </summary>
+        /// <param name="idTipoAnalisis">Identificador del tipo de análisis</param>
+        /// <returns>Colección de métricas del tipo de análisis</returns>
         public IEnumerable<Metrica> ObtenerMetricasPorTipoAnalisis(int idTipoAnalisis)
         {
             try
@@ -345,6 +418,11 @@ namespace SALC.BLL
             }
         }
 
+        /// <summary>
+        /// Crea una relación entre un tipo de análisis y una métrica
+        /// </summary>
+        /// <param name="idTipoAnalisis">Identificador del tipo de análisis</param>
+        /// <param name="idMetrica">Identificador de la métrica</param>
         public void CrearRelacionTipoAnalisisMetrica(int idTipoAnalisis, int idMetrica)
         {
             try
@@ -374,6 +452,11 @@ namespace SALC.BLL
             }
         }
 
+        /// <summary>
+        /// Elimina una relación entre un tipo de análisis y una métrica
+        /// </summary>
+        /// <param name="idTipoAnalisis">Identificador del tipo de análisis</param>
+        /// <param name="idMetrica">Identificador de la métrica</param>
         public void EliminarRelacionTipoAnalisisMetrica(int idTipoAnalisis, int idMetrica)
         {
             try
@@ -400,6 +483,11 @@ namespace SALC.BLL
             }
         }
 
+        /// <summary>
+        /// Actualiza todas las relaciones de un tipo de análisis con métricas
+        /// </summary>
+        /// <param name="idTipoAnalisis">Identificador del tipo de análisis</param>
+        /// <param name="idsMetricas">Colección de identificadores de métricas a asociar</param>
         public void ActualizarRelacionesTipoAnalisis(int idTipoAnalisis, IEnumerable<int> idsMetricas)
         {
             try
@@ -412,10 +500,8 @@ namespace SALC.BLL
 
                 ExceptionHandler.LogInfo($"Actualizando relaciones de tipo de análisis - ID: {idTipoAnalisis}, Cantidad de métricas: {idsMetricas.Count()}", "ActualizarRelacionesTipoAnalisis");
 
-                // Eliminar todas las relaciones existentes del tipo de análisis
                 _tipoAnalisisMetricaRepo.EliminarTodasLasRelacionesDeTipoAnalisis(idTipoAnalisis);
 
-                // Crear las nuevas relaciones
                 foreach (var idMetrica in idsMetricas)
                 {
                     if (idMetrica > 0)
@@ -436,6 +522,12 @@ namespace SALC.BLL
             }
         }
 
+        /// <summary>
+        /// Verifica si existe una relación entre un tipo de análisis y una métrica
+        /// </summary>
+        /// <param name="idTipoAnalisis">Identificador del tipo de análisis</param>
+        /// <param name="idMetrica">Identificador de la métrica</param>
+        /// <returns>True si existe la relación, false en caso contrario</returns>
         public bool ExisteRelacionTipoAnalisisMetrica(int idTipoAnalisis, int idMetrica)
         {
             try
@@ -452,6 +544,10 @@ namespace SALC.BLL
 
         #region Validaciones
 
+        /// <summary>
+        /// Valida los datos de una obra social
+        /// </summary>
+        /// <param name="os">Obra social a validar</param>
         private void ValidarObraSocial(ObraSocial os)
         {
             if (os == null)
@@ -467,6 +563,10 @@ namespace SALC.BLL
                 throw new SalcValidacionException("El nombre de la obra social es obligatorio.", "nombre");
         }
 
+        /// <summary>
+        /// Valida los datos de un tipo de análisis
+        /// </summary>
+        /// <param name="ta">Tipo de análisis a validar</param>
         private void ValidarTipoAnalisis(TipoAnalisis ta)
         {
             if (ta == null)
@@ -476,6 +576,10 @@ namespace SALC.BLL
                 throw new SalcValidacionException("La descripción del tipo de análisis es obligatoria.", "descripcion");
         }
 
+        /// <summary>
+        /// Valida los datos de una métrica
+        /// </summary>
+        /// <param name="m">Métrica a validar</param>
         private void ValidarMetrica(Metrica m)
         {
             if (m == null)

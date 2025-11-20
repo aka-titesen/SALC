@@ -9,13 +9,16 @@ using SALC.DAL;
 namespace SALC.BLL
 {
     /// <summary>
-    /// Servicio para gestionar copias de seguridad manuales de la base de datos
-    /// Implementa el patrón de 3 capas: esta capa contiene la lógica de negocio
+    /// Servicio de lógica de negocio para la gestión de copias de seguridad de la base de datos.
+    /// Permite ejecutar backups manuales, consultar el historial y limpiar backups antiguos.
     /// </summary>
     public class BackupService : IBackupService
     {
         private readonly BackupRepositorio _backupRepo;
 
+        /// <summary>
+        /// Constructor del servicio de backup
+        /// </summary>
         public BackupService()
         {
             _backupRepo = new BackupRepositorio();
@@ -24,15 +27,12 @@ namespace SALC.BLL
         #region Ejecución de Backup Manual
 
         /// <summary>
-        /// Ejecuta una copia de seguridad manual de la base de datos SQL Server
+        /// Ejecuta una copia de seguridad manual de la base de datos
         /// </summary>
-        /// <param name="rutaArchivoBak">Ruta completa donde se guardará el archivo .bak</param>
+        /// <param name="rutaArchivoBak">Ruta completa donde se guardará el archivo de backup</param>
         /// <param name="dniUsuario">DNI del administrador que ejecuta el backup</param>
-        /// <exception cref="ArgumentException">Si la ruta es inválida</exception>
-        /// <exception cref="SqlException">Si hay un error al ejecutar el backup en SQL Server</exception>
         public void EjecutarBackupManual(string rutaArchivoBak, int dniUsuario)
         {
-            // Validaciones de negocio
             if (string.IsNullOrWhiteSpace(rutaArchivoBak))
                 throw new ArgumentException("La ruta del archivo de backup no puede estar vacía.", nameof(rutaArchivoBak));
 
@@ -48,7 +48,6 @@ namespace SALC.BLL
 
             try
             {
-                // Validar y crear directorio si no existe
                 var directorio = Path.GetDirectoryName(rutaArchivoBak);
                 if (string.IsNullOrEmpty(directorio))
                     throw new ArgumentException("No se pudo determinar el directorio de la ruta especificada.", nameof(rutaArchivoBak));
@@ -58,7 +57,6 @@ namespace SALC.BLL
                     Directory.CreateDirectory(directorio);
                 }
 
-                // Obtener el nombre de la base de datos del connection string
                 var connectionString = System.Configuration.ConfigurationManager.ConnectionStrings["SALC"].ConnectionString;
                 var builder = new SqlConnectionStringBuilder(connectionString);
                 var nombreBaseDatos = builder.InitialCatalog;
@@ -66,20 +64,18 @@ namespace SALC.BLL
                 if (string.IsNullOrEmpty(nombreBaseDatos))
                     throw new InvalidOperationException("No se pudo determinar el nombre de la base de datos del connection string.");
 
-                // Ejecutar el comando BACKUP DATABASE en SQL Server
                 var sqlBackup = $"BACKUP DATABASE [{nombreBaseDatos}] TO DISK = @ruta WITH INIT, STATS = 5";
                 
                 using (var conexion = DbConexion.CrearConexion())
                 using (var comando = new SqlCommand(sqlBackup, conexion))
                 {
                     comando.Parameters.AddWithValue("@ruta", rutaArchivoBak);
-                    comando.CommandTimeout = 0; // Sin timeout para permitir backups grandes
+                    comando.CommandTimeout = 0;
                     
                     conexion.Open();
                     comando.ExecuteNonQuery();
                 }
 
-                // Obtener información del archivo creado
                 if (File.Exists(rutaArchivoBak))
                 {
                     var archivoInfo = new FileInfo(rutaArchivoBak);
@@ -98,21 +94,18 @@ namespace SALC.BLL
                 historial.Estado = "Error";
                 historial.Observaciones = $"Error al ejecutar backup: {ex.Message}";
                 
-                // Registrar en historial antes de relanzar la excepción
                 try
                 {
                     _backupRepo.InsertarHistorial(historial);
                 }
                 catch
                 {
-                    // Ignorar errores al guardar historial si el backup falló
                 }
                 
-                throw; // Relanzar la excepción original
+                throw;
             }
             finally
             {
-                // Siempre registrar en el historial si el backup fue exitoso
                 if (historial.Estado == "Exitoso")
                 {
                     _backupRepo.InsertarHistorial(historial);
@@ -127,6 +120,8 @@ namespace SALC.BLL
         /// <summary>
         /// Obtiene el historial de backups ordenado por fecha descendente
         /// </summary>
+        /// <param name="limite">Cantidad máxima de registros a retornar</param>
+        /// <returns>Lista con el historial de backups</returns>
         public List<HistorialBackup> ObtenerHistorialBackups(int limite = 50)
         {
             if (limite <= 0)
@@ -138,6 +133,7 @@ namespace SALC.BLL
         /// <summary>
         /// Obtiene información del último backup exitoso ejecutado
         /// </summary>
+        /// <returns>Información del último backup o null si no hay registros</returns>
         public HistorialBackup ObtenerUltimoBackup()
         {
             return _backupRepo.ObtenerUltimoBackup();
@@ -146,33 +142,29 @@ namespace SALC.BLL
         /// <summary>
         /// Elimina registros de historial y archivos físicos de backups más antiguos que el período especificado
         /// </summary>
+        /// <param name="diasRetencion">Cantidad de días de retención de backups</param>
         public void LimpiarBackupsAntiguos(int diasRetencion)
         {
             if (diasRetencion <= 0)
                 throw new ArgumentException("Los días de retención deben ser mayor a cero.", nameof(diasRetencion));
 
-            // Limpiar registros de historial en la base de datos
             _backupRepo.LimpiarHistorialAntiguo(diasRetencion);
             
-            // Intentar eliminar archivos físicos antiguos
-            // Nota: Esto es una operación de mejor esfuerzo, no debe fallar si hay problemas con archivos
             try
             {
                 EliminarArchivosAntiguos(diasRetencion);
             }
             catch
             {
-                // Ignorar errores al eliminar archivos físicos
-                // El historial ya fue limpiado en la BD
             }
         }
 
         /// <summary>
         /// Elimina archivos físicos de backup más antiguos que el período especificado
         /// </summary>
+        /// <param name="diasRetencion">Cantidad de días de retención</param>
         private void EliminarArchivosAntiguos(int diasRetencion)
         {
-            // Obtener todas las rutas únicas del historial
             var rutas = _backupRepo.ObtenerRutasBackups();
             
             var fechaLimite = DateTime.Now.AddDays(-diasRetencion);
@@ -192,7 +184,6 @@ namespace SALC.BLL
                 }
                 catch
                 {
-                    // Ignorar errores individuales (archivo en uso, sin permisos, etc.)
                     continue;
                 }
             }
@@ -203,8 +194,10 @@ namespace SALC.BLL
         #region Utilidades
 
         /// <summary>
-        /// Formatea un tamaño en bytes a una representación legible
+        /// Formatea un tamaño en bytes a una representación legible (B, KB, MB, GB)
         /// </summary>
+        /// <param name="bytes">Tamaño en bytes</param>
+        /// <returns>Cadena formateada con el tamaño legible</returns>
         public string FormatearTamanoArchivo(long bytes)
         {
             if (bytes < 1024) 

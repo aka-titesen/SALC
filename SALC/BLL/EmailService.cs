@@ -7,8 +7,8 @@ using System.Net.Mail;
 namespace SALC.BLL
 {
     /// <summary>
-    /// Implementación del servicio de envío de correos electrónicos siguiendo el patrón MVP.
-    /// RF-08: Generar y Enviar Informe (parte 2: envío)
+    /// Servicio de lógica de negocio para el envío de correos electrónicos.
+    /// Gestiona el envío de informes de análisis a pacientes por correo electrónico.
     /// </summary>
     public class EmailService : IEmailService
     {
@@ -19,9 +19,11 @@ namespace SALC.BLL
         private readonly string _nombreRemitente;
         private readonly bool _habilitarSsl;
 
+        /// <summary>
+        /// Constructor del servicio de email. Lee la configuración desde App.config
+        /// </summary>
         public EmailService()
         {
-            // Leer configuración desde App.config
             _smtpHost = ConfigurationManager.AppSettings["SMTP_Host"] ?? "smtp.gmail.com";
             _smtpPort = int.Parse(ConfigurationManager.AppSettings["SMTP_Port"] ?? "587");
             _smtpUsuario = ConfigurationManager.AppSettings["SMTP_Usuario"] ?? "";
@@ -29,7 +31,6 @@ namespace SALC.BLL
             _nombreRemitente = ConfigurationManager.AppSettings["SMTP_NombreRemitente"] ?? "Laboratorio SALC";
             _habilitarSsl = bool.Parse(ConfigurationManager.AppSettings["SMTP_EnableSSL"] ?? "true");
 
-            // Validar configuración
             if (string.IsNullOrWhiteSpace(_smtpUsuario) || string.IsNullOrWhiteSpace(_smtpPassword))
             {
                 throw new InvalidOperationException(
@@ -38,6 +39,14 @@ namespace SALC.BLL
             }
         }
 
+        /// <summary>
+        /// Envía un informe de análisis por correo electrónico a un paciente
+        /// </summary>
+        /// <param name="destinatario">Email del destinatario</param>
+        /// <param name="nombrePaciente">Nombre completo del paciente</param>
+        /// <param name="rutaArchivoPdf">Ruta completa del archivo PDF del informe</param>
+        /// <param name="tipoAnalisis">Descripción del tipo de análisis</param>
+        /// <returns>True si el envío fue exitoso, lanza excepción en caso de error</returns>
         public bool EnviarInformePorCorreo(string destinatario, string nombrePaciente, string rutaArchivoPdf, string tipoAnalisis)
         {
             // Validaciones
@@ -104,6 +113,12 @@ namespace SALC.BLL
             }
         }
 
+        /// <summary>
+        /// Genera el cuerpo del mensaje de correo con formato profesional
+        /// </summary>
+        /// <param name="nombrePaciente">Nombre del paciente</param>
+        /// <param name="tipoAnalisis">Tipo de análisis realizado</param>
+        /// <returns>Texto formateado del mensaje</returns>
         private string GenerarCuerpoMensaje(string nombrePaciente, string tipoAnalisis)
         {
             return $@"Estimado/a {nombrePaciente},

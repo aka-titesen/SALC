@@ -5,10 +5,15 @@ using System.Windows.Forms;
 using SALC.BLL;
 using SALC.Domain;
 using SALC.Presenters.ViewsContracts;
-using SALC.Views.PanelAsistente; // ? USAR FORMULARIO ESPECÍFICO DEL ASISTENTE
+using SALC.Views.PanelAsistente;
 
 namespace SALC.Presenters
 {
+    /// <summary>
+    /// Presenter para la gestión de pacientes desde el panel de asistente.
+    /// Coordina la vista de gestión de pacientes con los servicios de negocio, limitando las operaciones
+    /// según los permisos del rol de asistente (solo puede crear y editar datos básicos).
+    /// </summary>
     public class GestionPacientesAsistentePresenter
     {
         private readonly IGestionPacientesAsistenteView _view;
@@ -16,6 +21,10 @@ namespace SALC.Presenters
         private readonly ICatalogoService _catalogoService;
         private List<Paciente> _todosLosPacientes;
 
+        /// <summary>
+        /// Constructor del presenter
+        /// </summary>
+        /// <param name="view">Vista de gestión de pacientes para asistentes</param>
         public GestionPacientesAsistentePresenter(IGestionPacientesAsistenteView view)
         {
             _view = view ?? throw new ArgumentNullException(nameof(view));
@@ -25,6 +34,9 @@ namespace SALC.Presenters
             SubscribirEventos();
         }
 
+        /// <summary>
+        /// Suscribe a los eventos de la vista
+        /// </summary>
         private void SubscribirEventos()
         {
             _view.VistaInicializada += OnVistaInicializada;
@@ -34,6 +46,9 @@ namespace SALC.Presenters
             _view.RefrescarClick += OnRefrescar;
         }
 
+        /// <summary>
+        /// Inicializa la vista cargando los datos iniciales
+        /// </summary>
         public void InicializarVista()
         {
             try
@@ -50,16 +65,25 @@ namespace SALC.Presenters
             }
         }
 
+        /// <summary>
+        /// Maneja el evento de vista inicializada
+        /// </summary>
         private void OnVistaInicializada(object sender, EventArgs e)
         {
             InicializarVista();
         }
 
+        /// <summary>
+        /// Maneja el evento de refrescar la lista de pacientes
+        /// </summary>
         private void OnRefrescar(object sender, EventArgs e)
         {
             CargarPacientes();
         }
 
+        /// <summary>
+        /// Carga todos los pacientes del sistema y actualiza la vista
+        /// </summary>
         private void CargarPacientes()
         {
             try
@@ -82,11 +106,17 @@ namespace SALC.Presenters
             }
         }
 
+        /// <summary>
+        /// Maneja el evento de búsqueda de pacientes
+        /// </summary>
         private void OnBuscarPacientes(object sender, EventArgs e)
         {
             FiltrarPacientes();
         }
 
+        /// <summary>
+        /// Filtra la lista de pacientes según el texto de búsqueda ingresado
+        /// </summary>
         private void FiltrarPacientes()
         {
             try
@@ -114,22 +144,23 @@ namespace SALC.Presenters
             }
         }
 
+        /// <summary>
+        /// Maneja el evento de crear un nuevo paciente
+        /// </summary>
         private void OnNuevoPaciente(object sender, EventArgs e)
         {
             try
             {
-                // ? USAR FORMULARIO ESPECÍFICO DEL ASISTENTE
                 using (var frmEdit = new FrmPacienteEditAsistente())
                 {
                     if (frmEdit.ShowDialog() == DialogResult.OK)
                     {
                         var nuevoPaciente = frmEdit.ObtenerPaciente();
                         
-                        // El formulario ya garantiza que el estado es "Activo"
                         _pacienteService.CrearPaciente(nuevoPaciente);
                         
                         _view.MostrarMensaje(
-                            $"? Paciente creado exitosamente\n\n" +
+                            $"Paciente creado exitosamente\n\n" +
                             $"DNI: {nuevoPaciente.Dni}\n" +
                             $"Nombre: {nuevoPaciente.Nombre} {nuevoPaciente.Apellido}\n" +
                             $"Estado: {nuevoPaciente.Estado}\n" +
@@ -143,10 +174,13 @@ namespace SALC.Presenters
             }
             catch (Exception ex)
             {
-                _view.MostrarMensaje($"? Error al crear paciente: {ex.Message}", true);
+                _view.MostrarMensaje($"Error al crear paciente: {ex.Message}", true);
             }
         }
 
+        /// <summary>
+        /// Maneja el evento de editar un paciente existente
+        /// </summary>
         private void OnEditarPaciente(object sender, EventArgs e)
         {
             var pacienteSeleccionado = _view.PacienteSeleccionado;
@@ -158,20 +192,16 @@ namespace SALC.Presenters
 
             try
             {
-                // ? USAR FORMULARIO ESPECÍFICO DEL ASISTENTE
                 using (var frmEdit = new FrmPacienteEditAsistente(pacienteSeleccionado))
                 {
                     if (frmEdit.ShowDialog() == DialogResult.OK)
                     {
                         var pacienteEditado = frmEdit.ObtenerPaciente();
                         
-                        // ? EL FORMULARIO YA GARANTIZA QUE EL ESTADO NO SE MODIFICÓ
-                        // No es necesaria validación adicional aquí
-                        
                         _pacienteService.ActualizarPaciente(pacienteEditado);
                         
                         var cambios = DetectarCambios(pacienteSeleccionado, pacienteEditado);
-                        _view.MostrarMensaje($"? Paciente actualizado exitosamente.\n\nCambios realizados:\n{cambios}");
+                        _view.MostrarMensaje($"Paciente actualizado exitosamente.\n\nCambios realizados:\n{cambios}");
                         
                         CargarPacientes();
                     }
@@ -179,36 +209,42 @@ namespace SALC.Presenters
             }
             catch (Exception ex)
             {
-                _view.MostrarMensaje($"? Error al editar paciente: {ex.Message}", true);
+                _view.MostrarMensaje($"Error al editar paciente: {ex.Message}", true);
             }
         }
 
+        /// <summary>
+        /// Detecta y lista los cambios realizados en un paciente
+        /// </summary>
+        /// <param name="original">Paciente con datos originales</param>
+        /// <param name="editado">Paciente con datos editados</param>
+        /// <returns>Texto con la lista de cambios realizados</returns>
         private string DetectarCambios(Paciente original, Paciente editado)
         {
             var cambios = new List<string>();
 
             if (original.Nombre != editado.Nombre)
-                cambios.Add($"• Nombre: '{original.Nombre}' ? '{editado.Nombre}'");
+                cambios.Add($"- Nombre: '{original.Nombre}' -> '{editado.Nombre}'");
             
             if (original.Apellido != editado.Apellido)
-                cambios.Add($"• Apellido: '{original.Apellido}' ? '{editado.Apellido}'");
+                cambios.Add($"- Apellido: '{original.Apellido}' -> '{editado.Apellido}'");
             
             if (original.Email != editado.Email)
-                cambios.Add($"• Email: '{original.Email ?? "Sin email"}' ? '{editado.Email ?? "Sin email"}'");
+                cambios.Add($"- Email: '{original.Email ?? "Sin email"}' -> '{editado.Email ?? "Sin email"}'");
             
             if (original.Telefono != editado.Telefono)
-                cambios.Add($"• Teléfono: '{original.Telefono ?? "Sin teléfono"}' ? '{editado.Telefono ?? "Sin teléfono"}'");
+                cambios.Add($"- Teléfono: '{original.Telefono ?? "Sin teléfono"}' -> '{editado.Telefono ?? "Sin teléfono"}'");
             
             if (original.FechaNac != editado.FechaNac)
-                cambios.Add($"• Fecha Nacimiento: {original.FechaNac:dd/MM/yyyy} ? {editado.FechaNac:dd/MM/yyyy}");
+                cambios.Add($"- Fecha Nacimiento: {original.FechaNac:dd/MM/yyyy} -> {editado.FechaNac:dd/MM/yyyy}");
             
             if (original.Sexo != editado.Sexo)
-                cambios.Add($"• Sexo: '{original.Sexo}' ? '{editado.Sexo}'");
+                cambios.Add($"- Sexo: '{original.Sexo}' -> '{editado.Sexo}'");
             
             if (original.IdObraSocial != editado.IdObraSocial)
-                cambios.Add($"• Obra Social: {(original.IdObraSocial?.ToString() ?? "Sin obra social")} ? {(editado.IdObraSocial?.ToString() ?? "Sin obra social")}");
+                cambios.Add($"- Obra Social: {(original.IdObraSocial?.ToString() ?? "Sin obra social")} -> {(editado.IdObraSocial?.ToString() ?? "Sin obra social")}");
 
-            return cambios.Count > 0 ? string.Join("\n", cambios) : "• Ningún cambio detectado";
+            return cambios.Count > 0 ? string.Join("\n", cambios) : "- Ningún cambio detectado";
         }
     }
 }

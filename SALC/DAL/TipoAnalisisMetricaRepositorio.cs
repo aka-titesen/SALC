@@ -5,8 +5,16 @@ using SALC.Infraestructura;
 
 namespace SALC.DAL
 {
+    /// <summary>
+    /// Repositorio para el acceso a datos de la relación entre tipos de análisis y métricas.
+    /// Gestiona qué métricas se deben medir para cada tipo de análisis.
+    /// </summary>
     public class TipoAnalisisMetricaRepositorio
     {
+        /// <summary>
+        /// Obtiene todas las relaciones activas entre tipos de análisis y métricas
+        /// </summary>
+        /// <returns>Colección de relaciones con información completa de tipo y métrica</returns>
         public IEnumerable<TipoAnalisisMetrica> ObtenerRelaciones()
         {
             using (var cn = DbConexion.CrearConexion())
@@ -27,17 +35,22 @@ namespace SALC.DAL
                     {
                         yield return new TipoAnalisisMetrica
                         {
-                            IdTipoAnalisis = rd.GetInt32(0), // id_tipo_analisis
-                            IdMetrica = rd.GetInt32(1), // id_metrica
-                            DescripcionTipoAnalisis = rd.GetString(2), // descripcion_tipo_analisis
-                            NombreMetrica = rd.GetString(3), // nombre_metrica
-                            UnidadMedidaMetrica = rd.GetString(4) // unidad_medida
+                            IdTipoAnalisis = rd.GetInt32(0),
+                            IdMetrica = rd.GetInt32(1),
+                            DescripcionTipoAnalisis = rd.GetString(2),
+                            NombreMetrica = rd.GetString(3),
+                            UnidadMedidaMetrica = rd.GetString(4)
                         };
                     }
                 }
             }
         }
 
+        /// <summary>
+        /// Obtiene todas las métricas activas asociadas a un tipo de análisis específico
+        /// </summary>
+        /// <param name="idTipoAnalisis">Identificador del tipo de análisis</param>
+        /// <returns>Colección de métricas del tipo de análisis</returns>
         public IEnumerable<Metrica> ObtenerMetricasPorTipoAnalisis(int idTipoAnalisis)
         {
             using (var cn = DbConexion.CrearConexion())
@@ -56,18 +69,23 @@ namespace SALC.DAL
                     {
                         yield return new Metrica
                         {
-                            IdMetrica = rd.GetInt32(0), // id_metrica
-                            Nombre = rd.GetString(1), // nombre
-                            UnidadMedida = rd.GetString(2), // unidad_medida
-                            ValorMinimo = rd.IsDBNull(3) ? (decimal?)null : rd.GetDecimal(3), // valor_minimo
-                            ValorMaximo = rd.IsDBNull(4) ? (decimal?)null : rd.GetDecimal(4), // valor_maximo
-                            Estado = rd.GetString(5) // estado
+                            IdMetrica = rd.GetInt32(0),
+                            Nombre = rd.GetString(1),
+                            UnidadMedida = rd.GetString(2),
+                            ValorMinimo = rd.IsDBNull(3) ? (decimal?)null : rd.GetDecimal(3),
+                            ValorMaximo = rd.IsDBNull(4) ? (decimal?)null : rd.GetDecimal(4),
+                            Estado = rd.GetString(5)
                         };
                     }
                 }
             }
         }
 
+        /// <summary>
+        /// Crea una nueva relación entre un tipo de análisis y una métrica
+        /// </summary>
+        /// <param name="idTipoAnalisis">Identificador del tipo de análisis</param>
+        /// <param name="idMetrica">Identificador de la métrica</param>
         public void CrearRelacion(int idTipoAnalisis, int idMetrica)
         {
             using (var cn = DbConexion.CrearConexion())
@@ -80,6 +98,11 @@ namespace SALC.DAL
             }
         }
 
+        /// <summary>
+        /// Elimina una relación específica entre un tipo de análisis y una métrica
+        /// </summary>
+        /// <param name="idTipoAnalisis">Identificador del tipo de análisis</param>
+        /// <param name="idMetrica">Identificador de la métrica</param>
         public void EliminarRelacion(int idTipoAnalisis, int idMetrica)
         {
             using (var cn = DbConexion.CrearConexion())
@@ -92,6 +115,10 @@ namespace SALC.DAL
             }
         }
 
+        /// <summary>
+        /// Elimina todas las relaciones de un tipo de análisis con todas sus métricas
+        /// </summary>
+        /// <param name="idTipoAnalisis">Identificador del tipo de análisis</param>
         public void EliminarTodasLasRelacionesDeTipoAnalisis(int idTipoAnalisis)
         {
             using (var cn = DbConexion.CrearConexion())
@@ -103,6 +130,12 @@ namespace SALC.DAL
             }
         }
 
+        /// <summary>
+        /// Verifica si existe una relación entre un tipo de análisis y una métrica
+        /// </summary>
+        /// <param name="idTipoAnalisis">Identificador del tipo de análisis</param>
+        /// <param name="idMetrica">Identificador de la métrica</param>
+        /// <returns>True si existe la relación, false en caso contrario</returns>
         public bool ExisteRelacion(int idTipoAnalisis, int idMetrica)
         {
             using (var cn = DbConexion.CrearConexion())

@@ -7,13 +7,21 @@ using SALC.Infraestructura;
 
 namespace SALC.DAL
 {
+    /// <summary>
+    /// Repositorio para el acceso a datos de análisis clínicos.
+    /// Gestiona las operaciones CRUD sobre la tabla de análisis en la base de datos.
+    /// </summary>
     public class AnalisisRepositorio : IRepositorioBase<Analisis>
     {
-        // Constantes para los estados de análisis basados en la base de datos
         private const int EstadoSinVerificar = 1;
         private const int EstadoVerificado = 2;
-        private const int EstadoAnulado = 3; // Baja lógica
+        private const int EstadoAnulado = 3;
 
+        /// <summary>
+        /// Crea un nuevo análisis en la base de datos y retorna el objeto creado con su ID asignado
+        /// </summary>
+        /// <param name="a">Análisis a crear</param>
+        /// <returns>El análisis creado con su identificador asignado por la base de datos</returns>
         public Analisis CrearYDevolver(Analisis a)
         {
             using (var cn = DbConexion.CrearConexion())
@@ -36,8 +44,16 @@ namespace SALC.DAL
             }
         }
 
+        /// <summary>
+        /// Crea un nuevo análisis en la base de datos
+        /// </summary>
+        /// <param name="entidad">Análisis a crear</param>
         public void Crear(Analisis entidad) => CrearYDevolver(entidad);
 
+        /// <summary>
+        /// Actualiza un análisis existente en la base de datos
+        /// </summary>
+        /// <param name="a">Análisis con los datos actualizados</param>
         public void Actualizar(Analisis a)
         {
             using (var cn = DbConexion.CrearConexion())
@@ -60,9 +76,12 @@ namespace SALC.DAL
             }
         }
 
+        /// <summary>
+        /// Elimina un análisis mediante baja lógica, cambiando su estado a Anulado
+        /// </summary>
+        /// <param name="id">Identificador del análisis a eliminar</param>
         public void Eliminar(object id)
         {
-            // Baja lógica - cambiar estado a "Anulado"
             using (var cn = DbConexion.CrearConexion())
             using (var cmd = new SqlCommand("UPDATE analisis SET id_estado=@estado WHERE id_analisis=@id", cn))
             {
@@ -73,6 +92,11 @@ namespace SALC.DAL
             }
         }
 
+        /// <summary>
+        /// Obtiene un análisis específico por su identificador
+        /// </summary>
+        /// <param name="id">Identificador del análisis</param>
+        /// <returns>El análisis encontrado o null si no existe</returns>
         public Analisis ObtenerPorId(object id)
         {
             using (var cn = DbConexion.CrearConexion())
@@ -89,6 +113,10 @@ namespace SALC.DAL
             return null;
         }
 
+        /// <summary>
+        /// Obtiene todos los análisis del sistema
+        /// </summary>
+        /// <returns>Colección de todos los análisis</returns>
         public IEnumerable<Analisis> ObtenerTodos()
         {
             using (var cn = DbConexion.CrearConexion())
@@ -102,7 +130,10 @@ namespace SALC.DAL
             }
         }
 
-        // Método para obtener solo análisis no anulados (activos)
+        /// <summary>
+        /// Obtiene todos los análisis no anulados del sistema
+        /// </summary>
+        /// <returns>Colección de análisis activos</returns>
         public IEnumerable<Analisis> ObtenerActivos()
         {
             using (var cn = DbConexion.CrearConexion())
@@ -118,6 +149,11 @@ namespace SALC.DAL
             }
         }
 
+        /// <summary>
+        /// Obtiene todos los análisis creados por un médico específico
+        /// </summary>
+        /// <param name="dni">DNI del médico</param>
+        /// <returns>Colección de análisis del médico</returns>
         public IEnumerable<Analisis> ObtenerPorMedicoCarga(int dni)
         {
             using (var cn = DbConexion.CrearConexion())
@@ -133,7 +169,11 @@ namespace SALC.DAL
             }
         }
 
-        // Método para obtener análisis no anulados por médico
+        /// <summary>
+        /// Obtiene los análisis activos (no anulados) creados por un médico específico
+        /// </summary>
+        /// <param name="dni">DNI del médico</param>
+        /// <returns>Colección de análisis activos del médico</returns>
         public IEnumerable<Analisis> ObtenerActivosPorMedicoCarga(int dni)
         {
             using (var cn = DbConexion.CrearConexion())
@@ -150,6 +190,11 @@ namespace SALC.DAL
             }
         }
 
+        /// <summary>
+        /// Obtiene todos los análisis de un paciente específico
+        /// </summary>
+        /// <param name="dniPaciente">DNI del paciente</param>
+        /// <returns>Colección de análisis del paciente</returns>
         public IEnumerable<Analisis> ObtenerPorPaciente(int dniPaciente)
         {
             using (var cn = DbConexion.CrearConexion())
@@ -165,7 +210,11 @@ namespace SALC.DAL
             }
         }
 
-        // Método para obtener análisis no anulados por paciente
+        /// <summary>
+        /// Obtiene los análisis activos (no anulados) de un paciente específico
+        /// </summary>
+        /// <param name="dniPaciente">DNI del paciente</param>
+        /// <returns>Colección de análisis activos del paciente</returns>
         public IEnumerable<Analisis> ObtenerActivosPorPaciente(int dniPaciente)
         {
             using (var cn = DbConexion.CrearConexion())
@@ -182,6 +231,11 @@ namespace SALC.DAL
             }
         }
 
+        /// <summary>
+        /// Mapea un registro de la base de datos a un objeto Analisis
+        /// </summary>
+        /// <param name="rd">Registro leído de la base de datos</param>
+        /// <returns>Instancia de Analisis con los datos del registro</returns>
         private Analisis Map(IDataRecord rd)
         {
             return new Analisis

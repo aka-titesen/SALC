@@ -10,33 +10,41 @@ using MigraDoc.Rendering;
 namespace SALC.BLL
 {
     /// <summary>
-    /// Servicio de generación de informes PDF siguiendo el patrón MVP de 3 capas.
-    /// Implementa RF-08: Generar y Enviar Informe
+    /// Servicio de lógica de negocio para la generación de informes PDF de análisis clínicos.
+    /// Crea documentos PDF profesionales con los resultados de los análisis verificados.
     /// </summary>
     public class InformeService : IInformeService
     {
+        /// <summary>
+        /// Genera un PDF del análisis mostrando un diálogo para seleccionar la ubicación del archivo
+        /// </summary>
+        /// <param name="idAnalisis">Identificador del análisis</param>
+        /// <returns>Ruta del archivo generado o null si se canceló</returns>
         public string GenerarPdfDeAnalisis(int idAnalisis)
         {
             return GenerarPdfDeAnalisis(idAnalisis, null, true);
         }
 
         /// <summary>
-        /// Genera un PDF del análisis en una ruta específica (para envío por email)
+        /// Genera un PDF del análisis en una ruta específica sin mostrar diálogo
         /// </summary>
-        /// <param name="idAnalisis">ID del análisis</param>
-        /// <param name="rutaDestino">Ruta donde guardar el PDF. Si es null, se pregunta al usuario</param>
-        /// <returns>Ruta del archivo generado o null si se canceló</returns>
+        /// <param name="idAnalisis">Identificador del análisis</param>
+        /// <param name="rutaDestino">Ruta donde guardar el PDF</param>
+        /// <returns>Ruta del archivo generado</returns>
         public string GenerarPdfDeAnalisis(int idAnalisis, string rutaDestino)
         {
             return GenerarPdfDeAnalisis(idAnalisis, rutaDestino, false);
         }
 
         /// <summary>
-        /// Método interno que genera el PDF con o sin diálogo
+        /// Genera el PDF con o sin diálogo de selección de archivo
         /// </summary>
+        /// <param name="idAnalisis">Identificador del análisis</param>
+        /// <param name="rutaDestino">Ruta donde guardar el PDF (opcional)</param>
+        /// <param name="mostrarDialogo">Indica si debe mostrar el diálogo de guardar archivo</param>
+        /// <returns>Ruta del archivo generado o null si se canceló</returns>
         private string GenerarPdfDeAnalisis(int idAnalisis, string rutaDestino, bool mostrarDialogo)
         {
-            // Variables para almacenar los datos del análisis
             string nombrePaciente = "";
             string apellidoPaciente = "";
             int dniPaciente = 0;
@@ -54,7 +62,7 @@ namespace SALC.BLL
             {
                 cn.Open();
 
-                // ===== 1) CABECERA DEL ANÁLISIS =====
+                // Obtener cabecera del análisis
                 const string sqlCabecera = @"
 SELECT  p.dni, p.nombre, p.apellido,
         t.descripcion      AS tipo_analisis,
@@ -94,13 +102,12 @@ WHERE   a.id_analisis = @id;";
                     }
                 }
 
-                // Validar que el análisis esté verificado
                 if (estado != "Verificado")
                 {
                     throw new InvalidOperationException("Solo se pueden generar informes de análisis verificados.");
                 }
 
-                // ===== 2) DATOS DEL MÉDICO QUE FIRMÓ =====
+                // Obtener datos del médico que firmó
                 const string sqlMedico = @"
 SELECT  u.nombre, u.apellido, m.nro_matricula, m.especialidad
 FROM    usuarios u
@@ -124,7 +131,7 @@ WHERE   a.id_analisis = @id;";
                     }
                 }
 
-                // ===== 3) MÉTRICAS Y RESULTADOS =====
+                // Obtener métricas y resultados
                 var metricas = new List<MetricaResultado>();
 
                 const string sqlMetricas = @"
@@ -163,7 +170,7 @@ ORDER BY m.nombre;";
                     }
                 }
 
-                // ===== 4) DETERMINAR RUTA DEL ARCHIVO =====
+                // Determinar ruta del archivo
                 string rutaArchivo = rutaDestino;
 
                 if (mostrarDialogo || string.IsNullOrWhiteSpace(rutaArchivo))
@@ -178,21 +185,21 @@ ORDER BY m.nombre;";
 
                         if (saveDialog.ShowDialog() != DialogResult.OK)
                         {
-                            return null; // Usuario canceló
+                            return null;
                         }
 
                         rutaArchivo = saveDialog.FileName;
                     }
                 }
 
-                // ===== 5) GENERAR EL DOCUMENTO PDF =====
+                // Generar el documento PDF
                 Document doc = CrearDocumentoPdf(
                     nombrePaciente, apellidoPaciente, dniPaciente,
                     tipoAnalisis, fechaCreacion, fechaFirma,
                     medicoFirmaNombre, medicoFirmaApellido, medicoMatricula, medicoEspecialidad,
                     metricas, observaciones, idAnalisis);
 
-                // ===== 6) RENDERIZAR Y GUARDAR =====
+                // Renderizar y guardar
                 PdfDocumentRenderer renderer = new PdfDocumentRenderer
                 {
                     Document = doc
@@ -207,6 +214,20 @@ ORDER BY m.nombre;";
         /// <summary>
         /// Crea el documento PDF con formato profesional
         /// </summary>
+        /// <param name="nombrePaciente">Nombre del paciente</param>
+        /// <param name="apellidoPaciente">Apellido del paciente</param>
+        /// <param name="dniPaciente">DNI del paciente</param>
+        /// <param name="tipoAnalisis">Tipo de análisis realizado</param>
+        /// <param name="fechaCreacion">Fecha de creación del análisis</param>
+        /// <param name="fechaFirma">Fecha de verificación del análisis</param>
+        /// <param name="medicoNombre">Nombre del médico que firmó</param>
+        /// <param name="medicoApellido">Apellido del médico que firmó</param>
+        /// <param name="medicoMatricula">Matrícula del médico</param>
+        /// <param name="medicoEspecialidad">Especialidad del médico</param>
+        /// <param name="metricas">Lista de métricas con sus resultados</param>
+        /// <param name="observaciones">Observaciones del análisis</param>
+        /// <param name="idAnalisis">Identificador del análisis</param>
+        /// <returns>Documento PDF generado</returns>
         private Document CrearDocumentoPdf(
             string nombrePaciente, string apellidoPaciente, int dniPaciente,
             string tipoAnalisis, DateTime fechaCreacion, DateTime? fechaFirma,
@@ -216,13 +237,12 @@ ORDER BY m.nombre;";
             Document doc = new Document();
             Section seccion = doc.AddSection();
 
-            // Configurar márgenes
             seccion.PageSetup.LeftMargin = "2.5cm";
             seccion.PageSetup.RightMargin = "2.5cm";
             seccion.PageSetup.TopMargin = "2cm";
             seccion.PageSetup.BottomMargin = "2cm";
 
-            // ===== ENCABEZADO =====
+            // Encabezado
             Paragraph titulo = seccion.AddParagraph("INFORME DE ANÁLISIS CLÍNICO");
             titulo.Format.Font.Size = 18;
             titulo.Format.Font.Bold = true;
@@ -235,13 +255,12 @@ ORDER BY m.nombre;";
             subtitulo.Format.Alignment = ParagraphAlignment.Center;
             subtitulo.Format.SpaceAfter = "1cm";
 
-            // ===== INFORMACIÓN DEL ANÁLISIS =====
             Paragraph infoAnalisis = seccion.AddParagraph($"Análisis N° {idAnalisis}");
             infoAnalisis.Format.Font.Size = 10;
             infoAnalisis.Format.Font.Bold = true;
             infoAnalisis.Format.SpaceAfter = "0.3cm";
 
-            // ===== DATOS DEL PACIENTE =====
+            // Datos del paciente
             Paragraph seccionPaciente = seccion.AddParagraph("DATOS DEL PACIENTE");
             seccionPaciente.Format.Font.Size = 12;
             seccionPaciente.Format.Font.Bold = true;
@@ -252,7 +271,7 @@ ORDER BY m.nombre;";
             seccion.AddParagraph($"DNI: {dniPaciente}");
             seccion.AddParagraph().Format.SpaceAfter = "0.5cm";
 
-            // ===== DATOS DEL ANÁLISIS =====
+            // Datos del análisis
             Paragraph seccionAnalisisDetalle = seccion.AddParagraph("INFORMACIÓN DEL ANÁLISIS");
             seccionAnalisisDetalle.Format.Font.Size = 12;
             seccionAnalisisDetalle.Format.Font.Bold = true;
@@ -265,7 +284,7 @@ ORDER BY m.nombre;";
                 seccion.AddParagraph($"Fecha de Verificación: {fechaFirma:dd/MM/yyyy HH:mm}");
             seccion.AddParagraph().Format.SpaceAfter = "0.5cm";
 
-            // ===== RESULTADOS =====
+            // Resultados
             Paragraph seccionResultados = seccion.AddParagraph("RESULTADOS");
             seccionResultados.Format.Font.Size = 12;
             seccionResultados.Format.Font.Bold = true;
@@ -276,13 +295,11 @@ ORDER BY m.nombre;";
             Table tabla = seccion.AddTable();
             tabla.Borders.Width = 0.75;
 
-            // Columnas
             Column col1 = tabla.AddColumn("7cm");
             Column col2 = tabla.AddColumn("2.5cm");
             Column col3 = tabla.AddColumn("2cm");
             Column col4 = tabla.AddColumn("3cm");
 
-            // Encabezado de la tabla
             Row header = tabla.AddRow();
             header.Shading.Color = Colors.LightGray;
             header.HeadingFormat = true;
@@ -292,17 +309,14 @@ ORDER BY m.nombre;";
             header.Cells[2].AddParagraph("Unidad");
             header.Cells[3].AddParagraph("Valores de Ref.");
 
-            // Datos de las métricas
             foreach (var metrica in metricas)
             {
                 Row row = tabla.AddRow();
                 row.Cells[0].AddParagraph(metrica.Nombre);
                 
-                // Resultado
                 Paragraph pResultado = row.Cells[1].AddParagraph(metrica.Resultado.ToString("0.00"));
                 pResultado.Format.Alignment = ParagraphAlignment.Right;
                 
-                // Verificar si el resultado está fuera de rango
                 bool fueraDeRango = false;
                 if (metrica.ValorMinimo.HasValue && metrica.Resultado < metrica.ValorMinimo.Value)
                     fueraDeRango = true;
@@ -317,7 +331,6 @@ ORDER BY m.nombre;";
 
                 row.Cells[2].AddParagraph(metrica.Unidad);
 
-                // Valores de referencia
                 string valoresRef = "";
                 if (metrica.ValorMinimo.HasValue && metrica.ValorMaximo.HasValue)
                     valoresRef = $"{metrica.ValorMinimo:0.00} - {metrica.ValorMaximo:0.00}";
@@ -334,7 +347,7 @@ ORDER BY m.nombre;";
 
             seccion.AddParagraph().Format.SpaceAfter = "0.5cm";
 
-            // ===== OBSERVACIONES =====
+            // Observaciones
             if (!string.IsNullOrWhiteSpace(observaciones))
             {
                 Paragraph seccionObservaciones = seccion.AddParagraph("OBSERVACIONES");
@@ -347,7 +360,7 @@ ORDER BY m.nombre;";
                 seccion.AddParagraph().Format.SpaceAfter = "0.5cm";
             }
 
-            // ===== FIRMA DEL MÉDICO =====
+            // Firma del médico
             seccion.AddParagraph().Format.SpaceAfter = "1.5cm";
 
             Paragraph seccionFirma = seccion.AddParagraph("VERIFICADO POR");
@@ -360,7 +373,7 @@ ORDER BY m.nombre;";
             seccion.AddParagraph($"Matrícula N°: {medicoMatricula}");
             seccion.AddParagraph($"Especialidad: {medicoEspecialidad}");
 
-            // ===== PIE DE PÁGINA =====
+            // Pie de página
             seccion.AddParagraph().Format.SpaceAfter = "1cm";
             Paragraph pie = seccion.AddParagraph($"Documento generado el {DateTime.Now:dd/MM/yyyy HH:mm}");
             pie.Format.Font.Size = 8;
@@ -372,15 +385,38 @@ ORDER BY m.nombre;";
         }
 
         /// <summary>
-        /// Clase auxiliar para transportar datos de métricas
+        /// Clase auxiliar para transportar datos de métricas con sus resultados
         /// </summary>
         private class MetricaResultado
         {
+            /// <summary>
+            /// Nombre de la métrica
+            /// </summary>
             public string Nombre { get; set; }
+
+            /// <summary>
+            /// Valor del resultado obtenido
+            /// </summary>
             public decimal Resultado { get; set; }
+
+            /// <summary>
+            /// Unidad de medida
+            /// </summary>
             public string Unidad { get; set; }
+
+            /// <summary>
+            /// Valor mínimo de referencia
+            /// </summary>
             public decimal? ValorMinimo { get; set; }
+
+            /// <summary>
+            /// Valor máximo de referencia
+            /// </summary>
             public decimal? ValorMaximo { get; set; }
+
+            /// <summary>
+            /// Observaciones sobre el resultado
+            /// </summary>
             public string Observaciones { get; set; }
         }
     }

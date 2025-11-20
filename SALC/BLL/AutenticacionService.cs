@@ -7,17 +7,32 @@ using SALC.Infraestructura.Exceptions;
 
 namespace SALC.BLL
 {
+    /// <summary>
+    /// Servicio de lógica de negocio para la autenticación de usuarios.
+    /// Valida credenciales y verifica que el usuario esté activo en el sistema.
+    /// </summary>
     public class AutenticacionService : IAutenticacionService
     {
         private readonly UsuarioRepositorio _usuarioRepo;
         private readonly IPasswordHasher _hasher;
 
+        /// <summary>
+        /// Constructor del servicio de autenticación
+        /// </summary>
+        /// <param name="usuarioRepo">Repositorio de usuarios</param>
+        /// <param name="hasher">Servicio de hashing de contraseñas</param>
         public AutenticacionService(UsuarioRepositorio usuarioRepo, IPasswordHasher hasher)
         {
             _usuarioRepo = usuarioRepo ?? throw new ArgumentNullException(nameof(usuarioRepo));
             _hasher = hasher ?? throw new ArgumentNullException(nameof(hasher));
         }
 
+        /// <summary>
+        /// Valida las credenciales de un usuario
+        /// </summary>
+        /// <param name="dni">DNI del usuario</param>
+        /// <param name="contrasenia">Contraseña en texto plano</param>
+        /// <returns>El usuario autenticado si las credenciales son válidas, null en caso contrario</returns>
         public Usuario ValidarCredenciales(int dni, string contrasenia)
         {
             try

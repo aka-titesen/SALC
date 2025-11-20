@@ -4,20 +4,40 @@ using System.IO;
 namespace SALC.Infraestructura.Logging
 {
     /// <summary>
-    /// Niveles de severidad para los logs
+    /// Niveles de severidad para los logs del sistema
     /// </summary>
     public enum LogLevel
     {
+        /// <summary>
+        /// Información de depuración para diagnóstico detallado
+        /// </summary>
         Debug,
+
+        /// <summary>
+        /// Información general sobre el flujo de la aplicación
+        /// </summary>
         Info,
+
+        /// <summary>
+        /// Situaciones potencialmente problemáticas que no impiden la operación
+        /// </summary>
         Warning,
+
+        /// <summary>
+        /// Errores que afectan la funcionalidad pero permiten continuar
+        /// </summary>
         Error,
+
+        /// <summary>
+        /// Errores críticos que pueden causar el cierre de la aplicación
+        /// </summary>
         Fatal
     }
 
     /// <summary>
-    /// Logger simple basado en archivos de texto
-    /// Implementación ligera para .NET Framework 4.7.2 sin dependencias externas
+    /// Logger simple basado en archivos de texto.
+    /// Implementa el patrón Singleton para proporcionar un punto centralizado de logging.
+    /// Los logs se guardan en archivos diarios en la carpeta Logs.
     /// </summary>
     public class Logger
     {
@@ -27,6 +47,9 @@ namespace SALC.Infraestructura.Logging
         private readonly string _logFileName;
         private readonly bool _isEnabled;
 
+        /// <summary>
+        /// Constructor privado para implementar el patrón Singleton
+        /// </summary>
         private Logger()
         {
             _logDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Logs");
@@ -48,7 +71,7 @@ namespace SALC.Infraestructura.Logging
         }
 
         /// <summary>
-        /// Obtiene la instancia única del logger (Singleton)
+        /// Obtiene la instancia única del logger
         /// </summary>
         public static Logger Instance
         {
@@ -71,6 +94,7 @@ namespace SALC.Infraestructura.Logging
         /// <summary>
         /// Registra un mensaje de depuración
         /// </summary>
+        /// <param name="message">Mensaje a registrar</param>
         public void Debug(string message)
         {
             Log(LogLevel.Debug, message);
@@ -79,6 +103,7 @@ namespace SALC.Infraestructura.Logging
         /// <summary>
         /// Registra un mensaje informativo
         /// </summary>
+        /// <param name="message">Mensaje a registrar</param>
         public void Info(string message)
         {
             Log(LogLevel.Info, message);
@@ -87,6 +112,7 @@ namespace SALC.Infraestructura.Logging
         /// <summary>
         /// Registra una advertencia
         /// </summary>
+        /// <param name="message">Mensaje de advertencia</param>
         public void Warning(string message)
         {
             Log(LogLevel.Warning, message);
@@ -95,14 +121,17 @@ namespace SALC.Infraestructura.Logging
         /// <summary>
         /// Registra un error
         /// </summary>
+        /// <param name="message">Mensaje de error</param>
         public void Error(string message)
         {
             Log(LogLevel.Error, message);
         }
 
         /// <summary>
-        /// Registra un error con excepción
+        /// Registra un error con información detallada de la excepción
         /// </summary>
+        /// <param name="message">Mensaje de error</param>
+        /// <param name="exception">Excepción que causó el error</param>
         public void Error(string message, Exception exception)
         {
             var fullMessage = $"{message}\nException: {exception.GetType().Name}\nMessage: {exception.Message}\nStackTrace: {exception.StackTrace}";
@@ -118,14 +147,17 @@ namespace SALC.Infraestructura.Logging
         /// <summary>
         /// Registra un error fatal
         /// </summary>
+        /// <param name="message">Mensaje de error fatal</param>
         public void Fatal(string message)
         {
             Log(LogLevel.Fatal, message);
         }
 
         /// <summary>
-        /// Registra un error fatal con excepción
+        /// Registra un error fatal con información detallada de la excepción
         /// </summary>
+        /// <param name="message">Mensaje de error fatal</param>
+        /// <param name="exception">Excepción que causó el error fatal</param>
         public void Fatal(string message, Exception exception)
         {
             var fullMessage = $"{message}\nException: {exception.GetType().Name}\nMessage: {exception.Message}\nStackTrace: {exception.StackTrace}";
@@ -138,6 +170,11 @@ namespace SALC.Infraestructura.Logging
             Log(LogLevel.Fatal, fullMessage);
         }
 
+        /// <summary>
+        /// Escribe una entrada en el archivo de log
+        /// </summary>
+        /// <param name="level">Nivel de severidad del mensaje</param>
+        /// <param name="message">Mensaje a registrar</param>
         private void Log(LogLevel level, string message)
         {
             if (!_isEnabled)
@@ -162,8 +199,9 @@ namespace SALC.Infraestructura.Logging
         }
 
         /// <summary>
-        /// Limpia logs antiguos (más de X días)
+        /// Elimina archivos de log más antiguos que el período de retención especificado
         /// </summary>
+        /// <param name="diasRetencion">Cantidad de días de retención de logs</param>
         public void LimpiarLogsAntiguos(int diasRetencion = 30)
         {
             try

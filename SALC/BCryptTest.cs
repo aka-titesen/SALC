@@ -5,15 +5,20 @@ using SALC.BLL;
 namespace SALC
 {
     /// <summary>
-    /// Utilidad de prueba para verificar BCrypt
+    /// Utilidad de prueba para verificar el correcto funcionamiento del algoritmo BCrypt.
+    /// Valida que las contraseñas de prueba puedan ser verificadas correctamente con sus hashes.
     /// </summary>
     public class BCryptTest
     {
+        /// <summary>
+        /// Ejecuta pruebas de verificación de BCrypt con casos de prueba predefinidos.
+        /// Verifica que las contraseñas de los usuarios de prueba coincidan con sus hashes.
+        /// </summary>
         public static void TestBCrypt()
         {
             var hasher = new DefaultPasswordHasher();
 
-            // Contraseñas del lote-salc.sql para testing
+            // Contraseñas del script de inicialización para testing
             var testCases = new[]
             {
                 new { Password = "9ffe8/5<7X1}", Hash = "$2a$12$URP1nbn2iSYn5/cEFwcaMeN8N.8SR1TaL3FMwFvYthH6c7DAfxWWm", User = "Juan Pérez (Admin)" },
@@ -31,29 +36,28 @@ namespace SALC
                 try
                 {
                     bool result = hasher.Verify(testCase.Password, testCase.Hash);
-                    results += $"? {testCase.User}\n";
+                    results += $"- {testCase.User}\n";
                     results += $"  Contraseña: '{testCase.Password}'\n";
                     results += $"  Hash: {testCase.Hash.Substring(0, 20)}...\n";
-                    results += $"  Resultado: {(result ? "? PASS" : "? FAIL")}\n\n";
+                    results += $"  Resultado: {(result ? "PASS" : "FAIL")}\n\n";
                     
                     if (!result) allPassed = false;
                 }
                 catch (Exception ex)
                 {
-                    results += $"? {testCase.User}\n";
+                    results += $"- {testCase.User}\n";
                     results += $"  ERROR: {ex.Message}\n\n";
                     allPassed = false;
                 }
             }
 
             results += $"\n=== RESUMEN ===\n";
-            results += $"Estado general: {(allPassed ? "? TODAS LAS PRUEBAS PASARON" : "? ALGUNAS PRUEBAS FALLARON")}\n";
+            results += $"Estado general: {(allPassed ? "TODAS LAS PRUEBAS PASARON" : "ALGUNAS PRUEBAS FALLARON")}\n";
 
-            // Mostrar resultado
+            // Mostrar resultado en ventana y debug output
             MessageBox.Show(results, "Prueba BCrypt", MessageBoxButtons.OK, 
                 allPassed ? MessageBoxIcon.Information : MessageBoxIcon.Error);
 
-            // También escribir al debug output
             System.Diagnostics.Debug.WriteLine(results);
         }
     }

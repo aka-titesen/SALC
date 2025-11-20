@@ -8,6 +8,11 @@ using SALC.Infraestructura.Exceptions;
 
 namespace SALC.Presenters
 {
+    /// <summary>
+    /// Presenter para el panel del asistente de laboratorio.
+    /// Coordina la vista del asistente con los servicios de negocio para la búsqueda de pacientes
+    /// y visualización de historial de análisis.
+    /// </summary>
     public class PanelAsistentePresenter
     {
         private readonly IPanelAsistenteView _view;
@@ -17,6 +22,10 @@ namespace SALC.Presenters
         private readonly IInformeService _informeService = new InformeService();
         private readonly IEmailService _emailService = new EmailService();
 
+        /// <summary>
+        /// Constructor del presenter
+        /// </summary>
+        /// <param name="view">Vista del panel de asistente</param>
         public PanelAsistentePresenter(IPanelAsistenteView view)
         {
             _view = view;
@@ -24,6 +33,9 @@ namespace SALC.Presenters
             _view.VerHistorialClick += (s, e) => OnVerHistorial();
         }
 
+        /// <summary>
+        /// Inicializa la vista cargando los datos iniciales
+        /// </summary>
         public void InicializarVista()
         {
             ExceptionHandler.EjecutarConManejo(() =>
@@ -33,6 +45,9 @@ namespace SALC.Presenters
             }, "InicializarVistaAsistente");
         }
 
+        /// <summary>
+        /// Carga todos los pacientes activos en la vista
+        /// </summary>
         private void CargarTodosLosPacientes()
         {
             try
@@ -56,6 +71,9 @@ namespace SALC.Presenters
             }
         }
 
+        /// <summary>
+        /// Maneja el evento de búsqueda de pacientes
+        /// </summary>
         private void OnBuscarPacientes()
         {
             try
@@ -64,7 +82,6 @@ namespace SALC.Presenters
                 
                 if (string.IsNullOrEmpty(textoBusqueda))
                 {
-                    // Si no hay texto, mostrar todos los pacientes
                     CargarTodosLosPacientes();
                     return;
                 }
@@ -74,12 +91,10 @@ namespace SALC.Presenters
                 // Buscar por DNI o apellido
                 if (int.TryParse(textoBusqueda, out int dni))
                 {
-                    // Búsqueda por DNI
                     pacientes = pacientes.Where(p => p.Dni.ToString().Contains(textoBusqueda));
                 }
                 else
                 {
-                    // Búsqueda por apellido (case-insensitive)
                     pacientes = pacientes.Where(p => p.Apellido.ToLower().Contains(textoBusqueda.ToLower()));
                 }
 
@@ -97,6 +112,9 @@ namespace SALC.Presenters
             }
         }
 
+        /// <summary>
+        /// Maneja el evento de visualización de historial de un paciente
+        /// </summary>
         private void OnVerHistorial()
         {
             try
@@ -107,7 +125,6 @@ namespace SALC.Presenters
                     throw new SalcValidacionException("Seleccione un paciente para ver su historial.", "paciente");
                 }
 
-                // Validar que el paciente tenga datos completos
                 if (pacienteSeleccionado.Dni <= 0)
                 {
                     throw new SalcValidacionException("El DNI del paciente no es válido.", "dni");
@@ -115,7 +132,6 @@ namespace SALC.Presenters
 
                 ExceptionHandler.LogInfo($"Abriendo historial de paciente - DNI: {pacienteSeleccionado.Dni}", "PanelAsistente");
 
-                // Cargar paciente completo desde la base de datos
                 var pacienteCompleto = _pacienteService.ObtenerPorDni(pacienteSeleccionado.Dni);
                 if (pacienteCompleto == null)
                 {

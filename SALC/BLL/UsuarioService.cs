@@ -8,6 +8,11 @@ using SALC.Infraestructura.Exceptions;
 
 namespace SALC.BLL
 {
+    /// <summary>
+    /// Servicio de lógica de negocio para la gestión de usuarios.
+    /// Maneja la creación, actualización y gestión de usuarios del sistema,
+    /// incluyendo datos específicos para médicos y asistentes.
+    /// </summary>
     public class UsuarioService : IUsuarioService
     {
         private readonly UsuarioRepositorio _usuarios = new UsuarioRepositorio();
@@ -15,19 +20,22 @@ namespace SALC.BLL
         private readonly AsistenteRepositorio _asistentes = new AsistenteRepositorio();
         private readonly IPasswordHasher _hasher = new DefaultPasswordHasher();
 
+        /// <summary>
+        /// Actualiza un usuario y opcionalmente sus datos de médico o asistente
+        /// </summary>
+        /// <param name="usuario">Usuario con los datos actualizados</param>
+        /// <param name="medico">Datos de médico si el usuario es de rol médico</param>
+        /// <param name="asistente">Datos de asistente si el usuario es de rol asistente</param>
         public void ActualizarUsuario(Usuario usuario, Medico medico = null, Asistente asistente = null)
         {
             try
             {
-                // Validaciones
                 ValidarUsuario(usuario);
 
-                // Verificar que el usuario existe
                 var existente = _usuarios.ObtenerPorId(usuario.Dni);
                 if (existente == null)
                     throw new SalcBusinessException($"No existe un usuario con DNI {usuario.Dni}.");
 
-                // Si PasswordHash trae una contraseña plana (heurística), la hasheamos
                 if (!string.IsNullOrEmpty(usuario.PasswordHash) && !usuario.PasswordHash.StartsWith("$2"))
                 {
                     usuario.PasswordHash = _hasher.Hash(usuario.PasswordHash);
@@ -71,6 +79,10 @@ namespace SALC.BLL
             }
         }
 
+        /// <summary>
+        /// Actualiza solo los datos base de un usuario
+        /// </summary>
+        /// <param name="usuario">Usuario con los datos actualizados</param>
         public void ActualizarUsuario(Usuario usuario)
         {
             try
@@ -103,6 +115,12 @@ namespace SALC.BLL
             }
         }
 
+        /// <summary>
+        /// Crea un nuevo usuario en el sistema, con datos específicos según su rol
+        /// </summary>
+        /// <param name="usuario">Datos del usuario a crear</param>
+        /// <param name="medico">Datos de médico si el usuario es de rol médico</param>
+        /// <param name="asistente">Datos de asistente si el usuario es de rol asistente</param>
         public void CrearUsuario(Usuario usuario, Medico medico = null, Asistente asistente = null)
         {
             try
@@ -178,6 +196,10 @@ namespace SALC.BLL
             }
         }
 
+        /// <summary>
+        /// Elimina un usuario mediante baja lógica
+        /// </summary>
+        /// <param name="dni">DNI del usuario a eliminar</param>
         public void EliminarUsuario(int dni)
         {
             try
@@ -206,6 +228,11 @@ namespace SALC.BLL
             }
         }
 
+        /// <summary>
+        /// Obtiene un usuario específico por su DNI
+        /// </summary>
+        /// <param name="dni">DNI del usuario</param>
+        /// <returns>El usuario encontrado o null si no existe</returns>
         public Usuario ObtenerPorDni(int dni)
         {
             try
@@ -221,6 +248,10 @@ namespace SALC.BLL
             }
         }
 
+        /// <summary>
+        /// Obtiene todos los usuarios del sistema
+        /// </summary>
+        /// <returns>Colección de todos los usuarios</returns>
         public IEnumerable<Usuario> ObtenerTodos()
         {
             try
@@ -233,6 +264,10 @@ namespace SALC.BLL
             }
         }
 
+        /// <summary>
+        /// Obtiene todos los usuarios activos del sistema
+        /// </summary>
+        /// <returns>Colección de usuarios con estado Activo</returns>
         public IEnumerable<Usuario> ObtenerActivos()
         {
             try
@@ -245,6 +280,11 @@ namespace SALC.BLL
             }
         }
 
+        /// <summary>
+        /// Cambia el estado de un usuario
+        /// </summary>
+        /// <param name="dni">DNI del usuario</param>
+        /// <param name="nuevoEstado">Nuevo estado (Activo o Inactivo)</param>
         public void CambiarEstadoUsuario(int dni, string nuevoEstado)
         {
             try
@@ -279,19 +319,28 @@ namespace SALC.BLL
             }
         }
 
+        /// <summary>
+        /// Activa un usuario cambiando su estado a Activo
+        /// </summary>
+        /// <param name="dni">DNI del usuario</param>
         public void ActivarUsuario(int dni)
         {
             CambiarEstadoUsuario(dni, "Activo");
         }
 
+        /// <summary>
+        /// Desactiva un usuario cambiando su estado a Inactivo
+        /// </summary>
+        /// <param name="dni">DNI del usuario</param>
         public void DesactivarUsuario(int dni)
         {
             CambiarEstadoUsuario(dni, "Inactivo");
         }
 
         /// <summary>
-        /// Valida los datos del usuario
+        /// Valida que los datos del usuario cumplan con las reglas de negocio
         /// </summary>
+        /// <param name="usuario">Usuario a validar</param>
         private void ValidarUsuario(Usuario usuario)
         {
             if (usuario == null)
@@ -320,8 +369,9 @@ namespace SALC.BLL
         }
 
         /// <summary>
-        /// Valida los datos específicos de un médico
+        /// Valida que los datos específicos de un médico cumplan con las reglas de negocio
         /// </summary>
+        /// <param name="medico">Médico a validar</param>
         private void ValidarMedico(Medico medico)
         {
             if (medico == null)
@@ -338,8 +388,9 @@ namespace SALC.BLL
         }
 
         /// <summary>
-        /// Valida los datos específicos de un asistente
+        /// Valida que los datos específicos de un asistente cumplan con las reglas de negocio
         /// </summary>
+        /// <param name="asistente">Asistente a validar</param>
         private void ValidarAsistente(Asistente asistente)
         {
             if (asistente == null)

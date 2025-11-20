@@ -12,7 +12,9 @@ using SALC.Infraestructura.Exceptions;
 
 namespace SALC.Presenters
 {
-    // ViewModel para mostrar información enriquecida de pacientes en la grilla del médico
+    /// <summary>
+    /// ViewModel para mostrar información enriquecida de pacientes en las vistas del médico
+    /// </summary>
     public class PacienteViewModelMedico
     {
         public int Dni { get; set; }
@@ -25,6 +27,12 @@ namespace SALC.Presenters
         public string ObraSocial { get; set; }
         public string Estado { get; set; }
 
+        /// <summary>
+        /// Crea un ViewModel desde una entidad Paciente
+        /// </summary>
+        /// <param name="paciente">Paciente fuente</param>
+        /// <param name="nombreObraSocial">Nombre de la obra social (opcional)</param>
+        /// <returns>ViewModel del paciente</returns>
         public static PacienteViewModelMedico FromPaciente(Paciente paciente, string nombreObraSocial = null)
         {
             return new PacienteViewModelMedico
@@ -53,6 +61,11 @@ namespace SALC.Presenters
         }
     }
 
+    /// <summary>
+    /// Presenter para el panel del médico.
+    /// Coordina las operaciones de gestión de pacientes, creación de análisis,
+    /// carga de resultados y firma digital de análisis.
+    /// </summary>
     public class PanelMedicoPresenter
     {
         private readonly IPanelMedicoView _view;
@@ -73,6 +86,11 @@ namespace SALC.Presenters
         private List<PacienteViewModelMedico> _pacientesGestionViewModel = new List<PacienteViewModelMedico>();
         private string _filtroEstadoPacientesGestion = "Todos";
 
+        /// <summary>
+        /// Constructor del presenter
+        /// </summary>
+        /// <param name="view">Vista del panel de médico</param>
+        /// <param name="dniMedico">DNI del médico autenticado</param>
         public PanelMedicoPresenter(IPanelMedicoView view, int dniMedico)
         {
             _view = view;
@@ -100,6 +118,9 @@ namespace SALC.Presenters
             InicializarPanel();
         }
 
+        /// <summary>
+        /// Inicializa el panel cargando los datos iniciales
+        /// </summary>
         private void InicializarPanel()
         {
             ExceptionHandler.EjecutarConManejo(() =>
@@ -116,7 +137,7 @@ namespace SALC.Presenters
             }, "InicializarPanelMedico");
         }
 
-        #region RF-03: Gestión de Pacientes (ABM - SEPARADO DEL FLUJO DE ANÁLISIS)
+        #region Gestión de Pacientes
 
         private void CargarListadoPacientesGestion()
         {
@@ -272,7 +293,7 @@ namespace SALC.Presenters
 
         #endregion
 
-        #region RF-05: Crear Análisis (FLUJO INDEPENDIENTE - NO RELACIONADO CON ABM DE PACIENTES)
+        #region Crear Análisis
 
         private void OnBuscarPacienteParaCrearAnalisis(object sender, EventArgs e)
         {
@@ -356,7 +377,7 @@ namespace SALC.Presenters
 
         #endregion
 
-        #region RF-06: Cargar Resultados
+        #region Cargar Resultados
 
         private void OnBuscarAnalisisResultados(object sender, EventArgs e)
         {
@@ -466,7 +487,7 @@ namespace SALC.Presenters
 
         #endregion
 
-        #region RF-07: Validar/Firmar
+        #region Validar y Firmar
 
         private void OnBuscarAnalisisFirmar(object sender, EventArgs e)
         {
@@ -550,8 +571,11 @@ namespace SALC.Presenters
 
         #endregion
 
-        #region Helpers
+        #region Métodos Auxiliares
 
+        /// <summary>
+        /// Prepara las métricas para un análisis específico cargando sus valores existentes
+        /// </summary>
         private void PrepararResultadosParaAnalisis(int idAnalisis)
         {
             try

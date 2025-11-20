@@ -7,8 +7,8 @@ using SALC.Infraestructura;
 namespace SALC.DAL
 {
     /// <summary>
-    /// Repositorio para acceso a datos de backups
-    /// Capa de acceso a datos (DAL) - maneja todas las operaciones de BD relacionadas con backups
+    /// Repositorio para el acceso a datos del historial de copias de seguridad.
+    /// Gestiona las operaciones de registro y consulta del historial de backups.
     /// </summary>
     public class BackupRepositorio
     {
@@ -17,6 +17,7 @@ namespace SALC.DAL
         /// <summary>
         /// Inserta un nuevo registro en el historial de backups
         /// </summary>
+        /// <param name="historial">Datos del backup a registrar</param>
         public void InsertarHistorial(HistorialBackup historial)
         {
             const string sql = @"
@@ -43,6 +44,8 @@ namespace SALC.DAL
         /// <summary>
         /// Obtiene el historial de backups ordenado por fecha descendente
         /// </summary>
+        /// <param name="limite">Cantidad máxima de registros a retornar</param>
+        /// <returns>Lista con el historial de backups</returns>
         public List<HistorialBackup> ObtenerHistorial(int limite = 50)
         {
             var historial = new List<HistorialBackup>();
@@ -81,8 +84,9 @@ namespace SALC.DAL
         }
 
         /// <summary>
-        /// Obtiene el último backup exitoso registrado
+        /// Obtiene el último backup exitoso registrado en el sistema
         /// </summary>
+        /// <returns>Información del último backup exitoso o null si no hay registros</returns>
         public HistorialBackup ObtenerUltimoBackup()
         {
             const string sql = @"
@@ -119,8 +123,9 @@ namespace SALC.DAL
         }
 
         /// <summary>
-        /// Elimina registros del historial más antiguos que la fecha especificada
+        /// Elimina registros del historial más antiguos que el período de retención especificado
         /// </summary>
+        /// <param name="diasRetencion">Cantidad de días de retención de registros</param>
         public void LimpiarHistorialAntiguo(int diasRetencion)
         {
             const string sql = @"
@@ -137,9 +142,10 @@ namespace SALC.DAL
         }
 
         /// <summary>
-        /// Obtiene todas las rutas únicas de archivos de backup del historial
-        /// Útil para limpieza de archivos físicos
+        /// Obtiene todas las rutas únicas de archivos de backup del historial.
+        /// Útil para la limpieza de archivos físicos.
         /// </summary>
+        /// <returns>Lista de rutas de archivos de backup</returns>
         public List<string> ObtenerRutasBackups()
         {
             var rutas = new List<string>();

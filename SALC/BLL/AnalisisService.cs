@@ -8,17 +8,28 @@ using SALC.Infraestructura.Exceptions;
 
 namespace SALC.BLL
 {
+    /// <summary>
+    /// Servicio de lógica de negocio para la gestión de análisis clínicos.
+    /// Implementa las reglas de negocio y coordina las operaciones con el repositorio.
+    /// </summary>
     public class AnalisisService : IAnalisisService
     {
         private readonly AnalisisRepositorio _analisisRepo = new AnalisisRepositorio();
         private readonly AnalisisMetricaRepositorio _amRepo = new AnalisisMetricaRepositorio();
         private readonly CatalogoRepositorio _catRepo = new CatalogoRepositorio();
         
-        // Según scripts: 1 = "Sin verificar", 2 = "Verificado", 3 = "Anulado"
         private const int EstadoSinVerificar = 1;
         private const int EstadoVerificado = 2;
         private const int EstadoAnulado = 3;
 
+        /// <summary>
+        /// Crea un nuevo análisis clínico
+        /// </summary>
+        /// <param name="dniPaciente">DNI del paciente al que se realiza el análisis</param>
+        /// <param name="idTipoAnalisis">Identificador del tipo de análisis</param>
+        /// <param name="dniMedicoCarga">DNI del médico que crea el análisis</param>
+        /// <param name="observaciones">Observaciones adicionales sobre el análisis</param>
+        /// <returns>El análisis creado con su identificador asignado</returns>
         public Analisis CrearAnalisis(int dniPaciente, int idTipoAnalisis, int dniMedicoCarga, string observaciones)
         {
             try
@@ -72,6 +83,13 @@ namespace SALC.BLL
             }
         }
 
+        /// <summary>
+        /// Carga o actualiza el resultado de una métrica en un análisis
+        /// </summary>
+        /// <param name="idAnalisis">Identificador del análisis</param>
+        /// <param name="idMetrica">Identificador de la métrica</param>
+        /// <param name="resultado">Valor del resultado obtenido</param>
+        /// <param name="observaciones">Observaciones sobre este resultado específico</param>
         public void CargarResultado(int idAnalisis, int idMetrica, decimal resultado, string observaciones = null)
         {
             try
@@ -121,6 +139,11 @@ namespace SALC.BLL
             }
         }
 
+        /// <summary>
+        /// Obtiene todos los análisis creados por un médico específico
+        /// </summary>
+        /// <param name="dniMedico">DNI del médico</param>
+        /// <returns>Colección de análisis del médico</returns>
         public IEnumerable<Analisis> ObtenerAnalisisPorMedicoCarga(int dniMedico)
         {
             try
@@ -136,6 +159,11 @@ namespace SALC.BLL
             }
         }
 
+        /// <summary>
+        /// Obtiene los análisis activos (no anulados) creados por un médico específico
+        /// </summary>
+        /// <param name="dniMedico">DNI del médico</param>
+        /// <returns>Colección de análisis activos del médico</returns>
         public IEnumerable<Analisis> ObtenerAnalisisActivosPorMedicoCarga(int dniMedico)
         {
             try
@@ -151,6 +179,11 @@ namespace SALC.BLL
             }
         }
 
+        /// <summary>
+        /// Obtiene todos los análisis de un paciente específico
+        /// </summary>
+        /// <param name="dniPaciente">DNI del paciente</param>
+        /// <returns>Colección de análisis del paciente</returns>
         public IEnumerable<Analisis> ObtenerAnalisisPorPaciente(int dniPaciente)
         {
             try
@@ -166,6 +199,11 @@ namespace SALC.BLL
             }
         }
 
+        /// <summary>
+        /// Obtiene los análisis activos (no anulados) de un paciente específico
+        /// </summary>
+        /// <param name="dniPaciente">DNI del paciente</param>
+        /// <returns>Colección de análisis activos del paciente</returns>
         public IEnumerable<Analisis> ObtenerAnalisisActivosPorPaciente(int dniPaciente)
         {
             try
@@ -181,6 +219,11 @@ namespace SALC.BLL
             }
         }
 
+        /// <summary>
+        /// Obtiene todos los resultados de métricas de un análisis específico
+        /// </summary>
+        /// <param name="idAnalisis">Identificador del análisis</param>
+        /// <returns>Colección de resultados del análisis</returns>
         public IEnumerable<AnalisisMetrica> ObtenerResultados(int idAnalisis)
         {
             try
@@ -196,6 +239,11 @@ namespace SALC.BLL
             }
         }
 
+        /// <summary>
+        /// Valida y firma un análisis, cambiando su estado a Verificado
+        /// </summary>
+        /// <param name="idAnalisis">Identificador del análisis a validar</param>
+        /// <param name="dniMedicoFirma">DNI del médico que valida el análisis</param>
         public void ValidarAnalisis(int idAnalisis, int dniMedicoFirma)
         {
             try
@@ -245,6 +293,11 @@ namespace SALC.BLL
             }
         }
 
+        /// <summary>
+        /// Anula un análisis, cambiando su estado a Anulado (baja lógica)
+        /// </summary>
+        /// <param name="idAnalisis">Identificador del análisis a anular</param>
+        /// <param name="dniMedico">DNI del médico que anula el análisis</param>
         public void AnularAnalisis(int idAnalisis, int dniMedico)
         {
             try
@@ -292,11 +345,21 @@ namespace SALC.BLL
             }
         }
 
+        /// <summary>
+        /// Elimina un análisis (alias de AnularAnalisis para compatibilidad)
+        /// </summary>
+        /// <param name="idAnalisis">Identificador del análisis a eliminar</param>
+        /// <param name="dniMedico">DNI del médico que elimina el análisis</param>
         public void EliminarAnalisis(int idAnalisis, int dniMedico)
         {
             AnularAnalisis(idAnalisis, dniMedico);
         }
 
+        /// <summary>
+        /// Obtiene un análisis específico por su identificador
+        /// </summary>
+        /// <param name="idAnalisis">Identificador del análisis</param>
+        /// <returns>El análisis solicitado o null si no existe</returns>
         public Analisis ObtenerAnalisisPorId(int idAnalisis)
         {
             try
@@ -312,6 +375,10 @@ namespace SALC.BLL
             }
         }
 
+        /// <summary>
+        /// Obtiene todos los análisis activos (no anulados) del sistema
+        /// </summary>
+        /// <returns>Colección de análisis activos</returns>
         public IEnumerable<Analisis> ObtenerAnalisisActivos()
         {
             try
@@ -324,6 +391,11 @@ namespace SALC.BLL
             }
         }
 
+        /// <summary>
+        /// Verifica si un análisis está anulado
+        /// </summary>
+        /// <param name="idAnalisis">Identificador del análisis</param>
+        /// <returns>True si el análisis está anulado, false en caso contrario</returns>
         public bool EstaAnulado(int idAnalisis)
         {
             try
@@ -337,6 +409,11 @@ namespace SALC.BLL
             }
         }
 
+        /// <summary>
+        /// Verifica si un análisis puede ser modificado (está en estado Sin Verificar)
+        /// </summary>
+        /// <param name="idAnalisis">Identificador del análisis</param>
+        /// <returns>True si el análisis puede ser modificado, false en caso contrario</returns>
         public bool PuedeSerModificado(int idAnalisis)
         {
             try

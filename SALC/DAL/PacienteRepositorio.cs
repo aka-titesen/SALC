@@ -7,8 +7,16 @@ using SALC.Infraestructura;
 
 namespace SALC.DAL
 {
+    /// <summary>
+    /// Repositorio para el acceso a datos de pacientes.
+    /// Gestiona las operaciones CRUD sobre la tabla de pacientes en la base de datos.
+    /// </summary>
     public class PacienteRepositorio : IRepositorioBase<Paciente>
     {
+        /// <summary>
+        /// Crea un nuevo paciente en la base de datos
+        /// </summary>
+        /// <param name="p">Paciente a crear</param>
         public void Crear(Paciente p)
         {
             using (var cn = DbConexion.CrearConexion())
@@ -30,6 +38,10 @@ namespace SALC.DAL
             }
         }
 
+        /// <summary>
+        /// Actualiza los datos de un paciente existente
+        /// </summary>
+        /// <param name="p">Paciente con los datos actualizados</param>
         public void Actualizar(Paciente p)
         {
             using (var cn = DbConexion.CrearConexion())
@@ -51,9 +63,12 @@ namespace SALC.DAL
             }
         }
 
+        /// <summary>
+        /// Elimina un paciente mediante baja lógica, cambiando su estado a Inactivo
+        /// </summary>
+        /// <param name="id">DNI del paciente a eliminar</param>
         public void Eliminar(object id)
         {
-            // Baja lógica - cambiar estado a "Inactivo"
             using (var cn = DbConexion.CrearConexion())
             using (var cmd = new SqlCommand("UPDATE pacientes SET estado='Inactivo' WHERE dni=@dni", cn))
             {
@@ -63,6 +78,11 @@ namespace SALC.DAL
             }
         }
 
+        /// <summary>
+        /// Obtiene un paciente por su DNI
+        /// </summary>
+        /// <param name="id">DNI del paciente</param>
+        /// <returns>El paciente encontrado o null si no existe</returns>
         public Paciente ObtenerPorId(object id)
         {
             using (var cn = DbConexion.CrearConexion())
@@ -80,6 +100,10 @@ namespace SALC.DAL
             return null;
         }
 
+        /// <summary>
+        /// Obtiene todos los pacientes del sistema
+        /// </summary>
+        /// <returns>Colección de todos los pacientes</returns>
         public IEnumerable<Paciente> ObtenerTodos()
         {
             using (var cn = DbConexion.CrearConexion())
@@ -94,7 +118,10 @@ namespace SALC.DAL
             }
         }
 
-        // Método para obtener solo pacientes activos
+        /// <summary>
+        /// Obtiene todos los pacientes con estado Activo
+        /// </summary>
+        /// <returns>Colección de pacientes activos</returns>
         public IEnumerable<Paciente> ObtenerActivos()
         {
             using (var cn = DbConexion.CrearConexion())
@@ -109,6 +136,11 @@ namespace SALC.DAL
             }
         }
 
+        /// <summary>
+        /// Mapea un registro de la base de datos a un objeto Paciente
+        /// </summary>
+        /// <param name="rd">Registro leído de la base de datos</param>
+        /// <returns>Instancia de Paciente con los datos del registro</returns>
         private Paciente Map(IDataRecord rd)
         {
             return new Paciente

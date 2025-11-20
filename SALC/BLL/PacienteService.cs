@@ -8,10 +8,18 @@ using SALC.Infraestructura.Exceptions;
 
 namespace SALC.BLL
 {
+    /// <summary>
+    /// Servicio de lógica de negocio para la gestión de pacientes.
+    /// Implementa las reglas de negocio y coordina las operaciones con el repositorio.
+    /// </summary>
     public class PacienteService : IPacienteService
     {
         private readonly PacienteRepositorio _repo = new PacienteRepositorio();
         
+        /// <summary>
+        /// Actualiza los datos de un paciente existente
+        /// </summary>
+        /// <param name="paciente">Paciente con los datos actualizados</param>
         public void ActualizarPaciente(Paciente paciente)
         {
             try
@@ -53,6 +61,10 @@ namespace SALC.BLL
             }
         }
 
+        /// <summary>
+        /// Crea un nuevo paciente en el sistema
+        /// </summary>
+        /// <param name="paciente">Datos del paciente a crear</param>
         public void CrearPaciente(Paciente paciente)
         {
             try
@@ -94,6 +106,10 @@ namespace SALC.BLL
             }
         }
 
+        /// <summary>
+        /// Elimina un paciente mediante baja lógica (cambia estado a Inactivo)
+        /// </summary>
+        /// <param name="dni">DNI del paciente a eliminar</param>
         public void EliminarPaciente(int dni)
         {
             try
@@ -133,6 +149,11 @@ namespace SALC.BLL
             }
         }
 
+        /// <summary>
+        /// Obtiene un paciente específico por su DNI
+        /// </summary>
+        /// <param name="dni">DNI del paciente</param>
+        /// <returns>El paciente encontrado o null si no existe</returns>
         public Paciente ObtenerPorDni(int dni)
         {
             try
@@ -152,6 +173,10 @@ namespace SALC.BLL
             }
         }
 
+        /// <summary>
+        /// Obtiene todos los pacientes del sistema
+        /// </summary>
+        /// <returns>Colección de todos los pacientes</returns>
         public IEnumerable<Paciente> ObtenerTodos()
         {
             try
@@ -164,6 +189,10 @@ namespace SALC.BLL
             }
         }
 
+        /// <summary>
+        /// Obtiene todos los pacientes activos del sistema
+        /// </summary>
+        /// <returns>Colección de pacientes con estado Activo</returns>
         public IEnumerable<Paciente> ObtenerActivos()
         {
             try
@@ -176,6 +205,11 @@ namespace SALC.BLL
             }
         }
 
+        /// <summary>
+        /// Cambia el estado de un paciente
+        /// </summary>
+        /// <param name="dni">DNI del paciente</param>
+        /// <param name="nuevoEstado">Nuevo estado (Activo o Inactivo)</param>
         public void CambiarEstadoPaciente(int dni, string nuevoEstado)
         {
             try
@@ -211,16 +245,29 @@ namespace SALC.BLL
             }
         }
 
+        /// <summary>
+        /// Activa un paciente cambiando su estado a Activo
+        /// </summary>
+        /// <param name="dni">DNI del paciente</param>
         public void ActivarPaciente(int dni)
         {
             CambiarEstadoPaciente(dni, "Activo");
         }
 
+        /// <summary>
+        /// Desactiva un paciente cambiando su estado a Inactivo
+        /// </summary>
+        /// <param name="dni">DNI del paciente</param>
         public void DesactivarPaciente(int dni)
         {
             CambiarEstadoPaciente(dni, "Inactivo");
         }
 
+        /// <summary>
+        /// Verifica si un paciente está activo
+        /// </summary>
+        /// <param name="dni">DNI del paciente</param>
+        /// <returns>True si el paciente está activo, false en caso contrario</returns>
         public bool EstaActivo(int dni)
         {
             try
@@ -238,8 +285,9 @@ namespace SALC.BLL
         }
 
         /// <summary>
-        /// Valida los datos del paciente
+        /// Valida que los datos del paciente cumplan con las reglas de negocio
         /// </summary>
+        /// <param name="paciente">Paciente a validar</param>
         private void ValidarPaciente(Paciente paciente)
         {
             if (paciente == null)

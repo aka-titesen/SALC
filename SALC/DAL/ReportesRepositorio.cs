@@ -6,8 +6,19 @@ using SALC.Infraestructura;
 
 namespace SALC.DAL
 {
+    /// <summary>
+    /// Repositorio para el acceso a datos de reportes y estadísticas del sistema.
+    /// Proporciona consultas especializadas para generación de reportes gerenciales y médicos.
+    /// </summary>
     public class ReportesRepositorio
     {
+        /// <summary>
+        /// Obtiene un reporte de productividad de médicos en un rango de fechas.
+        /// Incluye cantidad de análisis creados y verificados por cada médico.
+        /// </summary>
+        /// <param name="desde">Fecha de inicio del período</param>
+        /// <param name="hasta">Fecha de fin del período</param>
+        /// <returns>Lista de reportes de productividad por médico</returns>
         public List<ReporteProductividad> ObtenerProductividadMedicos(DateTime desde, DateTime hasta)
         {
             var resultado = new List<ReporteProductividad>();
@@ -58,6 +69,13 @@ namespace SALC.DAL
             return resultado;
         }
 
+        /// <summary>
+        /// Obtiene un reporte de facturación agrupado por obra social en un rango de fechas.
+        /// Incluye cantidad de análisis y porcentaje respecto al total.
+        /// </summary>
+        /// <param name="desde">Fecha de inicio del período</param>
+        /// <param name="hasta">Fecha de fin del período</param>
+        /// <returns>Lista de reportes de facturación por obra social</returns>
         public List<ReporteFacturacion> ObtenerFacturacionPorObraSocial(DateTime desde, DateTime hasta)
         {
             var resultado = new List<ReporteFacturacion>();
@@ -105,6 +123,13 @@ namespace SALC.DAL
             return resultado;
         }
 
+        /// <summary>
+        /// Obtiene los tipos de análisis más solicitados en un rango de fechas
+        /// </summary>
+        /// <param name="desde">Fecha de inicio del período</param>
+        /// <param name="hasta">Fecha de fin del período</param>
+        /// <param name="top">Cantidad de tipos de análisis a retornar</param>
+        /// <returns>Lista de tipos de análisis más demandados</returns>
         public List<ReporteDemanda> ObtenerTopAnalisis(DateTime desde, DateTime hasta, int top)
         {
             var resultado = new List<ReporteDemanda>();
@@ -149,6 +174,14 @@ namespace SALC.DAL
             return resultado;
         }
 
+        /// <summary>
+        /// Obtiene un reporte de valores críticos (fuera de rango) para un médico específico.
+        /// Lista todos los resultados que están fuera de los valores de referencia.
+        /// </summary>
+        /// <param name="dniMedico">DNI del médico</param>
+        /// <param name="desde">Fecha de inicio del período</param>
+        /// <param name="hasta">Fecha de fin del período</param>
+        /// <returns>Lista de alertas de valores críticos</returns>
         public List<ReporteAlerta> ObtenerValoresCriticos(int dniMedico, DateTime desde, DateTime hasta)
         {
             var resultado = new List<ReporteAlerta>();
@@ -211,6 +244,12 @@ namespace SALC.DAL
             return resultado;
         }
 
+        /// <summary>
+        /// Obtiene un reporte de carga de trabajo de un médico específico.
+        /// Incluye análisis pendientes y análisis verificados en el mes actual.
+        /// </summary>
+        /// <param name="dniMedico">DNI del médico</param>
+        /// <returns>Información sobre la carga de trabajo del médico</returns>
         public ReporteCargaTrabajo ObtenerCargaTrabajo(int dniMedico)
         {
             var resultado = new ReporteCargaTrabajo();

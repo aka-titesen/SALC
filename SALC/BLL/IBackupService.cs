@@ -4,14 +4,15 @@ using SALC.Domain;
 namespace SALC.BLL
 {
     /// <summary>
-    /// Interfaz para el servicio de copias de seguridad manuales de la base de datos
+    /// Interfaz para el servicio de copias de seguridad de la base de datos.
+    /// Define las operaciones para ejecutar, consultar y gestionar backups del sistema.
     /// </summary>
     public interface IBackupService
     {
         /// <summary>
         /// Ejecuta una copia de seguridad manual de la base de datos
         /// </summary>
-        /// <param name="rutaArchivoBak">Ruta completa donde se guardará el archivo .bak</param>
+        /// <param name="rutaArchivoBak">Ruta completa donde se guardará el archivo de backup</param>
         /// <param name="dniUsuario">DNI del administrador que ejecuta el backup</param>
         void EjecutarBackupManual(string rutaArchivoBak, int dniUsuario);
         
@@ -29,13 +30,13 @@ namespace SALC.BLL
         HistorialBackup ObtenerUltimoBackup();
         
         /// <summary>
-        /// Elimina registros de historial y archivos de backups antiguos
+        /// Elimina registros de historial y archivos de backups más antiguos que el período de retención
         /// </summary>
-        /// <param name="diasRetencion">Días de antigüedad para considerar un backup como antiguo</param>
+        /// <param name="diasRetencion">Cantidad de días de retención de backups</param>
         void LimpiarBackupsAntiguos(int diasRetencion);
         
         /// <summary>
-        /// Formatea un tamaño en bytes a una representación legible (KB, MB, GB)
+        /// Formatea un tamaño en bytes a una representación legible (B, KB, MB, GB)
         /// </summary>
         /// <param name="bytes">Tamaño en bytes</param>
         /// <returns>Cadena formateada con la unidad apropiada</returns>

@@ -6,8 +6,16 @@ using SALC.Infraestructura;
 
 namespace SALC.DAL
 {
+    /// <summary>
+    /// Repositorio para el acceso a datos específicos de asistentes de laboratorio.
+    /// Gestiona las operaciones CRUD sobre la tabla de asistentes en la base de datos.
+    /// </summary>
     public class AsistenteRepositorio : IRepositorioBase<Asistente>
     {
+        /// <summary>
+        /// Crea un nuevo asistente en la base de datos
+        /// </summary>
+        /// <param name="a">Asistente a crear</param>
         public void Crear(Asistente a)
         {
             using (var cn = DbConexion.CrearConexion())
@@ -21,6 +29,10 @@ namespace SALC.DAL
             }
         }
 
+        /// <summary>
+        /// Actualiza los datos específicos de un asistente
+        /// </summary>
+        /// <param name="a">Asistente con los datos actualizados</param>
         public void Actualizar(Asistente a)
         {
             using (var cn = DbConexion.CrearConexion())
@@ -34,6 +46,10 @@ namespace SALC.DAL
             }
         }
 
+        /// <summary>
+        /// Elimina un asistente de la base de datos
+        /// </summary>
+        /// <param name="id">DNI del asistente a eliminar</param>
         public void Eliminar(object id)
         {
             using (var cn = DbConexion.CrearConexion())
@@ -45,6 +61,11 @@ namespace SALC.DAL
             }
         }
 
+        /// <summary>
+        /// Obtiene un asistente por su DNI
+        /// </summary>
+        /// <param name="id">DNI del asistente</param>
+        /// <returns>El asistente encontrado o null si no existe</returns>
         public Asistente ObtenerPorId(object id)
         {
             using (var cn = DbConexion.CrearConexion())
@@ -66,6 +87,10 @@ namespace SALC.DAL
             return null;
         }
 
+        /// <summary>
+        /// Obtiene todos los asistentes del sistema
+        /// </summary>
+        /// <returns>Colección de todos los asistentes</returns>
         public IEnumerable<Asistente> ObtenerTodos()
         {
             using (var cn = DbConexion.CrearConexion())

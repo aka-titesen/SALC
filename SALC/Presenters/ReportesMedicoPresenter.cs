@@ -4,12 +4,21 @@ using SALC.BLL;
 
 namespace SALC.Presenters
 {
+    /// <summary>
+    /// Presenter para la gestión de reportes del médico.
+    /// Coordina la generación de reportes de alertas y carga de trabajo.
+    /// </summary>
     public class ReportesMedicoPresenter
     {
         private readonly IReportesMedicoView _view;
         private readonly IReportesService _reportesService = new ReportesService();
         private readonly int _dniMedico;
 
+        /// <summary>
+        /// Constructor del presenter
+        /// </summary>
+        /// <param name="view">Vista que implementa la interfaz IReportesMedicoView</param>
+        /// <param name="dniMedico">DNI del médico que solicita los reportes</param>
         public ReportesMedicoPresenter(IReportesMedicoView view, int dniMedico)
         {
             _view = view;
@@ -18,6 +27,9 @@ namespace SALC.Presenters
             _view.GenerarReporteCargaTrabajoClick += (s, e) => OnGenerarReporteCargaTrabajo();
         }
 
+        /// <summary>
+        /// Maneja la generación del reporte de alertas de valores críticos
+        /// </summary>
         private void OnGenerarReporteAlertas()
         {
             if (!ValidarFechas())
@@ -44,6 +56,9 @@ namespace SALC.Presenters
             }
         }
 
+        /// <summary>
+        /// Maneja la generación del reporte de carga de trabajo del médico
+        /// </summary>
         private void OnGenerarReporteCargaTrabajo()
         {
             try
@@ -58,6 +73,10 @@ namespace SALC.Presenters
             }
         }
 
+        /// <summary>
+        /// Valida que el rango de fechas seleccionado sea correcto
+        /// </summary>
+        /// <returns>True si las fechas son válidas, false en caso contrario</returns>
         private bool ValidarFechas()
         {
             if (_view.FechaDesde > _view.FechaHasta)

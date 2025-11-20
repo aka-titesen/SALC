@@ -5,8 +5,17 @@ using SALC.Infraestructura;
 
 namespace SALC.DAL
 {
+    /// <summary>
+    /// Repositorio para el acceso a datos de resultados de métricas en análisis.
+    /// Gestiona la relación entre análisis y métricas con sus resultados.
+    /// </summary>
     public class AnalisisMetricaRepositorio
     {
+        /// <summary>
+        /// Inserta o actualiza el resultado de una métrica en un análisis.
+        /// Si el registro existe, actualiza el resultado; si no existe, lo crea.
+        /// </summary>
+        /// <param name="am">Análisis-Métrica con el resultado a guardar</param>
         public void UpsertResultado(AnalisisMetrica am)
         {
             using (var cn = DbConexion.CrearConexion())
@@ -25,6 +34,11 @@ WHEN NOT MATCHED THEN INSERT (id_analisis, id_metrica, resultado, observaciones)
             }
         }
 
+        /// <summary>
+        /// Obtiene todos los resultados de métricas de un análisis específico
+        /// </summary>
+        /// <param name="idAnalisis">Identificador del análisis</param>
+        /// <returns>Colección de resultados del análisis</returns>
         public IEnumerable<AnalisisMetrica> ObtenerResultados(int idAnalisis)
         {
             using (var cn = DbConexion.CrearConexion())

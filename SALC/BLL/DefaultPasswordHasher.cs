@@ -2,38 +2,45 @@ using System;
 
 namespace SALC.BLL
 {
+    /// <summary>
+    /// Implementación por defecto del hasher de contraseñas utilizando BCrypt.
+    /// Proporciona hashing seguro y verificación de contraseñas.
+    /// </summary>
     public class DefaultPasswordHasher : IPasswordHasher
     {
+        /// <summary>
+        /// Verifica si una contraseña en texto plano coincide con un hash BCrypt
+        /// </summary>
+        /// <param name="plainText">Contraseña en texto plano a verificar</param>
+        /// <param name="hashed">Hash BCrypt para comparar</param>
+        /// <returns>True si la contraseña coincide, false en caso contrario</returns>
         public bool Verify(string plainText, string hashed)
         {
             try
             {
-                // Intentar usar BCrypt.Net-Next si está disponible
-                // NOTA: Para que esto funcione, debe instalar el paquete NuGet "BCrypt.Net-Next"
-                // desde Visual Studio: Tools → NuGet Package Manager → Manage NuGet Packages for Solution
                 return BCrypt.Net.BCrypt.Verify(plainText, hashed);
             }
             catch (Exception)
             {
-                // Si BCrypt no está disponible, comparar como texto plano
-                // SOLO para migración automática de contraseñas legacy
                 return string.Equals(plainText, hashed, StringComparison.Ordinal);
             }
         }
 
+        /// <summary>
+        /// Genera un hash BCrypt de una contraseña en texto plano
+        /// </summary>
+        /// <param name="plainText">Contraseña en texto plano</param>
+        /// <returns>Hash BCrypt de la contraseña</returns>
         public string Hash(string plainText)
         {
             try
             {
-                // Usar BCrypt con work factor 12 (recomendado para seguridad)
-                // NOTA: Requiere paquete NuGet "BCrypt.Net-Next"
                 return BCrypt.Net.BCrypt.HashPassword(plainText, workFactor: 12);
             }
             catch (TypeLoadException)
             {
-                // BCrypt no está instalado - informar al usuario
                 throw new InvalidOperationException(
-                    "❌ BCrypt.Net-Next no está instalado.\n\n" +
+                    "BCrypt.Net-Next no está instalado.\n\n" +
                     "Para habilitar el hashing seguro de contraseñas:\n" +
                     "1. Abra Visual Studio\n" +
                     "2. Click derecho en el proyecto SALC\n" +
@@ -47,12 +54,13 @@ namespace SALC.BLL
         }
 
         /// <summary>
-        /// Determina si una contraseña está en texto plano o ya está hasheada con BCrypt
+        /// Determina si una contraseña está en texto plano o ya está hasheada con BCrypt.
+        /// Los hashes de BCrypt empiezan con $2a$, $2b$, $2x$ o $2y$ y tienen 60 caracteres.
         /// </summary>
+        /// <param name="passwordHash">Cadena a evaluar</param>
+        /// <returns>True si es texto plano, false si es un hash BCrypt</returns>
         public bool IsPlainText(string passwordHash)
         {
-            // Los hashes de BCrypt siempre empiezan con $2a$, $2b$, $2x$ o $2y$
-            // y tienen una longitud de 60 caracteres
             if (string.IsNullOrEmpty(passwordHash))
                 return true;
 

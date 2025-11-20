@@ -7,11 +7,20 @@ using SALC.Infraestructura.Exceptions;
 
 namespace SALC.Presenters
 {
+    /// <summary>
+    /// Presenter para la pantalla de inicio de sesión.
+    /// Coordina la autenticación de usuarios y la navegación a la pantalla principal.
+    /// </summary>
     public class LoginPresenter
     {
         private readonly ILoginView _view;
         private readonly IAutenticacionService _authService;
 
+        /// <summary>
+        /// Constructor del presenter
+        /// </summary>
+        /// <param name="view">Vista que implementa la interfaz ILoginView</param>
+        /// <param name="authService">Servicio de autenticación</param>
         public LoginPresenter(ILoginView view, IAutenticacionService authService)
         {
             _view = view;
@@ -19,6 +28,9 @@ namespace SALC.Presenters
             _view.AccederClick += (s, e) => OnAcceder();
         }
 
+        /// <summary>
+        /// Maneja el evento de clic en el botón de acceder
+        /// </summary>
         private void OnAcceder()
         {
             try

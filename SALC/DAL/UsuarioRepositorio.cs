@@ -7,8 +7,16 @@ using SALC.Infraestructura;
 
 namespace SALC.DAL
 {
+    /// <summary>
+    /// Repositorio para el acceso a datos de usuarios.
+    /// Gestiona las operaciones CRUD sobre la tabla de usuarios y sus tablas relacionadas (médicos, asistentes).
+    /// </summary>
     public class UsuarioRepositorio : IRepositorioBase<Usuario>
     {
+        /// <summary>
+        /// Crea un nuevo usuario en la base de datos
+        /// </summary>
+        /// <param name="entidad">Usuario a crear</param>
         public void Crear(Usuario entidad)
         {
             using (var cn = DbConexion.CrearConexion())
@@ -26,6 +34,10 @@ namespace SALC.DAL
             }
         }
 
+        /// <summary>
+        /// Actualiza los datos de un usuario existente
+        /// </summary>
+        /// <param name="entidad">Usuario con los datos actualizados</param>
         public void Actualizar(Usuario entidad)
         {
             using (var cn = DbConexion.CrearConexion())
@@ -43,9 +55,12 @@ namespace SALC.DAL
             }
         }
 
+        /// <summary>
+        /// Elimina un usuario mediante baja lógica, cambiando su estado a Inactivo
+        /// </summary>
+        /// <param name="id">DNI del usuario a eliminar</param>
         public void Eliminar(object id)
         {
-            // Baja lógica - cambiar estado a "Inactivo"
             using (var cn = DbConexion.CrearConexion())
             using (var cmd = new SqlCommand("UPDATE usuarios SET estado='Inactivo' WHERE dni=@dni", cn))
             {
@@ -55,6 +70,11 @@ namespace SALC.DAL
             }
         }
 
+        /// <summary>
+        /// Obtiene un usuario por su DNI
+        /// </summary>
+        /// <param name="id">DNI del usuario</param>
+        /// <returns>El usuario encontrado o null si no existe</returns>
         public Usuario ObtenerPorId(object id)
         {
             using (var cn = DbConexion.CrearConexion())
@@ -73,6 +93,10 @@ namespace SALC.DAL
             return null;
         }
 
+        /// <summary>
+        /// Obtiene todos los usuarios del sistema
+        /// </summary>
+        /// <returns>Colección de todos los usuarios</returns>
         public IEnumerable<Usuario> ObtenerTodos()
         {
             using (var cn = DbConexion.CrearConexion())
@@ -87,7 +111,10 @@ namespace SALC.DAL
             }
         }
 
-        // Método para obtener solo usuarios activos
+        /// <summary>
+        /// Obtiene todos los usuarios con estado Activo
+        /// </summary>
+        /// <returns>Colección de usuarios activos</returns>
         public IEnumerable<Usuario> ObtenerActivos()
         {
             using (var cn = DbConexion.CrearConexion())
@@ -102,9 +129,13 @@ namespace SALC.DAL
             }
         }
 
+        /// <summary>
+        /// Obtiene un usuario activo por su email
+        /// </summary>
+        /// <param name="email">Email del usuario</param>
+        /// <returns>El usuario encontrado o null si no existe o está inactivo</returns>
         public Usuario ObtenerPorEmail(string email)
         {
-            // Solo buscar entre usuarios activos para el login
             using (var cn = DbConexion.CrearConexion())
             using (var cmd = new SqlCommand("SELECT dni, nombre, apellido, email, password_hash, id_rol, estado FROM usuarios WHERE email=@em AND estado='Activo'", cn))
             {
@@ -119,6 +150,11 @@ namespace SALC.DAL
             return null;
         }
 
+        /// <summary>
+        /// Mapea un registro de la base de datos a un objeto Usuario
+        /// </summary>
+        /// <param name="rd">Registro leído de la base de datos</param>
+        /// <returns>Instancia de Usuario con los datos del registro</returns>
         private Usuario MapUsuario(IDataRecord rd)
         {
             return new Usuario
@@ -133,7 +169,11 @@ namespace SALC.DAL
             };
         }
 
-        // Operaciones transaccionales combinando usuarios + medicos/asistentes
+        /// <summary>
+        /// Crea un usuario médico en una transacción, insertando en las tablas usuarios y medicos
+        /// </summary>
+        /// <param name="usuario">Datos del usuario</param>
+        /// <param name="medico">Datos específicos del médico</param>
         public void CrearUsuarioMedico(Usuario usuario, Medico medico)
         {
             using (var cn = DbConexion.CrearConexion())
@@ -174,6 +214,11 @@ namespace SALC.DAL
             }
         }
 
+        /// <summary>
+        /// Crea un usuario asistente en una transacción, insertando en las tablas usuarios y asistentes
+        /// </summary>
+        /// <param name="usuario">Datos del usuario</param>
+        /// <param name="asistente">Datos específicos del asistente</param>
         public void CrearUsuarioAsistente(Usuario usuario, Asistente asistente)
         {
             using (var cn = DbConexion.CrearConexion())
@@ -214,20 +259,28 @@ namespace SALC.DAL
             }
         }
 
-        // Métodos de eliminación que usan baja lógica
+        /// <summary>
+        /// Elimina un usuario médico mediante baja lógica
+        /// </summary>
+        /// <param name="dni">DNI del médico a eliminar</param>
         public void EliminarUsuarioMedico(int dni)
         {
-            // Usar baja lógica
             Eliminar(dni);
         }
 
+        /// <summary>
+        /// Elimina un usuario asistente mediante baja lógica
+        /// </summary>
+        /// <param name="dni">DNI del asistente a eliminar</param>
         public void EliminarUsuarioAsistente(int dni)
         {
-            // Usar baja lógica
             Eliminar(dni);
         }
 
-        // Método para obtener médicos que han firmado al menos un análisis
+        /// <summary>
+        /// Obtiene los médicos activos que han firmado al menos un análisis
+        /// </summary>
+        /// <returns>Colección de médicos con análisis firmados</returns>
         public IEnumerable<Usuario> ObtenerMedicosConAnalisisFirmados()
         {
             using (var cn = DbConexion.CrearConexion())
@@ -247,7 +300,10 @@ namespace SALC.DAL
             }
         }
 
-        // Método para obtener médicos activos (todos)
+        /// <summary>
+        /// Obtiene todos los médicos activos del sistema
+        /// </summary>
+        /// <returns>Colección de médicos activos ordenados por apellido y nombre</returns>
         public IEnumerable<Usuario> ObtenerMedicosActivos()
         {
             using (var cn = DbConexion.CrearConexion())

@@ -11,28 +11,33 @@ using SALC.Views.PanelAdministrador;
 
 namespace SALC.Presenters
 {
-    // ViewModel para mostrar información enriquecida de usuarios en la grilla
+    /// <summary>
+    /// ViewModel para mostrar información enriquecida de usuarios en las vistas del administrador
+    /// </summary>
     public class UsuarioViewModel
     {
-        public int DNI { get; set; }  // CAMBIADO de Dni
+        public int DNI { get; set; }
         public string Nombre { get; set; }
         public string Apellido { get; set; }
         public string Email { get; set; }
         public string Rol { get; set; }
         public string Estado { get; set; }
-        public string DatosEspecíficos { get; set; }  // CAMBIADO de DatosEspecificos
+        public string DatosEspecíficos { get; set; }
 
+        /// <summary>
+        /// Crea un ViewModel desde una entidad Usuario
+        /// </summary>
         public static UsuarioViewModel FromUsuario(Usuario usuario, string datosEspecificos = "")
         {
             return new UsuarioViewModel
             {
-                DNI = usuario.Dni,  // CAMBIADO
+                DNI = usuario.Dni,
                 Nombre = usuario.Nombre,
                 Apellido = usuario.Apellido,
                 Email = usuario.Email,
                 Rol = ObtenerNombreRol(usuario.IdRol),
                 Estado = usuario.Estado,
-                DatosEspecíficos = datosEspecificos  // CAMBIADO
+                DatosEspecíficos = datosEspecificos
             };
         }
 
@@ -48,6 +53,11 @@ namespace SALC.Presenters
         }
     }
 
+    /// <summary>
+    /// Presenter para el panel del administrador.
+    /// Coordina todas las funcionalidades administrativas: gestión de usuarios,
+    /// catálogos (obras sociales, tipos de análisis, métricas), reportes y backups.
+    /// </summary>
     public class PanelAdministradorPresenter
     {
         private readonly IPanelAdministradorView _view;
@@ -67,6 +77,10 @@ namespace SALC.Presenters
         private List<Metrica> _metricas = new List<Metrica>();
         private int _dniUsuarioActual;
 
+        /// <summary>
+        /// Constructor del presenter
+        /// </summary>
+        /// <param name="view">Vista del panel de administrador</param>
         public PanelAdministradorPresenter(IPanelAdministradorView view)
         {
             _view = view;
@@ -77,7 +91,7 @@ namespace SALC.Presenters
             CargarListadoUsuarios();
             CargarCatalogos();
 
-            // Usuarios
+            // Suscripción a eventos de usuarios
             _view.UsuariosNuevoClick += (s, e) => OnUsuariosNuevo();
             _view.UsuariosEditarClick += (s, e) => OnUsuariosEditar();
             _view.UsuariosEliminarClick += (s, e) => OnUsuariosEliminar();
@@ -85,33 +99,41 @@ namespace SALC.Presenters
             _view.UsuariosDetalleClick += (s, e) => OnUsuariosDetalle();
             _view.UsuariosFiltroEstadoChanged += (s, filtro) => OnUsuariosFiltroEstado(filtro);
 
-            // Catálogos - Obras Sociales
+            // Suscripción a eventos de obras sociales
             _view.ObrasSocialesNuevoClick += (s, e) => OnObrasSocialesNuevo();
             _view.ObrasSocialesEditarClick += (s, e) => OnObrasSocialesEditar();
             _view.ObrasSocialesEliminarClick += (s, e) => OnObrasSocialesEliminar();
             _view.ObrasSocialesBuscarTextoChanged += (s, txt) => OnObrasSocialesBuscar(txt);
             _view.ObrasSocialesFiltroEstadoChanged += (s, filtro) => OnObrasSocialesFiltroEstado(filtro);
             
-            // Catálogos - Tipos de Análisis
+            // Suscripción a eventos de tipos de análisis
             _view.TiposAnalisisNuevoClick += (s, e) => OnTiposAnalisisNuevo();
             _view.TiposAnalisisEditarClick += (s, e) => OnTiposAnalisisEditar();
             _view.TiposAnalisisEliminarClick += (s, e) => OnTiposAnalisisEliminar();
             _view.TiposAnalisisBuscarTextoChanged += (s, txt) => OnTiposAnalisisBuscar(txt);
             _view.TiposAnalisisFiltroEstadoChanged += (s, filtro) => OnTiposAnalisisFiltroEstado(filtro);
             
-            // Catálogos - Métricas
+            // Suscripción a eventos de métricas
             _view.MetricasNuevoClick += (s, e) => OnMetricasNuevo();
             _view.MetricasEditarClick += (s, e) => OnMetricasEditar();
             _view.MetricasEliminarClick += (s, e) => OnMetricasEliminar();
             _view.MetricasBuscarTextoChanged += (s, txt) => OnMetricasBuscar(txt);
             _view.MetricasFiltroEstadoChanged += (s, filtro) => OnMetricasFiltroEstado(filtro);
 
-            // Relaciones Tipo Análisis - Métricas
+            // Otras funcionalidades
             _view.RelacionesTipoAnalisisMetricaGestionarClick += (s, e) => OnGestionarRelacionesTipoAnalisisMetricas();
-            
-            // Reportes
             _view.ReportesClick += (s, e) => OnAbrirReportes();
         }
+
+        /// <summary>
+        /// Establece el DNI del usuario administrador actual
+        /// </summary>
+        public void EstablecerUsuarioActual(int dni)
+        {
+            _dniUsuarioActual = dni;
+        }
+
+        #region Conexión y Backup
 
         private void OnProbarConexion()
         {
@@ -126,10 +148,8 @@ namespace SALC.Presenters
         {
             try
             {
-                // Obtener la ruta predeterminada de backups de SQL Server
                 string rutaSugerida = ObtenerRutaBackupSQLServer();
                 
-                // Mostrar diálogo para seleccionar la ubicación del backup
                 using (var dlg = new SaveFileDialog())
                 {
                     dlg.Filter = "Archivos de backup (*.bak)|*.bak";
@@ -145,10 +165,8 @@ namespace SALC.Presenters
                         {
                             Cursor.Current = Cursors.WaitCursor;
                             
-                            // Ejecutar backup manual
                             _backupService.EjecutarBackupManual(dlg.FileName, _dniUsuarioActual);
                             
-                            // Obtener información del backup ejecutado
                             var ultimoBackup = _backupService.ObtenerUltimoBackup();
                             var tamanoFormateado = _backupService.FormatearTamanoArchivo(ultimoBackup.TamanoArchivo);
                             
@@ -172,7 +190,6 @@ namespace SALC.Presenters
             {
                 string mensajeError = "Error al ejecutar la copia de seguridad de la base de datos:\n\n";
                 
-                // Analizar el error específico de SQL Server
                 if (sqlEx.Message.Contains("Operating system error 5") || 
                     sqlEx.Message.Contains("Acceso denegado") ||
                     sqlEx.Message.Contains("Access is denied"))
@@ -212,20 +229,18 @@ namespace SALC.Presenters
         }
         
         /// <summary>
-        /// Obtiene la ruta predeterminada de backups de SQL Server consultando la instancia
+        /// Obtiene la ruta predeterminada de backups de SQL Server
         /// </summary>
         private string ObtenerRutaBackupSQLServer()
         {
             try
             {
-                // Consultar a SQL Server por su carpeta predeterminada de backups
                 var connectionString = System.Configuration.ConfigurationManager.ConnectionStrings["SALC"].ConnectionString;
                 
                 using (var conexion = new System.Data.SqlClient.SqlConnection(connectionString))
                 {
                     conexion.Open();
                     
-                    // Esta consulta obtiene la ruta predeterminada de backups de SQL Server
                     var sqlQuery = @"
                         DECLARE @BackupDirectory NVARCHAR(500)
                         EXEC master.dbo.xp_instance_regread 
@@ -241,8 +256,6 @@ namespace SALC.Presenters
                         if (resultado != null && !string.IsNullOrEmpty(resultado.ToString()))
                         {
                             var rutaBackup = resultado.ToString();
-                            
-                            // Crear subdirectorio para SALC si no existe
                             var rutaSALC = System.IO.Path.Combine(rutaBackup, "SALC");
                             if (!System.IO.Directory.Exists(rutaSALC))
                             {
@@ -253,7 +266,6 @@ namespace SALC.Presenters
                                 }
                                 catch
                                 {
-                                    // Si no se puede crear subdirectorio, usar la raíz
                                     return rutaBackup;
                                 }
                             }
@@ -265,10 +277,9 @@ namespace SALC.Presenters
             }
             catch
             {
-                // Si falla la consulta, usar rutas de respaldo conocidas
+                // Si falla la consulta, usar rutas de respaldo
             }
             
-            // Rutas de respaldo en orden de prioridad
             string[] rutasRespaldo = new[]
             {
                 @"C:\Program Files\Microsoft SQL Server\MSSQL16.MSSQLSERVER\MSSQL\Backup",
@@ -278,7 +289,6 @@ namespace SALC.Presenters
                 System.IO.Path.GetTempPath()
             };
             
-            // Retornar la primera ruta que exista
             foreach (var ruta in rutasRespaldo)
             {
                 if (System.IO.Directory.Exists(ruta))
@@ -287,39 +297,12 @@ namespace SALC.Presenters
                 }
             }
             
-            // Última opción: carpeta temporal
             return System.IO.Path.GetTempPath();
         }
 
-        private void OnGestionarRelacionesTipoAnalisisMetricas()
-        {
-            try
-            {
-                using (var dlg = new FrmGestionRelacionesTipoAnalisisMetricas())
-                {
-                    dlg.ShowDialog();
-                }
-            }
-            catch (Exception ex)
-            {
-                _view.MostrarMensaje("Error al abrir gestión de relaciones: " + ex.Message, "Relaciones Tipo Análisis-Métricas", true);
-            }
-        }
+        #endregion
 
-        private void OnAbrirReportes()
-        {
-            try
-            {
-                using (var dlg = new FrmReportesAdmin())
-                {
-                    dlg.ShowDialog();
-                }
-            }
-            catch (Exception ex)
-            {
-                _view.MostrarMensaje("Error al abrir módulo de reportes: " + ex.Message, "Reportes", true);
-            }
-        }
+        #region Gestión de Usuarios
 
         private void CargarListadoUsuarios()
         {
@@ -345,17 +328,17 @@ namespace SALC.Presenters
                 {
                     switch (usuario.IdRol)
                     {
-                        case 2: // Médico
+                        case 2:
                             var medico = _medicoRepo.ObtenerPorId(usuario.Dni);
                             if (medico != null)
                                 datosEspecificos = $"Mat: {medico.NroMatricula} - {medico.Especialidad}";
                             break;
-                        case 3: // Asistente
+                        case 3:
                             var asistente = _asistenteRepo.ObtenerPorId(usuario.Dni);
                             if (asistente != null)
                                 datosEspecificos = $"Supervisor: {asistente.DniSupervisor} - Ingreso: {asistente.FechaIngreso:dd/MM/yyyy}";
                             break;
-                        case 1: // Administrador
+                        case 1:
                             datosEspecificos = "Acceso completo al sistema";
                             break;
                     }
@@ -373,7 +356,6 @@ namespace SALC.Presenters
         {
             IEnumerable<UsuarioViewModel> usuariosFiltrados = _usuariosViewModel;
 
-            // Filtro por estado
             if (_filtroEstadoUsuariosActual != "Todos")
             {
                 usuariosFiltrados = usuariosFiltrados.Where(u => u.Estado == _filtroEstadoUsuariosActual);
@@ -388,19 +370,153 @@ namespace SALC.Presenters
             AplicarFiltrosUsuarios();
         }
 
+        private void OnUsuariosBuscar(string txt)
+        {
+            var q = txt?.Trim().ToLowerInvariant();
+            IEnumerable<UsuarioViewModel> src = _usuariosViewModel;
+
+            if (_filtroEstadoUsuariosActual != "Todos")
+            {
+                src = src.Where(u => u.Estado == _filtroEstadoUsuariosActual);
+            }
+
+            if (!string.IsNullOrEmpty(q))
+            {
+                src = src.Where(u => u.Apellido.ToLowerInvariant().Contains(q)
+                    || u.Nombre.ToLowerInvariant().Contains(q)
+                    || u.Email.ToLowerInvariant().Contains(q)
+                    || u.DNI.ToString().Contains(q));
+            }
+            
+            _view.CargarUsuarios(src.ToList());
+        }
+
+        private void OnUsuariosNuevo()
+        {
+            using (var dlg = new SALC.Views.PanelAdministrador.FrmUsuarioEdit())
+            {
+                if (dlg.ShowDialog() == DialogResult.OK)
+                {
+                    try
+                    {
+                        var data = dlg.ObtenerDatos();
+                        _usuarioService.CrearUsuario(data.Usuario, data.Medico, data.Asistente);
+                        CargarListadoUsuarios();
+                        _view.MostrarMensaje("Usuario creado correctamente.", "Usuarios");
+                    }
+                    catch (System.Exception ex)
+                    {
+                        _view.MostrarMensaje("Error al crear usuario: " + ex.Message, "Usuarios", true);
+                    }
+                }
+            }
+        }
+
+        private void OnUsuariosEditar()
+        {
+            var dni = _view.ObtenerUsuarioSeleccionadoDni();
+            if (dni == null)
+            {
+                _view.MostrarMensaje("Seleccione un usuario para editar.", "Usuarios");
+                return;
+            }
+            var existente = _usuarios.FirstOrDefault(u => u.Dni == dni.Value);
+            using (var dlg = new SALC.Views.PanelAdministrador.FrmUsuarioEdit(existente))
+            {
+                if (dlg.ShowDialog() == DialogResult.OK)
+                {
+                    try
+                    {
+                        var data = dlg.ObtenerDatos();
+                        _usuarioService.ActualizarUsuario(data.Usuario, data.Medico, data.Asistente);
+                        CargarListadoUsuarios();
+                        _view.MostrarMensaje("Usuario actualizado.", "Usuarios");
+                    }
+                    catch (System.Exception ex)
+                    {
+                        _view.MostrarMensaje("Error al actualizar usuario: " + ex.Message, "Usuarios", true);
+                    }
+                }
+            }
+        }
+
+        private void OnUsuariosEliminar()
+        {
+            var dni = _view.ObtenerUsuarioSeleccionadoDni();
+            if (dni == null)
+            {
+                _view.MostrarMensaje("Seleccione un usuario para eliminar.", "Usuarios");
+                return;
+            }
+
+            var usuario = _usuarios.FirstOrDefault(u => u.Dni == dni.Value);
+            if (usuario == null) return;
+
+            var resultado = MessageBox.Show(
+                $"¿Está seguro que desea desactivar al usuario {usuario.Nombre} {usuario.Apellido}?\n\n" +
+                "El usuario quedará inactivo pero sus datos se conservarán en el sistema.",
+                "Desactivar Usuario",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question);
+
+            if (resultado != DialogResult.Yes) return;
+
+            try
+            {
+                usuario.Estado = "Inactivo";
+                _usuarioService.ActualizarUsuario(usuario);
+                CargarListadoUsuarios();
+                _view.MostrarMensaje("Usuario desactivado correctamente.", "Usuarios");
+            }
+            catch (System.Exception ex)
+            {
+                _view.MostrarMensaje("Error al desactivar usuario: " + ex.Message, "Usuarios", true);
+            }
+        }
+
+        private void OnUsuariosDetalle()
+        {
+            var dni = _view.ObtenerUsuarioSeleccionadoDni();
+            if (dni == null)
+            {
+                _view.MostrarMensaje("Seleccione un usuario para ver los detalles.", "Usuarios");
+                return;
+            }
+
+            var usuario = _usuarios.FirstOrDefault(u => u.Dni == dni.Value);
+            if (usuario == null)
+            {
+                _view.MostrarMensaje("No se encontró el usuario seleccionado.", "Usuarios", true);
+                return;
+            }
+
+            try
+            {
+                using (var dlg = new SALC.Views.PanelAdministrador.FrmUsuarioDetalle(usuario))
+                {
+                    dlg.ShowDialog();
+                }
+            }
+            catch (System.Exception ex)
+            {
+                _view.MostrarMensaje("Error al mostrar detalles del usuario: " + ex.Message, "Usuarios", true);
+            }
+        }
+
+        #endregion
+
+        #region Catálogos
+
         private void CargarCatalogos()
         {
             try
             {
-                // Cargar obras sociales
                 _obrasSociales = _catalogoService.ObtenerObrasSociales().OrderBy(os => os.Nombre).ToList();
                 AplicarFiltrosObrasSociales();
                 
-                // Cargar tipos de análisis
                 _tiposAnalisis = _catalogoService.ObtenerTiposAnalisis().OrderBy(ta => ta.Descripcion).ToList();
                 AplicarFiltrosTiposAnalisis();
                 
-                // Cargar métricas
                 _metricas = _catalogoService.ObtenerMetricas().OrderBy(m => m.Nombre).ToList();
                 AplicarFiltrosMetricas();
             }
@@ -410,11 +526,19 @@ namespace SALC.Presenters
             }
         }
 
+        // Los métodos de catálogos (Obras Sociales, Tipos de Análisis y Métricas)
+        // siguen el mismo patrón de filtrado, creación, edición y eliminación
+        // que los métodos de gestión de usuarios mostrados arriba.
+        // Por brevedad, se omite su documentación detallada ya que la lógica es similar.
+
+        #endregion
+
+        #region Obras Sociales
+        
         private void AplicarFiltrosObrasSociales()
         {
             IEnumerable<ObraSocial> obrasSocialesFiltradas = _obrasSociales;
 
-            // Filtro por estado
             if (_filtroEstadoObrasSocialesActual != "Todos")
             {
                 obrasSocialesFiltradas = obrasSocialesFiltradas.Where(os => os.Estado == _filtroEstadoObrasSocialesActual);
@@ -434,13 +558,11 @@ namespace SALC.Presenters
             var q = txt?.Trim().ToLowerInvariant();
             IEnumerable<ObraSocial> src = _obrasSociales;
 
-            // Aplicar filtro de estado
             if (_filtroEstadoObrasSocialesActual != "Todos")
             {
                 src = src.Where(os => os.Estado == _filtroEstadoObrasSocialesActual);
             }
 
-            // Aplicar filtro de búsqueda
             if (!string.IsNullOrEmpty(q))
             {
                 src = src.Where(os => os.Nombre.ToLowerInvariant().Contains(q)
@@ -450,86 +572,6 @@ namespace SALC.Presenters
             _view.CargarObrasSociales(src.ToList());
         }
 
-        private void AplicarFiltrosTiposAnalisis()
-        {
-            IEnumerable<TipoAnalisis> tiposAnalisisFiltrados = _tiposAnalisis;
-
-            // Filtro por estado
-            if (_filtroEstadoTiposAnalisisActual != "Todos")
-            {
-                tiposAnalisisFiltrados = tiposAnalisisFiltrados.Where(ta => ta.Estado == _filtroEstadoTiposAnalisisActual);
-            }
-
-            _view.CargarTiposAnalisis(tiposAnalisisFiltrados.ToList());
-        }
-
-        private void OnTiposAnalisisFiltroEstado(string filtro)
-        {
-            _filtroEstadoTiposAnalisisActual = filtro ?? "Todos";
-            AplicarFiltrosTiposAnalisis();
-        }
-
-        private void OnTiposAnalisisBuscar(string txt)
-        {
-            var q = txt?.Trim().ToLowerInvariant();
-            IEnumerable<TipoAnalisis> src = _tiposAnalisis;
-
-            // Aplicar filtro de estado
-            if (_filtroEstadoTiposAnalisisActual != "Todos")
-            {
-                src = src.Where(ta => ta.Estado == _filtroEstadoTiposAnalisisActual);
-            }
-
-            // Aplicar filtro de búsqueda
-            if (!string.IsNullOrEmpty(q))
-            {
-                src = src.Where(ta => ta.Descripcion.ToLowerInvariant().Contains(q));
-            }
-            
-            _view.CargarTiposAnalisis(src.ToList());
-        }
-
-        private void AplicarFiltrosMetricas()
-        {
-            IEnumerable<Metrica> metricasFiltradas = _metricas;
-
-            // Filtro por estado
-            if (_filtroEstadoMetricasActual != "Todos")
-            {
-                metricasFiltradas = metricasFiltradas.Where(m => m.Estado == _filtroEstadoMetricasActual);
-            }
-
-            _view.CargarMetricas(metricasFiltradas.ToList());
-        }
-
-        private void OnMetricasFiltroEstado(string filtro)
-        {
-            _filtroEstadoMetricasActual = filtro ?? "Todos";
-            AplicarFiltrosMetricas();
-        }
-
-        private void OnMetricasBuscar(string txt)
-        {
-            var q = txt?.Trim().ToLowerInvariant();
-            IEnumerable<Metrica> src = _metricas;
-
-            // Aplicar filtro de estado
-            if (_filtroEstadoMetricasActual != "Todos")
-            {
-                src = src.Where(m => m.Estado == _filtroEstadoMetricasActual);
-            }
-
-            // Aplicar filtro de búsqueda
-            if (!string.IsNullOrEmpty(q))
-            {
-                src = src.Where(m => m.Nombre.ToLowerInvariant().Contains(q)
-                    || m.UnidadMedida.ToLowerInvariant().Contains(q));
-            }
-            
-            _view.CargarMetricas(src.ToList());
-        }
-
-        // Catálogos — Obras Sociales con formulario profesional
         private void OnObrasSocialesNuevo()
         {
             using (var dlg = new FrmObraSocialEdit())
@@ -619,7 +661,46 @@ namespace SALC.Presenters
             }
         }
 
-        // Catálogos — Tipos de Análisis con formulario profesional
+        #endregion
+
+        #region Tipos de Análisis
+
+        private void AplicarFiltrosTiposAnalisis()
+        {
+            IEnumerable<TipoAnalisis> tiposAnalisisFiltrados = _tiposAnalisis;
+
+            if (_filtroEstadoTiposAnalisisActual != "Todos")
+            {
+                tiposAnalisisFiltrados = tiposAnalisisFiltrados.Where(ta => ta.Estado == _filtroEstadoTiposAnalisisActual);
+            }
+
+            _view.CargarTiposAnalisis(tiposAnalisisFiltrados.ToList());
+        }
+
+        private void OnTiposAnalisisFiltroEstado(string filtro)
+        {
+            _filtroEstadoTiposAnalisisActual = filtro ?? "Todos";
+            AplicarFiltrosTiposAnalisis();
+        }
+
+        private void OnTiposAnalisisBuscar(string txt)
+        {
+            var q = txt?.Trim().ToLowerInvariant();
+            IEnumerable<TipoAnalisis> src = _tiposAnalisis;
+
+            if (_filtroEstadoTiposAnalisisActual != "Todos")
+            {
+                src = src.Where(ta => ta.Estado == _filtroEstadoTiposAnalisisActual);
+            }
+
+            if (!string.IsNullOrEmpty(q))
+            {
+                src = src.Where(ta => ta.Descripcion.ToLowerInvariant().Contains(q));
+            }
+            
+            _view.CargarTiposAnalisis(src.ToList());
+        }
+
         private void OnTiposAnalisisNuevo()
         {
             using (var dlg = new FrmTipoAnalisisEdit())
@@ -690,7 +771,7 @@ namespace SALC.Presenters
 
             var confirm = MessageBox.Show(
                 $"¿Desactivar tipo de análisis '{tipoAnalisis.Descripcion}'?\n\n" +
-                "El tipo de análisis se marcará como inactivo pero se conserverán todos los datos asociados.",
+                "El tipo de análisis se marcará como inactivo pero se conservarán todos los datos asociados.",
                 "Confirmar Baja Lógica", 
                 MessageBoxButtons.YesNo, 
                 MessageBoxIcon.Question);
@@ -709,7 +790,47 @@ namespace SALC.Presenters
             }
         }
 
-        // Catálogos — Métricas con formulario profesional
+        #endregion
+
+        #region Métricas
+
+        private void AplicarFiltrosMetricas()
+        {
+            IEnumerable<Metrica> metricasFiltradas = _metricas;
+
+            if (_filtroEstadoMetricasActual != "Todos")
+            {
+                metricasFiltradas = metricasFiltradas.Where(m => m.Estado == _filtroEstadoMetricasActual);
+            }
+
+            _view.CargarMetricas(metricasFiltradas.ToList());
+        }
+
+        private void OnMetricasFiltroEstado(string filtro)
+        {
+            _filtroEstadoMetricasActual = filtro ?? "Todos";
+            AplicarFiltrosMetricas();
+        }
+
+        private void OnMetricasBuscar(string txt)
+        {
+            var q = txt?.Trim().ToLowerInvariant();
+            IEnumerable<Metrica> src = _metricas;
+
+            if (_filtroEstadoMetricasActual != "Todos")
+            {
+                src = src.Where(m => m.Estado == _filtroEstadoMetricasActual);
+            }
+
+            if (!string.IsNullOrEmpty(q))
+            {
+                src = src.Where(m => m.Nombre.ToLowerInvariant().Contains(q)
+                    || m.UnidadMedida.ToLowerInvariant().Contains(q));
+            }
+            
+            _view.CargarMetricas(src.ToList());
+        }
+
         private void OnMetricasNuevo()
         {
             using (var dlg = new FrmMetricaEdit())
@@ -799,146 +920,40 @@ namespace SALC.Presenters
             }
         }
 
-        private void OnUsuariosBuscar(string txt)
+        #endregion
+
+        #region Relaciones y Reportes
+
+        private void OnGestionarRelacionesTipoAnalisisMetricas()
         {
-            var q = txt?.Trim().ToLowerInvariant();
-            IEnumerable<UsuarioViewModel> src = _usuariosViewModel;
-
-            // Aplicar filtro de estado
-            if (_filtroEstadoUsuariosActual != "Todos")
-            {
-                src = src.Where(u => u.Estado == _filtroEstadoUsuariosActual);
-            }
-
-            // Aplicar filtro de búsqueda
-            if (!string.IsNullOrEmpty(q))
-            {
-                src = src.Where(u => u.Apellido.ToLowerInvariant().Contains(q)
-                    || u.Nombre.ToLowerInvariant().Contains(q)
-                    || u.Email.ToLowerInvariant().Contains(q)
-                    || u.DNI.ToString().Contains(q));  // CAMBIADO de u.Dni a u.DNI
-            }
-            
-            _view.CargarUsuarios(src.ToList());
-        }
-
-        private void OnUsuariosNuevo()
-        {
-            using (var dlg = new SALC.Views.PanelAdministrador.FrmUsuarioEdit())
-            {
-                if (dlg.ShowDialog() == DialogResult.OK)
-                {
-                    try
-                    {
-                        var data = dlg.ObtenerDatos();
-                        _usuarioService.CrearUsuario(data.Usuario, data.Medico, data.Asistente);
-                        CargarListadoUsuarios();
-                        _view.MostrarMensaje("Usuario creado correctamente.", "Usuarios");
-                    }
-                    catch (System.Exception ex)
-                    {
-                        _view.MostrarMensaje("Error al crear usuario: " + ex.Message, "Usuarios", true);
-                    }
-                }
-            }
-        }
-
-        private void OnUsuariosEditar()
-        {
-            var dni = _view.ObtenerUsuarioSeleccionadoDni();
-            if (dni == null)
-            {
-                _view.MostrarMensaje("Seleccione un usuario para editar.", "Usuarios");
-                return;
-            }
-            var existente = _usuarios.FirstOrDefault(u => u.Dni == dni.Value);
-            using (var dlg = new SALC.Views.PanelAdministrador.FrmUsuarioEdit(existente))
-            {
-                if (dlg.ShowDialog() == DialogResult.OK)
-                {
-                    try
-                    {
-                        var data = dlg.ObtenerDatos();
-                        _usuarioService.ActualizarUsuario(data.Usuario, data.Medico, data.Asistente);
-                        CargarListadoUsuarios();
-                        _view.MostrarMensaje("Usuario actualizado.", "Usuarios");
-                    }
-                    catch (System.Exception ex)
-                    {
-                        _view.MostrarMensaje("Error al actualizar usuario: " + ex.Message, "Usuarios", true);
-                    }
-                }
-            }
-        }
-
-        private void OnUsuariosEliminar()
-        {
-            var dni = _view.ObtenerUsuarioSeleccionadoDni();
-            if (dni == null)
-            {
-                _view.MostrarMensaje("Seleccione un usuario para eliminar.", "Usuarios");
-                return;
-            }
-
-            var usuario = _usuarios.FirstOrDefault(u => u.Dni == dni.Value);
-            if (usuario == null) return;
-
-            // Confirmación simple para baja lógica
-            var resultado = MessageBox.Show(
-                $"¿Está seguro que desea desactivar al usuario {usuario.Nombre} {usuario.Apellido}?\n\n" +
-                "El usuario quedará inactivo pero sus datos se conservarán en el sistema.",
-                "Desactivar Usuario",
-                MessageBoxButtons.YesNo,
-                MessageBoxIcon.Question);
-
-            if (resultado != DialogResult.Yes) return;
-
             try
             {
-                // Siempre realizar baja lógica (desactivar usuario)
-                usuario.Estado = "Inactivo";
-                _usuarioService.ActualizarUsuario(usuario);
-                CargarListadoUsuarios();
-                _view.MostrarMensaje("Usuario desactivado correctamente.", "Usuarios");
-            }
-            catch (System.Exception ex)
-            {
-                _view.MostrarMensaje("Error al desactivar usuario: " + ex.Message, "Usuarios", true);
-            }
-        }
-
-        private void OnUsuariosDetalle()
-        {
-            var dni = _view.ObtenerUsuarioSeleccionadoDni();
-            if (dni == null)
-            {
-                _view.MostrarMensaje("Seleccione un usuario para ver los detalles.", "Usuarios");
-                return;
-            }
-
-            var usuario = _usuarios.FirstOrDefault(u => u.Dni == dni.Value);
-            if (usuario == null)
-            {
-                _view.MostrarMensaje("No se encontró el usuario seleccionado.", "Usuarios", true);
-                return;
-            }
-
-            try
-            {
-                using (var dlg = new SALC.Views.PanelAdministrador.FrmUsuarioDetalle(usuario))
+                using (var dlg = new FrmGestionRelacionesTipoAnalisisMetricas())
                 {
                     dlg.ShowDialog();
                 }
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
-                _view.MostrarMensaje("Error al mostrar detalles del usuario: " + ex.Message, "Usuarios", true);
+                _view.MostrarMensaje("Error al abrir gestión de relaciones: " + ex.Message, "Relaciones Tipo Análisis-Métricas", true);
             }
         }
 
-        public void EstablecerUsuarioActual(int dni)
+        private void OnAbrirReportes()
         {
-            _dniUsuarioActual = dni;
+            try
+            {
+                using (var dlg = new FrmReportesAdmin())
+                {
+                    dlg.ShowDialog();
+                }
+            }
+            catch (Exception ex)
+            {
+                _view.MostrarMensaje("Error al abrir módulo de reportes: " + ex.Message, "Reportes", true);
+            }
         }
+
+        #endregion
     }
 }
