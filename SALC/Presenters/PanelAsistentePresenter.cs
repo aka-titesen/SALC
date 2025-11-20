@@ -3,6 +3,8 @@ using System.Linq;
 using SALC.Presenters.ViewsContracts;
 using SALC.BLL;
 using SALC.Domain;
+using SALC.Infraestructura;
+using SALC.Infraestructura.Exceptions;
 
 namespace SALC.Presenters
 {
@@ -24,8 +26,11 @@ namespace SALC.Presenters
 
         public void InicializarVista()
         {
-            // Cargar todos los pacientes activos al inicializar
-            CargarTodosLosPacientes();
+            ExceptionHandler.EjecutarConManejo(() =>
+            {
+                ExceptionHandler.LogInfo("Inicializando vista de asistente", "PanelAsistente");
+                CargarTodosLosPacientes();
+            }, "InicializarVistaAsistente");
         }
 
         private void CargarTodosLosPacientes()
@@ -35,9 +40,19 @@ namespace SALC.Presenters
                 var pacientes = _pacienteService.ObtenerActivos();
                 _view.CargarListaPacientes(pacientes);
             }
+            catch (SalcDatabaseException dbEx)
+            {
+                _view.MostrarMensaje(dbEx.UserFriendlyMessage, true);
+                ExceptionHandler.LogWarning($"Error de BD al cargar pacientes: {dbEx.Message}", "PanelAsistente");
+            }
+            catch (SalcException salcEx)
+            {
+                _view.MostrarMensaje(salcEx.UserFriendlyMessage, true);
+            }
             catch (Exception ex)
             {
-                _view.MostrarMensaje(string.Format("Error al cargar pacientes: {0}", ex.Message), true);
+                var mensaje = ExceptionHandler.ManejarExcepcion(ex, "CargarPacientesAsistente", mostrarAlUsuario: false);
+                _view.MostrarMensaje(mensaje, true);
             }
         }
 
@@ -69,10 +84,16 @@ namespace SALC.Presenters
                 }
 
                 _view.CargarListaPacientes(pacientes);
+                ExceptionHandler.LogInfo($"Búsqueda de pacientes - Criterio: '{textoBusqueda}'", "PanelAsistente");
+            }
+            catch (SalcException salcEx)
+            {
+                _view.MostrarMensaje(salcEx.UserFriendlyMessage, true);
             }
             catch (Exception ex)
             {
-                _view.MostrarMensaje(string.Format("Error en la búsqueda: {0}", ex.Message), true);
+                var mensaje = ExceptionHandler.ManejarExcepcion(ex, "BuscarPacientesAsistente", mostrarAlUsuario: false);
+                _view.MostrarMensaje(mensaje, true);
             }
         }
 
@@ -83,23 +104,22 @@ namespace SALC.Presenters
                 var pacienteSeleccionado = _view.PacienteSeleccionado;
                 if (pacienteSeleccionado == null)
                 {
-                    _view.MostrarMensaje("Seleccione un paciente para ver su historial.", true);
-                    return;
+                    throw new SalcValidacionException("Seleccione un paciente para ver su historial.", "paciente");
                 }
 
                 // Validar que el paciente tenga datos completos
                 if (pacienteSeleccionado.Dni <= 0)
                 {
-                    _view.MostrarMensaje("El DNI del paciente no es válido.", true);
-                    return;
+                    throw new SalcValidacionException("El DNI del paciente no es válido.", "dni");
                 }
+
+                ExceptionHandler.LogInfo($"Abriendo historial de paciente - DNI: {pacienteSeleccionado.Dni}", "PanelAsistente");
 
                 // Cargar paciente completo desde la base de datos
                 var pacienteCompleto = _pacienteService.ObtenerPorDni(pacienteSeleccionado.Dni);
                 if (pacienteCompleto == null)
                 {
-                    _view.MostrarMensaje("No se encontró información completa del paciente.", true);
-                    return;
+                    throw new SalcBusinessException("No se encontró información completa del paciente.");
                 }
 
                 // Abrir ventana modal con historial completo
@@ -107,10 +127,25 @@ namespace SALC.Presenters
                 {
                     frmHistorial.ShowDialog();
                 }
+
+                ExceptionHandler.LogInfo($"Historial consultado - DNI: {pacienteSeleccionado.Dni}", "PanelAsistente");
+            }
+            catch (SalcValidacionException valEx)
+            {
+                _view.MostrarMensaje(valEx.UserFriendlyMessage, true);
+            }
+            catch (SalcBusinessException bizEx)
+            {
+                _view.MostrarMensaje(bizEx.UserFriendlyMessage, true);
+            }
+            catch (SalcException salcEx)
+            {
+                _view.MostrarMensaje(salcEx.UserFriendlyMessage, true);
             }
             catch (Exception ex)
             {
-                _view.MostrarMensaje(string.Format("Error al abrir historial: {0}", ex.Message), true);
+                var mensaje = ExceptionHandler.ManejarExcepcion(ex, "VerHistorialAsistente", mostrarAlUsuario: false);
+                _view.MostrarMensaje(mensaje, true);
             }
         }
     }

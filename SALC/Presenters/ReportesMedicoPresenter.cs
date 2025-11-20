@@ -30,7 +30,7 @@ namespace SALC.Presenters
                 if (datos.Count == 0)
                 {
                     _view.MostrarMensaje(
-                        "? ¡Buenas noticias!\n\n" +
+                        "Buenas noticias!\n\n" +
                         "No se encontraron valores fuera de los rangos de referencia en el período seleccionado.\n\n" +
                         "Todos los resultados de sus análisis están dentro de los parámetros normales."
                     );

@@ -2,6 +2,8 @@ using System;
 using SALC.BLL;
 using SALC.Presenters.ViewsContracts;
 using SALC.Views;
+using SALC.Infraestructura;
+using SALC.Infraestructura.Exceptions;
 
 namespace SALC.Presenters
 {
@@ -19,22 +21,24 @@ namespace SALC.Presenters
 
         private void OnAcceder()
         {
-            // Validación de entrada
-            if (!int.TryParse(_view.DniTexto, out var dni))
-            {
-                _view.MostrarError("DNI debe ser numérico.");
-                return;
-            }
-            
-            var pass = _view.Contrasenia;
-            if (string.IsNullOrWhiteSpace(pass))
-            {
-                _view.MostrarError("Ingrese la contraseña.");
-                return;
-            }
-
             try
             {
+                // Validación de entrada
+                if (!int.TryParse(_view.DniTexto, out var dni))
+                {
+                    _view.MostrarError("El DNI debe ser numérico.");
+                    return;
+                }
+                
+                var pass = _view.Contrasenia;
+                if (string.IsNullOrWhiteSpace(pass))
+                {
+                    _view.MostrarError("Ingrese la contraseña.");
+                    return;
+                }
+
+                ExceptionHandler.LogInfo($"Intento de acceso al sistema - DNI: {dni}", "Login");
+
                 // Intentar autenticación
                 var usuario = _authService.ValidarCredenciales(dni, pass);
                 if (usuario == null)
@@ -64,37 +68,31 @@ namespace SALC.Presenters
                 frmPrincipalTabs.FormClosed += (s, e) => {
                     System.Windows.Forms.Application.Exit();
                 };
-            }
-            catch (System.Data.SqlClient.SqlException ex)
-            {
-                // Error específico de base de datos
-                string mensaje = "Error de conexión a la base de datos.\n\n";
-                
-                if (ex.Number == 4060) // Cannot open database
-                {
-                    mensaje += "La base de datos 'SALC' no existe o no es accesible.\n\n";
-                    mensaje += "Pasos para solucionar:\n";
-                    mensaje += "1. Abrir SQL Server Management Studio (SSMS)\n";
-                    mensaje += "2. Ejecutar el script: SALC/Docs/estructura-salc.sql\n";
-                    mensaje += "3. Ejecutar el script: SALC/Docs/lote-salc.sql\n";
-                    mensaje += "4. Verificar la cadena de conexión en App.config";
-                }
-                else if (ex.Number == 18456) // Login failed
-                {
-                    mensaje += "Error de autenticación de Windows.\n";
-                    mensaje += "Verificar permisos del usuario en SQL Server.";
-                }
-                else
-                {
-                    mensaje += $"Error SQL ({ex.Number}): {ex.Message}";
-                }
 
-                _view.MostrarError(mensaje);
+                ExceptionHandler.LogInfo($"Acceso concedido - Usuario: {usuario.Nombre} {usuario.Apellido}, Rol: {usuario.IdRol}", "Login");
+            }
+            catch (SalcDatabaseException dbEx)
+            {
+                // Error específico de base de datos con mensaje amigable ya configurado
+                _view.MostrarError(dbEx.UserFriendlyMessage);
+                ExceptionHandler.LogWarning($"Error de BD en login: {dbEx.Message}", "Login");
+            }
+            catch (SalcValidacionException valEx)
+            {
+                // Error de validación
+                _view.MostrarError(valEx.UserFriendlyMessage);
+            }
+            catch (SalcException salcEx)
+            {
+                // Otras excepciones SALC
+                _view.MostrarError(salcEx.UserFriendlyMessage);
+                ExceptionHandler.LogWarning($"Error en login: {salcEx.Message}", "Login");
             }
             catch (Exception ex)
             {
-                // Error general
-                _view.MostrarError($"Error inesperado: {ex.Message}");
+                // Error general no esperado
+                var mensajeUsuario = ExceptionHandler.ManejarExcepcion(ex, "Login", mostrarAlUsuario: false);
+                _view.MostrarError(mensajeUsuario);
             }
         }
     }

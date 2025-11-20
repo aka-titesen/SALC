@@ -298,6 +298,13 @@
     <Compile Include="DAL\IRepositorioBase.cs" />
     <Compile Include="Infraestructura\DbConexion.cs" />
     <Compile Include="Infraestructura\DbHealth.cs" />
+    <Compile Include="Infraestructura\ExceptionHandler.cs" />
+    <Compile Include="Infraestructura\Exceptions\SalcException.cs" />
+    <Compile Include="Infraestructura\Exceptions\SalcValidacionException.cs" />
+    <Compile Include="Infraestructura\Exceptions\SalcDatabaseException.cs" />
+    <Compile Include="Infraestructura\Exceptions\SalcBusinessException.cs" />
+    <Compile Include="Infraestructura\Exceptions\SalcAuthorizationException.cs" />
+    <Compile Include="Infraestructura\Logging\Logger.cs" />
     <Compile Include="Domain\Backup.cs" />
     <Compile Include="Domain\EstadoAnalisis.cs" />
     <Compile Include="Domain\Rol.cs" />

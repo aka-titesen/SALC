@@ -7,6 +7,8 @@ using SALC.Domain;
 using SALC.DAL;
 using SALC.Views.PanelMedico;
 using SALC.Views.PanelAdministrador;
+using SALC.Infraestructura;
+using SALC.Infraestructura.Exceptions;
 
 namespace SALC.Presenters
 {
@@ -100,8 +102,10 @@ namespace SALC.Presenters
 
         private void InicializarPanel()
         {
-            try
+            ExceptionHandler.EjecutarConManejo(() =>
             {
+                ExceptionHandler.LogInfo($"Inicializando panel médico - DNI: {_dniMedico}", "PanelMedico");
+
                 // Cargar tipos de análisis activos para el flujo de análisis
                 var tiposActivos = _catalogoService.ObtenerTiposAnalisis()
                     .Where(t => t.Estado == "Activo").ToList();
@@ -109,11 +113,7 @@ namespace SALC.Presenters
 
                 // Cargar pacientes SOLO para la gestión (ABM)
                 CargarListadoPacientesGestion();
-            }
-            catch (Exception ex)
-            {
-                _view.MostrarMensaje("Error al inicializar panel: " + ex.Message, true);
-            }
+            }, "InicializarPanelMedico");
         }
 
         #region RF-03: Gestión de Pacientes (ABM - SEPARADO DEL FLUJO DE ANÁLISIS)
@@ -126,9 +126,13 @@ namespace SALC.Presenters
                 GenerarViewModelsPacientesGestion();
                 AplicarFiltrosPacientesGestion();
             }
-            catch (System.Exception ex)
+            catch (SalcException salcEx)
             {
-                _view.MostrarMensaje("Error cargando pacientes: " + ex.Message, true);
+                _view.MostrarMensaje(salcEx.UserFriendlyMessage, true);
+            }
+            catch (Exception ex)
+            {
+                ExceptionHandler.ManejarExcepcion(ex, "CargarListadoPacientesGestion");
             }
         }
 
@@ -198,80 +202,72 @@ namespace SALC.Presenters
 
         private void OnPacientesGestionEditar(object sender, EventArgs e)
         {
-            var dni = _view.ObtenerPacienteSeleccionadoDni();
-            if (dni == null)
+            ExceptionHandler.EjecutarConManejo(() =>
             {
-                _view.MostrarMensaje("Seleccione un paciente para editar.");
-                return;
-            }
-            
-            var existente = _pacientesGestion.FirstOrDefault(p => p.Dni == dni.Value);
-            if (existente == null) 
-            {
-                _view.MostrarMensaje("No se encontró el paciente seleccionado.", true);
-                return;
-            }
-
-            using (var dlg = new FrmPacienteEdit(existente))
-            {
-                if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                var dni = _view.ObtenerPacienteSeleccionadoDni();
+                if (dni == null)
                 {
-                    try
+                    _view.MostrarMensaje("Seleccione un paciente para editar.");
+                    return;
+                }
+                
+                var existente = _pacientesGestion.FirstOrDefault(p => p.Dni == dni.Value);
+                if (existente == null) 
+                {
+                    throw new SalcBusinessException("No se encontró el paciente seleccionado.");
+                }
+
+                using (var dlg = new FrmPacienteEdit(existente))
+                {
+                    if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                     {
                         var p = dlg.ObtenerPaciente();
                         _pacienteService.ActualizarPaciente(p);
-                        CargarListadoPacientesGestion(); // Recargar solo la gestión
+                        CargarListadoPacientesGestion();
                         _view.MostrarMensaje("Paciente actualizado correctamente.");
-                    }
-                    catch (System.Exception ex)
-                    {
-                        _view.MostrarMensaje("Error al actualizar paciente: " + ex.Message, true);
+                        ExceptionHandler.LogInfo($"Paciente actualizado - DNI: {dni.Value}", "PanelMedico");
                     }
                 }
-            }
+            }, "EditarPacienteMedico");
         }
 
         private void OnPacientesGestionEliminar(object sender, EventArgs e)
         {
-            var dni = _view.ObtenerPacienteSeleccionadoDni();
-            if (dni == null)
+            ExceptionHandler.EjecutarConManejo(() =>
             {
-                _view.MostrarMensaje("Seleccione un paciente para dar de baja.");
-                return;
-            }
-            
-            var paciente = _pacientesGestion.FirstOrDefault(p => p.Dni == dni.Value);
-            if (paciente == null) 
-            {
-                _view.MostrarMensaje("No se encontró el paciente seleccionado.", true);
-                return;
-            }
-
-            if (paciente.Estado == "Inactivo")
-            {
-                _view.MostrarMensaje("El paciente ya está dado de baja.");
-                return;
-            }
-            
-            var confirm = System.Windows.Forms.MessageBox.Show(
-                $"¿Desea dar de baja al paciente {paciente.Nombre} {paciente.Apellido} (DNI: {dni})?\n\n" +
-                "El paciente se marcará como inactivo pero se conservarán todos sus datos y análisis.",
-                "Confirmar Baja Lógica", 
-                System.Windows.Forms.MessageBoxButtons.YesNo, 
-                System.Windows.Forms.MessageBoxIcon.Question);
+                var dni = _view.ObtenerPacienteSeleccionadoDni();
+                if (dni == null)
+                {
+                    _view.MostrarMensaje("Seleccione un paciente para dar de baja.");
+                    return;
+                }
                 
-            if (confirm != System.Windows.Forms.DialogResult.Yes) return;
-            
-            try
-            {
+                var paciente = _pacientesGestion.FirstOrDefault(p => p.Dni == dni.Value);
+                if (paciente == null) 
+                {
+                    throw new SalcBusinessException("No se encontró el paciente seleccionado.");
+                }
+
+                if (paciente.Estado == "Inactivo")
+                {
+                    _view.MostrarMensaje("El paciente ya está dado de baja.");
+                    return;
+                }
+                
+                var confirm = System.Windows.Forms.MessageBox.Show(
+                    $"¿Desea dar de baja al paciente {paciente.Nombre} {paciente.Apellido} (DNI: {dni})?\n\n" +
+                    "El paciente se marcará como inactivo pero se conservarán todos sus datos y análisis.",
+                    "Confirmar Baja Lógica", 
+                    System.Windows.Forms.MessageBoxButtons.YesNo, 
+                    System.Windows.Forms.MessageBoxIcon.Question);
+                    
+                if (confirm != System.Windows.Forms.DialogResult.Yes) return;
+                
                 _pacienteService.EliminarPaciente(dni.Value);
-                CargarListadoPacientesGestion(); // Recargar solo la gestión
+                CargarListadoPacientesGestion();
                 _view.MostrarMensaje("Paciente dado de baja correctamente.");
-            }
-            catch (System.Exception ex)
-            {
-                _view.MostrarMensaje("Error al dar de baja al paciente: " + ex.Message, true);
-            }
+                ExceptionHandler.LogInfo($"Paciente dado de baja - DNI: {dni.Value}", "PanelMedico");
+            }, "EliminarPacienteMedico");
         }
 
         #endregion
@@ -280,9 +276,8 @@ namespace SALC.Presenters
 
         private void OnBuscarPacienteParaCrearAnalisis(object sender, EventArgs e)
         {
-            try
+            ExceptionHandler.EjecutarConManejo(() =>
             {
-                // Usar diálogo independiente para seleccionar paciente para análisis
                 using (var frmSeleccion = new FrmSeleccionPaciente())
                 {
                     if (frmSeleccion.ShowDialog() == System.Windows.Forms.DialogResult.OK)
@@ -292,32 +287,26 @@ namespace SALC.Presenters
                         _view.MostrarMensaje($"Paciente seleccionado para análisis: {_pacienteParaCrearAnalisis.Nombre} {_pacienteParaCrearAnalisis.Apellido}");
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                _view.MostrarMensaje("Error al seleccionar paciente: " + ex.Message, true);
-                _view.LimpiarPacienteSeleccionado();
-                _pacienteParaCrearAnalisis = null;
-            }
+            }, "BuscarPacienteParaAnalisis");
         }
 
         private void OnCrearAnalisis(object sender, EventArgs e)
         {
-            if (_pacienteParaCrearAnalisis == null)
-            {
-                _view.MostrarMensaje("Primero debe seleccionar un paciente para crear el análisis", true);
-                return;
-            }
-
-            var idTipo = _view.TipoAnalisisSeleccionadoId;
-            if (idTipo == null)
-            {
-                _view.MostrarMensaje("Seleccione un tipo de análisis", true);
-                return;
-            }
-
             try
             {
+                if (_pacienteParaCrearAnalisis == null)
+                {
+                    throw new SalcValidacionException("Primero debe seleccionar un paciente para crear el análisis", "paciente");
+                }
+
+                var idTipo = _view.TipoAnalisisSeleccionadoId;
+                if (idTipo == null)
+                {
+                    throw new SalcValidacionException("Seleccione un tipo de análisis", "tipoAnalisis");
+                }
+
+                ExceptionHandler.LogInfo($"Creando análisis - Paciente: {_pacienteParaCrearAnalisis.Dni}, Tipo: {idTipo.Value}, Médico: {_dniMedico}", "PanelMedico");
+
                 var analisis = _analisisService.CrearAnalisis(
                     _pacienteParaCrearAnalisis.Dni,
                     idTipo.Value,
@@ -325,7 +314,6 @@ namespace SALC.Presenters
                     _view.CrearAnalisisObservaciones ?? ""
                 );
 
-                // ✅ REFACTORIZADO: Modal de confirmación con diseño limpio y profesional
                 var mensaje = string.Format(
                     "ANÁLISIS CREADO CORRECTAMENTE\n\n" +
                     "ID del Análisis: {0}\n" +
@@ -346,16 +334,23 @@ namespace SALC.Presenters
                     System.Windows.Forms.MessageBoxIcon.Information
                 );
 
-                // Limpiar formulario de análisis (NO afecta la gestión de pacientes)
                 _view.LimpiarPacienteSeleccionado();
                 _pacienteParaCrearAnalisis = null;
-
-                // Navegar automáticamente a la siguiente fase
                 _view.ActivarTabResultados();
+
+                ExceptionHandler.LogInfo($"Análisis creado exitosamente - ID: {analisis.IdAnalisis}", "PanelMedico");
+            }
+            catch (SalcValidacionException valEx)
+            {
+                _view.MostrarMensaje(valEx.UserFriendlyMessage, true);
+            }
+            catch (SalcException salcEx)
+            {
+                _view.MostrarMensaje(salcEx.UserFriendlyMessage, true);
             }
             catch (Exception ex)
             {
-                _view.MostrarMensaje("Error al crear análisis: " + ex.Message, true);
+                ExceptionHandler.ManejarExcepcion(ex, "CrearAnalisisMedico");
             }
         }
 
@@ -365,7 +360,7 @@ namespace SALC.Presenters
 
         private void OnBuscarAnalisisResultados(object sender, EventArgs e)
         {
-            try
+            ExceptionHandler.EjecutarConManejo(() =>
             {
                 using (var frmSeleccion = new FrmSeleccionAnalisisResultados(_dniMedico))
                 {
@@ -373,7 +368,6 @@ namespace SALC.Presenters
                     {
                         _analisisParaResultados = frmSeleccion.AnalisisSeleccionado;
                         
-                        // Obtener datos completos para mostrar
                         var paciente = _pacienteRepo.ObtenerPorId(_analisisParaResultados.DniPaciente);
                         var tipoAnalisis = _catalogoService.ObtenerTiposAnalisis()
                             .FirstOrDefault(t => t.IdTipoAnalisis == _analisisParaResultados.IdTipoAnalisis);
@@ -382,42 +376,46 @@ namespace SALC.Presenters
                         _view.MostrarMensaje("Análisis seleccionado. Use 'Cargar Métricas' para comenzar a ingresar resultados.");
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                _view.MostrarMensaje("Error al seleccionar análisis: " + ex.Message, true);
-                _view.LimpiarAnalisisParaResultados();
-                _analisisParaResultados = null;
-            }
+            }, "BuscarAnalisisResultados");
         }
 
         private void OnCargarMetricasAnalisis(object sender, EventArgs e)
         {
-            if (_analisisParaResultados == null)
+            try
             {
-                _view.MostrarMensaje("Primero debe seleccionar un análisis válido", true);
-                return;
-            }
+                if (_analisisParaResultados == null)
+                {
+                    throw new SalcValidacionException("Primero debe seleccionar un análisis válido", "analisis");
+                }
 
-            PrepararResultadosParaAnalisis(_analisisParaResultados.IdAnalisis);
+                PrepararResultadosParaAnalisis(_analisisParaResultados.IdAnalisis);
+            }
+            catch (SalcException salcEx)
+            {
+                _view.MostrarMensaje(salcEx.UserFriendlyMessage, true);
+            }
+            catch (Exception ex)
+            {
+                ExceptionHandler.ManejarExcepcion(ex, "CargarMetricasAnalisis");
+            }
         }
 
         private void OnGuardarResultados(object sender, EventArgs e)
         {
-            if (_analisisParaResultados == null)
-            {
-                _view.MostrarMensaje("Primero debe seleccionar un análisis válido", true);
-                return;
-            }
-
             try
             {
+                if (_analisisParaResultados == null)
+                {
+                    throw new SalcValidacionException("Primero debe seleccionar un análisis válido", "analisis");
+                }
+
                 var filas = _view.LeerResultadosEditados();
                 if (filas == null || filas.Count == 0)
                 {
-                    _view.MostrarMensaje("No hay resultados para guardar", true);
-                    return;
+                    throw new SalcValidacionException("No hay resultados para guardar", "resultados");
                 }
+
+                ExceptionHandler.LogInfo($"Guardando resultados - Análisis: {_analisisParaResultados.IdAnalisis}", "PanelMedico");
 
                 int resultadosGuardados = 0;
                 foreach (var fila in filas)
@@ -436,7 +434,6 @@ namespace SALC.Presenters
 
                 if (resultadosGuardados > 0)
                 {
-                    // ✅ REFACTORIZADO: Modal de confirmación con diseño limpio
                     var mensaje = string.Format(
                         "RESULTADOS GUARDADOS CORRECTAMENTE\n\n" +
                         "Se guardaron {0} resultado(s) de laboratorio.\n\n" +
@@ -447,22 +444,23 @@ namespace SALC.Presenters
                         resultadosGuardados
                     );
 
-                    System.Windows.Forms.MessageBox.Show(
-                        mensaje,
-                        "Resultados Guardados",
-                        System.Windows.Forms.MessageBoxButtons.OK,
-                        System.Windows.Forms.MessageBoxIcon.Information
-                    );
+                    System.Windows.Forms.MessageBox.Show(mensaje, "Resultados Guardados",
+                        System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Information);
+
+                    ExceptionHandler.LogInfo($"Resultados guardados - Análisis: {_analisisParaResultados.IdAnalisis}, Cantidad: {resultadosGuardados}", "PanelMedico");
                 }
                 else
                 {
                     _view.MostrarMensaje("No se guardó ningún resultado. Ingrese valores en la columna 'Resultado'", true);
                 }
-
+            }
+            catch (SalcException salcEx)
+            {
+                _view.MostrarMensaje(salcEx.UserFriendlyMessage, true);
             }
             catch (Exception ex)
             {
-                _view.MostrarMensaje("Error al guardar resultados: " + ex.Message, true);
+                ExceptionHandler.ManejarExcepcion(ex, "GuardarResultados");
             }
         }
 
@@ -472,7 +470,7 @@ namespace SALC.Presenters
 
         private void OnBuscarAnalisisFirmar(object sender, EventArgs e)
         {
-            try
+            ExceptionHandler.EjecutarConManejo(() =>
             {
                 using (var frmSeleccion = new FrmSeleccionAnalisisFirma(_dniMedico))
                 {
@@ -480,7 +478,6 @@ namespace SALC.Presenters
                     {
                         _analisisParaFirmar = frmSeleccion.AnalisisSeleccionado;
                         
-                        // Obtener datos completos para mostrar
                         var paciente = _pacienteRepo.ObtenerPorId(_analisisParaFirmar.DniPaciente);
                         var tipoAnalisis = _catalogoService.ObtenerTiposAnalisis()
                             .FirstOrDefault(t => t.IdTipoAnalisis == _analisisParaFirmar.IdTipoAnalisis);
@@ -492,26 +489,18 @@ namespace SALC.Presenters
                         _view.MostrarMensaje("Análisis seleccionado. Revise los resultados y presione 'Firmar Digitalmente'.");
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                _view.MostrarMensaje("Error al seleccionar análisis: " + ex.Message, true);
-                _view.LimpiarAnalisisParaFirmar();
-                _analisisParaFirmar = null;
-            }
+            }, "BuscarAnalisisFirmar");
         }
 
         private void OnFirmarAnalisis(object sender, EventArgs e)
         {
-            if (_analisisParaFirmar == null)
-            {
-                _view.MostrarMensaje("Primero debe seleccionar un análisis válido para firmar", true);
-                return;
-            }
-
             try
             {
-                // ✅ REFACTORIZADO: Modal de confirmación con diseño limpio
+                if (_analisisParaFirmar == null)
+                {
+                    throw new SalcValidacionException("Primero debe seleccionar un análisis válido para firmar", "analisis");
+                }
+
                 var confirmacion = System.Windows.Forms.MessageBox.Show(
                     "¿Está seguro de que desea firmar digitalmente este análisis?\n\n" +
                     "Una vez firmado, el análisis quedará VERIFICADO y NO podrá modificarse.\n\n" +
@@ -524,9 +513,10 @@ namespace SALC.Presenters
                 if (confirmacion != System.Windows.Forms.DialogResult.Yes)
                     return;
 
+                ExceptionHandler.LogInfo($"Firmando análisis - ID: {_analisisParaFirmar.IdAnalisis}, Médico: {_dniMedico}", "PanelMedico");
+
                 _analisisService.ValidarAnalisis(_analisisParaFirmar.IdAnalisis, _dniMedico);
 
-                // ✅ REFACTORIZADO: Modal de éxito con diseño limpio
                 var mensaje = string.Format(
                     "ANÁLISIS FIRMADO EXITOSAMENTE\n\n" +
                     "ID del Análisis: {0}\n\n" +
@@ -536,21 +526,25 @@ namespace SALC.Presenters
                     _analisisParaFirmar.IdAnalisis
                 );
 
-                System.Windows.Forms.MessageBox.Show(
-                    mensaje,
-                    "Análisis Firmado Digitalmente",
-                    System.Windows.Forms.MessageBoxButtons.OK,
-                    System.Windows.Forms.MessageBoxIcon.Information
-                );
+                System.Windows.Forms.MessageBox.Show(mensaje, "Análisis Firmado Digitalmente",
+                    System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Information);
 
-                // Limpiar estado
                 _view.LimpiarAnalisisParaFirmar();
                 _analisisParaFirmar = null;
 
+                ExceptionHandler.LogInfo($"Análisis firmado exitosamente", "PanelMedico");
+            }
+            catch (SalcAuthorizationException authEx)
+            {
+                _view.MostrarMensaje(authEx.UserFriendlyMessage, true);
+            }
+            catch (SalcException salcEx)
+            {
+                _view.MostrarMensaje(salcEx.UserFriendlyMessage, true);
             }
             catch (Exception ex)
             {
-                _view.MostrarMensaje("Error al firmar análisis: " + ex.Message, true);
+                ExceptionHandler.ManejarExcepcion(ex, "FirmarAnalisis");
             }
         }
 
@@ -562,31 +556,24 @@ namespace SALC.Presenters
         {
             try
             {
-                // Obtener el análisis para conocer su tipo
                 var analisis = _analisisService.ObtenerAnalisisPorId(idAnalisis);
                 if (analisis == null)
                 {
-                    _view.MostrarMensaje("No se encontró el análisis especificado.", true);
-                    return;
+                    throw new SalcBusinessException("No se encontró el análisis especificado.");
                 }
 
-                // Obtener solo las métricas asociadas a este tipo de análisis
                 var metricas = _catalogoService.ObtenerMetricasPorTipoAnalisis(analisis.IdTipoAnalisis).ToList();
 
                 if (metricas.Count == 0)
                 {
-                    _view.MostrarMensaje(
+                    throw new SalcBusinessException(
                         "El tipo de análisis seleccionado no tiene métricas asociadas.\n\n" +
                         "Contacte al administrador para configurar las relaciones\n" +
-                        "entre tipos de análisis y métricas en el sistema.", 
-                        true);
-                    return;
+                        "entre tipos de análisis y métricas en el sistema.");
                 }
 
-                // Obtener resultados existentes
                 var existentes = _analisisService.ObtenerResultados(idAnalisis).ToList();
 
-                // Crear filas para el grid usando SOLO las métricas específicas del tipo de análisis
                 var filas = new List<MetricaConResultado>();
                 foreach (var metrica in metricas)
                 {
@@ -596,7 +583,6 @@ namespace SALC.Presenters
 
                 _view.CargarResultadosParaEdicion(filas);
                 
-                // ✅ REFACTORIZADO: Modal informativo con diseño limpio
                 var mensaje = string.Format(
                     "MÉTRICAS CARGADAS CORRECTAMENTE\n\n" +
                     "Se cargaron {0} métrica(s) específica(s)\n" +
@@ -607,17 +593,17 @@ namespace SALC.Presenters
                     filas.Count
                 );
 
-                System.Windows.Forms.MessageBox.Show(
-                    mensaje,
-                    "Métricas del Análisis",
-                    System.Windows.Forms.MessageBoxButtons.OK,
-                    System.Windows.Forms.MessageBoxIcon.Information
-                );
-
+                System.Windows.Forms.MessageBox.Show(mensaje, "Métricas del Análisis",
+                    System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Information);
+            }
+            catch (SalcException)
+            {
+                throw;
             }
             catch (Exception ex)
             {
-                _view.MostrarMensaje("Error al cargar métricas: " + ex.Message, true);
+                throw new SalcException("Error al cargar las métricas del análisis",
+                    "No se pudieron cargar las métricas. Por favor, intente nuevamente.", "LOAD_METRICS_ERROR");
             }
         }
 

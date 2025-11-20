@@ -1,65 +1,100 @@
-using SALC.Domain;
+using System;
+using System.Data.SqlClient;
 using SALC.DAL;
+using SALC.Domain;
+using SALC.Infraestructura;
+using SALC.Infraestructura.Exceptions;
 
 namespace SALC.BLL
 {
     public class AutenticacionService : IAutenticacionService
     {
-        private readonly UsuarioRepositorio _usuarios;
+        private readonly UsuarioRepositorio _usuarioRepo;
         private readonly IPasswordHasher _hasher;
 
-        public AutenticacionService(UsuarioRepositorio usuarios, IPasswordHasher hasher)
+        public AutenticacionService(UsuarioRepositorio usuarioRepo, IPasswordHasher hasher)
         {
-            _usuarios = usuarios;
-            _hasher = hasher;
+            _usuarioRepo = usuarioRepo ?? throw new ArgumentNullException(nameof(usuarioRepo));
+            _hasher = hasher ?? throw new ArgumentNullException(nameof(hasher));
         }
 
         public Usuario ValidarCredenciales(int dni, string contrasenia)
         {
-            var usuario = _usuarios.ObtenerPorId(dni);
-            if (usuario == null) return null;
-            if (!string.Equals(usuario.Estado, "Activo", System.StringComparison.OrdinalIgnoreCase)) return null;
+            try
+            {
+                // Validaciones de entrada
+                if (dni <= 0)
+                {
+                    throw new SalcValidacionException("El DNI debe ser un número positivo.", "dni");
+                }
 
-            // ===== MIGRACIÓN AUTOMÁTICA DE CONTRASEÑAS =====
-            // Verificar si la contraseña está en texto plano
-            if (_hasher.IsPlainText(usuario.PasswordHash))
-            {
-                // La contraseña está en texto plano, verificar si coincide
-                if (string.Equals(contrasenia, usuario.PasswordHash, System.StringComparison.Ordinal))
+                if (string.IsNullOrWhiteSpace(contrasenia))
                 {
-                    // ? Contraseña correcta en texto plano ? Migrar a BCrypt
-                    try
-                    {
-                        string nuevoHash = _hasher.Hash(contrasenia);
-                        usuario.PasswordHash = nuevoHash;
-                        _usuarios.Actualizar(usuario);
-                        
-                        System.Diagnostics.Debug.WriteLine($"? Contraseña migrada a BCrypt para usuario DNI: {dni}");
-                        
-                        return usuario;
-                    }
-                    catch (System.Exception ex)
-                    {
-                        // Si falla la migración, aún permitir el login pero registrar el error
-                        System.Diagnostics.Debug.WriteLine($"?? Error al migrar contraseña para DNI {dni}: {ex.Message}");
-                        return usuario;
-                    }
+                    throw new SalcValidacionException("La contraseña es obligatoria.", "contrasenia");
                 }
-                else
+
+                ExceptionHandler.LogInfo($"Intento de autenticación para DNI: {dni}", "Autenticación");
+
+                // Buscar usuario
+                Usuario usuario;
+                try
                 {
-                    // ? Contraseña incorrecta
+                    usuario = _usuarioRepo.ObtenerPorId(dni);
+                }
+                catch (SqlException sqlEx)
+                {
+                    throw new SalcDatabaseException("Error al buscar usuario en la base de datos", "ValidarCredenciales", sqlEx);
+                }
+
+                // Validar que el usuario exista y esté activo
+                if (usuario == null)
+                {
+                    ExceptionHandler.LogWarning($"Usuario no encontrado - DNI: {dni}", "Autenticación");
+                    return null; // Credenciales incorrectas
+                }
+
+                if (usuario.Estado != "Activo")
+                {
+                    ExceptionHandler.LogWarning($"Intento de acceso de usuario inactivo - DNI: {dni}", "Autenticación");
+                    return null; // Usuario inactivo
+                }
+
+                // Validar contraseña
+                bool esValida;
+                try
+                {
+                    esValida = _hasher.Verify(contrasenia, usuario.PasswordHash);
+                }
+                catch (Exception ex)
+                {
+                    ExceptionHandler.LogWarning($"Error al validar contraseña para DNI: {dni} - {ex.Message}", "Autenticación");
                     return null;
                 }
-            }
-            else
-            {
-                // La contraseña ya está hasheada con BCrypt, verificar normalmente
-                if (!_hasher.Verify(contrasenia, usuario.PasswordHash))
+
+                if (!esValida)
                 {
+                    ExceptionHandler.LogWarning($"Contraseña incorrecta para DNI: {dni}", "Autenticación");
                     return null;
                 }
-                
+
+                // Autenticación exitosa
+                ExceptionHandler.LogInfo($"Autenticación exitosa - DNI: {dni}, Rol: {usuario.IdRol}", "Autenticación");
                 return usuario;
+            }
+            catch (SalcException)
+            {
+                // Re-lanzar excepciones SALC para que sean manejadas por capas superiores
+                throw;
+            }
+            catch (Exception ex)
+            {
+                // Cualquier otra excepción no esperada
+                ExceptionHandler.LogWarning($"Error inesperado en autenticación: {ex.Message}", "Autenticación");
+                throw new SalcException(
+                    "Error durante el proceso de autenticación",
+                    "Ha ocurrido un error al validar las credenciales. Por favor, intente nuevamente.",
+                    "AUTH_ERROR"
+                );
             }
         }
     }
