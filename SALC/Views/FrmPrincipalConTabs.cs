@@ -678,18 +678,19 @@ namespace SALC.Views
                 btnReportes.FlatAppearance.BorderSize = 0;
                 btnReportes.Click += (s, e) => AbrirReportesMedico();
 
-                var lblNota = new Label
-                {
-                    Text = "Beneficios de usar los reportes:\n\n" +
-                           "• Seguimiento proactivo de pacientes con valores críticos\n" +
-                           "• Visualización rápida de su carga de trabajo actual\n" +
-                           "• Mejora continua de la calidad asistencial",
-                    Location = new Point(200, 110),
-                    Size = new Size(600, 60),
-                    Font = new Font("Segoe UI", 9),
-                    ForeColor = Color.FromArgb(100, 100, 100),
-                    BackColor = Color.Transparent
-                };
+            var lblNota = new Label
+            {
+                Text = "Beneficios de usar los reportes:\n\n" +
+                       "• Seguimiento proactivo de pacientes con valores críticos\n" +
+                       "• Visualización rápida de su carga de trabajo actual\n" +
+                       "• Mejora continua de la calidad asistencial",
+                Location = new Point(250, 110),
+                Size = new Size(500, 60),
+                Font = new Font("Segoe UI", 9),
+                ForeColor = Color.FromArgb(100, 100, 100),
+                BackColor = Color.Transparent,
+                TextAlign = ContentAlignment.TopCenter
+            };
 
                 grpAcciones.Controls.AddRange(new Control[] { btnReportes, lblNota });
 
