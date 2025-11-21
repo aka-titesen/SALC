@@ -389,46 +389,13 @@ namespace SALC.Views.PanelMedico
             };
             btnCrearAnalisis.FlatAppearance.BorderSize = 0;
 
-            // Panel informativo con mejor visibilidad
-            var panelInfoPost = new Panel
-            {
-                Location = new Point(0, 535),
-                Size = new Size(1080, 120),
-                BackColor = Color.FromArgb(255, 243, 224),
-                BorderStyle = BorderStyle.FixedSingle
-            };
-
-            var lblInfoPostTitulo = new Label
-            {
-                Text = "Pasos Siguientes después de Crear el Análisis:",
-                Font = new Font("Segoe UI", 11, FontStyle.Bold),
-                ForeColor = Color.FromArgb(230, 81, 0),
-                Location = new Point(15, 10),
-                Size = new Size(1050, 25),
-                BackColor = Color.Transparent
-            };
-
-            var lblInfoPostDetalle = new Label 
-            {
-                Text = "1. Diríjase a la pestaña 'Cargar Resultados' para ingresar los valores de las métricas específicas\n" +
-                       "2. Complete todos los valores requeridos y guarde los resultados\n" +
-                       "3. Finalmente, proceda a la pestaña 'Validar y Firmar' para dar validez clínica al análisis",
-                Location = new Point(15, 40),
-                Size = new Size(1050, 70),
-                Font = new Font("Segoe UI", 10, FontStyle.Regular),
-                ForeColor = Color.FromArgb(100, 100, 100),
-                BackColor = Color.Transparent
-            };
-
-            panelInfoPost.Controls.AddRange(new Control[] { lblInfoPostTitulo, lblInfoPostDetalle });
-
             // Eventos
             btnSeleccionarPaciente.Click += (s, e) => BuscarPacienteCrearClick?.Invoke(this, EventArgs.Empty);
             btnCrearAnalisis.Click += (s, e) => CrearAnalisisClick?.Invoke(this, EventArgs.Empty);
 
             panelPrincipal.Controls.AddRange(new Control[] { 
                 lblTitulo, lblDescripcion, panelFlujo, gbPaciente, gbTipo, gbObservaciones, 
-                btnCrearAnalisis, panelInfoPost
+                btnCrearAnalisis
             });
             
             tab.Controls.Add(panelPrincipal);
@@ -563,7 +530,7 @@ namespace SALC.Views.PanelMedico
             };
             btnGuardarResultados.FlatAppearance.BorderSize = 0;
 
-            // Grid de resultados - MÁS GRANDE VERTICALMENTE
+            // Grid de resultados - ALTURA OPTIMIZADA
             var lblGrid = new Label 
             { 
                 Text = "Métricas Específicas del Tipo de Análisis:", 
@@ -576,7 +543,7 @@ namespace SALC.Views.PanelMedico
             gridResultados = new DataGridView 
             { 
                 Location = new Point(0, 250), 
-                Size = new Size(1080, 400),
+                Size = new Size(1080, 320),
                 AllowUserToAddRows = false,
                 AllowUserToDeleteRows = false,
                 AutoGenerateColumns = true,
@@ -663,7 +630,7 @@ namespace SALC.Views.PanelMedico
             var panelAdvertencia = new Panel
             {
                 Location = new Point(0, 75),
-                Size = new Size(1080, 60),
+                Size = new Size(1080, 55),
                 BackColor = Color.FromArgb(255, 235, 238),
                 BorderStyle = BorderStyle.FixedSingle
             };
@@ -671,9 +638,9 @@ namespace SALC.Views.PanelMedico
             var lblAdvertencia = new Label 
             {
                 Text = "Atención: Una vez firmado digitalmente, el análisis NO podrá modificarse",
-                Font = new Font("Segoe UI", 12, FontStyle.Bold),
+                Font = new Font("Segoe UI", 11, FontStyle.Bold),
                 ForeColor = Color.FromArgb(183, 28, 28),
-                Location = new Point(15, 18),
+                Location = new Point(15, 15),
                 Size = new Size(1050, 25),
                 BackColor = Color.Transparent
             };
@@ -684,8 +651,8 @@ namespace SALC.Views.PanelMedico
             var gbAnalisis = new GroupBox 
             { 
                 Text = "  Selección del Análisis para Firmar  ", 
-                Location = new Point(0, 155), 
-                Size = new Size(730, 110),
+                Location = new Point(0, 145), 
+                Size = new Size(720, 100),
                 Font = new Font("Segoe UI", 11, FontStyle.Bold),
                 ForeColor = Color.FromArgb(142, 68, 173),
                 BackColor = Color.FromArgb(250, 245, 255)
@@ -707,9 +674,9 @@ namespace SALC.Views.PanelMedico
             lblAnalisisFirmarSeleccionado = new Label 
             { 
                 Text = "Ningún análisis seleccionado", 
-                Location = new Point(20, 73), 
-                Size = new Size(690, 27),
-                Font = new Font("Segoe UI", 10, FontStyle.Regular),
+                Location = new Point(270, 30), 
+                Size = new Size(430, 35),
+                Font = new Font("Segoe UI", 9, FontStyle.Regular),
                 ForeColor = Color.FromArgb(149, 165, 166),
                 BorderStyle = BorderStyle.FixedSingle,
                 TextAlign = ContentAlignment.MiddleLeft,
@@ -722,9 +689,9 @@ namespace SALC.Views.PanelMedico
             btnFirmarAnalisis = new Button 
             { 
                 Text = "Firmar Digitalmente", 
-                Location = new Point(760, 185), 
-                Size = new Size(320, 50),
-                Font = new Font("Segoe UI", 12, FontStyle.Bold),
+                Location = new Point(740, 160), 
+                Size = new Size(340, 70),
+                Font = new Font("Segoe UI", 13, FontStyle.Bold),
                 BackColor = Color.FromArgb(142, 68, 173),
                 ForeColor = Color.White,
                 FlatStyle = FlatStyle.Flat,
@@ -737,7 +704,7 @@ namespace SALC.Views.PanelMedico
             var lblValidacion = new Label 
             { 
                 Text = "Revisión de Resultados de Laboratorio:", 
-                Location = new Point(0, 285), 
+                Location = new Point(0, 260), 
                 Size = new Size(500, 25),
                 Font = new Font("Segoe UI", 11, FontStyle.Bold),
                 ForeColor = Color.FromArgb(44, 62, 80)
@@ -745,8 +712,8 @@ namespace SALC.Views.PanelMedico
 
             gridValidacion = new DataGridView 
             { 
-                Location = new Point(0, 315), 
-                Size = new Size(1080, 350),
+                Location = new Point(0, 290), 
+                Size = new Size(1080, 310),
                 AllowUserToAddRows = false,
                 AllowUserToDeleteRows = false,
                 ReadOnly = true,
