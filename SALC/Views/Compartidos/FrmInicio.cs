@@ -132,15 +132,34 @@ namespace SALC.Views.Compartidos
                 Padding = new Padding(40, 20, 40, 20)
             };
 
+            // Crear un TableLayoutPanel para distribuir los elementos uniformemente
+            var tableLayout = new TableLayoutPanel
+            {
+                Dock = DockStyle.Fill,
+                ColumnCount = 3,
+                RowCount = 1,
+                BackColor = Color.Transparent,
+                Padding = new Padding(0)
+            };
+
+            // Configurar columnas - distribución equitativa
+            tableLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.33F));
+            tableLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.33F));
+            tableLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.34F));
+
+            // Configurar fila
+            tableLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+
             // Grupo: Información de la Clínica
             grpInformacion = new GroupBox
             {
                 Text = "  Información del Centro Médico  ",
                 Font = new Font("Segoe UI", 12, FontStyle.Bold),
                 ForeColor = Color.FromArgb(41, 128, 185),
-                Location = new Point(40, 20),
-                Size = new Size(380, 280),
-                BackColor = Color.FromArgb(250, 252, 255) // Fondo azul muy claro
+                Dock = DockStyle.Fill,
+                Margin = new Padding(0, 0, 10, 0),
+                BackColor = Color.FromArgb(250, 252, 255), // Fondo azul muy claro
+                Padding = new Padding(15, 10, 15, 15)
             };
 
             lblInfoClinica = new Label
@@ -160,8 +179,7 @@ namespace SALC.Views.Compartidos
                     "generación y personal altamente capacitado.",
                 Font = new Font("Segoe UI", 10, FontStyle.Regular),
                 ForeColor = Color.FromArgb(52, 73, 94),
-                Location = new Point(20, 30),
-                Size = new Size(340, 235),
+                Dock = DockStyle.Fill,
                 BackColor = Color.Transparent
             };
 
@@ -173,9 +191,10 @@ namespace SALC.Views.Compartidos
                 Text = "  Contacto y Ubicación  ",
                 Font = new Font("Segoe UI", 12, FontStyle.Bold),
                 ForeColor = Color.FromArgb(39, 174, 96), // Verde médico
-                Location = new Point(440, 20),
-                Size = new Size(380, 180),
-                BackColor = Color.FromArgb(248, 255, 250) // Fondo verde muy claro
+                Dock = DockStyle.Fill,
+                Margin = new Padding(5, 0, 5, 0),
+                BackColor = Color.FromArgb(248, 255, 250), // Fondo verde muy claro
+                Padding = new Padding(15, 10, 15, 15)
             };
 
             lblDatosContacto = new Label
@@ -194,8 +213,7 @@ namespace SALC.Views.Compartidos
                     "www.laboratoriosaLc.com",
                 Font = new Font("Segoe UI", 10, FontStyle.Regular),
                 ForeColor = Color.FromArgb(52, 73, 94),
-                Location = new Point(20, 30),
-                Size = new Size(340, 135),
+                Dock = DockStyle.Fill,
                 BackColor = Color.Transparent
             };
 
@@ -207,9 +225,10 @@ namespace SALC.Views.Compartidos
                 Text = "  Horarios de Atención  ",
                 Font = new Font("Segoe UI", 12, FontStyle.Bold),
                 ForeColor = Color.FromArgb(230, 126, 34), // Naranja suave
-                Location = new Point(440, 220),
-                Size = new Size(380, 80),
-                BackColor = Color.FromArgb(255, 250, 245) // Fondo naranja muy claro
+                Dock = DockStyle.Fill,
+                Margin = new Padding(10, 0, 0, 0),
+                BackColor = Color.FromArgb(255, 250, 245), // Fondo naranja muy claro
+                Padding = new Padding(15, 10, 15, 15)
             };
 
             lblHorariosAtencion = new Label
@@ -220,16 +239,18 @@ namespace SALC.Views.Compartidos
                     "Domingos y feriados: Cerrado",
                 Font = new Font("Segoe UI", 10, FontStyle.Regular),
                 ForeColor = Color.FromArgb(52, 73, 94),
-                Location = new Point(20, 25),
-                Size = new Size(340, 45),
+                Dock = DockStyle.Fill,
                 BackColor = Color.Transparent
             };
 
             grpHorarios.Controls.Add(lblHorariosAtencion);
 
-            panelCentral.Controls.AddRange(new Control[] {
-                grpInformacion, grpContacto, grpHorarios
-            });
+            // Agregar los controles al TableLayoutPanel
+            tableLayout.Controls.Add(grpInformacion, 0, 0);
+            tableLayout.Controls.Add(grpContacto, 1, 0);
+            tableLayout.Controls.Add(grpHorarios, 2, 0);
+
+            panelCentral.Controls.Add(tableLayout);
 
             // ============ PANEL INFERIOR - INFORMACIÓN DEL SISTEMA ============
             panelInferior = new Panel

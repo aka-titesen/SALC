@@ -173,7 +173,7 @@ namespace SALC.Views
             // Botón Acceder - Estilo Microsoft
             btnAcceder = new Button
             {
-                Text = "Acceder al Sistema",
+                Text = "Acceder",
                 Location = new Point(230, 150),
                 Size = new Size(140, 32),
                 Font = new Font("Segoe UI", 10, FontStyle.Bold),
