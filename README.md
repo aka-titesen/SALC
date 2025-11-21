@@ -882,12 +882,6 @@ git checkout -b fix/correccion-bug
 
 - Documentar todo el código con comentarios XML
 
-- No usar emojis en comentarios XML
-
-- Comentarios en español
-
-- Nombres de variables y métodos en español
-
 - Usar PascalCase para clases y métodos
 
 - Usar camelCase para variables privadas con prefijo `_`
@@ -1109,9 +1103,9 @@ El proyecto cuenta con **documentación XML completa** (100% de cobertura) en to
 
 - **IntelliSense**: Ayuda contextual completa en Visual Studio
 
-- **Especificación de Requisitos de Software**: Ver [ERS.md](SALC\SALC\Docs\ERS\ers-salc_ieeev2.9.md)
+- **Especificación de Requisitos de Software**: Ver [ERS.md](SALC\Docs\ERS\ers-salc_ieeev2.9.md)
 
-- **Manual de Usuario**: Ver [Manual de Usuario.md](SALC\SALC\Docs\UserManual\manual_de_usuario.md)
+- **Manual de Usuario**: Ver [Manual de Usuario.md](SALC\Docs\UserManual\manual_de_usuario.md)
 
 ### Generar Documentación HTML
 
