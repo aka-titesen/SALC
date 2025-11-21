@@ -238,7 +238,7 @@ Edita el archivo `App.config`:
 ```xml
 <connectionStrings>
   <add name="SALC" 
-       connectionString="Server=localhost;Database=SALC_DB;Integrated Security=true;" 
+       connectionString="Server=localhost;Database=SALC;Integrated Security=true;" 
        providerName="System.Data.SqlClient"/>
 </connectionStrings>
 ```
@@ -264,7 +264,7 @@ El archivo `App.config` contiene las siguientes configuraciones principales:
   <connectionStrings>
     <!-- Cadena de conexión a la base de datos -->
     <add name="SALC" 
-         connectionString="Server=localhost;Database=SALC_DB;Integrated Security=true;" 
+         connectionString="Server=localhost;Database=SALC;Integrated Security=true;" 
          providerName="System.Data.SqlClient"/>
   </connectionStrings>
   
@@ -654,10 +654,6 @@ Como asistente puedes:
 5. Asistente envía el informe por email al paciente
 ```
 
-### Capturas de Pantalla
-
-_(Agregar capturas de pantalla de las principales vistas)_
-
 ## Estructura del Proyecto
 
 ```
@@ -834,35 +830,35 @@ var resultado = DbHealth.ProbarConexion();
 
 1. **Validaciones**:
 
-   - [ ] Formato de DNI correcto
+   - Formato de DNI correcto
 
-   - [ ] Email válido
+   - Email válido
 
-   - [ ] Fechas coherentes
+   - Fechas coherentes
 
-   - [ ] Valores numéricos en métricas
+   - Valores numéricos en métricas
 
-   - [ ] Campos requeridos completos
+   - Campos requeridos completos
 
 2. **Seguridad**:
 
-   - [ ] Contraseñas hasheadas en BD
+   - Contraseñas hasheadas en BD
 
-   - [ ] Sesión por usuario
+   - Sesión por usuario
 
-   - [ ] Validación de permisos por rol
+   - Validación de permisos por rol
 
-   - [ ] Manejo de errores sin exponer información sensible
+   - Manejo de errores sin exponer información sensible
 
 3. **Integridad Referencial**:
 
-   - [ ] No se puede eliminar usuario con análisis
+   - No se puede eliminar usuario con análisis
 
-   - [ ] No se puede eliminar paciente con análisis
+   - No se puede eliminar paciente con análisis
 
-   - [ ] No se puede eliminar tipo de análisis en uso
+   - No se puede eliminar tipo de análisis en uso
 
-   - [ ] Baja lógica preserva relaciones
+   - Baja lógica preserva relaciones
 
 ## Contribuir
 
@@ -1141,17 +1137,11 @@ docfx build
 
 ### Estándares de Documentación
 
-- ✅ Comentarios XML en español
-
-- ✅ Sin emojis en documentación XML
-
 - ✅ Descripciones claras y concisas
 
 - ✅ Parámetros y retornos documentados
 
 - ✅ Excepciones documentadas
-
-- ✅ Sin referencias a requisitos (RF-XX)
 
 ## Licencia
 
@@ -1160,7 +1150,7 @@ Este proyecto está bajo la Licencia MIT. Ver el archivo [LICENSE](LICENSE) para
 ```
 MIT License
 
-Copyright (c) 2024 SALC - Sistema de Análisis de Laboratorio Clínico
+Copyright (c) 2025 SALC - Sistema de Análisis de Laboratorio Clínico
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
