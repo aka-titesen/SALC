@@ -700,11 +700,11 @@ namespace SALC.Views.PanelMedico
             };
             btnFirmarAnalisis.FlatAppearance.BorderSize = 0;
 
-            // Grid de validación
+            // Grid de validación - ALTURA REDUCIDA PARA NO CORTARSE
             var lblValidacion = new Label 
             { 
                 Text = "Revisión de Resultados de Laboratorio:", 
-                Location = new Point(0, 260), 
+                Location = new Point(0, 255), 
                 Size = new Size(500, 25),
                 Font = new Font("Segoe UI", 11, FontStyle.Bold),
                 ForeColor = Color.FromArgb(44, 62, 80)
@@ -712,8 +712,8 @@ namespace SALC.Views.PanelMedico
 
             gridValidacion = new DataGridView 
             { 
-                Location = new Point(0, 290), 
-                Size = new Size(1080, 310),
+                Location = new Point(0, 285), 
+                Size = new Size(1080, 280),
                 AllowUserToAddRows = false,
                 AllowUserToDeleteRows = false,
                 ReadOnly = true,
