@@ -90,19 +90,26 @@ namespace SALC.Views.PanelAdministrador
                 BackColor = Color.White
             };
 
+            // Panel interno para organizar los DateTimePickers
+            var panelFechasInterno = new Panel
+            {
+                Dock = DockStyle.Fill,
+                BackColor = Color.Transparent
+            };
+
             var lblDesde = new Label
             {
                 Text = "Desde:",
-                Location = new Point(20, 35),
-                Size = new Size(70, 22),
+                Location = new Point(10, 30),
+                AutoSize = true,
                 Font = new Font("Segoe UI", 10, FontStyle.Bold),
                 ForeColor = Color.FromArgb(44, 62, 80)
             };
 
             dtpDesde = new DateTimePicker
             {
-                Location = new Point(95, 32),
-                Width = 180,
+                Location = new Point(70, 27),
+                Width = 130,
                 Format = DateTimePickerFormat.Short,
                 Value = DateTime.Now.AddMonths(-1),
                 Font = new Font("Segoe UI", 10),
@@ -112,16 +119,16 @@ namespace SALC.Views.PanelAdministrador
             var lblHasta = new Label
             {
                 Text = "Hasta:",
-                Location = new Point(300, 35),
-                Size = new Size(70, 22),
+                Location = new Point(220, 30),
+                AutoSize = true,
                 Font = new Font("Segoe UI", 10, FontStyle.Bold),
                 ForeColor = Color.FromArgb(44, 62, 80)
             };
 
             dtpHasta = new DateTimePicker
             {
-                Location = new Point(370, 32),
-                Width = 160,
+                Location = new Point(275, 27),
+                Width = 130,
                 Format = DateTimePickerFormat.Short,
                 Value = DateTime.Now,
                 Font = new Font("Segoe UI", 10),
@@ -131,20 +138,45 @@ namespace SALC.Views.PanelAdministrador
             var lblInfoFiltro = new Label
             {
                 Text = "Seleccione el rango de fechas para filtrar los datos del reporte",
-                Location = new Point(20, 70),
-                Size = new Size(500, 20),
+                Location = new Point(10, 65),
+                AutoSize = true,
                 Font = new Font("Segoe UI", 9, FontStyle.Italic),
                 ForeColor = Color.FromArgb(149, 165, 166)
             };
 
-            grpFechas.Controls.AddRange(new Control[] { lblDesde, dtpDesde, lblHasta, dtpHasta, lblInfoFiltro });
+            panelFechasInterno.Controls.AddRange(new Control[] { lblDesde, dtpDesde, lblHasta, dtpHasta, lblInfoFiltro });
 
-            // Botones de reportes
+            grpFechas.Controls.Add(panelFechasInterno);
+
+            // Crear TableLayoutPanel para distribuir filtros y botones
+            var tableLayoutFiltros = new TableLayoutPanel
+            {
+                Dock = DockStyle.Fill,
+                ColumnCount = 4,
+                RowCount = 1,
+                BackColor = Color.Transparent,
+                Padding = new Padding(0)
+            };
+
+            // Configurar columnas - distribución adaptativa
+            tableLayoutFiltros.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 45F)); // Filtros de fecha
+            tableLayoutFiltros.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 18.33F)); // Botón 1
+            tableLayoutFiltros.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 18.33F)); // Botón 2
+            tableLayoutFiltros.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 18.34F)); // Botón 3
+
+            // Configurar fila
+            tableLayoutFiltros.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+
+            // Ajustar grpFechas para TableLayoutPanel
+            grpFechas.Dock = DockStyle.Fill;
+            grpFechas.Margin = new Padding(0, 0, 10, 0);
+
+            // Botones de reportes con Dock.Fill
             btnProductividad = new Button
             {
-                Text = "Productividad de Médicos",
-                Location = new Point(570, 10),
-                Size = new Size(220, 50),
+                Text = "Productividad de\nMédicos",
+                Dock = DockStyle.Fill,
+                Margin = new Padding(5, 0, 5, 0),
                 Font = new Font("Segoe UI", 10, FontStyle.Bold),
                 BackColor = Color.FromArgb(52, 152, 219),
                 ForeColor = Color.White,
@@ -157,9 +189,9 @@ namespace SALC.Views.PanelAdministrador
 
             btnFacturacion = new Button
             {
-                Text = "Distribución por Obra Social",
-                Location = new Point(810, 10),
-                Size = new Size(220, 50),
+                Text = "Distribución por\nObra Social",
+                Dock = DockStyle.Fill,
+                Margin = new Padding(5, 0, 5, 0),
                 Font = new Font("Segoe UI", 10, FontStyle.Bold),
                 BackColor = Color.FromArgb(39, 174, 96),
                 ForeColor = Color.White,
@@ -172,9 +204,9 @@ namespace SALC.Views.PanelAdministrador
 
             btnDemanda = new Button
             {
-                Text = "Análisis Más Solicitados",
-                Location = new Point(1050, 10),
-                Size = new Size(200, 50),
+                Text = "Análisis Más\nSolicitados",
+                Dock = DockStyle.Fill,
+                Margin = new Padding(5, 0, 0, 0),
                 Font = new Font("Segoe UI", 10, FontStyle.Bold),
                 BackColor = Color.FromArgb(230, 126, 34),
                 ForeColor = Color.White,
@@ -185,30 +217,13 @@ namespace SALC.Views.PanelAdministrador
             btnDemanda.FlatAppearance.BorderSize = 0;
             btnDemanda.Click += (s, e) => GenerarReporteDemandaClick?.Invoke(s, e);
 
-            // Panel de ayuda
-            var panelAyuda = new Panel
-            {
-                Location = new Point(570, 70),
-                Size = new Size(680, 40),
-                BackColor = Color.FromArgb(255, 250, 245),
-                BorderStyle = BorderStyle.FixedSingle
-            };
+            // Agregar controles al TableLayoutPanel
+            tableLayoutFiltros.Controls.Add(grpFechas, 0, 0);
+            tableLayoutFiltros.Controls.Add(btnProductividad, 1, 0);
+            tableLayoutFiltros.Controls.Add(btnFacturacion, 2, 0);
+            tableLayoutFiltros.Controls.Add(btnDemanda, 3, 0);
 
-            var lblAyuda = new Label
-            {
-                Text = "Haga clic en cualquier botón de reporte para generar la visualización correspondiente",
-                Location = new Point(10, 10),
-                Size = new Size(650, 20),
-                Font = new Font("Segoe UI", 9, FontStyle.Regular),
-                ForeColor = Color.FromArgb(230, 126, 34),
-                BackColor = Color.Transparent
-            };
-
-            panelAyuda.Controls.Add(lblAyuda);
-
-            panelFiltros.Controls.AddRange(new Control[] { 
-                grpFechas, btnProductividad, btnFacturacion, btnDemanda, panelAyuda 
-            });
+            panelFiltros.Controls.Add(tableLayoutFiltros);
 
             // ============ PANEL DEL GRÁFICO ============
             panelGrafico = new Panel

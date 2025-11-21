@@ -326,8 +326,8 @@ namespace SALC.Views.PanelAdministrador
             
             gridObrasSociales = new DataGridView 
             { 
-                Location = new Point(25, 135),
-                Size = new Size(1000, 380),
+                Dock = DockStyle.Fill,
+                Margin = new Padding(0, 135, 0, 0),
                 ReadOnly = true, 
                 AllowUserToAddRows = false, 
                 SelectionMode = DataGridViewSelectionMode.FullRowSelect, 
@@ -466,8 +466,8 @@ namespace SALC.Views.PanelAdministrador
             
             gridTiposAnalisis = new DataGridView 
             { 
-                Location = new Point(25, 135),
-                Size = new Size(1000, 380),
+                Dock = DockStyle.Fill,
+                Margin = new Padding(0, 135, 0, 0),
                 ReadOnly = true, 
                 AllowUserToAddRows = false, 
                 SelectionMode = DataGridViewSelectionMode.FullRowSelect, 
@@ -606,8 +606,8 @@ namespace SALC.Views.PanelAdministrador
             
             gridMetricas = new DataGridView 
             { 
-                Location = new Point(25, 135),
-                Size = new Size(1000, 380),
+                Dock = DockStyle.Fill,
+                Margin = new Padding(0, 135, 0, 0),
                 ReadOnly = true, 
                 AllowUserToAddRows = false, 
                 SelectionMode = DataGridViewSelectionMode.FullRowSelect, 
@@ -723,7 +723,7 @@ namespace SALC.Views.PanelAdministrador
             btnGestionar.FlatAppearance.BorderSize = 0;
             btnGestionar.Click += (s, e) => RelacionesTipoAnalisisMetricaGestionarClick?.Invoke(this, EventArgs.Empty);
 
-            // Nota adicional
+            // Nota adicional - AUMENTAR ALTURA
             var lblNota = new Label
             {
                 Text = "Nota: Los cambios en las relaciones solo afectarán a futuros análisis.\n" +
@@ -731,7 +731,8 @@ namespace SALC.Views.PanelAdministrador
                 Font = new Font("Segoe UI", 9, FontStyle.Italic),
                 ForeColor = Color.FromArgb(149, 165, 166),
                 Location = new Point(30, 350),
-                Size = new Size(600, 25)
+                Size = new Size(800, 50),
+                AutoSize = false
             };
             
             tab.Controls.AddRange(new Control[] { 
@@ -795,12 +796,12 @@ namespace SALC.Views.PanelAdministrador
             
             grpInfo.Controls.Add(lblDescripcion);
             
-            // Acciones
+            // Acciones - AUMENTAR ALTURA
             var grpAcciones = new GroupBox
             {
                 Text = "  Acceder al Módulo de Reportes  ",
                 Location = new Point(0, 230),
-                Size = new Size(900, 170),
+                Size = new Size(900, 200),
                 Font = new Font("Segoe UI", 11, FontStyle.Bold),
                 ForeColor = Color.FromArgb(39, 174, 96),
                 BackColor = Color.FromArgb(248, 255, 250)
@@ -826,8 +827,8 @@ namespace SALC.Views.PanelAdministrador
                        "• Análisis del rendimiento y productividad del personal médico\n" +
                        "• Comprensión de la distribución del trabajo por obra social\n" +
                        "• Identificación de los tipos de análisis más demandados",
-                Location = new Point(25, 100),
-                Size = new Size(840, 55),
+                Location = new Point(25, 105),
+                Size = new Size(840, 80),
                 AutoSize = false,
                 ForeColor = Color.FromArgb(52, 73, 94),
                 Font = new Font("Segoe UI", 9, FontStyle.Regular),

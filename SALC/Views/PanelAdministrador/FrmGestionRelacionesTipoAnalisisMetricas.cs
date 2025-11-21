@@ -30,7 +30,7 @@ namespace SALC.Views.PanelAdministrador
         private void InitializeComponent()
         {
             Text = "Gestión de Relaciones";
-            Size = new Size(950, 650);
+            Size = new Size(1100, 750);
             StartPosition = FormStartPosition.CenterParent;
             FormBorderStyle = FormBorderStyle.FixedDialog;
             MaximizeBox = false;
@@ -62,7 +62,7 @@ namespace SALC.Views.PanelAdministrador
             var pnlConfiguracion = new Panel
             {
                 Location = new Point(20, 75),
-                Size = new Size(420, 490),
+                Size = new Size(450, 590),
                 BackColor = Color.FromArgb(250, 252, 255),
                 BorderStyle = BorderStyle.FixedSingle
             };
@@ -71,7 +71,7 @@ namespace SALC.Views.PanelAdministrador
             {
                 Text = "Configurar Relaciones",
                 Location = new Point(0, 0),
-                Size = new Size(420, 35),
+                Size = new Size(450, 35),
                 Font = new Font("Segoe UI", 11, FontStyle.Bold),
                 ForeColor = Color.White,
                 BackColor = Color.FromArgb(70, 130, 180),
@@ -83,7 +83,7 @@ namespace SALC.Views.PanelAdministrador
             {
                 Text = "1. Seleccione el Tipo de Análisis:",
                 Location = new Point(15, 50),
-                Size = new Size(390, 20),
+                Size = new Size(420, 20),
                 Font = new Font("Segoe UI", 10, FontStyle.Bold),
                 ForeColor = Color.FromArgb(44, 62, 80)
             };
@@ -91,7 +91,7 @@ namespace SALC.Views.PanelAdministrador
             cboTiposAnalisis = new ComboBox
             {
                 Location = new Point(15, 75),
-                Size = new Size(385, 25),
+                Size = new Size(415, 25),
                 DropDownStyle = ComboBoxStyle.DropDownList,
                 DisplayMember = "Descripcion",
                 ValueMember = "IdTipoAnalisis",
@@ -103,7 +103,7 @@ namespace SALC.Views.PanelAdministrador
             {
                 Text = "2. Marque las Métricas que lo componen:",
                 Location = new Point(15, 115),
-                Size = new Size(390, 20),
+                Size = new Size(420, 20),
                 Font = new Font("Segoe UI", 10, FontStyle.Bold),
                 ForeColor = Color.FromArgb(44, 62, 80)
             };
@@ -111,7 +111,7 @@ namespace SALC.Views.PanelAdministrador
             clbMetricas = new CheckedListBox
             {
                 Location = new Point(15, 140),
-                Size = new Size(385, 280),
+                Size = new Size(415, 360),
                 DisplayMember = "NombreCompleto",
                 ValueMember = "IdMetrica",
                 CheckOnClick = true,
@@ -122,8 +122,8 @@ namespace SALC.Views.PanelAdministrador
             btnGuardar = new Button
             {
                 Text = "Guardar Relaciones",
-                Location = new Point(15, 435),
-                Size = new Size(180, 35),
+                Location = new Point(15, 515),
+                Size = new Size(190, 35),
                 Font = new Font("Segoe UI", 10, FontStyle.Bold),
                 BackColor = Color.FromArgb(39, 174, 96),
                 ForeColor = Color.White,
@@ -136,8 +136,8 @@ namespace SALC.Views.PanelAdministrador
             btnActualizar = new Button
             {
                 Text = "Actualizar Vista",
-                Location = new Point(210, 435),
-                Size = new Size(140, 35),
+                Location = new Point(220, 515),
+                Size = new Size(150, 35),
                 Font = new Font("Segoe UI", 10, FontStyle.Regular),
                 BackColor = Color.FromArgb(52, 152, 219),
                 ForeColor = Color.White,
@@ -156,8 +156,8 @@ namespace SALC.Views.PanelAdministrador
             // Panel derecho - Relaciones Existentes
             var pnlRelaciones = new Panel
             {
-                Location = new Point(460, 75),
-                Size = new Size(465, 490),
+                Location = new Point(490, 75),
+                Size = new Size(590, 590),
                 BackColor = Color.FromArgb(250, 252, 255),
                 BorderStyle = BorderStyle.FixedSingle
             };
@@ -166,7 +166,7 @@ namespace SALC.Views.PanelAdministrador
             {
                 Text = "Relaciones Existentes",
                 Location = new Point(0, 0),
-                Size = new Size(465, 35),
+                Size = new Size(590, 35),
                 Font = new Font("Segoe UI", 11, FontStyle.Bold),
                 ForeColor = Color.White,
                 BackColor = Color.FromArgb(230, 126, 34),
@@ -177,12 +177,12 @@ namespace SALC.Views.PanelAdministrador
             gridRelaciones = new DataGridView
             {
                 Location = new Point(15, 50),
-                Size = new Size(435, 370),
+                Size = new Size(560, 470),
                 ReadOnly = true,
                 AllowUserToAddRows = false,
                 SelectionMode = DataGridViewSelectionMode.FullRowSelect,
                 MultiSelect = false,
-                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
+                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None,
                 BackgroundColor = Color.White,
                 BorderStyle = BorderStyle.FixedSingle,
                 ColumnHeadersDefaultCellStyle = new DataGridViewCellStyle
@@ -190,27 +190,31 @@ namespace SALC.Views.PanelAdministrador
                     BackColor = Color.FromArgb(230, 126, 34),
                     ForeColor = Color.White,
                     Font = new Font("Segoe UI", 10, FontStyle.Bold),
-                    Padding = new Padding(5)
+                    Padding = new Padding(5),
+                    WrapMode = DataGridViewTriState.True
                 },
                 DefaultCellStyle = new DataGridViewCellStyle
                 {
                     Font = new Font("Segoe UI", 9),
                     SelectionBackColor = Color.FromArgb(255, 224, 178),
                     SelectionForeColor = Color.FromArgb(44, 62, 80),
-                    Padding = new Padding(5)
+                    Padding = new Padding(5),
+                    WrapMode = DataGridViewTriState.False
                 },
                 AlternatingRowsDefaultCellStyle = new DataGridViewCellStyle
                 {
                     BackColor = Color.FromArgb(255, 250, 245)
                 },
                 EnableHeadersVisualStyles = false,
-                RowHeadersVisible = false
+                RowHeadersVisible = false,
+                ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize,
+                AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells
             };
 
             btnEliminarRelacion = new Button
             {
                 Text = "Eliminar Relación",
-                Location = new Point(15, 435),
+                Location = new Point(15, 535),
                 Size = new Size(180, 35),
                 Font = new Font("Segoe UI", 10, FontStyle.Bold),
                 BackColor = Color.FromArgb(192, 57, 43),
@@ -230,7 +234,7 @@ namespace SALC.Views.PanelAdministrador
             btnCancelar = new Button
             {
                 Text = "Cerrar",
-                Location = new Point(835, 580),
+                Location = new Point(990, 680),
                 Size = new Size(90, 35),
                 DialogResult = DialogResult.Cancel,
                 Font = new Font("Segoe UI", 10, FontStyle.Regular),
@@ -300,6 +304,28 @@ namespace SALC.Views.PanelAdministrador
                     gridRelaciones.Columns["IdTipoAnalisis"].Visible = false;
                 if (gridRelaciones.Columns["IdMetrica"] != null)
                     gridRelaciones.Columns["IdMetrica"].Visible = false;
+
+                // Configurar ancho de columnas visibles
+                if (gridRelaciones.Columns["TipoAnalisis"] != null)
+                {
+                    gridRelaciones.Columns["TipoAnalisis"].HeaderText = "Tipo de Análisis";
+                    gridRelaciones.Columns["TipoAnalisis"].Width = 240;
+                    gridRelaciones.Columns["TipoAnalisis"].MinimumWidth = 200;
+                }
+
+                if (gridRelaciones.Columns["Metrica"] != null)
+                {
+                    gridRelaciones.Columns["Metrica"].HeaderText = "Métrica";
+                    gridRelaciones.Columns["Metrica"].Width = 220;
+                    gridRelaciones.Columns["Metrica"].MinimumWidth = 180;
+                }
+
+                if (gridRelaciones.Columns["Unidad"] != null)
+                {
+                    gridRelaciones.Columns["Unidad"].HeaderText = "Unidad";
+                    gridRelaciones.Columns["Unidad"].Width = 100;
+                    gridRelaciones.Columns["Unidad"].MinimumWidth = 80;
+                }
             }
             catch (Exception ex)
             {
