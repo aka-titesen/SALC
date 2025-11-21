@@ -95,7 +95,7 @@ namespace SALC.Views.PanelAsistente
                 Font = new Font("Segoe UI", 10)
             };
 
-            // ? CAMPO DE ESTADO - SOLO LECTURA PARA ASISTENTE
+            // CAMPO DE ESTADO - SOLO LECTURA PARA ASISTENTE
             var lblEstado = new Label 
             { 
                 Text = "Estado:", 
@@ -321,7 +321,7 @@ namespace SALC.Views.PanelAsistente
                 Email = string.IsNullOrWhiteSpace(txtEmail.Text) ? null : txtEmail.Text.Trim(),
                 Telefono = string.IsNullOrWhiteSpace(txtTelefono.Text) ? null : txtTelefono.Text.Trim(),
                 IdObraSocial = obraSocialSeleccionada?.Id,
-                // ? IMPORTANTE: El estado NO se puede modificar, se mantiene el original
+                // IMPORTANTE: El estado NO se puede modificar, se mantiene el original
                 Estado = estadoOriginal
             };
         }

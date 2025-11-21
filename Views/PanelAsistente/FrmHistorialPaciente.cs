@@ -81,7 +81,7 @@ namespace SALC.Views.PanelAsistente
                 Padding = new Padding(15, 10, 15, 10)
             };
 
-            // Grid de análisis - EXTENDIDO HORIZONTALMENTE
+            // Grid de análisis 
             gridHistorial = new DataGridView
             {
                 Location = new Point(0, 110),

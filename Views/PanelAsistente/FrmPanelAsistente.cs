@@ -119,7 +119,7 @@ namespace SALC.Views.PanelAsistente
                 lblBusqueda, txtBusqueda, lblInfoBusqueda, btnVerHistorial 
             });
 
-            // Grid de pacientes - MÁS GRANDE
+            // Grid de pacientes 
             gridPacientes = new DataGridView
             {
                 Location = new Point(0, 140),
@@ -164,7 +164,7 @@ namespace SALC.Views.PanelAsistente
 
             Controls.Add(panelPrincipal);
 
-            // Eventos - BÚSQUEDA EN TIEMPO REAL
+            // Eventos 
             txtBusqueda.TextChanged += (s, e) => BuscarPacientesClick?.Invoke(this, EventArgs.Empty);
             btnVerHistorial.Click += (s, e) => VerHistorialClick?.Invoke(this, EventArgs.Empty);
         }

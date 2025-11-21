@@ -83,7 +83,7 @@ namespace SALC.Views.PanelAsistente
                 Padding = new Padding(25)
             };
 
-            // Título - IGUAL QUE MÉDICO
+            // Título
             var lblTitulo = new Label 
             { 
                 Text = "Administración de Información de Pacientes", 
@@ -95,7 +95,7 @@ namespace SALC.Views.PanelAsistente
                 AutoSize = false
             };
 
-            // Toolbar - IGUAL QUE MÉDICO (más alto y más abajo)
+            // Toolbar 
             var tool = new ToolStrip
             {
                 BackColor = Color.FromArgb(236, 240, 241),
@@ -162,7 +162,7 @@ namespace SALC.Views.PanelAsistente
                 cboFiltroEstadoHost
             });
             
-            // Grid - IGUAL QUE MÉDICO (posición, altura de encabezados y filas)
+            // Grid 
             gridPacientes = new DataGridView 
             { 
                 Location = new Point(25, 140),

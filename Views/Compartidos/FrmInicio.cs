@@ -36,7 +36,7 @@ namespace SALC.Views.Compartidos
             Dock = DockStyle.Fill;
             FormBorderStyle = FormBorderStyle.None;
 
-            // ============ PANEL SUPERIOR - BIENVENIDA ============
+            // PANEL SUPERIOR - BIENVENIDA 
             panelSuperior = new Panel
             {
                 Dock = DockStyle.Top,
@@ -124,7 +124,7 @@ namespace SALC.Views.Compartidos
                 picLogo, lblBienvenida, lblSubtitulo, lblVersion
             });
 
-            // ============ PANEL CENTRAL - INFORMACIÓN ============
+            // PANEL CENTRAL - INFORMACIÓN 
             panelCentral = new Panel
             {
                 Dock = DockStyle.Fill,
@@ -252,7 +252,7 @@ namespace SALC.Views.Compartidos
 
             panelCentral.Controls.Add(tableLayout);
 
-            // ============ PANEL INFERIOR - INFORMACIÓN DEL SISTEMA ============
+            // PANEL INFERIOR - INFORMACIÓN DEL SISTEMA
             panelInferior = new Panel
             {
                 Dock = DockStyle.Bottom,

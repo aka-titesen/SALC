@@ -14,27 +14,27 @@ namespace SALC.Views.PanelMedico
     {
         private TabControl tabs;
         
-        // RF-05: Crear análisis
+        // Crear análisis
         private Button btnSeleccionarPaciente;
         private Label lblPacienteSeleccionado;
         private ComboBox cboTipoAnalisis;
         private TextBox txtObservacionesCrear;
         private Button btnCrearAnalisis;
 
-        // RF-06: Cargar resultados
+        // Cargar resultados
         private Button btnSeleccionarAnalisisResultados;
         private Label lblAnalisisResultadosSeleccionado;
         private Button btnCargarMetricas;
         private DataGridView gridResultados;
         private Button btnGuardarResultados;
 
-        // RF-07: Validar/Firmar
+        // Validar/Firmar
         private Button btnSeleccionarAnalisisFirmar;
         private Label lblAnalisisFirmarSeleccionado;
         private DataGridView gridValidacion;
         private Button btnFirmarAnalisis;
 
-        // RF-03: Gestión de Pacientes (Médico)
+        // Gestión de Pacientes (Médico)
         private DataGridView gridPacientes;
         private ComboBox cboFiltroEstadoPacientes;
 
@@ -79,7 +79,7 @@ namespace SALC.Views.PanelMedico
                 Padding = new Padding(25)
             };
 
-            // Título - IGUAL QUE ADMINISTRADOR
+            // Título 
             var lblTitulo = new Label 
             { 
                 Text = "Administración de Información de Pacientes", 
@@ -91,7 +91,7 @@ namespace SALC.Views.PanelMedico
                 AutoSize = false
             };
 
-            // Toolbar - IGUAL QUE ADMINISTRADOR (más alto y más abajo)
+            // Toolbar 
             var tool = new ToolStrip
             {
                 BackColor = Color.FromArgb(236, 240, 241),
@@ -158,7 +158,7 @@ namespace SALC.Views.PanelMedico
                 cboFiltroEstadoHost
             });
             
-            // Grid - IGUAL QUE ADMINISTRADOR (posición, altura de encabezados y filas)
+            // Grid 
             gridPacientes = new DataGridView 
             { 
                 Location = new Point(25, 140),
@@ -515,7 +515,7 @@ namespace SALC.Views.PanelMedico
             };
             btnCargarMetricas.FlatAppearance.BorderSize = 0;
 
-            // Botón guardar - POSICIONADO AL LADO DEL BOTÓN CARGAR MÉTRICAS
+            // Botón guardar 
             btnGuardarResultados = new Button 
             { 
                 Text = "Guardar Resultados", 
@@ -530,7 +530,7 @@ namespace SALC.Views.PanelMedico
             };
             btnGuardarResultados.FlatAppearance.BorderSize = 0;
 
-            // Grid de resultados - ALTURA OPTIMIZADA
+            // Grid de resultados
             var lblGrid = new Label 
             { 
                 Text = "Métricas Específicas del Tipo de Análisis:", 
@@ -700,7 +700,7 @@ namespace SALC.Views.PanelMedico
             };
             btnFirmarAnalisis.FlatAppearance.BorderSize = 0;
 
-            // Grid de validación - ALTURA REDUCIDA PARA NO CORTARSE
+            // Grid de validación 
             var lblValidacion = new Label 
             { 
                 Text = "Revisión de Resultados de Laboratorio:", 
@@ -776,7 +776,7 @@ namespace SALC.Views.PanelMedico
         public event EventHandler<string> PacientesBuscarTextoChanged;
         public event EventHandler<string> PacientesFiltroEstadoChanged;
 
-        // RF-05: Crear análisis
+        // Crear análisis
         public string CrearAnalisisDniPacienteTexto => "";
         public int? TipoAnalisisSeleccionadoId => cboTipoAnalisis?.SelectedValue as int? ?? 
             (cboTipoAnalisis?.SelectedValue != null ? (int?)Convert.ToInt32(cboTipoAnalisis.SelectedValue) : null);
@@ -809,7 +809,7 @@ namespace SALC.Views.PanelMedico
             txtObservacionesCrear.Text = "";
         }
 
-        // RF-06: Cargar resultados
+        // Cargar resultados
         public string AnalisisIdParaResultadosTexto => "";
 
         public void CargarResultadosParaEdicion(IList<MetricaConResultado> filas)
@@ -867,7 +867,7 @@ namespace SALC.Views.PanelMedico
             gridResultados.DataSource = null;
         }
 
-        // RF-07: Validar/Firmar
+        // Validar/Firmar
         public string AnalisisIdParaFirmaTexto => "";
 
         public void MostrarAnalisisParaFirmar(Analisis analisis, Paciente paciente, TipoAnalisis tipo)
@@ -903,7 +903,7 @@ namespace SALC.Views.PanelMedico
             gridValidacion.DataSource = datosValidacion;
         }
 
-        // RF-03: Gestión de Pacientes
+        // Gestión de Pacientes
         public void CargarPacientes(System.Collections.IEnumerable pacientes)
         {
             if (gridPacientes != null) gridPacientes.DataSource = pacientes;

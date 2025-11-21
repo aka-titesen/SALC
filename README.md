@@ -70,57 +70,89 @@ El proyecto fue desarrollado siguiendo el patrón arquitectónico MVP (Model-Vie
 
 - Registro completo de pacientes con validaciones
 
-- Asociación con obras sociales
+- **Alta**: Realizada por Asistentes (pestaña "Gestión de Pacientes" en panel Asistente)
 
-- Baja lógica preservando historial
+- **Modificación**: Realizada por Médicos y Asistentes
+
+- **Baja lógica**: Realizada SOLO por Médicos (cambio de estado a "Inactivo" desde pestaña "Gestión de Pacientes")
+
+- Asociación con obras sociales
 
 - Búsqueda y filtrado avanzado
 
+- **Filtro por estado**: "Todos", "Activo", "Inactivo"
+
+- Preservación del historial en bajas lógicas
+
 ### Análisis Clínicos
 
-- Creación de análisis vinculados a tipos predefinidos
+- Creación de análisis vinculados a tipos predefinidos (solo Médicos)
 
-- Carga de resultados de métricas específicas
+- Carga de resultados de métricas específicas (solo Médicos)
 
-- Validación y firma digital de análisis
+- Validación y firma digital de análisis (solo Médicos)
 
-- Estados de análisis (Pendiente, Verificado, Anulado)
+- Estados de análisis: "Sin verificar" y "Verificado"
 
-- Anulación de análisis con auditoría
+- Los resultados se vuelven inmutables tras la firma
+
+- Trazabilidad completa: `dni_carga` y `dni_firma`
 
 ### Catálogos Configurables
 
-- Gestión de obras sociales
+- Gestión de obras sociales (Administrador)
 
-- Tipos de análisis personalizables
+- Tipos de análisis personalizables (Administrador)
 
-- Métricas con valores de referencia
+- Métricas con valores de referencia (Administrador)
 
-- Relaciones dinámicas tipo análisis-métricas
+- **Relaciones dinámicas tipo análisis-métricas** (tabla `tipo_analisis_metrica`)
+
+- **El Administrador puede crear, modificar y eliminar las asociaciones entre tipos de análisis y métricas**
 
 - Baja lógica en todos los catálogos
 
+- Estados: "Activo" e "Inactivo"
+
 ### Reportes y Estadísticas
 
-- Reportes de productividad de médicos
+#### Reportes para Administrador (`FrmReportesAdmin`)
 
-- Análisis de facturación por obra social
+- **Productividad de Médicos**: Análisis creados y verificados por cada médico
 
-- Estadísticas de demanda de análisis
+- **Distribución por Obra Social**: Análisis agrupados por cobertura médica (gráfico de torta)
 
-- Alertas de valores críticos
+- **Análisis Más Solicitados**: Top 10 de tipos de análisis con mayor demanda (gráfico de barras)
 
-- Exportación a PDF
+- Visualización mediante gráficos (`System.Windows.Forms.DataVisualization.Charting.Chart`)
+
+- Filtros por rango de fechas personalizables
+
+- Datos globales de todo el sistema
+
+#### Reportes para Médico (`FrmReportesMedico`)
+
+- **Reporte de Alertas**: Valores fuera de rango crítico que requieren atención médica
+
+- **Mi Carga de Trabajo**: Análisis pendientes de verificar y análisis verificados del mes actual
+
+- Visualización mediante tarjetas visuales con indicadores numéricos
+
+- **Datos filtrados por el DNI del médico logueado**
+
+- Filtros por rango de fechas para alertas
 
 ### Informes Médicos
 
-- Generación automática de informes PDF
+- Generación automática de informes PDF con iTextSharp (solo Asistentes)
+
+- **Solo se pueden generar informes de análisis en estado "Verificado"**
 
 - Envío de informes por correo electrónico
 
-- Plantillas profesionales con membrete
+- Plantillas profesionales con información del laboratorio
 
-- Firma digital de médicos en informes
+- Incluye firma digital del médico que validó el análisis
 
 ### Seguridad y Auditoría
 
@@ -208,7 +240,7 @@ cd SALC
 cd Database
 
 # Ejecuta los scripts en orden
-sqlcmd -S localhost -E -i salc_crear-base-datos.sql
+# Nota: Primero crear la base de datos manualmente o desde SSMS
 sqlcmd -S localhost -d SALC -E -i estructura_salc_crear-tablas.sql
 sqlcmd -S localhost -d SALC -E -i lote_salc_datos-ejemplos.sql
 ```
@@ -305,7 +337,8 @@ El script de datos iniciales crea los siguientes usuarios de prueba:
 
 | DNI      | Rol           | Email                   | Contraseña |
 | -------- | ------------- | ----------------------- | ---------- |
-| 25111112 | Administrador | laura.campos@salc.co    | salc123    |
+| 25111111 | Administrador | admin@salc.com          | salc123    |
+| 25111112 | Administrador | laura.campos@salc.com   | salc123    |
 | 30100101 | Médico        | carlos.bianchi@salc.com | salc123    |
 | 30100102 | Médico        | ana.fernandez@salc.com  | salc123    |
 | 40100201 | Asistente     | maria.becerra@salc.com  | salc123    |
@@ -446,10 +479,10 @@ msbuild SALC.sln /p:Configuration=Release
 
 ```
 SALC/
-├── .vs/                    # Configuración de Visual Studio (no subir a Git)
-├── bin/                    # Ejecutables compilados (no subir a Git)
-├── obj/                    # Archivos de compilación (no subir a Git)
-├── packages/               # Paquetes NuGet (no subir a Git)
+├── .vs/                    # Configuración de Visual Studio 
+├── bin/                    # Ejecutables compilados 
+├── obj/                    # Archivos de compilación 
+├── packages/               # Paquetes NuGet 
 ├── Database/               # Scripts de base de datos
 ├── Docs/                   # Documentación del proyecto
 ├── BLL/                    # Capa de lógica de negocio
@@ -534,7 +567,7 @@ Como administrador puedes:
 
    - **Métricas**: Configurar métricas con valores de referencia
 
-   - **Relaciones**: Asociar métricas a tipos de análisis
+   - **Relaciones Tipo-Métrica**: Asociar métricas a tipos de análisis (crear, modificar y eliminar asociaciones en `tipo_analisis_metrica`)
 
 3. **Backups**:
 
@@ -544,19 +577,25 @@ Como administrador puedes:
 
    - Ver historial de backups
 
-4. **Reportes**:
+4. **Reportes Estadísticos Globales**:
 
-   - Productividad de médicos
+- **Productividad de Personal Médico**: Análisis creados vs. verificados por cada profesional
 
-   - Facturación por obra social
+- **Facturación por Obra Social**: Distribución porcentual de análisis por cobertura
 
-   - Demanda de tipos de análisis
+- **Demanda de Análisis**: Top 10 de tipos de análisis más solicitados
 
-5. **Salud del Sistema**:
+- Visualización mediante gráficos (columnas, torta, barras)
+
+- Filtros de período ajustables
+
+1. **Salud del Sistema**:
 
    - Probar conexión a la base de datos
 
    - Ver estado del sistema
+
+**IMPORTANTE**: El Administrador NO puede gestionar pacientes (ABM de pacientes es exclusivo de Médico y Asistente).
 
 ### Panel de Médico
 
@@ -564,57 +603,81 @@ Como médico puedes:
 
 1. **Gestión de Pacientes**:
 
-   - Ver listado de pacientes
+   - Ver listado de todos los pacientes
 
    - Editar información de pacientes
 
-   - Dar de baja pacientes
+   - Dar de baja lógica de pacientes (cambio de estado a "Inactivo")
 
    - Buscar y filtrar pacientes
 
-2. **Crear Análisis**:
+2. **Crear Análisis** (Pestaña "Crear Análisis Clínico"):
 
-   - Seleccionar paciente
+   - **Paso 1**: Buscar y seleccionar paciente
 
-   - Elegir tipo de análisis
+   - **Paso 2**: Elegir tipo de análisis del catálogo
 
-   - Agregar observaciones generales
+   - **Paso 3**: Agregar observaciones iniciales (opcional)
 
-   - Crear el análisis (queda en estado Pendiente)
+   - Crear el análisis (queda en estado "Sin verificar")
 
-3. **Cargar Resultados**:
+   - El DNI del médico se registra automáticamente en `dni_carga`
 
-   - Buscar análisis pendientes
+3. **Cargar Resultados** (Pestaña "Cargar Resultados"):
 
-   - Cargar métricas correspondientes al tipo de análisis
+   - Buscar análisis pendiente (estado "Sin verificar")
 
-   - Ingresar resultados numéricos
+   - Cargar métricas específicas del tipo de análisis seleccionado
 
-   - Agregar observaciones por métrica
+   - Ingresar resultados numéricos en la grilla editable
 
-   - Guardar resultados
+   - Agregar observaciones por métrica (opcional)
 
-4. **Validar y Firmar**:
+   - Guardar resultados en `analisis_metrica`
+
+   - **Importante**: Solo se muestran las métricas configuradas para ese tipo de análisis
+
+4. **Validar y Firmar** (Pestaña "Validar y Firmar"):
 
    - Buscar análisis con resultados cargados
 
-   - Revisar todos los resultados
+   - Revisar todos los resultados en grilla de solo lectura
 
-   - Firmar digitalmente el análisis
+   - Confirmar la firma digital del análisis
 
-   - El análisis pasa a estado Verificado
+   - El análisis cambia a estado "Verificado"
 
-5. **Reportes Médicos**:
+   - El DNI del médico se registra en `dni_firma` y se establece `fecha_firma`
 
-   - Ver alertas de valores críticos
+   - **Los resultados se vuelven inmutables** (no se pueden modificar después de firmados)
 
-   - Consultar carga de trabajo
+5. **Historial de Pacientes**:
+
+   - Ver listado completo de pacientes
+
+   - **Solo puede ver el historial detallado de análisis de pacientes asociados a análisis que él mismo cargó** (`analisis.dni_carga`)
+
+6. **Reportes de Calidad y Desempeño Personal**:
+
+- **Reporte de Alertas**: Identificación de valores críticos (fuera de rango) que requieren seguimiento
+
+- **Mi Carga de Trabajo**: Análisis pendientes de verificar y análisis verificados en el mes actual
+
+- Visualización mediante tarjetas con indicadores numéricos grandes
+
+- Alertas mostradas en DataGridView con código de colores
+
+- Filtros de período para análisis temporal
 
 ### Panel de Asistente
 
 Como asistente puedes:
 
 1. **Gestión de Pacientes**:
+
+   - **Alta de pacientes**: Registrar nuevos pacientes con todos sus datos
+
+   - **Modificación de pacientes**: Editar información de pacientes existentes
 
    - Buscar pacientes
 
@@ -624,34 +687,40 @@ Como asistente puedes:
 
 2. **Historial de Pacientes**:
 
-   - Seleccionar un paciente
+   - Seleccionar cualquier paciente
 
-   - Ver todos sus análisis (activos y anulados)
+   - **Ver el historial detallado de análisis de CUALQUIER paciente** (sin restricciones)
 
-   - Consultar resultados de análisis
+   - Consultar resultados de análisis verificados
 
-3. **Generar Informes**:
+3. **Generar y Enviar Informes**:
 
-   - Seleccionar análisis verificado
+   - Seleccionar análisis en estado "Verificado"
 
-   - Generar PDF del informe
+   - Generar PDF del informe médico
 
    - Guardar PDF en ubicación deseada
 
-   - Enviar informe por email al paciente
+   - Enviar informe por email o teléfono al paciente
+
+**IMPORTANTE**: El Asistente NO puede dar de baja pacientes. Solo puede dar de alta y modificar.
 
 ### Flujo de Trabajo Típico
 
 ```
-1. Médico crea un análisis para un paciente
+1. Asistente registra un nuevo paciente (Alta)
    ↓
-2. Médico carga los resultados de las métricas
+2. Médico crea un análisis para ese paciente
    ↓
-3. Médico valida y firma el análisis digitalmente
+3. Médico carga los resultados de las métricas
    ↓
-4. Asistente genera el informe PDF
+4. Médico valida y firma el análisis digitalmente (estado: "Verificado")
    ↓
-5. Asistente envía el informe por email al paciente
+5. Asistente busca el análisis verificado
+   ↓
+6. Asistente genera el informe PDF
+   ↓
+7. Asistente envía el informe por email al paciente
 ```
 
 ## Estructura del Proyecto
@@ -742,19 +811,45 @@ SALC/
 │
 ├── Views/                            # Vistas (Windows Forms)
 │   ├── FrmLogin.cs                   # Formulario de login
+│   ├── FrmPrincipalConTabs.cs        # Ventana principal con pestañas
+│   ├── FrmInicio.cs                  # Pantalla de inicio
+│   ├── Compartidos/                  # Controles compartidos
+│   │   ├── SeleccionAnalisisControl.cs
+│   │   └── SeleccionPacienteControl.cs
 │   ├── PanelAdministrador/           # Vistas del administrador
+│   │   ├── FrmPanelAdministrador.cs  # Panel principal con 4 tabs
+│   │   ├── FrmReportesAdmin.cs       # Módulo de reportes BI
+│   │   ├── FrmUsuarioEdit.cs
+│   │   ├── FrmUsuarioDetalle.cs
+│   │   ├── FrmObraSocialEdit.cs
+│   │   ├── FrmTipoAnalisisEdit.cs
+│   │   ├── FrmMetricaEdit.cs
+│   │   └── FrmGestionRelacionesTipoAnalisisMetricas.cs
 │   ├── PanelMedico/                  # Vistas del médico
+│   │   ├── FrmPanelMedico.cs         # Panel principal con 4 tabs
+│   │   ├── FrmReportesMedico.cs      # Módulo de reportes personales
+│   │   ├── FrmSeleccionPaciente.cs
+│   │   ├── FrmSeleccionAnalisisResultados.cs
+│   │   ├── FrmSeleccionAnalisisFirma.cs
+│   │   ├── FrmDetalleAnalisis.cs
+│   │   └── FrmGestionPacientes.cs    # Gestión de pacientes por médico
 │   └── PanelAsistente/               # Vistas del asistente
+│       ├── FrmPanelAsistente.cs      # Panel de consultas
+│       ├── FrmGestionPacientes.cs    # ABM de pacientes por asistente
+│       ├── FrmPacienteEdit.cs
+│       ├── FrmPacienteEditAsistente.cs
+│       ├── FrmPacienteDetalle.cs
+│       └── FrmHistorialPaciente.cs
 │
 ├── Database/                         # Scripts de base de datos
-│   ├── 01-crear-base-datos.sql
-│   ├── 02-crear-tablas.sql
-│   ├── 03-datos-iniciales.sql
-│   └── 04-usuarios-prueba.sql
+│   ├── estructura_salc_crear-tablas.sql  # Script de creación de tablas
+│   └── lote_salc_datos-ejemplos.sql      # Script de datos de ejemplo
 │
 ├── Docs/                             # Documentación
-│   ├── RESUMEN_DOCUMENTACION.md
-│   └── DOCUMENTACION_COMPLETADA.md
+│   ├── ERS/                          # Especificación de Requisitos
+│   │   └── ers-salc_ieee830v2.9.md   # ERS versión 2.9
+│   └── UserManual/                   # Manual de Usuario
+│       └── manual_de_usuario.md      # Manual completo
 │
 ├── Properties/                       # Propiedades del proyecto
 │   └── AssemblyInfo.cs
@@ -1103,9 +1198,9 @@ El proyecto cuenta con **documentación XML completa** (100% de cobertura) en to
 
 - **IntelliSense**: Ayuda contextual completa en Visual Studio
 
-- **Especificación de Requisitos de Software**: Ver [ERS.md](SALC\Docs\ERS\ers-salc_ieee830v2.9.md)
+- **Especificación de Requisitos de Software**: Ver [ers-salc_ieee830v2.9.md](Docs/ERS/ers-salc_ieee830v2.9.md)
 
-- **Manual de Usuario**: Ver [Manual de Usuario.md](SALC\Docs\UserManual\manual_de_usuario.md)
+- **Manual de Usuario**: Ver [manual_de_usuario.md](Docs/UserManual/manual_de_usuario.md)
 
 ### Generar Documentación HTML
 

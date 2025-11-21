@@ -76,12 +76,12 @@ namespace SALC.Presenters
         private readonly ObraSocialRepositorio _obraSocialRepo = new ObraSocialRepositorio();
         private readonly int _dniMedico;
 
-        // ===== ESTADO PARA FLUJO DE ANÁLISIS (SEPARADO) =====
+        // ESTADO PARA FLUJO DE ANÁLISIS (SEPARADO)
         private Paciente _pacienteParaCrearAnalisis; // Solo para flujo de análisis
         private Analisis _analisisParaResultados;
         private Analisis _analisisParaFirmar;
 
-        // ===== ESTADO PARA GESTIÓN DE PACIENTES (SEPARADO) =====
+        // ESTADO PARA GESTIÓN DE PACIENTES (SEPARADO)
         private List<Paciente> _pacientesGestion = new List<Paciente>();
         private List<PacienteViewModelMedico> _pacientesGestionViewModel = new List<PacienteViewModelMedico>();
         private string _filtroEstadoPacientesGestion = "Todos";
@@ -96,20 +96,20 @@ namespace SALC.Presenters
             _view = view;
             _dniMedico = dniMedico;
 
-            // RF-05: Crear Análisis (FLUJO INDEPENDIENTE)
+            // Crear Análisis (FLUJO INDEPENDIENTE)
             _view.CrearAnalisisClick += OnCrearAnalisis;
             _view.BuscarPacienteCrearClick += OnBuscarPacienteParaCrearAnalisis;
 
-            // RF-06: Cargar Resultados  
+            // Cargar Resultados  
             _view.CargarResultadosGuardarClick += OnGuardarResultados;
             _view.BuscarAnalisisResultadosClick += OnBuscarAnalisisResultados;
             _view.CargarMetricasAnalisisClick += OnCargarMetricasAnalisis;
 
-            // RF-07: Validar/Firmar
+            // Validar/Firmar
             _view.FirmarAnalisisClick += OnFirmarAnalisis;
             _view.BuscarAnalisisFirmarClick += OnBuscarAnalisisFirmar;
 
-            // RF-03: Gestión de Pacientes (ABM INDEPENDIENTE)
+            // Gestión de Pacientes (ABM INDEPENDIENTE)
             _view.PacientesEditarClick += OnPacientesGestionEditar;
             _view.PacientesEliminarClick += OnPacientesGestionEliminar;
             _view.PacientesBuscarTextoChanged += OnPacientesGestionBuscar;

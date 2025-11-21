@@ -38,7 +38,7 @@ namespace SALC.Views.PanelAdministrador
             this.MinimumSize = new Size(1200, 700);
             this.BackColor = Color.White;
 
-            // ============ PANEL HEADER ============
+            // PANEL HEADER 
             panelHeader = new Panel
             {
                 Dock = DockStyle.Top,
@@ -69,7 +69,7 @@ namespace SALC.Views.PanelAdministrador
 
             panelHeader.Controls.AddRange(new Control[] { lblTitulo, lblSubtitulo });
 
-            // ============ PANEL DE FILTROS Y BOTONES ============
+            // PANEL DE FILTROS Y BOTONES 
             panelFiltros = new Panel
             {
                 Dock = DockStyle.Top,
@@ -225,7 +225,7 @@ namespace SALC.Views.PanelAdministrador
 
             panelFiltros.Controls.Add(tableLayoutFiltros);
 
-            // ============ PANEL DEL GRÁFICO ============
+            // PANEL DEL GRÁFICO 
             panelGrafico = new Panel
             {
                 Dock = DockStyle.Fill,

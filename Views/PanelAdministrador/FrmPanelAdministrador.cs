@@ -71,7 +71,7 @@ namespace SALC.Views.PanelAdministrador
                 AutoSize = false
             };
 
-            // Toolbar - MÁS ALTO Y MÁS ABAJO
+            // Toolbar 
             var tool = new ToolStrip
             {
                 BackColor = Color.FromArgb(236, 240, 241),
@@ -148,7 +148,7 @@ namespace SALC.Views.PanelAdministrador
                 lblFiltroEstado, cboFiltroEstadoHost
             });
             
-            // DataGridView - MUCHO MÁS ABAJO CON ENCABEZADOS ALTOS
+            // DataGridView 
             gridUsuarios = new DataGridView 
             { 
                 Location = new Point(25, 140),
@@ -243,7 +243,7 @@ namespace SALC.Views.PanelAdministrador
                 Padding = new Padding(25)
             };
             
-            // Título - MÁS ALTO
+            // Título 
             var lblTitulo = new Label
             {
                 Text = "Gestión de Obras Sociales y Mutuales",
@@ -255,7 +255,7 @@ namespace SALC.Views.PanelAdministrador
                 AutoSize = false
             };
 
-            // Toolbar - MÁS ALTO
+            // Toolbar
             var tool = new ToolStrip
             {
                 BackColor = Color.FromArgb(248, 255, 250),
@@ -383,7 +383,7 @@ namespace SALC.Views.PanelAdministrador
                 Padding = new Padding(25)
             };
             
-            // Título - MÁS ALTO
+            // Título 
             var lblTitulo = new Label
             {
                 Text = "Catálogo de Tipos de Análisis Clínicos",
@@ -395,7 +395,7 @@ namespace SALC.Views.PanelAdministrador
                 AutoSize = false
             };
 
-            // Toolbar - MÁS ALTO
+            // Toolbar 
             var tool = new ToolStrip
             {
                 BackColor = Color.FromArgb(255, 250, 245),
@@ -523,7 +523,7 @@ namespace SALC.Views.PanelAdministrador
                 Padding = new Padding(25)
             };
             
-            // Título - MÁS ALTO
+            // Título 
             var lblTitulo = new Label
             {
                 Text = "Catálogo de Métricas y Parámetros de Laboratorio",
@@ -535,7 +535,7 @@ namespace SALC.Views.PanelAdministrador
                 AutoSize = false
             };
 
-            // Toolbar - MÁS ALTO
+            // Toolbar 
             var tool = new ToolStrip
             {
                 BackColor = Color.FromArgb(250, 245, 255),
@@ -723,7 +723,7 @@ namespace SALC.Views.PanelAdministrador
             btnGestionar.FlatAppearance.BorderSize = 0;
             btnGestionar.Click += (s, e) => RelacionesTipoAnalisisMetricaGestionarClick?.Invoke(this, EventArgs.Empty);
 
-            // Nota adicional - AUMENTAR ALTURA
+            // Nota adicional 
             var lblNota = new Label
             {
                 Text = "Nota: Los cambios en las relaciones solo afectarán a futuros análisis.\n" +
@@ -796,7 +796,7 @@ namespace SALC.Views.PanelAdministrador
             
             grpInfo.Controls.Add(lblDescripcion);
             
-            // Acciones - AUMENTAR ALTURA
+            // Acciones 
             var grpAcciones = new GroupBox
             {
                 Text = "  Acceder al Módulo de Reportes  ",

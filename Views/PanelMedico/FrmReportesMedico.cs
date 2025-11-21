@@ -39,7 +39,7 @@ namespace SALC.Views.PanelMedico
             this.MinimumSize = new Size(1200, 700);
             this.BackColor = Color.White;
 
-            // ============ PANEL HEADER ============
+            // PANEL HEADER
             panelHeader = new Panel
             {
                 Dock = DockStyle.Top,
@@ -70,7 +70,7 @@ namespace SALC.Views.PanelMedico
 
             panelHeader.Controls.AddRange(new Control[] { lblTitulo, lblSubtitulo });
 
-            // ============ PANEL DE FILTROS Y BOTONES ============
+            // PANEL DE FILTROS Y BOTONES
             panelFiltros = new Panel
             {
                 Dock = DockStyle.Top,
@@ -196,7 +196,7 @@ namespace SALC.Views.PanelMedico
                 grpFechas, btnAlertas, btnCargaTrabajo, panelAyuda 
             });
 
-            // ============ PANEL DEL CONTENIDO ============
+            // PANEL DEL CONTENIDO
             panelContenido = new Panel
             {
                 Dock = DockStyle.Fill,

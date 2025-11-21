@@ -34,7 +34,7 @@ namespace SALC.Views
             BackColor = Color.White;
             ShowIcon = false; // No mostrar icono personalizado - usar default de Windows
 
-            // ============ MENÚ PRINCIPAL ============
+            // MENÚ PRINCIPAL
             var menuStrip = new MenuStrip
             {
                 BackColor = Color.FromArgb(46, 134, 193), // Azul médico profesional
@@ -90,7 +90,7 @@ namespace SALC.Views
 
             menuStrip.Items.AddRange(new ToolStripItem[] { menuArchivo, menuAyuda });
 
-            // ============ PANEL DE INFORMACIÓN DE USUARIO ============
+            // PANEL DE INFORMACIÓN DE USUARIO 
             var panelInfoUsuario = new Panel
             {
                 Height = 50,
@@ -137,7 +137,7 @@ namespace SALC.Views
                 lblInfoUsuario, lblRolUsuario, lblVersionSistema
             });
 
-            // ============ TAB CONTROL PRINCIPAL - REDISEÑADO ============
+            // TAB CONTROL PRINCIPAL
             tabPrincipal = new TabControl
             {
                 Dock = DockStyle.Fill,
@@ -191,7 +191,7 @@ namespace SALC.Views
                 }
             };
 
-            // ============ BARRA DE ESTADO ============
+            // BARRA DE ESTADO
             statusStrip = new StatusStrip
             {
                 BackColor = Color.FromArgb(46, 134, 193),
@@ -541,7 +541,7 @@ namespace SALC.Views
                     ExtraerPestanaMedico(tabControlMedico, 0, "Cargar Resultados");
                     ExtraerPestanaMedico(tabControlMedico, 0, "Validar/Firmar");
                     
-                    // ⭐ NUEVA: Agregar pestaña de Reportes para Médico
+                    // NUEVA: Agregar pestaña de Reportes para Médico
                     AgregarPestanaReportesMedico();
                     
                     // Guardar referencia del presenter para que no se pierda
@@ -769,10 +769,10 @@ namespace SALC.Views
         {
             try
             {
-                // Pestaña 1: Gestión de Pacientes (RF-03) - NUEVA FUNCIONALIDAD
+                // Pestaña 1: Gestión de Pacientes 
                 AgregarPestanaGestionPacientesAsistente();
 
-                // Pestaña 2: Consultar Pacientes (RF-09)
+                // Pestaña 2: Consultar Pacientes 
                 var tabConsultarPacientes = new TabPage("Consultar Pacientes")
                 {
                     BackColor = Color.White,
@@ -868,15 +868,15 @@ namespace SALC.Views
 
                 var lblDescripcion = new Label
                 {
-                    Text = "RF-03: Administración de Pacientes por Asistente\n\n" +
+                    Text = "Administración de Pacientes por Asistente\n\n" +
                            "Funcionalidades habilitadas para Asistente:\n" +
-                           "• ✅ Alta de nuevos pacientes\n" +
-                           "• ✅ Modificación de datos de pacientes existentes\n" +
-                           "• 📋 Listado y búsqueda de pacientes\n" +
-                           "• 👁️ Visualización de información completa\n\n" +
+                           "• Alta de nuevos pacientes\n" +
+                           "• Modificación de datos de pacientes existentes\n" +
+                           "• Listado y búsqueda de pacientes\n" +
+                           "• Visualización de información completa\n\n" +
                            "Restricciones:\n" +
-                           "• ❌ No puede realizar baja de pacientes\n" +
-                           "• ⚠️ Supervisado por médico asignado\n\n" +
+                           "• No puede realizar baja de pacientes\n" +
+                           "• Supervisado por médico asignado\n\n" +
                            "Nota: Esta funcionalidad complementa la consulta de historiales (RF-09)",
                     Font = new Font("Segoe UI", 11),
                     ForeColor = Color.FromArgb(70, 130, 180),
@@ -886,7 +886,7 @@ namespace SALC.Views
 
                 var lblEstado = new Label
                 {
-                    Text = $"⚠️ Error al cargar componente: {ex.Message}",
+                    Text = $"Error al cargar componente: {ex.Message}",
                     Font = new Font("Segoe UI", 9, FontStyle.Italic),
                     ForeColor = Color.Orange,
                     Location = new Point(50, 370),
@@ -895,7 +895,7 @@ namespace SALC.Views
 
                 var lblImplementacion = new Label
                 {
-                    Text = "💡 Componentes implementados: FrmGestionPacientes y GestionPacientesAsistentePresenter",
+                    Text = "Componentes implementados: FrmGestionPacientes y GestionPacientesAsistentePresenter",
                     Font = new Font("Segoe UI", 9, FontStyle.Italic),
                     ForeColor = Color.Green,
                     Location = new Point(50, 400),

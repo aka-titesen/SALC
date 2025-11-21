@@ -362,10 +362,6 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 
-# ========================================================
-# SALC - ARCHIVOS SENSIBLES Y CREDENCIALES
-# ========================================================
-
 # Archivos de configuración con credenciales
 App.secrets.config
 **/App.secrets.config
@@ -407,7 +403,4 @@ appsettings.local.json
 .env
 .env.local
 .env.*.local
-
-# ========================================================
-
 
