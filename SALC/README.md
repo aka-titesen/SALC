@@ -301,10 +301,10 @@ SALC/
 ?   ??? estructura_salc_crear-tablas.sql    # Creación de BD y tablas
 ?   ??? lote_salc_datos-ejemplos.sql        # Datos de ejemplo (seed)
 ??? Docs/                           # Documentación del proyecto
-    ??? ERS/                        # Especificación de Requisitos
-    ?   ??? ers-salc_ieeev2.9.md
-    ??? UserManual/                 # Manual de usuario
-        ??? manual_de_usuario.md
+??? ERS/                        # Especificación de Requisitos
+?   ??? ers-salc_ieee830v2.9.md
+??? UserManual/                 # Manual de usuario
+    ??? manual_de_usuario.md
 ```
 
 ## 8. Arquitectura
@@ -460,7 +460,7 @@ El proyecto cuenta con documentación exhaustiva organizada en la carpeta `Docs/`
 
 ### Especificación de Requisitos de Software (ERS)
 
-**Ubicación**: Ver [ERS.md](Docs/ERS/ers-salc_ieeev2.9.md)
+**Ubicación**: Ver [ERS.md](Docs/ERS/ers-salc_ieee830v2.9.md)
 
 **Contenido**:
 - Requisitos funcionales detallados (RF-01 a RF-13)
