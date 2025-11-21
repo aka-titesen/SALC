@@ -460,7 +460,7 @@ El proyecto cuenta con documentación exhaustiva organizada en la carpeta `Docs/`
 
 ### Especificación de Requisitos de Software (ERS)
 
-**Ubicación**: Ver [ERS.md](Docs/ERS/ers-salc_ieee830v2.9.md)
+**Ubicación**: Ver [ERS (ers-salc_ieee830v2.9.md)](https://github.com/aka-titesen/SALC/blob/main/Docs/ERS/ers-salc_ieee830v2.9.md)
 
 **Contenido**:
 - Requisitos funcionales detallados (RF-01 a RF-13)
@@ -472,7 +472,7 @@ El proyecto cuenta con documentación exhaustiva organizada en la carpeta `Docs/`
 
 ### Manual de Usuario
 
-**Ubicación**: Ver [Manual de Usuario.md](Docs/UserManual/manual_de_usuario.md)
+**Ubicación**: Ver [Manual de Usuario (manual_de_usuario.md)](https://github.com/aka-titesen/SALC/blob/main/Docs/UserManual/manual_de_usuario.md)
 
 **Contenido**:
 - Guía paso a paso para cada rol de usuario
