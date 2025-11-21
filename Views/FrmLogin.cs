@@ -54,13 +54,19 @@ namespace SALC.Views
             // Cargar icono del proyecto
             try
             {
-                string iconPath = System.IO.Path.Combine(Application.StartupPath, "..", "..", "..", "icono.png");
+                // Ruta simple directa
+                string iconPath = System.IO.Path.Combine(Application.StartupPath, "icono.png");
+                
                 if (System.IO.File.Exists(iconPath))
                 {
                     picLogo.Image = Image.FromFile(iconPath);
                 }
                 else
                 {
+                    // Si no existe, mostrar error temporal para diagnóstico
+                    MessageBox.Show($"Ícono NO encontrado en:\n{iconPath}\n\nStartupPath:\n{Application.StartupPath}", 
+                        "Debug - Ícono", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    
                     // Fallback con logo placeholder
                     picLogo.BackColor = Color.FromArgb(100, 149, 237); // Cornflower blue - médico
                     picLogo.Paint += (s, e) => {

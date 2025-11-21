@@ -2,7 +2,7 @@
 # Visual Studio Version 17
 VisualStudioVersion = 17.14.36414.22 d17.14
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SALC", "SALC\SALC.csproj", "{698AD26E-F881-48F0-8D83-D9A6912EC957}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SALC", "SALC.csproj", "{698AD26E-F881-48F0-8D83-D9A6912EC957}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

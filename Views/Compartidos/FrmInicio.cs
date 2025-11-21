@@ -56,7 +56,7 @@ namespace SALC.Views.Compartidos
             // Cargar logo
             try
             {
-                string iconPath = System.IO.Path.Combine(Application.StartupPath, "..", "..", "..", "icono.png");
+                string iconPath = System.IO.Path.Combine(Application.StartupPath, "icono.png");
                 if (System.IO.File.Exists(iconPath))
                 {
                     picLogo.Image = Image.FromFile(iconPath);

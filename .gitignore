@@ -362,3 +362,52 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 
+# ========================================================
+# SALC - ARCHIVOS SENSIBLES Y CREDENCIALES
+# ========================================================
+
+# Archivos de configuración con credenciales
+App.secrets.config
+**/App.secrets.config
+
+# Archivos de conexión a base de datos con credenciales
+*.connectionStrings.config
+
+# Archivos de logs que pueden contener información sensible
+Logs/
+*.log
+
+# Backups de base de datos
+*.bak
+*.trn
+Backups/
+**/Backups/
+
+# Archivos temporales de SQL Server
+*.mdf
+*.ldf
+*.ndf
+
+# Archivos de configuración local
+appsettings.local.json
+*.local.config
+
+# Credenciales de Azure/AWS
+*.azureauth
+*.publishsettings
+
+# Archivos de certificados
+*.cer
+*.crt
+*.key
+*.pem
+*.p12
+
+# Variables de entorno
+.env
+.env.local
+.env.*.local
+
+# ========================================================
+
+

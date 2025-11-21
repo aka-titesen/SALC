@@ -9,19 +9,35 @@ namespace SALC.BLL
     public class DefaultPasswordHasher : IPasswordHasher
     {
         /// <summary>
-        /// Verifica si una contraseña en texto plano coincide con un hash BCrypt
+        /// Verifica si una contraseña en texto plano coincide con un hash BCrypt.
+        /// También soporta comparación directa para migración de contraseñas en texto plano.
         /// </summary>
         /// <param name="plainText">Contraseña en texto plano a verificar</param>
-        /// <param name="hashed">Hash BCrypt para comparar</param>
+        /// <param name="hashed">Hash BCrypt para comparar (o contraseña en texto plano para migración)</param>
         /// <returns>True si la contraseña coincide, false en caso contrario</returns>
         public bool Verify(string plainText, string hashed)
         {
+            if (string.IsNullOrEmpty(plainText) || string.IsNullOrEmpty(hashed))
+                return false;
+
             try
             {
-                return BCrypt.Net.BCrypt.Verify(plainText, hashed);
+                // Si el hash comienza con $2, es un hash BCrypt válido
+                if (hashed.StartsWith("$2a$") || hashed.StartsWith("$2b$") || 
+                    hashed.StartsWith("$2x$") || hashed.StartsWith("$2y$"))
+                {
+                    return BCrypt.Net.BCrypt.Verify(plainText, hashed);
+                }
+                else
+                {
+                    // Comparación directa para contraseñas en texto plano (migración)
+                    // ADVERTENCIA: Esto solo debe usarse durante la migración
+                    return string.Equals(plainText, hashed, StringComparison.Ordinal);
+                }
             }
             catch (Exception)
             {
+                // En caso de error, intentar comparación directa como fallback
                 return string.Equals(plainText, hashed, StringComparison.Ordinal);
             }
         }

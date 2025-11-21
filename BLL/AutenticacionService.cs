@@ -76,9 +76,18 @@ namespace SALC.BLL
 
                 // Validar contraseña
                 bool esValida;
+                bool necesitaMigracion = false;
+                
                 try
                 {
                     esValida = _hasher.Verify(contrasenia, usuario.PasswordHash);
+                    
+                    // Verificar si la contraseña está en texto plano y necesita migración
+                    if (esValida && _hasher.IsPlainText(usuario.PasswordHash))
+                    {
+                        necesitaMigracion = true;
+                        ExceptionHandler.LogInfo($"Contraseña en texto plano detectada para DNI: {dni}. Se migrará automáticamente.", "Autenticación");
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -90,6 +99,23 @@ namespace SALC.BLL
                 {
                     ExceptionHandler.LogWarning($"Contraseña incorrecta para DNI: {dni}", "Autenticación");
                     return null;
+                }
+
+                // Migrar contraseña a BCrypt si es necesario
+                if (necesitaMigracion)
+                {
+                    try
+                    {
+                        var hashNuevo = _hasher.Hash(contrasenia);
+                        usuario.PasswordHash = hashNuevo;
+                        _usuarioRepo.Actualizar(usuario);
+                        ExceptionHandler.LogInfo($"Contraseña migrada a BCrypt exitosamente - DNI: {dni}", "Autenticación");
+                    }
+                    catch (Exception ex)
+                    {
+                        ExceptionHandler.LogWarning($"Error al migrar contraseña para DNI: {dni} - {ex.Message}. El usuario podrá autenticarse de todos modos.", "Autenticación");
+                        // No lanzamos excepción, el usuario ya validó sus credenciales
+                    }
                 }
 
                 // Autenticación exitosa

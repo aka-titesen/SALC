@@ -36,8 +36,10 @@ namespace SALC.BLL
                 if (existente == null)
                     throw new SalcBusinessException($"No existe un usuario con DNI {usuario.Dni}.");
 
-                if (!string.IsNullOrEmpty(usuario.PasswordHash) && !usuario.PasswordHash.StartsWith("$2"))
+                // Hashear contraseña solo si es texto plano
+                if (!string.IsNullOrEmpty(usuario.PasswordHash) && _hasher.IsPlainText(usuario.PasswordHash))
                 {
+                    ExceptionHandler.LogInfo($"Hasheando contraseña para usuario - DNI: {usuario.Dni}", "ActualizarUsuario");
                     usuario.PasswordHash = _hasher.Hash(usuario.PasswordHash);
                 }
 
@@ -93,9 +95,10 @@ namespace SALC.BLL
                 if (existente == null)
                     throw new SalcBusinessException($"No existe un usuario con DNI {usuario.Dni}.");
 
-                // Si PasswordHash trae una contraseña plana (heurística), la hasheamos
-                if (!string.IsNullOrEmpty(usuario.PasswordHash) && !usuario.PasswordHash.StartsWith("$2"))
+                // Hashear contraseña solo si es texto plano
+                if (!string.IsNullOrEmpty(usuario.PasswordHash) && _hasher.IsPlainText(usuario.PasswordHash))
                 {
+                    ExceptionHandler.LogInfo($"Hasheando contraseña para usuario - DNI: {usuario.Dni}", "ActualizarUsuario");
                     usuario.PasswordHash = _hasher.Hash(usuario.PasswordHash);
                 }
 
