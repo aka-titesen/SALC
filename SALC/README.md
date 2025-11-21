@@ -460,7 +460,7 @@ El proyecto cuenta con documentación exhaustiva organizada en la carpeta `Docs/`
 
 ### Especificación de Requisitos de Software (ERS)
 
-**Ubicación**: [`Docs/ERS/ers-salc_ieeev2.9.md`](Docs/ERS/ers-salc_ieeev2.9.md)
+**Ubicación**: Ver [ERS.md](Docs/ERS/ers-salc_ieeev2.9.md)
 
 **Contenido**:
 - Requisitos funcionales detallados (RF-01 a RF-13)
@@ -472,7 +472,7 @@ El proyecto cuenta con documentación exhaustiva organizada en la carpeta `Docs/`
 
 ### Manual de Usuario
 
-**Ubicación**: [`Docs/UserManual/manual_de_usuario.md`](Docs/UserManual/manual_de_usuario.md)
+**Ubicación**: Ver [Manual de Usuario.md](Docs/UserManual/manual_de_usuario.md)
 
 **Contenido**:
 - Guía paso a paso para cada rol de usuario

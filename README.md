@@ -1103,7 +1103,7 @@ El proyecto cuenta con **documentación XML completa** (100% de cobertura) en to
 
 - **IntelliSense**: Ayuda contextual completa en Visual Studio
 
-- **Especificación de Requisitos de Software**: Ver [ERS.md](SALC\Docs\ERS\ers-salc_ieeev2.9.md)
+- **Especificación de Requisitos de Software**: Ver [ERS.md](SALC\Docs\ERS\ers-salc_ieee830v2.9.md)
 
 - **Manual de Usuario**: Ver [Manual de Usuario.md](SALC\Docs\UserManual\manual_de_usuario.md)
 
